@@ -1,6 +1,8 @@
-# ScriptureSecrets (Bible Fun Facts)
+# exégeomai (ἐξηγέομαι)
 
-A modern, high-performance React Native & Expo mobile application exploring historical context, cultural customs, original language deep dives (Strong's Concordance), and multi-lens daily devotionals from Sacred Scripture.
+> **Strong's Greek 1834**: *ἐξηγέομαι* (*exēgeomai*) — from *ἐκ* (out) and *ἡγέομαι* (to lead): **"to lead out, unfold, declare, interpret, draw out the true meaning."** As recorded in John 1:18: *"No one has seen God at any time; the only begotten Son, who is in the bosom of the Father, He has explained / declared (exēgēsato) Him."*
+
+**exégeomai** is a modern, high-performance React Native & Expo mobile application exploring ancient historical context, cultural customs, original language deep dives (Strong's Concordance), and multi-lens daily devotionals from Sacred Scripture.
 
 ---
 
@@ -124,7 +126,7 @@ In strict adherence to design guidelines, emojis and icon font bundles have been
 ## Directory Structure
 
 ```text
-bible_fun_facts/
+exegeomai/
 ├── assets/                       # App icons, adaptive icons, and splash assets
 │   ├── adaptive-icon.png
 │   ├── favicon.png

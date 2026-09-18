@@ -1,27 +1,27 @@
 {
   "expo": {
-    "name": "ScriptureSecrets",
-    "slug": "scripture-secrets",
+    "name": "exégeomai",
+    "slug": "exegeomai",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0B0F19"
     },
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSUserNotificationsUsageDescription": "ScriptureSecrets sends you daily Did You Know facts to deepen your biblical knowledge."
+        "NSUserNotificationsUsageDescription": "exégeomai sends daily biblical insights and cultural context to deepen your walk in the Word."
       }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#0B0F19"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
