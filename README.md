@@ -137,11 +137,11 @@ In strict adherence to design guidelines, emojis and icon font bundles have been
 
 ```text
 exegeomai/
-├── assets/                       # App icons, adaptive icons, and splash assets
-│   ├── adaptive-icon.png
-│   ├── favicon.png
-│   ├── icon.png
-│   └── splash-icon.png
+├── assets/                       # Custom brand icons, adaptive launcher, and splash assets
+│   ├── adaptive-icon.png         # Android adaptive icon (Obsidian #0B0F19 background)
+│   ├── favicon.png               # Web browser favicon
+│   ├── icon.png                  # iOS/Android master application icon
+│   └── splash-icon.png           # Launch & splash screen branding asset
 ├── src/
 │   ├── components/               # Modular UI components
 │   │   ├── Card.tsx              # Surface-contained cards with 8px spacing
