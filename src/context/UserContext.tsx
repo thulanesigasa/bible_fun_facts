@@ -26,7 +26,7 @@ interface UserContextType extends UserState {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-const STORAGE_KEY = '@scripture_secrets_user_data';
+const STORAGE_KEY = '@exegeomai_user_data';
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, setState] = useState<UserState>({

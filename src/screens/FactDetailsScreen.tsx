@@ -33,7 +33,7 @@ export default function FactDetailsScreen({ navigation, route }: FactDetailsScre
   const handleShare = async () => {
     try {
       await Share.share({
-        message: `Did You Know? ${fact.fact_title}\n${fact.scripture_ref}: "${fact.verse_text}"\n\nShared from ScriptureSecrets`,
+        message: `Did You Know? ${fact.fact_title}\n${fact.scripture_ref}: "${fact.verse_text}"\n\nShared from exégeomai`,
       });
     } catch {}
   };

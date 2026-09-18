@@ -27,9 +27,9 @@ export default function AuthScreen() {
           <View style={styles.logoCircle}>
             <ScripturesSvg size={40} color={colors.background} fill={colors.background} />
           </View>
-          <Text variant="h1" style={styles.title}>ScriptureSecrets</Text>
+          <Text variant="h1" style={styles.title}>exégeomai</Text>
           <Text variant="body" color={colors.textSecondary} style={styles.subtitle}>
-            Uncover the hidden depth of the Word
+            Unfold, interpret, and declare the depth of the Word
           </Text>
         </View>
 

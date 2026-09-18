@@ -34,7 +34,7 @@ export default function ScriptureDetailsScreen({ navigation, route }: ScriptureD
   const handleShare = async () => {
     try {
       await Share.share({
-        message: `"${scripture.text}" - ${scripture.reference}\n\nShared from ScriptureSecrets`,
+        message: `"${scripture.text}" - ${scripture.reference}\n\nShared from exégeomai`,
       });
     } catch {}
   };
