@@ -1,0 +1,95 @@
+import React from 'react';
+import { View, StyleSheet, ViewStyle, TouchableOpacity } from 'react-native';
+import { colors } from '../theme/colors';
+import { spacing, radius, shadow } from '../theme';
+import { ChevronRightSvg } from './SvgIcons';
+
+interface CardProps {
+  children: React.ReactNode;
+  style?: ViewStyle;
+  variant?: 'default' | 'highlighted' | 'dark' | 'outline';
+  padding?: number;
+  onPress?: () => void;
+  showChevron?: boolean;
+}
+
+export const Card: React.FC<CardProps> = ({
+  children,
+  style,
+  variant = 'default',
+  padding = spacing.md, // 16px
+  onPress,
+  showChevron = false,
+}) => {
+  const getVariantStyle = () => {
+    switch (variant) {
+      case 'highlighted':
+        return {
+          backgroundColor: colors.surfaceElevated,
+          borderColor: colors.accentBorder,
+          borderWidth: 1,
+        };
+      case 'dark':
+        return {
+          backgroundColor: colors.backgroundSecondary,
+          borderColor: colors.borderMuted,
+          borderWidth: 1,
+        };
+      case 'outline':
+        return {
+          backgroundColor: colors.background,
+          borderWidth: 1,
+          borderColor: colors.border,
+        };
+      default:
+        return {
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+          borderWidth: 1,
+        };
+    }
+  };
+
+  const content = (
+    <View style={styles.contentWrapper}>
+      <View style={{ flex: 1 }}>{children}</View>
+      {showChevron && (
+        <View style={styles.chevron}>
+          <ChevronRightSvg size={18} color={colors.textSecondary} />
+        </View>
+      )}
+    </View>
+  );
+
+  if (onPress) {
+    return (
+      <TouchableOpacity
+        onPress={onPress}
+        activeOpacity={0.8}
+        style={[styles.card, shadow.sm, getVariantStyle(), { padding }, style]}
+      >
+        {content}
+      </TouchableOpacity>
+    );
+  }
+
+  return (
+    <View style={[styles.card, shadow.sm, getVariantStyle(), { padding }, style]}>
+      {content}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  card: {
+    borderRadius: radius.lg, // 24px
+    marginBottom: spacing.md, // 16px
+  },
+  contentWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  chevron: {
+    marginLeft: spacing.sm, // 8px
+  },
+});
