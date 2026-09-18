@@ -1,5 +1,15 @@
 # exégeomai (ἐξηγέομαι)
 
+<p align="left">
+  <img src="https://img.shields.io/badge/Expo%20SDK-57.0-000000?style=for-the-badge&logo=expo&logoColor=white" alt="Expo SDK 57" />
+  <img src="https://img.shields.io/badge/React%20Native-0.86-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React Native 0.86" />
+  <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript 5.9" />
+  <img src="https://img.shields.io/badge/Platform-Android%20%7C%20iOS-F59E0B?style=for-the-badge" alt="Platform Android and iOS" />
+  <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Obsidian-131B2E?style=for-the-badge" alt="60-30-10 Design System" />
+  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
+  <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License MIT" />
+</p>
+
 > **Strong's Greek 1834**: *ἐξηγέομαι* (*exēgeomai*) — from *ἐκ* (out) and *ἡγέομαι* (to lead): **"to lead out, unfold, declare, interpret, draw out the true meaning."** As recorded in John 1:18: *"No one has seen God at any time; the only begotten Son, who is in the bosom of the Father, He has explained / declared (exēgēsato) Him."*
 
 **exégeomai** is a modern, high-performance React Native & Expo mobile application exploring ancient historical context, cultural customs, original language deep dives (Strong's Concordance), and multi-lens daily devotionals from Sacred Scripture.
@@ -178,7 +188,7 @@ exegeomai/
 
 ### Prerequisites
 - Node.js (v18+) or Bun (v1.0+)
-- Expo CLI (`npx expo`)
+- Expo SDK 57 (`npx expo`)
 - Expo Go app on iOS or Android (or a physical simulator/emulator)
 
 ### Installation
