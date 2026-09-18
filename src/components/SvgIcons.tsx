@@ -1,0 +1,276 @@
+import React from 'react';
+import Svg, { Path, Circle, Rect, G, Polygon } from 'react-native-svg';
+
+interface SvgIconProps {
+  size?: number;
+  color?: string;
+  fill?: string;
+  strokeWidth?: number;
+  style?: any;
+}
+
+// 1. Navigation & Core Icons
+export const DiscoverSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', fill = 'none', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={fill} style={style}>
+    <Path
+      d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"
+      stroke={color}
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill={fill !== 'none' ? fill : 'none'}
+    />
+    <Circle cx="19" cy="5" r="1.5" fill={color} />
+  </Svg>
+);
+
+export const WotdSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', fill = 'none', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={fill} style={style}>
+    <Circle cx="12" cy="12" r="4" stroke={color} strokeWidth={strokeWidth} fill={fill !== 'none' ? fill : 'none'} />
+    <Path d="M12 2V4M12 20V22M4 12H2M22 12H20M5.64 5.64L7.05 7.05M16.95 16.95L18.36 18.36M5.64 18.36L7.05 16.95M16.95 7.05L18.36 5.64" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+  </Svg>
+);
+
+export const ScripturesSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', fill = 'none', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={fill} style={style}>
+    <Path
+      d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V2H6.5A2.5 2.5 0 0 0 4 4.5V19.5Z"
+      stroke={color}
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path d="M8 7H16M8 11H13" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+  </Svg>
+);
+
+export const SearchSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Circle cx="11" cy="11" r="7" stroke={color} strokeWidth={strokeWidth} />
+    <Path d="M16.5 16.5L21.5 21.5" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+  </Svg>
+);
+
+export const FavoritesSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', fill = 'none', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={fill} style={style}>
+    <Path
+      d="M20.84 4.61A5.5 5.5 0 0 0 12.83 4.2L12 5.03L11.17 4.2A5.5 5.5 0 0 0 3.16 11.98L12 21L20.84 11.98A5.49 5.49 0 0 0 20.84 4.61Z"
+      stroke={color}
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill={fill}
+    />
+  </Svg>
+);
+
+// 2. Interactive & Detail Icons
+export const FlameSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', fill = 'none', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={fill} style={style}>
+    <Path
+      d="M8.5 14.5A3.5 3.5 0 0 0 12 18A3.5 3.5 0 0 0 15.5 14.5C15.5 11 12 8.5 12 8.5S8.5 11 8.5 14.5Z"
+      fill={fill !== 'none' ? fill : color}
+    />
+    <Path
+      d="M12 2C10.5 4.5 7 8 7 13.5A5 5 0 0 0 12 22A5 5 0 0 0 17 13.5C17 9 14 5 12 2Z"
+      stroke={color}
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+export const RefreshSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path
+      d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5V9H8M4 13A8.1 8.1 0 0 0 19.5 15M20 19V15H16"
+      stroke={color}
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+export const LandmarkSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M3 21H21M4 18H20M5 18V10M9 18V10M15 18V10M19 18V10M2 7L12 2L22 7V10H2V7Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const UsersSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M16 21V19A4 4 0 0 0 12 15M8 21V19A4 4 0 0 1 12 15M12 15A4 4 0 1 0 12 7A4 4 0 0 0 12 15Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M18 8A3 3 0 1 1 18 2M22 17A3 3 0 0 0 18 14" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const QuoteSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', fill = 'none', style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={fill !== 'none' ? fill : color} style={style}>
+    <Path d="M9.5 6C7.57 6 6 7.57 6 9.5C6 11.43 7.57 13 9.5 13C9.25 15.5 7.5 17 5 17V19C9 19 11.5 16 11.5 11V6H9.5ZM17.5 6C15.57 6 14 7.57 14 9.5C14 11.43 15.57 13 17.5 13C17.25 15.5 15.5 17 13 17V19C17 19 19.5 16 19.5 11V6H17.5Z" />
+  </Svg>
+);
+
+export const StrongsIconSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V2H6.5A2.5 2.5 0 0 0 4 4.5V19.5Z" stroke={color} strokeWidth={strokeWidth} />
+    <Circle cx="12" cy="10" r="3" stroke={color} strokeWidth={strokeWidth} />
+    <Path d="M14.5 12.5L17 15" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+  </Svg>
+);
+
+export const ChevronRightSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#94A3B8', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M9 18L15 12L9 6" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const BackArrowSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#FFFFFF', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M19 12H5M12 19L5 12L12 5" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const CloseSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#94A3B8', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M18 6L6 18M6 6L18 18" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const ShareSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Circle cx="18" cy="5" r="3" stroke={color} strokeWidth={strokeWidth} />
+    <Circle cx="6" cy="12" r="3" stroke={color} strokeWidth={strokeWidth} />
+    <Circle cx="18" cy="19" r="3" stroke={color} strokeWidth={strokeWidth} />
+    <Path d="M8.59 13.51L15.42 17.49M15.41 6.51L8.59 10.49" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+  </Svg>
+);
+
+export const CalendarSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#94A3B8', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Rect x="3" y="4" width="18" height="18" rx="3" stroke={color} strokeWidth={strokeWidth} />
+    <Path d="M16 2V6M8 2V6M3 10H21" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+  </Svg>
+);
+
+export const CheckSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', strokeWidth = 2.5, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M20 6L9 17L4 12" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+// 3. WOTD 4-Lens Icons
+export const OriginalIntentSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Circle cx="12" cy="12" r="9" stroke={color} strokeWidth={strokeWidth} />
+    <Path d="M12 7V12L15 15" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+  </Svg>
+);
+
+export const TheologicalTruthSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M12 3V21M7 8H17" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const ModernWalkSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M4 19C7 16 7 13 11 11C15 9 16 6 20 4M9 19L11 21M17 9L19 11" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const PrayerFocusSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M12 2C9.5 5 8 9 8 13C8 17.5 10 21 12 22C14 21 16 17.5 16 13C16 9 14.5 5 12 2Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M8 12L4 14C4 17 6 19 8 20M16 12L20 14C20 17 18 19 16 20" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+  </Svg>
+);
+
+// 4. Biblical Genre SVGs (Replacing Emojis strictly per Rule 2 & 4)
+export const GenreLawSvg: React.FC<SvgIconProps> = ({ size = 18, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M12 3V21M4 8L12 5L20 8M4 8L7 14C7 15.5 5.5 17 4 17C2.5 17 1 15.5 1 14L4 8ZM20 8L23 14C23 15.5 21.5 17 20 17C18.5 17 17 15.5 17 14L20 8Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const GenreHistorySvg: React.FC<SvgIconProps> = ({ size = 18, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M3 21H21M4 18H20M6 18V9M10 18V9M14 18V9M18 18V9M3 9H21M12 3L2 9H22L12 3Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const GenreWisdomSvg: React.FC<SvgIconProps> = ({ size = 18, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M9 18H15M10 22H14M12 2A7 7 0 0 0 5 9C5 12.3 7 14.5 8 16H16C17 14.5 19 12.3 19 9A7 7 0 0 0 12 2Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const GenreProphecySvg: React.FC<SvgIconProps> = ({ size = 18, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M2 12C2 12 5.5 5 12 5C18.5 5 22 12 22 12C22 12 18.5 19 12 19C5.5 19 2 12 2 12Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Circle cx="12" cy="12" r="3" stroke={color} strokeWidth={strokeWidth} />
+  </Svg>
+);
+
+export const GenreGospelSvg: React.FC<SvgIconProps> = ({ size = 18, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M12 2V22M7 7H17" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Circle cx="12" cy="7" r="4" stroke={color} strokeWidth={strokeWidth} />
+  </Svg>
+);
+
+export const GenreEpistleSvg: React.FC<SvgIconProps> = ({ size = 18, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Rect x="3" y="5" width="18" height="14" rx="2" stroke={color} strokeWidth={strokeWidth} />
+    <Path d="M3 7L12 13L21 7" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const GenreApocalypticSvg: React.FC<SvgIconProps> = ({ size = 18, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M4 17L2 7L7 10L12 4L17 10L22 7L20 17H4Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Rect x="4" y="17" width="16" height="3" rx="1.5" stroke={color} strokeWidth={strokeWidth} />
+  </Svg>
+);
+
+export const getGenreSvg = (genre: string, size = 18, color = '#F59E0B') => {
+  switch (genre) {
+    case 'Law': return <GenreLawSvg size={size} color={color} />;
+    case 'History': return <GenreHistorySvg size={size} color={color} />;
+    case 'Wisdom': return <GenreWisdomSvg size={size} color={color} />;
+    case 'Prophecy': return <GenreProphecySvg size={size} color={color} />;
+    case 'Gospel': return <GenreGospelSvg size={size} color={color} />;
+    case 'Epistle': return <GenreEpistleSvg size={size} color={color} />;
+    case 'Apocalyptic': return <GenreApocalypticSvg size={size} color={color} />;
+    default: return <ScripturesSvg size={size} color={color} />;
+  }
+};
+
+// 5. Auth Provider SVGs
+export const AppleSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#FFFFFF', style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color} style={style}>
+    <Path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.09 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 17 2.94 12.45 4.7 9.39C5.57 7.87 7.13 6.91 8.82 6.88C10.1 6.86 11.32 7.75 12.11 7.75C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.09 16.67C20.06 16.74 19.67 18.11 18.71 19.5ZM14.97 4.88C15.54 4.18 15.93 3.2 15.82 2.22C14.97 2.25 13.92 2.79 13.33 3.49C12.8 4.1 12.34 5.08 12.47 6.04C13.42 6.11 14.41 5.57 14.97 4.88Z" />
+  </Svg>
+);
+
+export const GoogleSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#FFFFFF', style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path
+      d="M21.8 12.23C21.8 11.45 21.73 10.7 21.6 10H12V14.07H17.5C17.26 15.33 16.53 16.4 15.44 17.13V19.7H18.78C20.73 17.9 21.8 15.29 21.8 12.23Z"
+      fill={color}
+    />
+    <Path
+      d="M12 22C14.76 22 17.08 21.09 18.78 19.7L15.44 17.13C14.52 17.75 13.36 18.13 12 18.13C9.33 18.13 7.07 16.33 6.26 13.91H2.8V16.59C4.54 20.05 8.01 22 12 22Z"
+      fill={color}
+    />
+    <Path
+      d="M6.26 13.91C6.05 13.29 5.93 12.63 5.93 11.95C5.93 11.27 6.05 10.61 6.26 9.99V7.31H2.8C2.08 8.74 1.67 10.3 1.67 11.95C1.67 13.6 2.08 15.16 2.8 16.59L6.26 13.91Z"
+      fill={color}
+    />
+    <Path
+      d="M12 5.77C13.5 5.77 14.85 6.29 15.91 7.3L18.86 4.35C17.07 2.68 14.75 1.7 12 1.7C8.01 1.7 4.54 3.65 2.8 7.31L6.26 9.99C7.07 7.57 9.33 5.77 12 5.77Z"
+      fill={color}
+    />
+  </Svg>
+);
