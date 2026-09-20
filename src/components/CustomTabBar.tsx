@@ -10,28 +10,28 @@ import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
 import { Text } from './Typography';
 import {
-  BookOpen,
-  Calendar,
-  Scroll,
-  Search,
-  Bookmark,
-} from 'lucide-react-native';
+  DiscoverSvg,
+  WotdSvg,
+  ScripturesSvg,
+  SearchSvg,
+  ProfileSvg,
+} from './SvgIcons';
 import { useApp } from '../context/UserContext';
 
-const getTabLucideIcon = (routeName: string, color: string) => {
+const getTabSvgIcon = (routeName: string, color: string) => {
   switch (routeName) {
     case 'Discover':
-      return <BookOpen size={16} color={color} />;
+      return <DiscoverSvg size={16} color={color} strokeWidth={2} />;
     case 'WOTD':
-      return <Calendar size={16} color={color} />;
+      return <WotdSvg size={16} color={color} strokeWidth={2} />;
     case 'Scriptures':
-      return <Scroll size={16} color={color} />;
+      return <ScripturesSvg size={16} color={color} strokeWidth={2} />;
     case 'Search':
-      return <Search size={16} color={color} />;
-    case 'Favorites':
-      return <Bookmark size={16} color={color} />;
+      return <SearchSvg size={16} color={color} strokeWidth={2} />;
+    case 'Profile':
+      return <ProfileSvg size={16} color={color} strokeWidth={2} />;
     default:
-      return <BookOpen size={16} color={color} />;
+      return <DiscoverSvg size={16} color={color} strokeWidth={2} />;
   }
 };
 
@@ -85,7 +85,7 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({
             style={styles.tabItem}
             activeOpacity={0.7}
           >
-            {getTabLucideIcon(route.name, color)}
+            {getTabSvgIcon(route.name, color)}
             <View style={styles.labelWrapper}>
               <Text
                 style={{

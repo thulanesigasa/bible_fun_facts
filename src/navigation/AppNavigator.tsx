@@ -10,18 +10,19 @@ import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
-  BookOpen,
-  Calendar,
-  Scroll,
-  Search,
-  Bookmark,
-} from 'lucide-react-native';
+  DiscoverSvg,
+  WotdSvg,
+  ScripturesSvg,
+  SearchSvg,
+  ProfileSvg,
+} from '../components/SvgIcons';
 
 import DiscoverScreen from '../screens/DiscoverScreen';
 import WOTDScreen from '../screens/WOTDScreen';
 import ScripturesScreen from '../screens/ScripturesScreen';
 import SearchScreen from '../screens/SearchScreen';
 import FavoritesScreen from '../screens/FavoritesScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 import FactDetailsScreen from '../screens/FactDetailsScreen';
 import ScriptureDetailsScreen from '../screens/ScriptureDetailsScreen';
 import WOTDDetailsScreen from '../screens/WOTDDetailsScreen';
@@ -38,7 +39,8 @@ export type RootStackParamList = {
   ScriptureDetails: { scripture: Scripture };
   SearchMain: undefined;
   WOTDDetails: { wotd: WOTDEntry };
-  FavoritesMain: undefined;
+  ProfileMain: undefined;
+  Favorites: undefined;
 };
 
 const Tab = createBottomTabNavigator();
@@ -95,10 +97,28 @@ function SearchStack() {
   );
 }
 
-function FavoritesStack() {
+function ProfileStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="FavoritesMain" component={FavoritesScreen} />
+      <Stack.Screen name="ProfileMain" component={ProfileScreen} />
+      <Stack.Screen
+        name="Favorites"
+        component={FavoritesScreen}
+        options={{
+          headerShown: true,
+          title: 'Saved Collection',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: colors.accent,
+        }}
+      />
       <Stack.Screen
         name="FactDetails"
         component={FactDetailsScreen}
@@ -223,7 +243,7 @@ export default function AppNavigator() {
             component={DiscoverStack}
             options={{
               title: 'Feed',
-              tabBarIcon: ({ color }) => <BookOpen size={16} color={color} />,
+              tabBarIcon: ({ color }) => <DiscoverSvg size={16} color={color} strokeWidth={2} />,
               headerTitle: () => (
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Image
@@ -250,7 +270,7 @@ export default function AppNavigator() {
             component={WOTDScreen}
             options={{
               title: 'Word',
-              tabBarIcon: ({ color }) => <Calendar size={16} color={color} />,
+              tabBarIcon: ({ color }) => <WotdSvg size={16} color={color} strokeWidth={2} />,
               headerTitle: 'Word of the Day',
             }}
           />
@@ -259,7 +279,7 @@ export default function AppNavigator() {
             component={ScripturesStack}
             options={{
               title: 'Verses',
-              tabBarIcon: ({ color }) => <Scroll size={16} color={color} />,
+              tabBarIcon: ({ color }) => <ScripturesSvg size={16} color={color} strokeWidth={2} />,
               headerTitle: 'Scripture Library',
             }}
           />
@@ -268,17 +288,17 @@ export default function AppNavigator() {
             component={SearchStack}
             options={{
               title: 'Search',
-              tabBarIcon: ({ color }) => <Search size={16} color={color} />,
+              tabBarIcon: ({ color }) => <SearchSvg size={16} color={color} strokeWidth={2} />,
               headerTitle: 'Search & Explore',
             }}
           />
           <Tab.Screen
-            name="Favorites"
-            component={FavoritesStack}
+            name="Profile"
+            component={ProfileStack}
             options={{
-              title: 'Saved',
-              tabBarIcon: ({ color }) => <Bookmark size={16} color={color} />,
-              headerTitle: 'Saved Collection',
+              title: 'Profile',
+              tabBarIcon: ({ color }) => <ProfileSvg size={16} color={color} strokeWidth={2} />,
+              headerTitle: 'Account & Settings',
             }}
           />
         </Tab.Navigator>

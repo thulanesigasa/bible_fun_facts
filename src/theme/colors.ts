@@ -13,6 +13,7 @@ export const colors = {
 
   // 30% Panel & Surface
   surface: '#FFFFFF',
+  surfaceSecondary: '#F1F5F9',
   surfaceElevated: '#F8FAFC',
   border: 'rgba(15, 23, 42, 0.08)',
   borderMuted: 'rgba(15, 23, 42, 0.04)',

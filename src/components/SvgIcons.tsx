@@ -274,3 +274,113 @@ export const GoogleSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#FFFFFF'
     />
   </Svg>
 );
+
+// 6. Profile, Account, Auth & Settings SVGs
+export const ProfileSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path
+      d="M20 21V19C20 16.7909 18.2091 15 16 15H8C5.79086 15 4 16.7909 4 19V21"
+      stroke={color}
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Circle cx="12" cy="7" r="4" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const SettingsSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Circle cx="12" cy="12" r="3" stroke={color} strokeWidth={strokeWidth} />
+    <Path
+      d="M19.4 15A1.65 1.65 0 0 0 19.73 16.82L19.8 16.89C20.25 17.34 20.25 18.06 19.8 18.51L18.51 19.8C18.06 20.25 17.34 20.25 16.89 19.8L16.82 19.73A1.65 1.65 0 0 0 15 19.4A1.65 1.65 0 0 0 13.8 20.89V21A1.5 1.5 0 0 1 12.3 22.5H10.5A1.5 1.5 0 0 1 9 21V20.89A1.65 1.65 0 0 0 7.8 19.4A1.65 1.65 0 0 0 5.98 19.73L5.91 19.8C5.46 20.25 4.74 20.25 4.29 19.8L3 18.51C2.55 18.06 2.55 17.34 3 16.89L3.07 16.82A1.65 1.65 0 0 0 3.4 15A1.65 1.65 0 0 0 1.91 13.8H1.8A1.5 1.5 0 0 1 0.3 12.3V10.5A1.5 1.5 0 0 1 1.8 9H1.91A1.65 1.65 0 0 0 3.4 7.8A1.65 1.65 0 0 0 3.07 5.98L3 5.91C2.55 5.46 2.55 4.74 3 4.29L4.29 3C4.74 2.55 5.46 2.55 5.91 3L5.98 3.07A1.65 1.65 0 0 0 7.8 3.4A1.65 1.65 0 0 0 9 1.91V1.8A1.5 1.5 0 0 1 10.5 0.3H12.3A1.5 1.5 0 0 1 13.8 1.8V1.91A1.65 1.65 0 0 0 15 3.4A1.65 1.65 0 0 0 16.82 3.07L16.89 3C17.34 2.55 18.06 2.55 18.51 3L19.8 4.29C20.25 4.74 20.25 5.46 19.8 5.91L19.73 5.98A1.65 1.65 0 0 0 19.4 7.8A1.65 1.65 0 0 0 20.89 9H21A1.5 1.5 0 0 1 22.5 10.5V12.3A1.5 1.5 0 0 1 21 13.8H20.89A1.65 1.65 0 0 0 19.4 15Z"
+      stroke={color}
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+export const LogOutSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#EF4444', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M9 21H5A2 2 0 0 1 3 19V5A2 2 0 0 1 5 3H9" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M16 17L21 12L16 7" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M21 12H9" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const BookmarkSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', fill = 'none', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={fill !== 'none' ? fill : 'none'} style={style}>
+    <Path
+      d="M19 21L12 16L5 21V5A2 2 0 0 1 7 3H17A2 2 0 0 1 19 5V21Z"
+      stroke={color}
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill={fill !== 'none' ? fill : 'none'}
+    />
+  </Svg>
+);
+
+export const MailSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#94A3B8', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Rect x="2" y="4" width="20" height="16" rx="2" stroke={color} strokeWidth={strokeWidth} />
+    <Path d="M22 6L12 13L2 6" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const LockSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#94A3B8', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Rect x="3" y="11" width="18" height="11" rx="2" stroke={color} strokeWidth={strokeWidth} />
+    <Path d="M7 11V7A5 5 0 0 1 17 7V11" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const EyeSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#94A3B8', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Circle cx="12" cy="12" r="3" stroke={color} strokeWidth={strokeWidth} />
+  </Svg>
+);
+
+export const EyeOffSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#94A3B8', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M17.94 17.94A10.07 10.07 0 0 1 12 20C5 20 1 12 1 12C1 12 2.76 7.42 6.53 4.97M9.9 4.24A9.12 9.12 0 0 1 12 4C19 4 23 12 23 12C23 12 21.6 15.66 18.66 18.06M1 1L23 23" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M10 10.5A3 3 0 0 0 13.5 14" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const UserSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#94A3B8', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M20 21V19A4 4 0 0 0 16 15H8A4 4 0 0 0 4 19V21" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Circle cx="12" cy="7" r="4" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const BellSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#94A3B8', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M18 8A6 6 0 0 0 6 8C6 15 3 17 3 17H21S18 15 18 8Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M13.73 21A2 2 0 0 1 10.27 21" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const GlobeSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#94A3B8', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Circle cx="12" cy="12" r="10" stroke={color} strokeWidth={strokeWidth} />
+    <Path d="M2 12H22M12 2A15.3 15.3 0 0 1 16 12A15.3 15.3 0 0 1 12 22A15.3 15.3 0 0 1 8 12A15.3 15.3 0 0 1 12 2Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const BookOpenSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M2 3H8A4 4 0 0 1 12 7A4 4 0 0 1 16 3H22V19H16A4 4 0 0 0 12 23A4 4 0 0 0 8 19H2V3Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M12 7V23" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const ScrollSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M19 17V5A3 3 0 0 0 16 2H5A3 3 0 0 0 2 5V19A3 3 0 0 0 5 22H18A4 4 0 0 0 22 18V16A3 3 0 0 0 19 13H5" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);

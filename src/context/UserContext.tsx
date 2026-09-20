@@ -3,8 +3,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Fact, Scripture, WOTDEntry } from '../data/mockDatabase';
 import { colors } from '../theme/colors';
 
+export interface UserProfile {
+  name: string;
+  email: string;
+  joinedDate: string;
+  preferredTranslation: string;
+  notificationsEnabled: boolean;
+}
+
 interface UserState {
-  userProfile: { name: string } | null;
+  userProfile: UserProfile | null;
   favoritesFacts: Fact[];
   favoritesScriptures: Scripture[];
   completedWOTDs: WOTDEntry[];
@@ -18,7 +26,9 @@ interface AppContextType extends UserState {
   setHideTabBar: (hide: boolean) => void;
   accent: string;
   setAccent: (accent: string) => void;
-  login: (name: string) => void;
+  login: (emailOrName: string, password?: string, name?: string) => void;
+  signup: (name: string, email: string, password?: string) => void;
+  updateProfile: (updates: Partial<UserProfile>) => void;
   logout: () => void;
   toggleFavoriteFact: (fact: Fact) => void;
   toggleFavoriteScripture: (scripture: Scripture) => void;
@@ -98,8 +108,41 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setState(prev => ({ ...prev, streak: newStreak, lastLoginDate: today }));
   };
 
-  const login = (name: string) => {
-    setState(prev => ({ ...prev, userProfile: { name } }));
+  const login = (emailOrName: string, _password?: string, name?: string) => {
+    const displayName = name || (emailOrName.includes('@') ? emailOrName.split('@')[0] : emailOrName);
+    const email = emailOrName.includes('@') ? emailOrName : `${emailOrName.toLowerCase().replace(/\s+/g, '')}@example.com`;
+    const formattedName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+
+    setState(prev => ({
+      ...prev,
+      userProfile: {
+        name: prev.userProfile?.name || formattedName,
+        email: prev.userProfile?.email || email,
+        joinedDate: prev.userProfile?.joinedDate || 'September 2026',
+        preferredTranslation: prev.userProfile?.preferredTranslation || 'ESV',
+        notificationsEnabled: prev.userProfile?.notificationsEnabled ?? true,
+      },
+    }));
+  };
+
+  const signup = (name: string, email: string, _password?: string) => {
+    setState(prev => ({
+      ...prev,
+      userProfile: {
+        name,
+        email,
+        joinedDate: 'September 2026',
+        preferredTranslation: 'ESV',
+        notificationsEnabled: true,
+      },
+    }));
+  };
+
+  const updateProfile = (updates: Partial<UserProfile>) => {
+    setState(prev => ({
+      ...prev,
+      userProfile: prev.userProfile ? { ...prev.userProfile, ...updates } : null,
+    }));
   };
 
   const logout = () => {
@@ -150,6 +193,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       accent,
       setAccent,
       login,
+      signup,
+      updateProfile,
       logout,
       toggleFavoriteFact,
       toggleFavoriteScripture,
