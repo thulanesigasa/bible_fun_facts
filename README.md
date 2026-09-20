@@ -316,6 +316,7 @@ This project strictly adheres to **Rule 21** of our global mobile standards:
 | **In-App Update Modal** | Implemented in `src/components/UpdateModal.tsx` with foreground resume listening, "Update Now", and 30-minute "Remind Me Later" snooze. |
 | **Peer Dependency Stability** | `.npmrc` with `legacy-peer-deps=true` committed at root to prevent React 19 / Expo peer dependency collisions. |
 | **TypeScript Base Config** | `tsconfig.json` extends `expo/tsconfig.base.json` with explicit `jsx: "react-jsx"` and `esModuleInterop: true`. |
+| **JVM Memory & Runner Stability** | Gradle configured with `-Xmx4096m -XX:MaxMetaspaceSize=1024m` and explicit `timeout-minutes` (35 min compile, 15 min OTA) to prevent Metaspace OOM crashes and runner hangs. |
 
 ---
 
