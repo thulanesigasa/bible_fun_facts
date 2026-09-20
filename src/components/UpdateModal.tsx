@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   View,
   Modal,
@@ -6,31 +6,54 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  AppState,
+  AppStateStatus,
 } from 'react-native';
 import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from './Typography';
 import { checkOTAUpdate, downloadOTAUpdate, reloadAppOTA } from '../services/updates';
 
+const SNOOZE_DURATION_MS = 30 * 60 * 1000; // 30 minutes
+
 export const UpdateModal: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [updateReady, setUpdateReady] = useState(false);
+  const snoozedUntilRef = useRef<number>(0);
+  const appStateRef = useRef<AppStateStatus>(AppState.currentState);
+
+  const inspectUpdates = useCallback(async () => {
+    // If user previously chose 'Remind Me Later' and snooze has not expired, skip
+    if (Date.now() < snoozedUntilRef.current) {
+      return;
+    }
+
+    const hasUpdate = await checkOTAUpdate();
+    if (hasUpdate) {
+      setModalVisible(true);
+    }
+  }, []);
 
   useEffect(() => {
-    let isMounted = true;
-    const inspectUpdates = async () => {
-      const hasUpdate = await checkOTAUpdate();
-      if (hasUpdate && isMounted) {
-        setModalVisible(true);
-      }
-    };
-
+    // Check on initial mount
     inspectUpdates();
+
+    // Check automatically whenever app resumes to foreground
+    const subscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
+      if (
+        appStateRef.current.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+        inspectUpdates();
+      }
+      appStateRef.current = nextAppState;
+    });
+
     return () => {
-      isMounted = false;
+      subscription.remove();
     };
-  }, []);
+  }, [inspectUpdates]);
 
   const handleApplyUpdate = async () => {
     if (updateReady) {
@@ -50,7 +73,9 @@ export const UpdateModal: React.FC = () => {
     }
   };
 
-  const handleDismiss = () => {
+  const handleRemindMeLater = () => {
+    // Snooze for 30 minutes
+    snoozedUntilRef.current = Date.now() + SNOOZE_DURATION_MS;
     setModalVisible(false);
   };
 
@@ -61,7 +86,7 @@ export const UpdateModal: React.FC = () => {
       transparent
       animationType="fade"
       visible={modalVisible}
-      onRequestClose={handleDismiss}
+      onRequestClose={handleRemindMeLater}
     >
       <View style={styles.overlay}>
         <View style={[styles.dialogCard, shadow.lg]}>
@@ -76,10 +101,11 @@ export const UpdateModal: React.FC = () => {
 
           <Text variant="h2" style={styles.title}>Update Available</Text>
           <Text variant="body" color={colors.textSecondary} align="center" style={styles.description}>
-            A fresh update for exégeomai is ready with new biblical insights and scholarly improvements.
+            A fresh update for exégeomai is ready with new biblical insights, cultural discoveries, and performance enhancements.
           </Text>
 
           <View style={styles.actions}>
+            {/* Primary Action Button */}
             <TouchableOpacity
               style={[styles.applyButton, shadow.sm]}
               onPress={handleApplyUpdate}
@@ -87,7 +113,12 @@ export const UpdateModal: React.FC = () => {
               disabled={downloading}
             >
               {downloading ? (
-                <ActivityIndicator color="#FFFFFF" size="small" />
+                <View style={styles.loadingRow}>
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                  <Text variant="h3" style={styles.applyButtonText}>
+                    Downloading...
+                  </Text>
+                </View>
               ) : (
                 <Text variant="h3" style={styles.applyButtonText}>
                   {updateReady ? 'Restart & Apply' : 'Update Now'}
@@ -95,14 +126,15 @@ export const UpdateModal: React.FC = () => {
               )}
             </TouchableOpacity>
 
+            {/* Remind Me Later Button */}
             {!downloading && (
               <TouchableOpacity
-                style={styles.laterButton}
-                onPress={handleDismiss}
+                style={styles.remindButton}
+                onPress={handleRemindMeLater}
                 activeOpacity={0.7}
               >
-                <Text variant="caption" color={colors.textTertiary} style={styles.laterButtonText}>
-                  Later
+                <Text variant="caption" color={colors.textSecondary} style={styles.remindButtonText}>
+                  Remind Me Later
                 </Text>
               </TouchableOpacity>
             )}
@@ -179,11 +211,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
-  laterButton: {
+  loadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm, // 8px
+  },
+  remindButton: {
     paddingVertical: spacing.sm, // 8px
     paddingHorizontal: spacing.md, // 16px
   },
-  laterButtonText: {
+  remindButtonText: {
     fontSize: 14,
     fontWeight: '600',
   },

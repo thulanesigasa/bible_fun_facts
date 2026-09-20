@@ -4,6 +4,7 @@
   <img src="https://img.shields.io/badge/Expo%20SDK-57.0-000000?style=for-the-badge&logo=expo&logoColor=white" alt="Expo SDK 57" />
   <img src="https://img.shields.io/badge/React%20Native-0.86-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React Native 0.86" />
   <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript 5.9" />
+  <img src="https://img.shields.io/badge/EAS%20Channels-Production%20%7C%20Preview-000000?style=for-the-badge&logo=expo&logoColor=white" alt="EAS Channels" />
   <img src="https://img.shields.io/badge/EAS%20OTA%20Updates-Active%20(v1.0.1)-000000?style=for-the-badge&logo=expo&logoColor=white" alt="EAS OTA Updates" />
   <img src="https://img.shields.io/badge/GitHub%20Actions-Compilation%20&%20OTA-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions" />
   <img src="https://img.shields.io/badge/Tab%20Architecture-Floating%20Pill%20280px-D97706?style=for-the-badge" alt="Floating Pill Tab Bar" />
@@ -24,7 +25,7 @@
 graph TD
     App[App.tsx] --> Providers[UserProvider + SafeAreaProvider]
     Providers --> Nav[AppNavigator]
-    Providers --> UpdateModal[UpdateModal - 50x50 Logo in 68x68 Box]
+    Providers --> UpdateModal[UpdateModal - Update Now / Remind Me Later]
     Nav --> Auth[AuthScreen - 28x28 Calibrated Logo]
     Nav --> Tabs[Rule 20 Floating Pill Tab Bar - 280px]
     
@@ -47,14 +48,17 @@ graph TD
         AsyncStorage[(AsyncStorage)] <--> UserContext[UserContext - useApp / useUser]
         MockDB[(mockDatabase.ts)] --> Components[UI Components]
         ExpoUpdates[(expo-updates)] <--> UpdateService[updates.ts]
+        AppStateListener[AppState Foreground Resume] --> UpdateModal
     end
     
-    subgraph CI / CD & Deployment Pipeline
+    subgraph Multi-Channel CI/CD Pipeline
         GHA[GitHub Actions: compile-and-ota.yml]
-        GHA --> OTAJob[Publish OTA Update - Runtime v1.0.1]
-        GHA --> CompileJob[Compile Native Binary - Incremental Build]
+        GHA --> ProdOTA[Deploy to Channel: production]
+        GHA --> PrevOTA[Deploy to Channel: preview]
+        GHA --> CompileJob[Compile Native APK / AAB]
         EASCloud[EAS Cloud - Project c00f29d0]
-        OTAJob --> EASCloud
+        ProdOTA --> EASCloud
+        PrevOTA --> EASCloud
         CompileJob --> EASCloud
     end
 ```
@@ -63,22 +67,31 @@ graph TD
 
 ## Over-The-Air (OTA) Updates & Versioning Strategy
 
-### 1. Dual Versioning Model
-The application implements a decoupled versioning architecture:
+### 1. Dual-Channel Release Pipeline (`production` & `preview`)
+EAS Update is configured with two distinct channels:
+- **`production` Channel**: Bound to branch `production` for all end-user release builds.
+- **`preview` Channel**: Bound to branch `preview` for internal testing APK builds.
+- **Dual Deployment**: Pushes to `main` automatically publish OTA updates to both channels so that internal testers on preview APKs and production users receive updates concurrently.
+
+### 2. Dual Versioning Model (Preserving `v1.0.1`)
 - **Locked OTA & App Version**: `app.json` specifies `"version": "1.0.1"` and `"runtimeVersion": "1.0.1"`. All Over-The-Air updates deployed through EAS target runtime `1.0.1`.
-- **Dynamic Native Compilation Build Numbers**: When native binaries are compiled through GitHub Actions or EAS Build, the CI pipeline automatically injects incremental build identifiers (`android.versionCode` and `ios.buildNumber`) while strictly preserving `1.0.1` as the base version and runtimeVersion.
+- **Dynamic Native Compilation Build Numbers**: When native binaries are compiled through GitHub Actions or EAS Build, the CI pipeline automatically injects incremental build identifiers (`android.versionCode` and `ios.buildNumber`) derived from `github.run_number` while strictly preserving `1.0.1` as the base version and runtimeVersion.
 - **Runtime Compatibility Guarantee**: Any compiled native application bearing runtimeVersion `1.0.1` will continuously and seamlessly receive OTA JavaScript and asset updates without triggering native version mismatches.
 
-### 2. In-App Update Modal Calibration (Rule 15 & Rule 19)
+### 3. In-App Update Notification & Reminder Flow (Rule 15 & Rule 19)
 The in-app update experience is implemented in `src/components/UpdateModal.tsx` and strictly adheres to Rule 15 and Rule 19 sizing specifications:
 - **Logo Container**: `68x68` rounded surface container (`borderRadius: 18`, `backgroundColor: '#F8FAFC'`, border `rgba(15, 23, 42, 0.08)`).
 - **Brand Logo Image**: Centered `50x50` logo with `borderRadius: 12`.
+- **Update Actions**:
+  - **"Update Now"**: Downloads the update and reloads the app immediately with fresh code and assets.
+  - **"Remind Me Later"**: Snoozes the notification for 30 minutes.
+- **Foreground Resume Detection**: Uses `AppState.addEventListener('change', ...)` to dynamically check for fresh updates whenever the user returns to the app from the background.
 - **Aesthetic**: Pure white surface card (`#FFFFFF`), biblical amber gold action button (`#D97706`), clean typography, and zero status badges per Rule 16.
 
-### 3. Automated GitHub Actions Workflow (`compile-and-ota.yml`)
+### 4. Automated GitHub Actions Workflow (`compile-and-ota.yml`)
 The workflow `.github/workflows/compile-and-ota.yml` coordinates automated deployments:
-- **Automatic OTA Publish**: Triggered on push to `main` when application code changes. Compiles the JS bundle, validates TypeScript, and publishes directly to the `production` update channel.
-- **Manual Native Compilation**: Triggered via `workflow_dispatch` with parameters for platform (`android`, `ios`, `all`), build profile (`preview`, `production`, `development`), and optional custom build numbers.
+- **Automatic OTA Publish**: Triggered on push to `main` when application code changes. Compiles the JS bundle, validates TypeScript, and publishes directly to both `production` and `preview` channels.
+- **Manual Native Compilation**: Triggered via `workflow_dispatch` with parameters for platform (`android`, `ios`, `all`), build profile (`preview`, `production`, `development`), target OTA channel (`both`, `production`, `preview`), and custom build numbers.
 
 ---
 
@@ -136,7 +149,7 @@ All margins, paddings, gaps, and component dimensions follow strict multiples of
 exegeomai/
 ├── .github/
 │   └── workflows/
-│       └── compile-and-ota.yml           # GitHub Actions workflow for native compile and OTA updates
+│       └── compile-and-ota.yml           # GitHub Actions workflow for native compile and dual-channel OTA updates
 ├── assets/                               # Calibrated brand assets
 │   ├── adaptive-icon.png                 # Android adaptive icon (512x512, 96px symbol, #FFFFFF background)
 │   ├── android-icon-foreground.png       # Android launcher foreground (512x512, 96px symbol, ~72% breathing room)
@@ -152,7 +165,7 @@ exegeomai/
 │   │   ├── SearchBar.tsx                 # Search input with clear button and chips
 │   │   ├── SvgIcons.tsx                  # Pure vector SVG library (zero emojis)
 │   │   ├── Typography.tsx                # Monochromatic typography hierarchy
-│   │   ├── UpdateModal.tsx               # OTA update modal (50x50 logo in 68x68 container)
+│   │   ├── UpdateModal.tsx               # OTA update modal (50x50 logo in 68x68 container, Remind Me Later snooze)
 │   │   └── WOTDCard.tsx                  # Word of the Day devotional card
 │   ├── context/
 │   │   └── UserContext.tsx               # State management with useApp & useUser hooks (tab & user state)
@@ -213,6 +226,9 @@ npm run dev
 ```bash
 # Publish an OTA update to the production channel (targets runtimeVersion 1.0.1)
 npx eas update --branch production --message "Update description"
+
+# Publish an OTA update to the preview channel
+npx eas update --branch preview --message "Preview update description"
 ```
 
 ### Compiling Native Binaries

@@ -21,6 +21,15 @@ on:
           - 'publish_ota'
           - 'compile_native_app'
           - 'both'
+      ota_channel:
+        description: 'OTA Update Channel'
+        required: false
+        type: choice
+        default: 'both'
+        options:
+          - 'both'
+          - 'production'
+          - 'preview'
       platform:
         description: 'Native build platform (for compile_native_app)'
         required: false
@@ -46,9 +55,9 @@ on:
         default: ''
 
 jobs:
-  # Job 1: Publish Over-The-Air Update (Runtime locked to 1.0.1)
+  # Job 1: Publish Over-The-Air Updates (Both Preview & Production Channels)
   publish_ota:
-    name: Publish Expo OTA Update
+    name: Publish Expo OTA Updates
     if: github.event_name == 'push' || inputs.action == 'publish_ota' || inputs.action == 'both'
     runs-on: ubuntu-latest
     steps:
@@ -75,9 +84,19 @@ jobs:
           version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Publish OTA Update to Production Branch
+      # Publish to Production Channel
+      - name: Publish OTA Update to Production Channel
+        if: github.event_name == 'push' || inputs.ota_channel == 'production' || inputs.ota_channel == 'both'
         run: |
-          npx eas update --branch production --message "${{ github.event.head_commit.message || 'Automated OTA update from GitHub' }}" --non-interactive
+          npx eas update --branch production --message "${{ github.event.head_commit.message || 'Automated OTA production update from GitHub' }}" --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      # Publish to Preview Channel
+      - name: Publish OTA Update to Preview Channel
+        if: github.event_name == 'push' || inputs.ota_channel == 'preview' || inputs.ota_channel == 'both'
+        run: |
+          npx eas update --branch preview --message "${{ github.event.head_commit.message || 'Automated OTA preview update from GitHub' }}" --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
