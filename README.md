@@ -124,15 +124,16 @@ The bottom navigation bar adheres strictly to the floating pill / curved rectang
   - Scriptures Library: `ScripturesSvg`
   - Search & Explore: `SearchSvg`
   - Profile & Settings: `ProfileSvg` (replaces Saved; Saved Collection is nested within Profile)
-- **Header Standard**: Flat clean white header (`backgroundColor: '#FFFFFF', shadowColor: 'transparent', elevation: 0, borderBottomWidth: 1, borderBottomColor: 'rgba(15, 23, 42, 0.08)'`), `fontFamily: 'SpaceMono', fontSize: 18`, and on the primary tab, include the `24x24` brand logo with `borderRadius: 5`
+- **Header Standard**: Flat clean white header (`backgroundColor: '#FFFFFF', shadowColor: 'transparent', elevation: 0, borderBottomWidth: 1, borderBottomColor: 'rgba(15, 23, 42, 0.08)'`), `fontFamily: 'SpaceMono', fontSize: 18`. Across all 5 tabs (Feed, Word, Verses, Search, Profile), the header persistently displays the `24x24` transparent brand logo and `exégeomai` brand title without changing text between tabs.
 
 ### 3. App Icon, Launcher & In-App Logo Calibration (Rule 15 & Rule 19)
 - **Android Adaptive Launcher Icon**: `assets/android-icon-foreground.png` is centered on a `512x512` canvas with a target icon height of `96px` (bounding box ~`74x96px`), providing ~`72%` clean white breathing room so Samsung One UI squircle masks and standard Android launcher cutouts never crop or zoom into the icon. Background is solid `#FFFFFF`.
-- **In-App Brand Icon / App Store Icon**: `assets/icon.png` is a `1024x1024` canvas with an `800px` prominent brand symbol so in-app usages remain sharp, bold, and readable.
+- **In-App Transparent Brand Icon**: `assets/logo-transparent.png` is a `1024x1024` RGBA canvas with an `800px` symbol and zero background, ensuring pristine, borderless rendering across light and elevated surfaces.
 - **Component In-App Logo Sizing**:
-  - Header brand logos: `24x24` (with `borderRadius: 5`)
-  - Auth / Login / Register logos: `28x28`
-  - In-app update / modal logos: `50x50` inside a `68x68` rounded container (`borderRadius: 18`, image `borderRadius: 12`)
+  - Header brand logos: `24x24` (zero background, transparent)
+  - Auth / Login / Register logos: `28x28` (zero background, transparent)
+  - In-app update / modal logos: `50x50` (zero background, transparent) inside a clean borderless container
+- **Clean Modal Design**: `UpdateModal.tsx` implements clean `0px` border radius on modal cards and buttons for a modern, sharp presentation.
 
 ### 4. Spacing Grid (Multiples of 8px) & Scroll Clearance
 All margins, paddings, gaps, and component dimensions follow strict multiples of **8px**:
@@ -165,6 +166,7 @@ exegeomai/
 │   ├── android-icon-foreground.png       # Android launcher foreground (512x512, 96px symbol, ~72% breathing room)
 │   ├── favicon.png                       # Browser favicon
 │   ├── icon.png                          # Master brand icon (1024x1024, 800px symbol)
+│   ├── logo-transparent.png              # In-app transparent brand icon (1024x1024, zero background)
 │   └── splash-icon.png                   # Launch & splash screen branding asset
 ├── src/
 │   ├── components/                       # Modular UI components
