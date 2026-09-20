@@ -4,6 +4,7 @@
   <img src="https://img.shields.io/badge/Expo%20SDK-57.0-000000?style=for-the-badge&logo=expo&logoColor=white" alt="Expo SDK 57" />
   <img src="https://img.shields.io/badge/React%20Native-0.86-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React Native 0.86" />
   <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript 5.9" />
+  <img src="https://img.shields.io/badge/CI%2FCD-Rule%2021%20Compliant-10B981?style=for-the-badge&logo=githubactions&logoColor=white" alt="Rule 21 Compliant" />
   <img src="https://img.shields.io/badge/EAS%20Channels-Production%20%7C%20Preview-000000?style=for-the-badge&logo=expo&logoColor=white" alt="EAS Channels" />
   <img src="https://img.shields.io/badge/EAS%20OTA%20Updates-Active%20(v1.0.1)-000000?style=for-the-badge&logo=expo&logoColor=white" alt="EAS OTA Updates" />
   <img src="https://img.shields.io/badge/GitHub%20Actions-Compilation%20&%20OTA-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions" />
@@ -147,6 +148,9 @@ All margins, paddings, gaps, and component dimensions follow strict multiples of
 
 ```text
 exegeomai/
+├── .agents/
+│   └── rules/
+│       └── rule-21-mobile-ci-cd-standards.md # Rule 21 Mobile CI/CD, Native Compile & OTA standards
 ├── .github/
 │   └── workflows/
 │       └── compile-and-ota.yml           # GitHub Actions workflow for native compile and dual-channel OTA updates
@@ -190,14 +194,32 @@ exegeomai/
 │   └── theme/
 │       ├── colors.ts                     # Strict 60-30-10 light theme tokens
 │       └── index.ts                      # Spacing (8px grid), pillTabBar specs, and soft shadows
+├── .gitignore                            # Standard git exclusion rules
+├── .npmrc                                # npm configuration (legacy-peer-deps=true)
 ├── App.tsx                               # Root container, Dark StatusBar, providers, and UpdateModal
 ├── app.json                              # Expo configuration (v1.0.1, runtimeVersion 1.0.1, updates URL)
 ├── eas.json                              # EAS build profiles and update channels (production, preview)
 ├── index.ts                              # Expo entrypoint
 ├── package.json                          # Dependencies (expo-updates, lucide-react-native) and scripts
-├── tsconfig.json                         # TypeScript compiler configuration
+├── tsconfig.json                         # TypeScript compiler configuration (extends expo/tsconfig.base.json)
 └── README.md                             # Comprehensive project architecture guide
 ```
+
+---
+
+## Rule 21: Mobile CI/CD & Native Compilation Architecture
+
+This project strictly adheres to **Rule 21** of our global mobile standards:
+
+| Standard | Implementation in `exégeomai` |
+| :--- | :--- |
+| **Direct Runner Compilation** | Android APKs compile on `ubuntu-latest` GitHub Actions runners using Java 17 Temurin, Android SDK, and `./gradlew assembleRelease`, bypassing cloud build queues entirely. |
+| **EAS Exclusively for OTA** | EAS CLI is reserved exclusively for Over-The-Air updates (`production` and `preview` channels) via `npx eas-cli update`. |
+| **Automated Release Distribution** | Compiled APKs are automatically uploaded to GitHub Releases (`exegeomai-v1.0.1.apk`) using `gh release upload --clobber`. |
+| **Locked Runtime Versioning** | `runtimeVersion` is explicitly locked to `1.0.1` in `app.json`, guaranteeing continuous OTA compatibility while CI injects dynamic `versionCode = github.run_number`. |
+| **In-App Update Modal** | Implemented in `src/components/UpdateModal.tsx` with foreground resume listening, "Update Now", and 30-minute "Remind Me Later" snooze. |
+| **Peer Dependency Stability** | `.npmrc` with `legacy-peer-deps=true` committed at root to prevent React 19 / Expo peer dependency collisions. |
+| **TypeScript Base Config** | `tsconfig.json` extends `expo/tsconfig.base.json` with explicit `jsx: "react-jsx"` and `esModuleInterop: true`. |
 
 ---
 
