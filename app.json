@@ -2,11 +2,17 @@
   "expo": {
     "name": "exégeomai",
     "slug": "exegeomai",
-    "version": "1.0.0",
+    "version": "1.0.1",
+    "runtimeVersion": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "updates": {
+      "url": "https://u.expo.dev/c00f29d0-af3e-4a5c-859d-ea657fb0d515",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    },
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -14,11 +20,15 @@
     },
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.thulanesigasa.exegeomai",
+      "buildNumber": "1",
       "infoPlist": {
         "NSUserNotificationsUsageDescription": "exégeomai sends daily biblical insights and cultural context to deepen your walk in the Word."
       }
     },
     "android": {
+      "package": "com.thulanesigasa.exegeomai",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundColor": "#FFFFFF"
@@ -33,6 +43,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c00f29d0-af3e-4a5c-859d-ea657fb0d515"
+      }
+    },
+    "owner": "thulanesigasa0"
   }
 }
