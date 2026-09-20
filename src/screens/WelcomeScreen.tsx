@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -12,6 +12,7 @@ import {
   NativeScrollEvent,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
@@ -53,14 +54,25 @@ const SLIDES: OnboardingSlide[] = [
 ];
 
 /**
- * Interactive Swipe-to-Start Button with PanResponder.
- * Fulfills requirement 2: "the third screen has a get started button, that button should be changed into the swipe to get started and the user can swipe to get started".
+ * Interactive Swipe-to-Start Button with PanResponder, focus-reset, text fade-out,
+ * and animated flowing progress fill.
  */
-function SwipeToStartButton({ onComplete }: { onComplete: () => void }) {
+function SwipeToStartButton({
+  onComplete,
+  resetTrigger,
+}: {
+  onComplete: () => void;
+  resetTrigger?: number;
+}) {
   const panX = useRef(new Animated.Value(0)).current;
   const trackWidth = 210;
   const thumbSize = 44;
   const maxDrag = trackWidth - thumbSize - 8; // ~158px travel
+
+  // Automatically reset arrow to the left whenever screen gains focus
+  useEffect(() => {
+    panX.setValue(0);
+  }, [resetTrigger, panX]);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -73,20 +85,22 @@ function SwipeToStartButton({ onComplete }: { onComplete: () => void }) {
         }
       },
       onPanResponderRelease: (_, gestureState) => {
-        if (gestureState.dx > maxDrag * 0.6) {
+        if (gestureState.dx > maxDrag * 0.55) {
           // Swipe completed successfully
           Animated.timing(panX, {
             toValue: maxDrag,
             duration: 120,
-            useNativeDriver: true,
+            useNativeDriver: false,
           }).start(() => {
             onComplete();
+            // Reset position for when user navigates back
+            setTimeout(() => panX.setValue(0), 400);
           });
         } else {
           // Snap back with gentle spring
           Animated.spring(panX, {
             toValue: 0,
-            useNativeDriver: true,
+            useNativeDriver: false,
             bounciness: 8,
           }).start();
         }
@@ -94,16 +108,43 @@ function SwipeToStartButton({ onComplete }: { onComplete: () => void }) {
     })
   ).current;
 
+  // Text fades out smoothly as the arrow button slides right
+  const textOpacity = panX.interpolate({
+    inputRange: [0, maxDrag * 0.45],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
+  // Flowing soft amber progress fill behind the sliding thumb
+  const fillWidth = panX.interpolate({
+    inputRange: [0, maxDrag],
+    outputRange: [thumbSize + 8, trackWidth],
+    extrapolate: 'clamp',
+  });
+
   return (
     <View style={[styles.swipeTrack, shadow.sm]}>
-      <Text
-        variant="caption"
-        weight="700"
-        color={colors.textSecondary}
-        style={styles.swipeTrackText}
-      >
-        Swipe to start  ››
-      </Text>
+      {/* Animated soft fill flowing behind the thumb */}
+      <Animated.View
+        style={[
+          styles.swipeProgressFill,
+          { width: fillWidth },
+        ]}
+      />
+
+      {/* Swipe text that fades out cleanly during slide */}
+      <Animated.View style={{ opacity: textOpacity }}>
+        <Text
+          variant="caption"
+          weight="700"
+          color={colors.textSecondary}
+          style={styles.swipeTrackText}
+        >
+          Swipe to start  ››
+        </Text>
+      </Animated.View>
+
+      {/* Draggable Arrow Thumb */}
       <Animated.View
         {...panResponder.panHandlers}
         style={[
@@ -116,7 +157,10 @@ function SwipeToStartButton({ onComplete }: { onComplete: () => void }) {
       >
         <TouchableOpacity
           activeOpacity={0.85}
-          onPress={onComplete}
+          onPress={() => {
+            onComplete();
+            panX.setValue(0);
+          }}
           style={styles.swipeThumbTouchable}
         >
           <ChevronRightSvg size={20} color="#FFFFFF" strokeWidth={2.5} />
@@ -131,6 +175,14 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<any>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
+  const [resetTrigger, setResetTrigger] = useState(0);
+
+  // Reset the swipe thumb whenever WelcomeScreen comes into view
+  useFocusEffect(
+    useCallback(() => {
+      setResetTrigger(prev => prev + 1);
+    }, [])
+  );
 
   const artSize = Math.min(width * 0.66, 260);
 
@@ -157,8 +209,7 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
     navigation.navigate('Auth', { initialMode });
   };
 
-  // Requirement 3: Smooth sliding tab locator interpolation
-  // 3 dots spaced by 16px (6px dot + 10px gap).
+  // Sliding tab locator interpolation across 3 stationary slots
   const pillTranslateX = scrollX.interpolate({
     inputRange: [0, width, 2 * width],
     outputRange: [0, 16, 32],
@@ -201,7 +252,7 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
 
       {/* Main Slide Content Area */}
       <View style={styles.mainContent}>
-        {/* Requirement 4: Image Merge / Crossfade Shared Canvas */}
+        {/* Requirement: Pure Merge / Crossfade Shared Canvas (Zero scale pop) */}
         <View style={[styles.sharedArtContainer, { height: artSize }]}>
           {SLIDES.map((slide, index) => {
             const inputRange = [
@@ -216,22 +267,13 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
               extrapolate: 'clamp',
             });
 
-            const scale = scrollX.interpolate({
-              inputRange,
-              outputRange: [0.88, 1, 0.88],
-              extrapolate: 'clamp',
-            });
-
             return (
               <Animated.View
                 key={slide.id}
                 pointerEvents="none"
                 style={[
                   styles.sharedArtSlide,
-                  {
-                    opacity,
-                    transform: [{ scale }],
-                  },
+                  { opacity },
                 ]}
               >
                 <Image
@@ -294,10 +336,9 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
       </View>
 
       {/* Persistent Bottom Controls Area */}
-      {/* Requirement 1: Active tab locator remains at bottom-left on ALL screens (including slide 3) */}
       <View style={styles.bottomArea}>
         <View style={styles.controlsRow}>
-          {/* Requirement 1 & 3: Sliding Tab Locator */}
+          {/* Sliding Tab Locator */}
           <View style={styles.indicatorContainer}>
             {/* 3 Stationary dot slots */}
             <View style={styles.trackDotSlots}>
@@ -318,9 +359,7 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
             />
           </View>
 
-          {/* Requirement 2: Button on the right */}
-          {/* On screen 1 & 2: Circular forward next button */}
-          {/* On screen 3: Interactive Swipe-to-Get-Started slider track */}
+          {/* Action button on the right */}
           {currentIndex < SLIDES.length - 1 ? (
             <TouchableOpacity
               style={[styles.nextCircleBtn, shadow.md]}
@@ -331,7 +370,10 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
               <ChevronRightSvg size={22} color="#FFFFFF" strokeWidth={2.5} />
             </TouchableOpacity>
           ) : (
-            <SwipeToStartButton onComplete={() => navigateToAuth('signup')} />
+            <SwipeToStartButton
+              onComplete={() => navigateToAuth('signup')}
+              resetTrigger={resetTrigger}
+            />
           )}
         </View>
 
@@ -349,15 +391,13 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
           </Text>
         </TouchableOpacity>
 
-        {/* Terms of Service & Privacy Policy Disclaimer */}
+        {/* Terms of Service & Privacy Policy Disclaimer: Uniform styling (no underline, no color change, no font change) */}
         <View style={styles.disclaimerContainer}>
           <Text variant="caption" color={colors.textSecondary} align="center" style={styles.disclaimerText}>
             By continuing, you agree to our{' '}
             <Text
               variant="caption"
-              weight="700"
-              color={colors.accent}
-              style={styles.legalLink}
+              color={colors.textSecondary}
               onPress={() => navigation.navigate('TermsOfService')}
             >
               Terms of Service
@@ -365,9 +405,7 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
             and{' '}
             <Text
               variant="caption"
-              weight="700"
-              color={colors.accent}
-              style={styles.legalLink}
+              color={colors.textSecondary}
               onPress={() => navigation.navigate('PrivacyPolicy')}
             >
               Privacy Policy
@@ -467,7 +505,7 @@ const styles = StyleSheet.create({
   bottomArea: {
     paddingHorizontal: spacing.lg, // 24px
     paddingBottom: spacing.lg, // 24px
-    minHeight: 128, // Invariant height across all 3 slides
+    minHeight: 128,
     justifyContent: 'center',
   },
   controlsRow: {
@@ -477,7 +515,6 @@ const styles = StyleSheet.create({
     height: 56,
     marginBottom: spacing.sm,
   },
-  // Sliding Tab Indicator (Requirement 1 & 3)
   indicatorContainer: {
     width: 56,
     height: 16,
@@ -506,11 +543,10 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: colors.accent, // 10% accent
+    backgroundColor: colors.accent,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  // Swipe to Start Slider (Requirement 2)
   swipeTrack: {
     width: 210,
     height: 52,
@@ -523,6 +559,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
     paddingHorizontal: 4,
+    overflow: 'hidden',
+  },
+  swipeProgressFill: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(217, 119, 6, 0.12)',
+    borderRadius: 26,
   },
   swipeTrackText: {
     fontSize: 12,
@@ -558,8 +603,5 @@ const styles = StyleSheet.create({
   disclaimerText: {
     fontSize: 11,
     lineHeight: 16,
-  },
-  legalLink: {
-    textDecorationLine: 'underline',
   },
 });

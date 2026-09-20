@@ -12,6 +12,8 @@ export interface UserProfile {
   username: string;
   avatarUrl?: string;
   email: string;
+  phoneNumber?: string;
+  countryCode?: string;
   joinedDate: string;
   preferredTranslation: string;
   notificationsEnabled: boolean;
@@ -26,6 +28,8 @@ export interface SignUpExtendedParams {
   username: string;
   email: string;
   password: string;
+  phoneNumber?: string;
+  countryCode?: string;
   preferredTranslation?: string;
   studyFocus?: string;
   dailyGoal?: string;
@@ -356,6 +360,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       username,
       email,
       password,
+      countryCode,
+      phoneNumber,
       preferredTranslation = 'ESV',
       studyFocus = 'Original Languages & Strong\'s',
       dailyGoal = '15 mins / day',
@@ -376,6 +382,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
               firstName: firstName.trim(),
               lastName: lastName.trim(),
               username: cleanUsername,
+              countryCode,
+              phoneNumber,
               preferredTranslation,
               studyFocus,
               dailyGoal,
@@ -403,6 +411,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
               lastName: lastName.trim(),
               username: cleanUsername,
               email,
+              countryCode,
+              phoneNumber,
               joinedDate: new Date(data.user!.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
               preferredTranslation,
               notificationsEnabled: true,
@@ -429,6 +439,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         lastName: lastName.trim(),
         username: cleanUsername,
         email,
+        countryCode,
+        phoneNumber,
         joinedDate: 'September 2026',
         preferredTranslation,
         notificationsEnabled: true,
