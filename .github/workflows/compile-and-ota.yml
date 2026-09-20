@@ -8,6 +8,7 @@ on:
       - 'src/**'
       - 'assets/**'
       - '.github/workflows/**'
+      - '.npmrc'
       - 'App.tsx'
       - 'app.json'
       - 'package.json'
@@ -73,7 +74,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install --prefer-offline --no-audit
+        run: npm install --legacy-peer-deps --prefer-offline --no-audit
 
       - name: Verify TypeScript & Config
         run: |
@@ -118,7 +119,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install --prefer-offline --no-audit
+        run: npm install --legacy-peer-deps --prefer-offline --no-audit
 
       - name: Inject Incremental Compilation Build Version
         run: |
