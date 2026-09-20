@@ -1,41 +1,41 @@
 /**
  * 60-30-10 Design System Color Tokens
- * Rule 1 & Rule 15:
- * - 60% Dominant Background: Deep Obsidian Midnight (#0B0F19)
- * - 30% Panel / Surface: Slate Navy (#131B2E) & Border (#1C263D)
- * - 10% Accent: Amber Gold (#F59E0B) & Soft Amber Tint (rgba(245, 158, 11, 0.14))
+ * Rule 1, Rule 15, and Rule 20 Specification:
+ * - 60% Dominant Background: Clean Slate (#F8FAFC)
+ * - 30% Panel / Surface: Pure White (#FFFFFF) & Hairline Border (rgba(15, 23, 42, 0.08))
+ * - 10% Accent: Biblical Amber Gold (#D97706) & Soft Amber Tint (rgba(217, 119, 6, 0.12))
  */
 
 export const colors = {
   // 60% Dominant Background
-  background: '#0B0F19',
-  backgroundSecondary: '#0E1422',
+  background: '#F8FAFC',
+  backgroundSecondary: '#F1F5F9',
 
   // 30% Panel & Surface
-  surface: '#131B2E',
-  surfaceElevated: '#18223A',
-  border: '#1C263D',
-  borderMuted: '#162035',
+  surface: '#FFFFFF',
+  surfaceElevated: '#F8FAFC',
+  border: 'rgba(15, 23, 42, 0.08)',
+  borderMuted: 'rgba(15, 23, 42, 0.04)',
 
   // 10% Accent
-  accent: '#F59E0B',
-  accentHover: '#D97706',
-  accentSoft: 'rgba(245, 158, 11, 0.14)',
-  accentBorder: 'rgba(245, 158, 11, 0.28)',
+  accent: '#D97706',
+  accentHover: '#B45309',
+  accentSoft: 'rgba(217, 119, 6, 0.12)',
+  accentBorder: 'rgba(217, 119, 6, 0.24)',
 
   // Neutral Typography (Monochromatic within surfaces)
-  textPrimary: '#FFFFFF',
-  textSecondary: '#94A3B8',
-  textTertiary: '#64748B',
+  textPrimary: '#0F172A',
+  textSecondary: '#64748B',
+  textTertiary: '#94A3B8',
 
   // Aliases for compatibility
   white: '#FFFFFF',
-  orange: '#F59E0B',
-  softOrange: 'rgba(245, 158, 11, 0.14)',
-  lightOrange: 'rgba(245, 158, 11, 0.28)',
-  lightGray: '#131B2E',
-  softGray: '#0E1422',
-  darkSlate: '#94A3B8',
-  text: '#FFFFFF',
-  secondaryText: '#94A3B8',
+  orange: '#D97706',
+  softOrange: 'rgba(217, 119, 6, 0.12)',
+  lightOrange: 'rgba(217, 119, 6, 0.24)',
+  lightGray: '#F1F5F9',
+  softGray: '#F8FAFC',
+  darkSlate: '#0F172A',
+  text: '#0F172A',
+  secondaryText: '#64748B',
 };

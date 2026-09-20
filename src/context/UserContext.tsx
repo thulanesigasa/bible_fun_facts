@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Fact, Scripture, WOTDEntry } from '../data/mockDatabase';
+import { colors } from '../theme/colors';
 
 interface UserState {
   userProfile: { name: string } | null;
@@ -12,7 +13,11 @@ interface UserState {
   lastLoginDate: string | null;
 }
 
-interface UserContextType extends UserState {
+interface AppContextType extends UserState {
+  hideTabBar: boolean;
+  setHideTabBar: (hide: boolean) => void;
+  accent: string;
+  setAccent: (accent: string) => void;
   login: (name: string) => void;
   logout: () => void;
   toggleFavoriteFact: (fact: Fact) => void;
@@ -24,11 +29,13 @@ interface UserContextType extends UserState {
   isWOTDCompleted: (id: string) => boolean;
 }
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
+const UserContext = createContext<AppContextType | undefined>(undefined);
 
 const STORAGE_KEY = '@exegeomai_user_data';
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [hideTabBar, setHideTabBar] = useState<boolean>(false);
+  const [accent, setAccent] = useState<string>(colors.accent);
   const [state, setState] = useState<UserState>({
     userProfile: null,
     favoritesFacts: [],
@@ -138,6 +145,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <UserContext.Provider value={{
       ...state,
+      hideTabBar,
+      setHideTabBar,
+      accent,
+      setAccent,
       login,
       logout,
       toggleFavoriteFact,
@@ -157,4 +168,12 @@ export const useUser = () => {
   const context = useContext(UserContext);
   if (!context) throw new Error('useUser must be used within UserProvider');
   return context;
+};
+
+/**
+ * useApp hook matching Rule 20 and tabs skill specification:
+ * const { hideTabBar, accent } = useApp();
+ */
+export const useApp = () => {
+  return useUser();
 };

@@ -11,7 +11,7 @@ import { Text } from '../components/Typography';
 import { Card } from '../components/Card';
 import { FactCard } from '../components/FactCard';
 import { colors } from '../theme/colors';
-import { spacing, radius } from '../theme';
+import { spacing, radius, shadow } from '../theme';
 import { facts } from '../data/mockDatabase';
 import { scheduleDidYouKnowNotifications } from '../services/notifications';
 import { DiscoverSvg, FlameSvg, RefreshSvg } from '../components/SvgIcons';
@@ -37,7 +37,7 @@ export const HomeScreen: React.FC = ({ navigation }: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
@@ -53,7 +53,7 @@ export const HomeScreen: React.FC = ({ navigation }: any) => {
       >
         {/* Header Branding */}
         <View style={styles.header}>
-          <DiscoverSvg size={28} color={colors.accent} fill={colors.accentSoft} />
+          <DiscoverSvg size={24} color={colors.accent} fill={colors.accentSoft} />
           <Text variant="h1" style={styles.titleText}>Did You Know?</Text>
           <Text variant="body" color={colors.textSecondary} style={styles.subtitle}>
             Discover hidden treasures in Scripture
@@ -64,16 +64,16 @@ export const HomeScreen: React.FC = ({ navigation }: any) => {
         <Card style={styles.streakCard}>
           <View style={styles.streakLeft}>
             <View style={styles.streakIconCircle}>
-              <FlameSvg size={20} color={colors.accent} fill={colors.accent} />
+              <FlameSvg size={18} color={colors.accent} fill={colors.accent} />
             </View>
             <View>
               <Text variant="label" color={colors.textSecondary}>Daily Streak</Text>
-              <Text variant="h2" style={{ fontSize: 24, color: colors.textPrimary }}>1 day</Text>
+              <Text variant="h2" style={{ fontSize: 22, color: colors.textPrimary }}>1 day</Text>
             </View>
           </View>
           <View style={styles.streakRight}>
             <Text variant="label" color={colors.textSecondary} align="right">Facts Viewed</Text>
-            <Text variant="h2" color={colors.accent} align="right" style={{ fontSize: 24 }}>3</Text>
+            <Text variant="h2" color={colors.accent} align="right" style={{ fontSize: 22 }}>3</Text>
           </View>
         </Card>
 
@@ -84,11 +84,11 @@ export const HomeScreen: React.FC = ({ navigation }: any) => {
 
         {/* Discover Another Fact Button */}
         <TouchableOpacity
-          style={styles.refreshBtn}
+          style={[styles.refreshBtn, shadow.sm]}
           onPress={rotateFact}
           activeOpacity={0.85}
         >
-          <RefreshSvg size={20} color={colors.background} />
+          <RefreshSvg size={20} color="#FFFFFF" />
           <Text variant="h3" style={styles.refreshBtnText}>Discover Another Fact</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -99,16 +99,16 @@ export const HomeScreen: React.FC = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: colors.background },
   scroll: { flex: 1 },
-  content: { padding: spacing.md, paddingBottom: spacing.xxl },
+  content: { padding: spacing.md, paddingBottom: 96 },
   header: { marginBottom: spacing.lg, alignItems: 'flex-start' },
-  titleText: { fontSize: 28, marginTop: spacing.sm, color: colors.textPrimary },
-  subtitle: { marginTop: 4, fontSize: 16 },
+  titleText: { fontSize: 26, marginTop: spacing.sm, color: colors.textPrimary },
+  subtitle: { marginTop: 4, fontSize: 15 },
   streakCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: spacing.md,
-    borderRadius: radius.lg,
+    borderRadius: radius.md,
     backgroundColor: colors.surface,
     marginBottom: spacing.lg,
     borderWidth: 1,
@@ -116,12 +116,14 @@ const styles = StyleSheet.create({
   },
   streakLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   streakIconCircle: {
-    width: 40,
-    height: 40,
+    width: 36,
+    height: 36,
     borderRadius: radius.full,
     backgroundColor: colors.surfaceElevated,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   streakRight: { justifyContent: 'center' },
   refreshBtn: {
@@ -134,5 +136,5 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     marginBottom: spacing.md,
   },
-  refreshBtnText: { fontSize: 16, color: colors.background, fontWeight: '700' },
+  refreshBtnText: { fontSize: 16, color: '#FFFFFF', fontWeight: '700' },
 });

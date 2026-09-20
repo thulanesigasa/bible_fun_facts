@@ -8,18 +8,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
-import { spacing, radius } from '../theme';
+import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
 import { Card } from '../components/Card';
-import { facts, scriptures, Category, Fact, Scripture } from '../data/mockDatabase';
+import { facts, scriptures, Category } from '../data/mockDatabase';
 import {
   SearchSvg,
-  UsersSvg,
-  LandmarkSvg,
-  ScripturesSvg,
-  StrongsIconSvg,
   ChevronRightSvg,
-  QuoteSvg,
 } from '../components/SvgIcons';
 
 const CATEGORIES: Category[] = ['People', 'Prophecy', 'Customs', 'History', 'Language'];
@@ -78,26 +73,26 @@ export default function SearchScreen({ navigation }: { navigation: any }) {
   }, [searchText, activeCategory]);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
       <ScrollView
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
       >
-        <Text variant="h1" style={styles.mainTitle}>Find Facts</Text>
-
-        <View style={styles.headerSubtitleRow}>
+        <View style={styles.headerRow}>
           <View style={styles.searchIconCircle}>
-            <SearchSvg size={20} color={colors.accent} />
+            <SearchSvg size={18} color={colors.accent} />
           </View>
           <View>
-            <Text variant="h2" style={styles.subTitle}>Discover More</Text>
-            <Text variant="body" color={colors.textSecondary}>Search facts and scriptures</Text>
+            <Text variant="h2" style={styles.title}>Search Library</Text>
+            <Text variant="body" color={colors.textSecondary} style={{ fontSize: 14 }}>
+              Explore across historical facts and scriptures
+            </Text>
           </View>
         </View>
 
         {/* Search Input Box */}
-        <View style={styles.searchContainer}>
+        <View style={[styles.searchContainer, shadow.sm]}>
           <SearchSvg size={18} color={colors.accent} />
           <TextInput
             style={styles.searchInput}
@@ -109,7 +104,12 @@ export default function SearchScreen({ navigation }: { navigation: any }) {
         </View>
 
         {/* Category Filter Pills */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow} contentContainerStyle={styles.filterRowContent}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.filterRow}
+          contentContainerStyle={styles.filterRowContent}
+        >
           <FilterPill
             label="All Facts"
             active={activeCategory === 'All'}
@@ -213,22 +213,18 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: spacing.md, // 16px margins & gutters
-    paddingBottom: spacing.xxl, // 48px
+    paddingBottom: 96, // 96px padding clears floating pill tab bar
   },
-  mainTitle: {
-    fontSize: 28,
-    color: colors.textPrimary,
-    marginBottom: spacing.md, // 16px
-  },
-  headerSubtitleRow: {
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.md, // 16px
-    marginBottom: spacing.lg, // 24px
+    gap: spacing.sm, // 8px
+    marginTop: spacing.sm, // 8px
+    marginBottom: spacing.md, // 16px
   },
   searchIconCircle: {
-    width: 40,
-    height: 40,
+    width: 36,
+    height: 36,
     borderRadius: radius.full,
     backgroundColor: colors.surface,
     borderWidth: 1,
@@ -236,8 +232,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  subTitle: {
-    fontSize: 18,
+  title: {
+    fontSize: 22,
     color: colors.textPrimary,
   },
   searchContainer: {
@@ -255,7 +251,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     color: colors.textPrimary,
-    fontSize: 16,
+    fontSize: 15,
     paddingVertical: spacing.sm, // 8px
   },
   filterRow: {
@@ -287,7 +283,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg, // 24px
   },
   sectionTitle: {
-    letterSpacing: 1,
+    letterSpacing: 0.5,
     marginBottom: spacing.sm, // 8px
   },
   resultCard: {
@@ -321,15 +317,17 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 17,
     color: colors.textPrimary,
     marginBottom: 4,
   },
   cardRef: {
     marginBottom: spacing.sm, // 8px
+    fontSize: 13,
   },
   cardSnippet: {
     lineHeight: 20,
+    fontSize: 14,
   },
   emptyState: {
     paddingVertical: spacing.xxl, // 48px

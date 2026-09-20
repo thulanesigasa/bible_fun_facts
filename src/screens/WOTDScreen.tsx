@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
-import { spacing, radius } from '../theme';
+import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
 import { Card } from '../components/Card';
 import { wotd, LENS_TABS } from '../data/mockDatabase';
@@ -64,7 +64,7 @@ export default function WOTDScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
       <ScrollView
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -73,11 +73,11 @@ export default function WOTDScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerTitleRow}>
-            <WotdSvg size={28} color={colors.accent} fill={colors.accentSoft} />
-            <Text variant="h1" style={styles.titleText}>Word of the Day</Text>
+            <WotdSvg size={24} color={colors.accent} fill={colors.accentSoft} />
+            <Text variant="h2" style={styles.titleText}>Daily Word & Exegesis</Text>
           </View>
           <Text variant="body" color={colors.textSecondary} style={styles.subtitle}>
-            Deepen your understanding with 4 distinct analytical lenses
+            Deepen your understanding across 4 distinct analytical perspectives
           </Text>
         </View>
 
@@ -85,7 +85,7 @@ export default function WOTDScreen() {
         <Card style={styles.verseCard}>
           <View style={styles.dateBadge}>
             <CalendarSvg size={14} color={colors.accent} />
-            <Text variant="label" color={colors.accent} style={{ fontSize: 10 }}>DAILY DEVOTION</Text>
+            <Text variant="label" color={colors.accent} style={{ fontSize: 10 }}>DAILY SCRIPTURE</Text>
           </View>
 
           <View style={styles.quoteWrapper}>
@@ -98,7 +98,7 @@ export default function WOTDScreen() {
         </Card>
 
         {/* Lens Selection Grid */}
-        <Text variant="h3" style={styles.sectionTitle}>Choose Your Analytical Lens</Text>
+        <Text variant="h3" style={styles.sectionTitle}>Choose Analytical Lens</Text>
 
         <View style={styles.lensGrid}>
           {LENS_TABS.map((tab) => {
@@ -144,7 +144,7 @@ export default function WOTDScreen() {
 
         {/* Reflection & Memory Verse Box */}
         <View style={styles.memoryContainer}>
-          <Text variant="label" color={colors.accent} style={{ letterSpacing: 1, marginBottom: spacing.sm }}>
+          <Text variant="label" color={colors.accent} style={{ letterSpacing: 0.5, marginBottom: spacing.sm }}>
             MEMORY VERSE
           </Text>
           <Text variant="body" color={colors.textSecondary} style={styles.memoryText}>
@@ -155,11 +155,11 @@ export default function WOTDScreen() {
         {/* Bottom Actions */}
         <View style={styles.actionRow}>
           <TouchableOpacity
-            style={[styles.completeBtn, completed && styles.completeBtnActive]}
+            style={[styles.completeBtn, completed && styles.completeBtnActive, shadow.sm]}
             onPress={() => markWOTDComplete(wotd)}
             activeOpacity={0.85}
           >
-            <CheckSvg size={18} color={completed ? colors.background : colors.accent} />
+            <CheckSvg size={18} color={completed ? '#FFFFFF' : colors.accent} />
             <Text
               variant="label"
               weight="800"
@@ -170,7 +170,7 @@ export default function WOTDScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.shareBtn}
+            style={[styles.shareBtn, shadow.sm]}
             onPress={onShare}
             activeOpacity={0.8}
           >
@@ -192,10 +192,11 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: spacing.md, // 16px margins & gutters
-    paddingBottom: spacing.xxl, // 48px
+    paddingBottom: 96, // 96px ensures content clears floating pill tab bar
   },
   header: {
-    marginBottom: spacing.lg, // 24px
+    marginTop: spacing.sm, // 8px
+    marginBottom: spacing.md, // 16px
   },
   headerTitleRow: {
     flexDirection: 'row',
@@ -203,16 +204,16 @@ const styles = StyleSheet.create({
     gap: spacing.sm, // 8px
   },
   titleText: {
-    fontSize: 28,
+    fontSize: 22,
     color: colors.textPrimary,
   },
   subtitle: {
-    marginTop: spacing.sm, // 8px
-    fontSize: 16,
+    marginTop: 4,
+    fontSize: 14,
   },
   verseCard: {
     backgroundColor: colors.surface,
-    borderRadius: radius.xl, // 32px
+    borderRadius: radius.lg, // 24px
     padding: spacing.lg, // 24px
     marginBottom: spacing.lg, // 24px
     borderWidth: 1,
@@ -235,17 +236,17 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md, // 16px
   },
   verseText: {
-    fontSize: 20,
+    fontSize: 19,
     fontStyle: 'italic',
-    lineHeight: 28,
+    lineHeight: 27,
     color: colors.textPrimary,
   },
   verseRef: {
     color: colors.accent,
-    fontSize: 16,
+    fontSize: 15,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 17,
     color: colors.textPrimary,
     marginBottom: spacing.md, // 16px
   },
@@ -277,6 +278,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceElevated,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   lensIconBoxActive: {
     backgroundColor: colors.surface,
@@ -309,15 +312,15 @@ const styles = StyleSheet.create({
     gap: spacing.sm, // 8px
   },
   insightTitle: {
-    fontSize: 18,
+    fontSize: 17,
     color: colors.accent,
   },
   insightBody: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 15,
+    lineHeight: 23,
   },
   memoryContainer: {
-    backgroundColor: colors.surfaceElevated,
+    backgroundColor: colors.surface,
     borderRadius: radius.md, // 16px
     padding: spacing.md, // 16px
     marginBottom: spacing.lg, // 24px
@@ -327,6 +330,7 @@ const styles = StyleSheet.create({
   memoryText: {
     fontStyle: 'italic',
     lineHeight: 22,
+    fontSize: 14,
   },
   actionRow: {
     flexDirection: 'row',
@@ -352,10 +356,10 @@ const styles = StyleSheet.create({
   },
   completeText: {
     color: colors.accent,
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
   completeTextActive: {
-    color: colors.background,
+    color: '#FFFFFF',
   },
   shareBtn: {
     width: 48,

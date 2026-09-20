@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
-import { spacing, radius } from '../theme';
+import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
 import { Card } from '../components/Card';
 import { scriptures, Scripture, Testament, Genre } from '../data/mockDatabase';
@@ -64,24 +64,24 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
   }, [searchText, activeTestament, activeGenre]);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
       <ScrollView
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
       >
-        <Text variant="h1" style={styles.mainTitle}>Scripture Library</Text>
-
-        <View style={styles.headerSubtitleRow}>
+        <View style={styles.headerRow}>
           <ScripturesSvg size={24} color={colors.accent} fill={colors.accentSoft} />
           <View>
-            <Text variant="h2" style={styles.subTitle}>Find Scriptures</Text>
-            <Text variant="body" color={colors.textSecondary}>Search and explore Bible verses</Text>
+            <Text variant="h2" style={styles.title}>Find Scriptures</Text>
+            <Text variant="body" color={colors.textSecondary} style={{ fontSize: 14 }}>
+              Search and explore Bible verses with original root words
+            </Text>
           </View>
         </View>
 
         {/* Search Bar */}
-        <View style={styles.searchContainer}>
+        <View style={[styles.searchContainer, shadow.sm]}>
           <SearchSvg size={18} color={colors.accent} />
           <TextInput
             style={styles.searchInput}
@@ -94,7 +94,12 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
 
         {/* Testament Filter */}
         <Text variant="h3" style={styles.filterLabel}>Testament</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow} contentContainerStyle={styles.filterRowContent}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.filterRow}
+          contentContainerStyle={styles.filterRowContent}
+        >
           <FilterPill label="All" active={activeTestament === 'All'} onPress={() => setActiveTestament('All')} />
           {TESTAMENTS.map((t) => (
             <FilterPill key={t} label={t} active={activeTestament === t} onPress={() => setActiveTestament(t)} />
@@ -103,7 +108,12 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
 
         {/* Genre Filter */}
         <Text variant="h3" style={styles.filterLabel}>Genre</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow} contentContainerStyle={styles.filterRowContent}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.filterRow}
+          contentContainerStyle={styles.filterRowContent}
+        >
           <FilterPill label="All" active={activeGenre === 'All'} onPress={() => setActiveGenre('All')} />
           {GENRES.map((g) => (
             <FilterPill key={g} label={g} active={activeGenre === g} onPress={() => setActiveGenre(g)} />
@@ -174,21 +184,17 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: spacing.md, // 16px margins & gutters
-    paddingBottom: spacing.xxl, // 48px
+    paddingBottom: 96, // 96px bottom padding clears floating pill tab bar
   },
-  mainTitle: {
-    fontSize: 28,
-    color: colors.textPrimary,
-    marginBottom: spacing.md, // 16px
-  },
-  headerSubtitleRow: {
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.md, // 16px
-    marginBottom: spacing.lg, // 24px
+    gap: spacing.sm, // 8px
+    marginTop: spacing.sm, // 8px
+    marginBottom: spacing.md, // 16px
   },
-  subTitle: {
-    fontSize: 18,
+  title: {
+    fontSize: 22,
     color: colors.textPrimary,
   },
   searchContainer: {
@@ -200,17 +206,17 @@ const styles = StyleSheet.create({
     borderRadius: radius.md, // 16px
     borderWidth: 1,
     borderColor: colors.border,
-    marginBottom: spacing.lg, // 24px
+    marginBottom: spacing.md, // 16px
     gap: spacing.sm, // 8px
   },
   searchInput: {
     flex: 1,
     color: colors.textPrimary,
-    fontSize: 16,
+    fontSize: 15,
     paddingVertical: spacing.sm, // 8px
   },
   filterLabel: {
-    fontSize: 15,
+    fontSize: 14,
     color: colors.textPrimary,
     marginBottom: spacing.sm, // 8px
   },
@@ -278,13 +284,14 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   referenceText: {
-    fontSize: 20,
+    fontSize: 19,
     color: colors.textPrimary,
     marginBottom: spacing.sm, // 8px
   },
   versePreview: {
     fontStyle: 'italic',
     lineHeight: 22,
+    fontSize: 14,
     marginBottom: spacing.md, // 16px
   },
   tagsContainer: {
