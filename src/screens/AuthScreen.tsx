@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as ScreenCapture from 'expo-screen-capture';
+import { useSecurePasswordCapture } from '../hooks/useSecurePasswordCapture';
 import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
@@ -86,33 +86,25 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
   const loginEmailRef = useRef<TextInput>(null);
   const loginPasswordRef = useRef<TextInput>(null);
 
-  // Screen recording & screenshot protection for sensitive password inputs
+  // Enterprise hardware-level screen recording & screenshot protection
   // Under the hood on Android, ScreenCapture invokes Kotlin ScreenCaptureModule:
   // activity.window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-  // This causes screen recorders (built-in or third party) to capture a solid black/blank screen.
-  const handlePasswordFocus = () => {
-    ScreenCapture.preventScreenCaptureAsync().catch(() => {});
-  };
-
-  const handlePasswordBlur = () => {
-    if (step !== 3) {
-      ScreenCapture.allowScreenCaptureAsync().catch(() => {});
-    }
-  };
+  // Screen recorders capture a solid black/blank screen while the user types normally.
+  const {
+    isSecured,
+    activateSecurity,
+    deactivateSecurity,
+    handlePasswordFocus,
+    handlePasswordBlur,
+  } = useSecurePasswordCapture({ enableAppSwitcherProtection: true });
 
   useEffect(() => {
     if (mode === 'signup' && step === 3) {
-      ScreenCapture.preventScreenCaptureAsync().catch(() => {});
+      activateSecurity();
     } else {
-      ScreenCapture.allowScreenCaptureAsync().catch(() => {});
+      deactivateSecurity(true);
     }
-  }, [step, mode]);
-
-  useEffect(() => {
-    return () => {
-      ScreenCapture.allowScreenCaptureAsync().catch(() => {});
-    };
-  }, []);
+  }, [step, mode, activateSecurity, deactivateSecurity]);
 
   // Auto-focus next field when transitioning wizard steps
   useEffect(() => {
