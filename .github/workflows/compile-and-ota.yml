@@ -60,6 +60,10 @@ on:
 permissions:
   contents: write
 
+env:
+  EXPO_PUBLIC_SUPABASE_URL: "https://ibwooiejzxhbzplnldcz.supabase.co"
+  EXPO_PUBLIC_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlid29vaWVqenhoYnpwbG5sZGN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4ODgwNjcsImV4cCI6MjEwNTQ2NDA2N30.1RTBu4znHqhQRx5dnNAR5Oyfgfq3Kiqsp4NnS4FmPfk"
+
 jobs:
   # Job 1: Publish Over-The-Air Updates (Both Preview & Production Channels)
   publish_ota:

@@ -318,6 +318,7 @@ This project strictly adheres to **Rule 21** of our global mobile standards:
 | **TypeScript Base Config** | `tsconfig.json` extends `expo/tsconfig.base.json` with explicit `jsx: "react-jsx"` and `esModuleInterop: true`. |
 | **JVM & Node Memory Stability** | Gradle configured with `-Xmx4096m -XX:MaxMetaspaceSize=1024m`, Node.js with `NODE_OPTIONS: "--max-old-space-size=4096"`, and explicit timeouts (35m compile, 15m OTA) to eliminate OOM crashes and runner hangs. |
 | **Autolinking Inline Modules** | `expo.inlineModules.watchedDirectories=[]` configured in `android/gradle.properties` and `app.json` `experiments`, resolving `ExpoAutolinkingPlugin` command-line parameter requirements. |
+| **Startup Stability & Defensive Client** | Supabase client initialized defensively with fallback public anon key and exception handling, and onboarding assets compressed from 64MB RAM to 4.3MB, eliminating device crash-on-launch. |
 
 ---
 
