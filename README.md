@@ -204,10 +204,14 @@ exegeomai/
 │   └── theme/
 │       ├── colors.ts                     # Strict 60-30-10 light theme tokens
 │       └── index.ts                      # Spacing (8px grid), pillTabBar specs, and soft shadows
+├── scripts/                              # Database seeding and development automation
+│   └── seed_database.ts                  # Canonical content extraction and SQL seeder generator
 ├── supabase/                             # Supabase CLI project configuration
 │   ├── config.toml                       # Supabase local and remote configuration
+│   ├── seed.sql                          # Production seed dataset (categories, facts, scriptures, WOTD)
 │   ├── migrations/                       # Database schema and RLS policies
-│   │   └── 20260920000000_create_profiles_and_avatars.sql # profiles table, trigger, and avatars bucket
+│   │   ├── 20260920000000_create_profiles_and_avatars.sql # profiles table, trigger, and avatars bucket
+│   │   └── 20260920000001_create_production_schema.sql   # Complete 8-table relational production schema
 │   └── .gitignore                        # Supabase ignore rules
 ├── .env.example                          # Environment template for all Supabase connections
 ├── .gitignore                            # Standard git exclusion rules (includes .env and .agents)
@@ -223,7 +227,35 @@ exegeomai/
 
 ---
 
-## Supabase Integration, Database & AVIF Avatar Storage (`ibwooiejzxhbzplnldcz`)
+## Supabase Relational Database Architecture (`ibwooiejzxhbzplnldcz`)
+
+The application is backed by a full production-ready relational schema on Supabase with Row Level Security (RLS) enabled across every table:
+
+| Table | Purpose | Row Level Security (RLS) | Seeded Records |
+| :--- | :--- | :--- | :--- |
+| **`public.profiles`** | User account identity, theological goals, translation preferences, and AVIF avatar URLs. | Public read; owner-restricted insert and update. | Dynamic (on signup) |
+| **`public.categories`** | Canonical biblical categories (`History`, `Language`, `People`, `Prophecy`, `Customs`). | Public read (`USING (true)`). | 5 categories |
+| **`public.facts`** | Curated historical, cultural, and Strong's concordance biblical facts with verification state. | Public read (`USING (true)`). | 120 facts |
+| **`public.scriptures`** | Canonical scripture library passages with genre, testament, historical context, and Strong's data. | Public read (`USING (true)`). | 24 scriptures |
+| **`public.word_of_the_day`** | Daily devotional readings with 4 analytical lenses, memory verses, and prayer prompts. | Public read (`USING (true)`). | Canonical entry |
+| **`public.user_favorites_facts`** | User-saved biblical facts collection with cascade deletion on user removal. | Owner-restricted select, insert, and delete (`auth.uid() = user_id`). | User-generated |
+| **`public.user_favorites_scriptures`** | User-saved scripture passages collection. | Owner-restricted select, insert, and delete (`auth.uid() = user_id`). | User-generated |
+| **`public.user_study_progress`** | Tracks completed daily devotionals and reading streaks per authenticated user. | Owner-restricted select, insert, and delete (`auth.uid() = user_id`). | User-generated |
+| **`public.study_notes`** | User-authored exegesis notes, reflections, and cross-references linked to scripture verses. | Owner-restricted select, insert, update, delete (`auth.uid() = user_id`). | User-generated |
+
+---
+
+## Clean UI Architecture & Zero Badge Standard (Rule 16)
+
+In strict adherence to Rule 16 and clean typography principles:
+- **Zero Status Badges & Pill Containers**: All status tags, rounded background pills, and card badge indicators have been completely eliminated across all screens and components (`FactCard`, `ScriptureCard`, `WOTDCard`, `DiscoverScreen`, `FactDetailsScreen`, `ScripturesScreen`, `ScriptureDetailsScreen`, `SearchScreen`, `WOTDScreen`, `WOTDDetailsScreen`).
+- **Clean Inline Metadata**: Metadata (such as categories, testaments, genres, and dates) is rendered as clean, high-contrast inline typography (`Category • Testament • Genre`) without artificial container borders or colored badge backgrounds.
+- **Analytical Lens Navigation**: The 4 analytical perspectives (*Original Intent*, *Theological Truth*, *Modern Walk*, *Prayer Focus*) are structured as clean, minimalist segmented tabs with active amber underlines rather than boxed badge buttons.
+- **Zero Star Icons / Emojis**: Removed star shapes across the entire application; `DiscoverSvg` has been redesigned as a precision navigation compass needle.
+
+---
+
+## Multi-Step Authentication & AVIF Profile Storage
 
 The mobile client integrates with Supabase for user authentication, profile data persistence, and compressed avatar storage:
 
@@ -238,20 +270,10 @@ The mobile client integrates with Supabase for user authentication, profile data
 - The image is processed and compressed via `expo-image-manipulator` into ultra-lightweight format (`image/avif`) before uploading to the Supabase Storage `avatars` bucket at `${userId}/avatar_${timestamp}.avif`.
 - This ensures maximum visual fidelity while consuming minimal cloud storage space (< 50KB per avatar).
 
-### 3. Database Schema & Migration (`supabase/migrations/`)
-- **`public.profiles` Table**:
-  - `id` (UUID, references `auth.users(id)` on delete cascade)
-  - `username` (unique, lowercase alphanumeric)
-  - `first_name`, `last_name`, `full_name`, `avatar_url`
-  - `preferred_translation`, `study_focus`, `daily_goal`, `knowledge_level`
-  - Row Level Security (RLS) enabled with public read and owner-only update policies.
-- **Automatic Trigger**: `on_auth_user_created` trigger executes `handle_new_user()` to automatically populate `public.profiles` from `auth.users.raw_user_meta_data`.
-- **Storage Bucket**: `avatars` bucket configured with a 2MB file size limit and public read access.
-
-### 4. Environment Configuration (`.env`)
+### 3. Environment Configuration (`.env`)
 - `EXPO_PUBLIC_SUPABASE_URL`: `https://ibwooiejzxhbzplnldcz.supabase.co`
-- `EXPO_PUBLIC_SUPABASE_ANON_KEY`: Retrieve from [Supabase Dashboard > Project Settings > API](https://supabase.com/dashboard/project/ibwooiejzxhbzplnldcz/settings/api).
-- `SUPABASE_DB_URL`: Postgres direct connection string for migration execution.
+- `EXPO_PUBLIC_SUPABASE_ANON_KEY`: Supabase project anon key.
+- `SUPABASE_DB_URL`: Direct Postgres pooled connection string for schema migrations and administrative queries.
 
 ---
 

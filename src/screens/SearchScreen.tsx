@@ -19,22 +19,22 @@ import {
 
 const CATEGORIES: Category[] = ['People', 'Prophecy', 'Customs', 'History', 'Language'];
 
-interface FilterPillProps {
+interface FilterTabProps {
   label: string;
   active: boolean;
   onPress: () => void;
 }
 
-const FilterPill: React.FC<FilterPillProps> = ({ label, active, onPress }) => (
+const FilterTab: React.FC<FilterTabProps> = ({ label, active, onPress }) => (
   <TouchableOpacity
-    style={[styles.pill, active && styles.pillActive]}
+    style={[styles.filterTab, active && styles.filterTabActive]}
     onPress={onPress}
     activeOpacity={0.8}
   >
     <Text
       variant="caption"
-      weight={active ? '700' : '600'}
-      style={[styles.pillText, active && styles.pillTextActive]}
+      weight={active ? '700' : '500'}
+      style={[styles.filterTabText, active && styles.filterTabTextActive]}
     >
       {label}
     </Text>
@@ -110,18 +110,18 @@ export default function SearchScreen({ navigation }: { navigation: any }) {
           style={styles.filterRow}
           contentContainerStyle={styles.filterRowContent}
         >
-          <FilterPill
-            label="All Facts"
+          <FilterTab
+            label="All"
             active={activeCategory === 'All'}
             onPress={() => setActiveCategory('All')}
           />
-          <FilterPill
-            label="Scriptures Only"
+          <FilterTab
+            label="Scriptures"
             active={activeCategory === 'Scriptures'}
             onPress={() => setActiveCategory('Scriptures')}
           />
           {CATEGORIES.map((cat) => (
-            <FilterPill
+            <FilterTab
               key={cat}
               label={cat}
               active={activeCategory === cat}
@@ -144,9 +144,7 @@ export default function SearchScreen({ navigation }: { navigation: any }) {
               >
                 <Card style={styles.resultCard}>
                   <View style={styles.cardTopRow}>
-                    <View style={styles.badge}>
-                      <Text variant="label" color={colors.accent}>{fact.category.toUpperCase()}</Text>
-                    </View>
+                    <Text variant="caption" weight="700" color={colors.accent}>{fact.category.toUpperCase()}</Text>
                     <ChevronRightSvg size={16} color={colors.textSecondary} />
                   </View>
                   <Text variant="h3" style={styles.cardTitle}>{fact.fact_title}</Text>
@@ -176,9 +174,7 @@ export default function SearchScreen({ navigation }: { navigation: any }) {
               >
                 <Card style={styles.resultCard}>
                   <View style={styles.cardTopRow}>
-                    <View style={styles.scriptureBadge}>
-                      <Text variant="label" color={colors.accent}>{scripture.testament.toUpperCase()}</Text>
-                    </View>
+                    <Text variant="caption" weight="700" color={colors.accent}>{scripture.testament.toUpperCase()}</Text>
                     <ChevronRightSvg size={16} color={colors.textSecondary} />
                   </View>
                   <Text variant="h3" style={styles.cardTitle}>{scripture.reference}</Text>
@@ -260,23 +256,21 @@ const styles = StyleSheet.create({
   filterRowContent: {
     gap: spacing.sm, // 8px
   },
-  pill: {
-    paddingHorizontal: spacing.md, // 16px
-    paddingVertical: spacing.sm, // 8px
-    borderRadius: radius.full,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
+  filterTab: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.sm,
+    marginRight: spacing.sm,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
   },
-  pillActive: {
-    backgroundColor: colors.accentSoft,
-    borderColor: colors.accentBorder,
+  filterTabActive: {
+    borderBottomColor: colors.accent,
   },
-  pillText: {
+  filterTabText: {
     color: colors.textSecondary,
-    fontSize: 12,
+    fontSize: 13,
   },
-  pillTextActive: {
+  filterTabTextActive: {
     color: colors.accent,
   },
   sectionBlock: {
@@ -300,22 +294,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing.sm, // 8px
   },
-  badge: {
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: spacing.sm, // 8px
-    paddingVertical: 4,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: colors.accentBorder,
-  },
-  scriptureBadge: {
-    backgroundColor: colors.surfaceElevated,
-    paddingHorizontal: spacing.sm, // 8px
-    paddingVertical: 4,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+
   cardTitle: {
     fontSize: 17,
     color: colors.textPrimary,

@@ -83,9 +83,9 @@ export default function WOTDScreen() {
 
         {/* Verse Highlight Card */}
         <Card style={styles.verseCard}>
-          <View style={styles.dateBadge}>
+          <View style={styles.metaRow}>
             <CalendarSvg size={14} color={colors.accent} />
-            <Text variant="label" color={colors.accent} style={{ fontSize: 10 }}>DAILY SCRIPTURE</Text>
+            <Text variant="label" color={colors.accent} style={styles.metaLabel}>DAILY SCRIPTURE</Text>
           </View>
 
           <View style={styles.quoteWrapper}>
@@ -97,34 +97,37 @@ export default function WOTDScreen() {
           <Text variant="h3" style={styles.verseRef}>{wotd.reference}</Text>
         </Card>
 
-        {/* Lens Selection Grid */}
+        {/* Lens Selection Tabs */}
         <Text variant="h3" style={styles.sectionTitle}>Choose Analytical Lens</Text>
 
-        <View style={styles.lensGrid}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.lensTabsContainer}
+          style={styles.lensTabsScroll}
+        >
           {LENS_TABS.map((tab) => {
             const active = activeLens === tab.key;
             const iconColor = active ? colors.accent : colors.textSecondary;
             return (
               <TouchableOpacity
                 key={tab.key}
-                style={[styles.lensBtn, active && styles.lensBtnActive]}
+                style={[styles.lensTab, active && styles.lensTabActive]}
                 onPress={() => setActiveLens(tab.key as LensKey)}
-                activeOpacity={0.8}
+                activeOpacity={0.7}
               >
-                <View style={[styles.lensIconBox, active && styles.lensIconBoxActive]}>
-                  {getLensIcon(tab.key as LensKey, iconColor)}
-                </View>
+                {getLensIcon(tab.key as LensKey, iconColor)}
                 <Text
                   variant="label"
-                  style={[styles.lensLabel, active && styles.lensLabelActive]}
-                  weight={active ? '800' : '600'}
+                  style={[styles.lensTabLabel, active && styles.lensTabLabelActive]}
+                  weight={active ? '700' : '500'}
                 >
                   {tab.label}
                 </Text>
               </TouchableOpacity>
             );
           })}
-        </View>
+        </ScrollView>
 
         {/* Selected Lens Explanation Card */}
         <Card style={styles.insightCard}>
@@ -219,18 +222,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  dateBadge: {
+  metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm, // 8px
-    alignSelf: 'flex-start',
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: spacing.sm, // 8px
-    paddingVertical: 4,
-    borderRadius: radius.full,
-    marginBottom: spacing.md, // 16px
-    borderWidth: 1,
-    borderColor: colors.accentBorder,
+    gap: 6,
+    marginBottom: spacing.sm, // 8px
+  },
+  metaLabel: {
+    fontSize: 11,
+    letterSpacing: 0.5,
   },
   quoteWrapper: {
     marginBottom: spacing.md, // 16px
@@ -248,48 +248,35 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 17,
     color: colors.textPrimary,
-    marginBottom: spacing.md, // 16px
+    marginBottom: spacing.sm, // 8px
   },
-  lensGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm, // 8px
+  lensTabsScroll: {
     marginBottom: spacing.lg, // 24px
   },
-  lensBtn: {
-    width: '48%',
+  lensTabsContainer: {
+    flexDirection: 'row',
+    gap: spacing.md, // 16px
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    paddingBottom: 2,
+  },
+  lensTab: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm, // 8px
-    padding: spacing.md, // 16px
-    borderRadius: radius.md, // 16px
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
+    gap: 6,
+    paddingVertical: spacing.sm, // 8px
+    paddingHorizontal: 4,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
   },
-  lensBtnActive: {
-    borderColor: colors.accentBorder,
-    backgroundColor: colors.accentSoft,
+  lensTabActive: {
+    borderBottomColor: colors.accent,
   },
-  lensIconBox: {
-    width: 32,
-    height: 32,
-    borderRadius: radius.sm, // 8px
-    backgroundColor: colors.surfaceElevated,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  lensIconBoxActive: {
-    backgroundColor: colors.surface,
-  },
-  lensLabel: {
-    fontSize: 11,
+  lensTabLabel: {
+    fontSize: 13,
     color: colors.textSecondary,
-    flexShrink: 1,
   },
-  lensLabelActive: {
+  lensTabLabelActive: {
     color: colors.accent,
   },
   insightCard: {

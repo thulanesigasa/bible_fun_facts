@@ -87,16 +87,9 @@ export default function ScriptureDetailsScreen({ navigation, route }: ScriptureD
             <View style={styles.genreIconRow}>
               {getGenreSvg(scripture.genre, 16, colors.accent)}
             </View>
-            <View style={styles.badge}>
-              <Text variant="label" weight="800" color={colors.accent}>
-                {scripture.testament.toUpperCase()}
-              </Text>
-            </View>
-            <View style={styles.genreBadge}>
-              <Text variant="label" color={colors.textSecondary}>
-                {scripture.genre}
-              </Text>
-            </View>
+            <Text variant="caption" weight="700" color={colors.accent}>
+              {scripture.testament.toUpperCase()} • {scripture.genre}
+            </Text>
           </View>
 
           <Text variant="h2" style={styles.scriptureRef}>{scripture.reference}</Text>
@@ -140,9 +133,7 @@ export default function ScriptureDetailsScreen({ navigation, route }: ScriptureD
                 <Text variant="h1" style={styles.strongsWord}>{scripture.strongs_word}</Text>
                 <Text variant="body" style={styles.strongsTrans}>{scripture.strongs_transliteration}</Text>
               </View>
-              <View style={styles.numberBadge}>
-                <Text variant="label" color={colors.accent}>{scripture.strongs_number}</Text>
-              </View>
+              <Text variant="body" weight="700" color={colors.accent}>{scripture.strongs_number}</Text>
             </View>
 
             <View style={styles.definitionBox}>
@@ -229,22 +220,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  badge: {
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: spacing.md, // 16px
-    paddingVertical: spacing.sm, // 8px
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: colors.accentBorder,
-  },
-  genreBadge: {
-    backgroundColor: colors.surfaceElevated,
-    paddingHorizontal: spacing.md, // 16px
-    paddingVertical: spacing.sm, // 8px
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+
   scriptureRef: {
     fontSize: 24,
     color: colors.textPrimary,
@@ -320,14 +296,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: 4,
   },
-  numberBadge: {
-    backgroundColor: colors.surfaceElevated,
-    paddingHorizontal: spacing.md, // 16px
-    paddingVertical: spacing.sm, // 8px
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+
   definitionBox: {
     backgroundColor: colors.surfaceElevated,
     borderRadius: radius.md, // 16px

@@ -138,16 +138,9 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
               <View style={styles.scriptureHeader}>
                 <View style={styles.genreIconRow}>
                   {getGenreSvg(scripture.genre, 16, colors.accent)}
-                  <View style={styles.badge}>
-                    <Text variant="label" color={colors.accent} weight="700">
-                      {scripture.testament}
-                    </Text>
-                  </View>
-                  <View style={styles.genreBadge}>
-                    <Text variant="label" color={colors.textSecondary}>
-                      {scripture.genre}
-                    </Text>
-                  </View>
+                  <Text variant="caption" color={colors.accent} weight="700">
+                    {scripture.testament} • {scripture.genre}
+                  </Text>
                 </View>
                 <ChevronRightSvg size={18} color={colors.accent} />
               </View>
@@ -160,9 +153,7 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
               {scripture.tags && (
                 <View style={styles.tagsContainer}>
                   {scripture.tags.slice(0, 3).map((tag) => (
-                    <View key={tag} style={styles.tagBadge}>
-                      <Text variant="caption" color={colors.textSecondary}>#{tag}</Text>
-                    </View>
+                    <Text key={tag} variant="caption" color={colors.textTertiary}>#{tag}</Text>
                   ))}
                 </View>
               )}
@@ -267,22 +258,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm, // 8px
   },
-  badge: {
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: spacing.sm, // 8px
-    paddingVertical: 4,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: colors.accentBorder,
-  },
-  genreBadge: {
-    backgroundColor: colors.surfaceElevated,
-    paddingHorizontal: spacing.sm, // 8px
-    paddingVertical: 4,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+
   referenceText: {
     fontSize: 19,
     color: colors.textPrimary,
@@ -299,12 +275,5 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.sm, // 8px
   },
-  tagBadge: {
-    backgroundColor: colors.surfaceElevated,
-    paddingHorizontal: spacing.sm, // 8px
-    paddingVertical: 4,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+
 });

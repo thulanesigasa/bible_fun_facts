@@ -27,13 +27,11 @@ interface FactCardProps {
 export const FactCard: React.FC<FactCardProps> = ({ fact, onPress, compact }) => {
   return (
     <View style={styles.card}>
-      {/* Category Pill & Scripture Icon Row */}
+      {/* Category Label & Scripture Icon Row */}
       <View style={styles.headerRow}>
-        <View style={styles.catPill}>
-          <Text variant="label" weight="800" style={styles.catPillText}>
-            {fact.category.toUpperCase()}
-          </Text>
-        </View>
+        <Text variant="caption" weight="700" color={colors.accent} style={styles.catLabel}>
+          {fact.category.toUpperCase()}
+        </Text>
         <ScripturesSvg size={20} color={colors.accent} fill={colors.accentSoft} />
       </View>
 
@@ -114,16 +112,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing.md, // 16px
   },
-  catPill: {
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: spacing.md, // 16px
-    paddingVertical: spacing.sm, // 8px
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: colors.accentBorder,
-  },
-  catPillText: {
-    color: colors.accent,
+  catLabel: {
     letterSpacing: 1,
   },
   verseSection: {
