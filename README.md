@@ -23,40 +23,40 @@
 
 ```mermaid
 graph TD
-    App[App.tsx] --> Providers[UserProvider + SafeAreaProvider]
-    Providers --> Nav[AppNavigator]
-    Providers --> UpdateModal[UpdateModal - Update Now / Remind Me Later]
-    Nav --> Auth[AuthScreen - 28x28 Calibrated Logo]
-    Nav --> Tabs[Rule 20 Floating Pill Tab Bar - 280px]
+    App["App.tsx"] --> Providers["UserProvider + SafeAreaProvider"]
+    Providers --> Nav["AppNavigator"]
+    Providers --> UpdateModal["UpdateModal (Update Now / Remind Me Later)"]
+    Nav --> Auth["AuthScreen (28x28 Calibrated Logo)"]
+    Nav --> Tabs["Rule 20 Floating Pill Tab Bar (280px)"]
     
-    Tabs --> DiscoverStack[Discover Stack]
-    Tabs --> WOTDScreen[Word of the Day - 4 Lenses]
-    Tabs --> ScripturesStack[Scriptures Stack]
-    Tabs --> SearchStack[Search Stack]
-    Tabs --> FavoritesStack[Favorites Stack]
+    Tabs --> DiscoverStack["Discover Stack"]
+    Tabs --> WOTDScreen["Word of the Day (4 Lenses)"]
+    Tabs --> ScripturesStack["Scriptures Stack"]
+    Tabs --> SearchStack["Search Stack"]
+    Tabs --> FavoritesStack["Favorites Stack"]
     
-    DiscoverStack --> DiscoverMain[DiscoverScreen]
-    DiscoverStack --> FactDetails[FactDetailsScreen - PageSheet]
+    DiscoverStack --> DiscoverMain["DiscoverScreen"]
+    DiscoverStack --> FactDetails["FactDetailsScreen (PageSheet)"]
     
-    ScripturesStack --> ScripturesMain[ScripturesScreen]
-    ScripturesStack --> ScriptureDetails[ScriptureDetailsScreen - PageSheet]
+    ScripturesStack --> ScripturesMain["ScripturesScreen"]
+    ScripturesStack --> ScriptureDetails["ScriptureDetailsScreen (PageSheet)"]
     
-    SearchStack --> SearchMain[SearchScreen]
-    FavoritesStack --> FavoritesMain[FavoritesScreen]
+    SearchStack --> SearchMain["SearchScreen"]
+    FavoritesStack --> FavoritesMain["FavoritesScreen"]
     
-    subgraph Data, State & Updates
-        AsyncStorage[(AsyncStorage)] <--> UserContext[UserContext - useApp / useUser]
-        MockDB[(mockDatabase.ts)] --> Components[UI Components]
-        ExpoUpdates[(expo-updates)] <--> UpdateService[updates.ts]
-        AppStateListener[AppState Foreground Resume] --> UpdateModal
+    subgraph DataUpdates["Data, State and Updates"]
+        AsyncStorage[("AsyncStorage")] <--> UserContext["UserContext (useApp / useUser)"]
+        MockDB[("mockDatabase.ts")] --> Components["UI Components"]
+        ExpoUpdates[("expo-updates")] <--> UpdateService["updates.ts"]
+        AppStateListener["AppState Foreground Resume"] --> UpdateModal
     end
     
-    subgraph Multi-Channel CI/CD Pipeline
-        GHA[GitHub Actions: compile-and-ota.yml]
-        GHA --> ProdOTA[Deploy to Channel: production]
-        GHA --> PrevOTA[Deploy to Channel: preview]
-        GHA --> CompileJob[Compile Native APK / AAB]
-        EASCloud[EAS Cloud - Project c00f29d0]
+    subgraph Pipeline["Multi-Channel CI/CD Pipeline"]
+        GHA["GitHub Actions (compile-and-ota.yml)"]
+        GHA --> ProdOTA["Deploy to Channel: production"]
+        GHA --> PrevOTA["Deploy to Channel: preview"]
+        GHA --> CompileJob["Compile Native APK / AAB"]
+        EASCloud["EAS Cloud (Project c00f29d0)"]
         ProdOTA --> EASCloud
         PrevOTA --> EASCloud
         CompileJob --> EASCloud
