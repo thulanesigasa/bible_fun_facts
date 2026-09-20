@@ -1,0 +1,132 @@
+name: Compile App & Publish OTA Updates
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'assets/**'
+      - 'App.tsx'
+      - 'app.json'
+      - 'package.json'
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to execute'
+        required: true
+        type: choice
+        default: 'publish_ota'
+        options:
+          - 'publish_ota'
+          - 'compile_native_app'
+          - 'both'
+      platform:
+        description: 'Native build platform (for compile_native_app)'
+        required: false
+        type: choice
+        default: 'android'
+        options:
+          - 'android'
+          - 'ios'
+          - 'all'
+      build_profile:
+        description: 'EAS Build Profile (for compile_native_app)'
+        required: false
+        type: choice
+        default: 'preview'
+        options:
+          - 'preview'
+          - 'production'
+          - 'development'
+      compile_build_number:
+        description: 'Custom native build number (leave blank to auto-use GitHub Run Number)'
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  # Job 1: Publish Over-The-Air Update (Runtime locked to 1.0.1)
+  publish_ota:
+    name: Publish Expo OTA Update
+    if: github.event_name == 'push' || inputs.action == 'publish_ota' || inputs.action == 'both'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify TypeScript & Config
+        run: |
+          npx tsc --noEmit
+          npx expo config --type public
+
+      - name: Setup EAS CLI
+        uses: expo/eas-cli-action@v1
+        with:
+          version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Publish OTA Update to Production Branch
+        run: |
+          npx eas update --branch production --message "${{ github.event.head_commit.message || 'Automated OTA update from GitHub' }}" --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+  # Job 2: Compile Native Binary on GitHub Actions
+  compile_native_app:
+    name: Compile Native Binary
+    if: github.event_name == 'workflow_dispatch' && (inputs.action == 'compile_native_app' || inputs.action == 'both')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Inject Incremental Compilation Build Version
+        run: |
+          # Set dynamic build number while preserving version 1.0.1 and runtimeVersion 1.0.1
+          BUILD_NUM="${{ inputs.compile_build_number }}"
+          if [ -z "$BUILD_NUM" ]; then
+            BUILD_NUM="${{ github.run_number }}"
+          fi
+          echo "Compiling native build with dynamic build number: $BUILD_NUM (runtimeVersion remains 1.0.1)"
+          node -e "
+            const fs = require('fs');
+            const app = JSON.parse(fs.readFileSync('app.json', 'utf8'));
+            app.expo.android.versionCode = parseInt('$BUILD_NUM') || 1;
+            app.expo.ios.buildNumber = String('$BUILD_NUM') || '1';
+            fs.writeFileSync('app.json', JSON.stringify(app, null, 2));
+          "
+          git diff app.json
+
+      - name: Verify Configuration
+        run: npx expo config --type public
+
+      - name: Setup EAS CLI
+        uses: expo/eas-cli-action@v1
+        with:
+          version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Compile Native Binary via EAS Build
+        run: |
+          npx eas build --platform ${{ inputs.platform }} --profile ${{ inputs.build_profile }} --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}

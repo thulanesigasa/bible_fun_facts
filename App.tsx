@@ -5,6 +5,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppNavigator from './src/navigation/AppNavigator';
 import { UserProvider } from './src/context/UserContext';
+import { UpdateModal } from './src/components/UpdateModal';
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <SafeAreaProvider>
           <StatusBar style="dark" />
           <AppNavigator />
+          <UpdateModal />
         </SafeAreaProvider>
       </UserProvider>
     </GestureHandlerRootView>
