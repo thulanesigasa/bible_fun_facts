@@ -11,6 +11,9 @@ import {
   Alert,
   ActivityIndicator,
   Modal,
+  Keyboard,
+  LayoutChangeEvent,
+  Text as RNText,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSecurePasswordCapture } from '../hooks/useSecurePasswordCapture';
@@ -85,6 +88,48 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
     handlePasswordBlur,
   } = useSecurePasswordCapture({ enableAppSwitcherProtection: true });
 
+  const scrollViewRef = useRef<ScrollView>(null);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const sectionTop = useRef(0);
+  const fieldOffsets = useRef<Record<string, number>>({});
+
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showSub = Keyboard.addListener(showEvent, (e) => {
+      setKeyboardHeight(e.endCoordinates.height);
+    });
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  const handleSectionLayout = (e: LayoutChangeEvent) => {
+    sectionTop.current = e.nativeEvent.layout.y;
+  };
+
+  const recordFieldLayout = (key: string) => (e: LayoutChangeEvent) => {
+    fieldOffsets.current[key] = e.nativeEvent.layout.y;
+  };
+
+  const scrollToField = (key: string, fallbackY: number) => {
+    const relY = fieldOffsets.current[key];
+    const targetY = typeof relY === 'number' ? sectionTop.current + relY : fallbackY;
+
+    setTimeout(() => {
+      scrollViewRef.current?.scrollTo({
+        y: Math.max(0, targetY - 60),
+        animated: true,
+      });
+    }, Platform.OS === 'ios' ? 80 : 150);
+  };
+
   useEffect(() => {
     if (mode === 'signup' && step === 3) {
       activateSecurity();
@@ -97,9 +142,15 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
   useEffect(() => {
     if (mode === 'signup') {
       if (step === 2) {
-        setTimeout(() => emailRef.current?.focus(), 150);
+        setTimeout(() => {
+          emailRef.current?.focus();
+          scrollToField('email', 260);
+        }, 150);
       } else if (step === 3) {
-        setTimeout(() => passwordRef.current?.focus(), 150);
+        setTimeout(() => {
+          passwordRef.current?.focus();
+          scrollToField('password', 260);
+        }, 150);
       }
     }
   }, [step, mode]);
@@ -235,24 +286,22 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
   // Requirement: Legal disclaimer text matches surrounding text (no underline, no color change, no font change)
   const renderLegalDisclaimer = () => (
     <View style={styles.disclaimerContainer}>
-      <Text variant="caption" color={colors.textSecondary} align="center" style={styles.disclaimer}>
+      <RNText style={styles.disclaimerText}>
         By continuing, you agree to our{' '}
-        <Text
-          variant="caption"
-          color={colors.textSecondary}
+        <RNText
+          style={styles.disclaimerText}
           onPress={() => navigation.navigate('TermsOfService')}
         >
           Terms of Service
-        </Text>{' '}
+        </RNText>{' '}
         and{' '}
-        <Text
-          variant="caption"
-          color={colors.textSecondary}
+        <RNText
+          style={styles.disclaimerText}
           onPress={() => navigation.navigate('PrivacyPolicy')}
         >
           Privacy Policy
-        </Text>.
-      </Text>
+        </RNText>.
+      </RNText>
     </View>
   );
 
@@ -260,15 +309,19 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 20}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
         style={styles.keyboardView}
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          ref={scrollViewRef}
+          contentContainerStyle={[
+            styles.scrollContent,
+            { paddingBottom: keyboardHeight > 0 ? keyboardHeight + 120 : 60 },
+          ]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
-          automaticallyAdjustKeyboardInsets={true}
+          automaticallyAdjustKeyboardInsets={false}
         >
           {/* Top Bar / Back to Welcome */}
           {navigation?.canGoBack?.() && (
@@ -335,8 +388,8 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
           {/* MODE: LOGIN                                                      */}
           {/* ================================================================ */}
           {mode === 'login' && (
-            <View style={styles.formSection}>
-              <View style={styles.inputGroup}>
+            <View style={styles.formSection} onLayout={handleSectionLayout}>
+              <View style={styles.inputGroup} onLayout={recordFieldLayout('loginEmail')}>
                 <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.inputLabel}>
                   EMAIL OR USERNAME
                 </Text>
@@ -354,12 +407,13 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                     autoCorrect={false}
                     returnKeyType="next"
                     blurOnSubmit={false}
+                    onFocus={() => scrollToField('loginEmail', 240)}
                     onSubmitEditing={() => loginPasswordRef.current?.focus()}
                   />
                 </View>
               </View>
 
-              <View style={styles.inputGroup}>
+              <View style={styles.inputGroup} onLayout={recordFieldLayout('loginPassword')}>
                 <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.inputLabel}>
                   PASSWORD
                 </Text>
@@ -376,7 +430,10 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                     autoCapitalize="none"
                     autoCorrect={false}
                     returnKeyType="done"
-                    onFocus={handlePasswordFocus}
+                    onFocus={() => {
+                      handlePasswordFocus();
+                      scrollToField('loginPassword', 340);
+                    }}
                     onBlur={handlePasswordBlur}
                     onSubmitEditing={handleLoginSubmit}
                   />
@@ -487,8 +544,8 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
 
               {/* STEP 1: Personal Identity & Username */}
               {step === 1 && (
-                <View style={styles.stepContentSection}>
-                  <View style={styles.inputGroup}>
+                <View style={styles.stepContentSection} onLayout={handleSectionLayout}>
+                  <View style={styles.inputGroup} onLayout={recordFieldLayout('firstName')}>
                     <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.inputLabel}>
                       FIRST NAME
                     </Text>
@@ -504,12 +561,13 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                         autoCapitalize="words"
                         returnKeyType="next"
                         blurOnSubmit={false}
+                        onFocus={() => scrollToField('firstName', 260)}
                         onSubmitEditing={() => lastNameRef.current?.focus()}
                       />
                     </View>
                   </View>
 
-                  <View style={styles.inputGroup}>
+                  <View style={styles.inputGroup} onLayout={recordFieldLayout('lastName')}>
                     <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.inputLabel}>
                       LAST NAME / SURNAME
                     </Text>
@@ -525,12 +583,13 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                         autoCapitalize="words"
                         returnKeyType="next"
                         blurOnSubmit={false}
+                        onFocus={() => scrollToField('lastName', 350)}
                         onSubmitEditing={() => usernameRef.current?.focus()}
                       />
                     </View>
                   </View>
 
-                  <View style={styles.inputGroup}>
+                  <View style={styles.inputGroup} onLayout={recordFieldLayout('username')}>
                     <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.inputLabel}>
                       DESIRED USERNAME
                     </Text>
@@ -554,6 +613,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                         autoCorrect={false}
                         returnKeyType="next"
                         blurOnSubmit={false}
+                        onFocus={() => scrollToField('username', 440)}
                         onSubmitEditing={() => {
                           if (canProceedStep1) {
                             setStep(2);
@@ -619,8 +679,8 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
 
               {/* STEP 2: Contact & Phone Verification */}
               {step === 2 && (
-                <View style={styles.stepContentSection}>
-                  <View style={styles.inputGroup}>
+                <View style={styles.stepContentSection} onLayout={handleSectionLayout}>
+                  <View style={styles.inputGroup} onLayout={recordFieldLayout('email')}>
                     <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.inputLabel}>
                       EMAIL ADDRESS
                     </Text>
@@ -638,6 +698,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                         autoCorrect={false}
                         returnKeyType="next"
                         blurOnSubmit={false}
+                        onFocus={() => scrollToField('email', 260)}
                         onSubmitEditing={() => confirmEmailRef.current?.focus()}
                       />
                       {isEmailValid(email) && (
@@ -646,7 +707,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                     </View>
                   </View>
 
-                  <View style={styles.inputGroup}>
+                  <View style={styles.inputGroup} onLayout={recordFieldLayout('confirmEmail')}>
                     <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.inputLabel}>
                       CONFIRM EMAIL ADDRESS
                     </Text>
@@ -671,6 +732,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                         autoCorrect={false}
                         returnKeyType="next"
                         blurOnSubmit={false}
+                        onFocus={() => scrollToField('confirmEmail', 350)}
                         onSubmitEditing={() => phoneRef.current?.focus()}
                       />
                       {confirmEmail.length > 0 && (
@@ -697,7 +759,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                   </View>
 
                   {/* Phone Number with Country Code (Leading zero auto-stripped) */}
-                  <View style={styles.inputGroup}>
+                  <View style={styles.inputGroup} onLayout={recordFieldLayout('phone')}>
                     <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.inputLabel}>
                       PHONE NUMBER
                     </Text>
@@ -725,6 +787,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                           keyboardType="phone-pad"
                           returnKeyType="next"
                           blurOnSubmit={false}
+                          onFocus={() => scrollToField('phone', 440)}
                           onSubmitEditing={() => {
                             if (canProceedStep2) {
                               setStep(3);
@@ -773,8 +836,8 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
 
               {/* STEP 3: Security & Credentials -> Complete Account */}
               {step === 3 && (
-                <View style={styles.stepContentSection}>
-                  <View style={styles.inputGroup}>
+                <View style={styles.stepContentSection} onLayout={handleSectionLayout}>
+                  <View style={styles.inputGroup} onLayout={recordFieldLayout('password')}>
                     <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.inputLabel}>
                       CREATE PASSWORD
                     </Text>
@@ -792,7 +855,10 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                         autoCorrect={false}
                         returnKeyType="next"
                         blurOnSubmit={false}
-                        onFocus={handlePasswordFocus}
+                        onFocus={() => {
+                          handlePasswordFocus();
+                          scrollToField('password', 260);
+                        }}
                         onBlur={handlePasswordBlur}
                         onSubmitEditing={() => confirmPasswordRef.current?.focus()}
                       />
@@ -874,7 +940,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                     </View>
                   </View>
 
-                  <View style={styles.inputGroup}>
+                  <View style={styles.inputGroup} onLayout={recordFieldLayout('confirmPassword')}>
                     <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.inputLabel}>
                       CONFIRM PASSWORD
                     </Text>
@@ -899,7 +965,10 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                         autoCorrect={false}
                         returnKeyType="done"
                         blurOnSubmit={false}
-                        onFocus={handlePasswordFocus}
+                        onFocus={() => {
+                          handlePasswordFocus();
+                          scrollToField('confirmPassword', 460);
+                        }}
                         onBlur={handlePasswordBlur}
                         onSubmitEditing={handleFinalSignUp}
                       />
@@ -1038,7 +1107,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: spacing.lg, // 24px
     paddingTop: spacing.md, // 16px
-    paddingBottom: Platform.OS === 'ios' ? 40 : 160, // Large padding preventing keyboard overlay
     flexGrow: 1,
   },
   topBar: {
@@ -1368,10 +1436,13 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     paddingHorizontal: spacing.sm,
   },
-  disclaimer: {
+  disclaimerText: {
     textAlign: 'center',
     fontSize: 11,
     lineHeight: 18,
+    fontWeight: '400',
+    color: colors.textSecondary,
+    textDecorationLine: 'none',
   },
   // Modal Country Code Picker
   modalOverlay: {

@@ -14,6 +14,8 @@
   <img src="https://img.shields.io/badge/GitHub%20Actions-Compilation%20&%20OTA-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions" />
   <img src="https://img.shields.io/badge/Tab%20Architecture-Floating%20Pill%20280px-D97706?style=for-the-badge" alt="Floating Pill Tab Bar" />
   <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
+  <img src="https://img.shields.io/badge/Keyboard%20Avoidance-Reactive%20Auto--Scroll-0284C7?style=for-the-badge" alt="Reactive Keyboard Auto-Scroll" />
+  <img src="https://img.shields.io/badge/Legal%20Typography-100%25%20Uniform-64748B?style=for-the-badge" alt="100% Uniform Legal Typography" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
   <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License MIT" />
 </p>
@@ -257,9 +259,38 @@ Immediately after the application boots up, new and unauthenticated users are gu
 - **Interactive "Swipe to Get Started" Slider**: Replaced the static full-width button with a sleek 210px `PanResponder` slider track (`#FFFFFF` surface, hairline border `rgba(15, 23, 42, 0.08)`). Users drag an amber circular thumb (`#D97706`) with white Chevron SVG across the track to launch into registration. Swiping past 60% executes the launch transition, while releasing early gently springs back. Tapping also navigates for accessibility.
 - **Persistent Tab Locator (Zero Center-Jumping)**: The active tab locator stays firmly anchored at the bottom-left on all three slides, completely eliminating abrupt position shifts.
 - **Real-Time Sliding Liquid Pill**: The active indicator pill interpolates `translateX` and `width` dynamically via `scrollX`, sliding smoothly between dot slots as the user drags.
-- **Image Merge & Crossfade Canvas**: Vector illustrations are mounted in a shared center stage where opacities and subtle scales crossfade seamlessly based on `scrollX`, creating an organic morphing dissolve effect between slides rather than rigid horizontal block translations.
+- **Image Merge & Pure Crossfade Canvas (Zero Pop)**: Vector illustrations are mounted in a shared center stage where opacities crossfade seamlessly based on `scrollX`. Unwanted scale pop animations were removed, ensuring an organic dissolving morph between slides rather than rigid block translations.
+- **Swipe-to-Start Reset & Flowing Trail**: Navigating back from registration automatically resets the slider thumb to origin via `useFocusEffect(useCallback(() => panX.setValue(0), []))`. Dragging features an amber trailing fill and real-time text fade-out.
+- **Uniform Legal Typography**: The Terms of Service and Privacy Policy disclaimer lines match the surrounding text completely in font size (11px), regular font weight (`400`), line height, and color (`#64748B`), with zero underline or bolding, while remaining interactive.
 - **Secondary CTA**: **"Already have an account? Sign In"** — Navigates directly to Login mode.
 - **Header Skip Action**: "Skip" button located in the top-right header on Slides 1 & 2 allows users to jump straight into the application without swiping through all slides.
+
+---
+
+## Reactive Keyboard Avoidance & Input Accessibility Architecture
+
+To ensure input fields are never obscured by virtual soft keyboards on Android or iOS:
+
+```mermaid
+graph TD
+    Focus["User Taps TextInput (onFocus)"] --> ScrollToField["scrollToField(fieldKey, fallbackY)"]
+    Layout["onLayout on InputGroup"] --> Offsets["fieldOffsets.current[fieldKey]"]
+    SectionLayout["onLayout on Section"] --> SectionTop["sectionTop.current"]
+    KeyboardEvent["Keyboard.addListener (keyboardDidShow / keyboardWillShow)"] --> DynamicPad["paddingBottom: keyboardHeight + 120"]
+    AndroidConfig["app.json: softwareKeyboardLayoutMode: resize"] --> WinResize["Android Window Frame Resizes"]
+    
+    Offsets --> TargetY["targetY = sectionTop + fieldOffset"]
+    SectionTop --> TargetY
+    TargetY --> SmoothScroll["ScrollView.scrollTo({ y: targetY - 60, animated: true })"]
+    DynamicPad --> SmoothScroll
+    WinResize --> SmoothScroll
+```
+
+1. **Android Frame Resizing (`app.json`)**: Configured `"android.softwareKeyboardLayoutMode": "resize"`, directing Android's window manager to contract the activity viewport when the keyboard opens rather than drawing on top of it.
+2. **Dynamic Inset Expansion**: Listens to `Keyboard.addListener` (`keyboardWillShow` / `keyboardDidShow`) and injects `paddingBottom: keyboardHeight > 0 ? keyboardHeight + 120 : 60` directly into `ScrollView.contentContainerStyle`. This guarantees the scroll container has sufficient vertical travel distance to elevate even the bottom-most fields (e.g. Confirm Password or Phone).
+3. **Deterministic Layout Calculation (New Architecture Compatible)**: Bypasses deprecated `findNodeHandle` by caching native `onLayout` coordinates of sections and input groups. `targetY = sectionTop + fieldOffset` computes the exact pixel coordinates within the scroll content.
+4. **Smooth Centering on Focus**: When any input receives focus, `scrollToField` smoothly animates the field into the upper third of the visible screen (`targetY - 60`), preserving 60px of breathing room above for labels and context.
+5. **No Double-Offset Conflict**: Disables `automaticallyAdjustKeyboardInsets` on `ScrollView` to avoid collision with `KeyboardAvoidingView` on iOS.
 
 ---
 
