@@ -10,7 +10,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
-import { Card } from '../components/Card';
 import { facts, Fact } from '../data/mockDatabase';
 import { useUser } from '../context/UserContext';
 import {
@@ -53,7 +52,7 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
   const isFavorited = isFactFavorited(currentFact.id);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
       <ScrollView
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -67,25 +66,25 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
           />
         }
       >
-        {/* Header */}
+        {/* Screen Top Header Greeting */}
         <View style={styles.header}>
           <View style={styles.headerIconRow}>
-            <DiscoverSvg size={28} color={colors.accent} fill={colors.accentSoft} />
-            <Text variant="h1" style={styles.headerTitle}>
+            <DiscoverSvg size={24} color={colors.accent} fill={colors.accentSoft} />
+            <Text variant="h2" style={styles.headerTitle}>
               Did You Know{userProfile?.name ? `, ${userProfile.name}` : ''}?
             </Text>
           </View>
           <Text variant="body" color={colors.textSecondary} style={styles.headerSub}>
-            Discover hidden treasures in Scripture
+            Discover hidden treasures in Biblical history & culture
           </Text>
         </View>
 
         {/* Compact Streak & Stats Card */}
-        <View style={styles.streakCard}>
+        <View style={[styles.streakCard, shadow.sm]}>
           <View style={styles.streakInnerRow}>
             <View style={styles.statItem}>
               <View style={styles.streakIconCircle}>
-                <FlameSvg size={20} color={colors.accent} fill={colors.accent} />
+                <FlameSvg size={18} color={colors.accent} fill={colors.accent} />
               </View>
               <View>
                 <Text variant="label" color={colors.textSecondary}>Streak</Text>
@@ -99,7 +98,7 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
 
             <View style={styles.statItem}>
               <View style={styles.streakIconCircle}>
-                <DiscoverSvg size={20} color={colors.accent} />
+                <DiscoverSvg size={18} color={colors.accent} />
               </View>
               <View>
                 <Text variant="label" color={colors.textSecondary}>Viewed</Text>
@@ -113,7 +112,7 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
 
         {/* Main Fact Card */}
         <TouchableOpacity
-          style={styles.factCard}
+          style={[styles.factCard, shadow.sm]}
           onPress={() => navigation.navigate('FactDetails', { fact: currentFact })}
           activeOpacity={0.88}
         >
@@ -200,11 +199,11 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
 
         {/* Discover Another Button */}
         <TouchableOpacity
-          style={styles.discoverBtn}
+          style={[styles.discoverBtn, shadow.sm]}
           onPress={discoverAnother}
           activeOpacity={0.85}
         >
-          <RefreshSvg size={20} color={colors.background} />
+          <RefreshSvg size={20} color="#FFFFFF" />
           <Text variant="h3" style={styles.discoverBtnText}>Discover Another Fact</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -222,10 +221,11 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: spacing.md, // 16px margins & gutters per Rule 15
-    paddingBottom: spacing.xxl, // 48px
+    paddingBottom: 96, // Multiple of 8 (96px) ensures clear spacing above 50px floating pill tab bar
   },
   header: {
-    marginBottom: spacing.lg, // 24px
+    marginTop: spacing.sm, // 8px
+    marginBottom: spacing.md, // 16px
     alignItems: 'flex-start',
   },
   headerIconRow: {
@@ -234,18 +234,18 @@ const styles = StyleSheet.create({
     gap: spacing.sm, // 8px
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 22,
     color: colors.textPrimary,
   },
   headerSub: {
-    marginTop: spacing.sm, // 8px
-    fontSize: 16,
+    marginTop: 4,
+    fontSize: 14,
   },
   streakCard: {
     paddingVertical: spacing.md, // 16px
     paddingHorizontal: spacing.md, // 16px
-    marginBottom: spacing.lg, // 24px
-    borderRadius: radius.lg, // 24px
+    marginBottom: spacing.md, // 16px
+    borderRadius: radius.md, // 16px
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
@@ -267,16 +267,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.border,
   },
   streakIconCircle: {
-    width: 40,
-    height: 40,
+    width: 36,
+    height: 36,
     borderRadius: radius.full,
     backgroundColor: colors.surfaceElevated,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   factCard: {
     padding: spacing.lg, // 24px
-    borderRadius: radius.xl, // 32px
+    borderRadius: radius.lg, // 24px
     backgroundColor: colors.surface,
     marginBottom: spacing.lg, // 24px
     borderWidth: 1,
@@ -306,14 +308,14 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm, // 8px
   },
   scriptureRef: {
-    fontSize: 16,
+    fontSize: 15,
     color: colors.accent,
   },
   verseText: {
-    fontSize: 16,
+    fontSize: 15,
     color: colors.textSecondary,
     fontStyle: 'italic',
-    lineHeight: 24,
+    lineHeight: 22,
   },
   divider: {
     height: 1,
@@ -321,7 +323,7 @@ const styles = StyleSheet.create({
     marginVertical: spacing.md, // 16px
   },
   factTitle: {
-    fontSize: 24,
+    fontSize: 22,
     color: colors.textPrimary,
     marginBottom: spacing.md, // 16px
   },
@@ -333,18 +335,18 @@ const styles = StyleSheet.create({
   },
   sectionLabel: {
     color: colors.accent,
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
   },
   bodyText: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 15,
+    lineHeight: 22,
     marginBottom: spacing.md, // 16px
     color: colors.textPrimary,
   },
   strongsCard: {
     backgroundColor: colors.surfaceElevated,
-    borderRadius: radius.lg, // 24px
+    borderRadius: radius.md, // 16px
     padding: spacing.md, // 16px
     marginTop: spacing.sm, // 8px
     borderWidth: 1,
@@ -363,7 +365,7 @@ const styles = StyleSheet.create({
   },
   strongsCaption: {
     color: colors.textPrimary,
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
   strongsBody: {},
   strongsInlineWord: {
@@ -373,12 +375,12 @@ const styles = StyleSheet.create({
   },
   strongsWord: {
     color: colors.textPrimary,
-    fontSize: 24,
+    fontSize: 22,
   },
   strongsTrans: {
     color: colors.textSecondary,
     fontStyle: 'italic',
-    fontSize: 16,
+    fontSize: 15,
   },
   discoverBtn: {
     flexDirection: 'row',
@@ -392,7 +394,7 @@ const styles = StyleSheet.create({
   },
   discoverBtnText: {
     fontSize: 16,
-    color: colors.background,
+    color: '#FFFFFF',
     fontWeight: '700',
   },
 });

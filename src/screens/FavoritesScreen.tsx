@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
-import { spacing, radius } from '../theme';
+import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
 import { Card } from '../components/Card';
 import { useUser } from '../context/UserContext';
@@ -15,7 +15,6 @@ import {
   FavoritesSvg,
   CheckSvg,
   DiscoverSvg,
-  ScripturesSvg,
 } from '../components/SvgIcons';
 
 type FavTab = 'Facts' | 'Scriptures' | 'WOTD';
@@ -28,24 +27,24 @@ export default function FavoritesScreen({ navigation }: { navigation: any }) {
   const hasFavorites = currentList.length > 0;
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
       <ScrollView
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
       >
-        <Text variant="h1" style={styles.mainTitle}>Favorites</Text>
-
-        <View style={styles.headerSubtitleRow}>
+        <View style={styles.headerRow}>
           <FavoritesSvg size={24} color={colors.accent} fill={colors.accent} />
           <View>
-            <Text variant="h2" style={styles.subTitle}>Your Collection</Text>
-            <Text variant="body" color={colors.textSecondary}>Saved for offline reflection</Text>
+            <Text variant="h2" style={styles.title}>Saved Collection</Text>
+            <Text variant="body" color={colors.textSecondary} style={{ fontSize: 14 }}>
+              Persisted for offline reflection & deeper study
+            </Text>
           </View>
         </View>
 
         {/* 3-Way Tab Selector */}
-        <View style={styles.toggleContainer}>
+        <View style={[styles.toggleContainer, shadow.sm]}>
           {(['Facts', 'Scriptures', 'WOTD'] as FavTab[]).map(t => (
             <TouchableOpacity
               key={t}
@@ -129,11 +128,11 @@ export default function FavoritesScreen({ navigation }: { navigation: any }) {
             </Text>
 
             <TouchableOpacity
-              style={styles.discoverBtn}
+              style={[styles.discoverBtn, shadow.sm]}
               onPress={() => navigation.navigate('Discover')}
               activeOpacity={0.85}
             >
-              <DiscoverSvg size={18} color={colors.background} />
+              <DiscoverSvg size={18} color="#FFFFFF" />
               <Text variant="h3" style={styles.discoverBtnText}>Explore Scriptures</Text>
             </TouchableOpacity>
           </View>
@@ -153,21 +152,17 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: spacing.md, // 16px margins & gutters
-    paddingBottom: spacing.xxl, // 48px
+    paddingBottom: 96, // 96px padding clears floating pill tab bar
   },
-  mainTitle: {
-    fontSize: 28,
-    color: colors.textPrimary,
-    marginBottom: spacing.md, // 16px
-  },
-  headerSubtitleRow: {
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.md, // 16px
-    marginBottom: spacing.lg, // 24px
+    gap: spacing.sm, // 8px
+    marginTop: spacing.sm, // 8px
+    marginBottom: spacing.md, // 16px
   },
-  subTitle: {
-    fontSize: 18,
+  title: {
+    fontSize: 22,
     color: colors.textPrimary,
   },
   toggleContainer: {
@@ -193,7 +188,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   toggleTextActive: {
-    color: colors.background,
+    color: '#FFFFFF',
   },
   list: {
     gap: spacing.sm, // 8px
@@ -217,8 +212,8 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xxl, // 48px
   },
   emptyCircle: {
-    width: 72,
-    height: 72,
+    width: 64,
+    height: 64,
     borderRadius: radius.full,
     backgroundColor: colors.surface,
     borderWidth: 1,
@@ -228,12 +223,12 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md, // 16px
   },
   emptyTitle: {
-    fontSize: 20,
+    fontSize: 19,
     color: colors.textPrimary,
     marginBottom: spacing.sm, // 8px
   },
   emptySub: {
-    fontSize: 15,
+    fontSize: 14,
     lineHeight: 22,
     paddingHorizontal: spacing.lg, // 24px
     marginBottom: spacing.lg, // 24px
@@ -248,8 +243,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.md, // 16px
   },
   discoverBtnText: {
-    fontSize: 16,
-    color: colors.background,
+    fontSize: 15,
+    color: '#FFFFFF',
     fontWeight: '700',
   },
 });

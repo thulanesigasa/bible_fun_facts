@@ -15,15 +15,23 @@ export const spacing = {
 };
 
 /**
- * Mobile Platform Dimension Constants per Rule 15:
+ * Mobile Platform Dimension Constants per Rule 15 & Rule 20:
  * - Android: status bar 24px, app bar 56px, nav bar 56px+48px, screen 360×640dp base, 4-column grid, 16px margin, 16px gutter
  * - iOS: status bar 54px, navigation bar 96px, tab bar 56px, home indicator 34px, screen 393×852pt base, 4-column grid, 16px margin, 16px gutter
+ * - Pill Tab Bar: width 280px, height 50px, radius 16px, bottom offset 24px (Android) / 28px (iOS)
  */
 export const platformSpecs = {
   grid: {
     columns: 4,
     margin: 16,
     gutter: 16,
+  },
+  pillTabBar: {
+    width: 280,
+    height: 50,
+    borderRadius: 16,
+    bottomAndroid: 24,
+    bottomIos: 28,
   },
   android: {
     statusBar: 24,
@@ -55,23 +63,30 @@ export const radius = {
 
 export const shadow = {
   sm: {
-    shadowColor: '#000',
+    shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
   },
   md: {
-    shadowColor: '#000',
+    shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
+    shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 4,
   },
-  lg: {
-    shadowColor: '#000',
+  pill: {
+    shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.45,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  lg: {
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.12,
     shadowRadius: 16,
     elevation: 8,
   },
