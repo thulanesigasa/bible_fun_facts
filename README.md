@@ -4,6 +4,7 @@
   <img src="https://img.shields.io/badge/Expo%20SDK-57.0-000000?style=for-the-badge&logo=expo&logoColor=white" alt="Expo SDK 57" />
   <img src="https://img.shields.io/badge/React%20Native-0.86-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React Native 0.86" />
   <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript 5.9" />
+  <img src="https://img.shields.io/badge/Supabase-Auth%20&%20Backend-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase Backend" />
   <img src="https://img.shields.io/badge/CI%2FCD-Rule%2021%20Compliant-10B981?style=for-the-badge&logo=githubactions&logoColor=white" alt="Rule 21 Compliant" />
   <img src="https://img.shields.io/badge/EAS%20Channels-Production%20%7C%20Preview-000000?style=for-the-badge&logo=expo&logoColor=white" alt="EAS Channels" />
   <img src="https://img.shields.io/badge/EAS%20OTA%20Updates-Active%20(v1.0.1)-000000?style=for-the-badge&logo=expo&logoColor=white" alt="EAS OTA Updates" />
@@ -46,8 +47,9 @@ graph TD
     ProfileStack --> ProfileMain["ProfileScreen (Settings, Translation, Streak)"]
     ProfileStack --> FavoritesMain["FavoritesScreen (Saved Collection)"]
     
-    subgraph DataUpdates["Data, State and Updates"]
+    subgraph DataUpdates["Data, State, Auth and Updates"]
         AsyncStorage[("AsyncStorage")] <--> UserContext["UserContext (useApp / useUser)"]
+        Supabase[("Supabase Auth (ibwooiejzxhbzplnldcz)")] <--> UserContext
         MockDB[("mockDatabase.ts")] --> Components["UI Components"]
         ExpoUpdates[("expo-updates")] <--> UpdateService["updates.ts"]
         AppStateListener["AppState Foreground Resume"] --> UpdateModal
@@ -179,7 +181,7 @@ exegeomai/
 │   │   ├── UpdateModal.tsx               # OTA update modal (50x50 logo in 68x68 container, Remind Me Later snooze)
 │   │   └── WOTDCard.tsx                  # Word of the Day devotional card
 │   ├── context/
-│   │   └── UserContext.tsx               # State management with useApp & useUser hooks (tab & user state)
+│   │   └── UserContext.tsx               # State management with useApp, useUser & Supabase Auth hooks
 │   ├── data/
 │   │   └── mockDatabase.ts               # Curated scriptures, facts, and Strong's database
 │   ├── navigation/
@@ -198,20 +200,48 @@ exegeomai/
 │   │   └── WOTDScreen.tsx                # Daily devotional with 4 analytical lenses
 │   ├── services/
 │   │   ├── notifications.ts              # Expo notifications handler and scheduler
+│   │   ├── supabase.ts                   # Supabase client SDK with AsyncStorage persistence
 │   │   └── updates.ts                    # Expo OTA updates check, download, and reload service
 │   └── theme/
 │       ├── colors.ts                     # Strict 60-30-10 light theme tokens
 │       └── index.ts                      # Spacing (8px grid), pillTabBar specs, and soft shadows
+├── supabase/                             # Supabase CLI project configuration
+│   ├── config.toml                       # Supabase local and remote configuration
+│   └── .gitignore                        # Supabase ignore rules
+├── .env.example                          # Environment template for Supabase URL and anon key
 ├── .gitignore                            # Standard git exclusion rules
 ├── .npmrc                                # npm configuration (legacy-peer-deps=true)
 ├── App.tsx                               # Root container, Dark StatusBar, providers, and UpdateModal
 ├── app.json                              # Expo configuration (v1.0.1, runtimeVersion 1.0.1, updates URL)
 ├── eas.json                              # EAS build profiles and update channels (production, preview)
 ├── index.ts                              # Expo entrypoint
-├── package.json                          # Dependencies (expo-updates, lucide-react-native) and scripts
+├── package.json                          # Dependencies (@supabase/supabase-js, expo-updates) and scripts
 ├── tsconfig.json                         # TypeScript compiler configuration (extends expo/tsconfig.base.json)
 └── README.md                             # Comprehensive project architecture guide
 ```
+
+---
+
+## Supabase Integration & Authentication (Project Ref: `ibwooiejzxhbzplnldcz`)
+
+The mobile client integrates with Supabase for user authentication (Sign In, Sign Up, Session Persistence):
+
+### 1. Supabase CLI Setup
+- **Initialization**: Initialized with `supabase init` creating `supabase/config.toml`.
+- **Project Linking**: Linked to project `ibwooiejzxhbzplnldcz` (`supabase link --project-ref ibwooiejzxhbzplnldcz`).
+- **CLI Authentication**: Run `npx supabase login` with your Supabase Personal Access Token (PAT) or interactively in your local terminal.
+
+### 2. Mobile Client Configuration
+- **Client Factory**: Initialized in `src/services/supabase.ts` with `createClient`.
+- **Session Persistence**: Backed by `@react-native-async-storage/async-storage` for auto-refreshing and persistent JWT tokens across app sessions.
+- **Environment Variables**:
+  - `EXPO_PUBLIC_SUPABASE_URL`: `https://ibwooiejzxhbzplnldcz.supabase.co`
+  - `EXPO_PUBLIC_SUPABASE_ANON_KEY`: Configured via `.env` or CI secret.
+- **Authentication Lifecycle**:
+  - `UserContext` automatically attaches `supabase.auth.onAuthStateChange` to listen to token refreshes, logins, and logouts.
+  - Sign in with email and password via `supabase.auth.signInWithPassword`.
+  - Sign up with user metadata via `supabase.auth.signUp`.
+  - Graceful fallback for offline / development when keys are not yet configured.
 
 ---
 
