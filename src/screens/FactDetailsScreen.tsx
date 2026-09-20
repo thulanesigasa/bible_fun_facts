@@ -83,12 +83,10 @@ export default function FactDetailsScreen({ navigation, route }: FactDetailsScre
           <Text variant="h1" style={styles.title}>Fact Details</Text>
 
           <View style={styles.metaRow}>
-            <View style={styles.badge}>
-              <Text variant="label" weight="800" color={colors.accent}>
-                {fact.category.toUpperCase()}
-              </Text>
-            </View>
-            <Text variant="body" color={colors.textSecondary}>{fact.scripture_ref}</Text>
+            <Text variant="caption" weight="700" color={colors.accent} style={{ letterSpacing: 0.5 }}>
+              {fact.category.toUpperCase()}
+            </Text>
+            <Text variant="body" color={colors.textSecondary}>• {fact.scripture_ref}</Text>
           </View>
 
           <Text variant="h2" style={styles.factTitle}>{fact.fact_title}</Text>
@@ -132,9 +130,7 @@ export default function FactDetailsScreen({ navigation, route }: FactDetailsScre
                 <Text variant="h1" style={styles.strongsWord}>{fact.strongs_word}</Text>
                 <Text variant="body" style={styles.strongsTrans}>{fact.strongs_transliteration}</Text>
               </View>
-              <View style={styles.numberBadge}>
-                <Text variant="label" color={colors.accent}>{fact.strongs_number}</Text>
-              </View>
+              <Text variant="body" weight="700" color={colors.accent}>{fact.strongs_number}</Text>
             </View>
 
             <View style={styles.definitionBox}>
@@ -215,14 +211,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm, // 8px
     marginBottom: spacing.md, // 16px
   },
-  badge: {
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: spacing.md, // 16px
-    paddingVertical: spacing.sm, // 8px
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: colors.accentBorder,
-  },
+
   factTitle: {
     fontSize: 24,
     color: colors.textPrimary,
@@ -298,14 +287,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: 4,
   },
-  numberBadge: {
-    backgroundColor: colors.surfaceElevated,
-    paddingHorizontal: spacing.md, // 16px
-    paddingVertical: spacing.sm, // 8px
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+
   definitionBox: {
     backgroundColor: colors.surfaceElevated,
     borderRadius: radius.md, // 16px

@@ -51,13 +51,11 @@ export const WOTDCard: React.FC<WOTDCardProps> = ({ entry }) => {
 
   return (
     <View style={[styles.card, shadow.md]}>
-      {/* Header Badge */}
+      {/* Header */}
       <View style={styles.headerRow}>
-        <View style={styles.wotdBadge}>
-          <Text variant="label" style={styles.wotdBadgeText}>
-            WORD OF THE DAY
-          </Text>
-        </View>
+        <Text variant="caption" weight="700" color={colors.accent} style={{ letterSpacing: 1 }}>
+          DAILY DEVOTIONAL
+        </Text>
         <Text variant="caption" color={colors.textSecondary}>
           {entry.reference}
         </Text>
@@ -137,52 +135,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing.md, // 16px
   },
-  wotdBadge: {
-    backgroundColor: colors.accentSoft,
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm, // 8px
-    paddingVertical: 4,
-    borderWidth: 1,
-    borderColor: colors.accentBorder,
-  },
-  wotdBadgeText: {
-    fontSize: 10,
-    color: colors.accent,
-    letterSpacing: 1,
-    fontWeight: '800',
-  },
   verseContainer: {
-    backgroundColor: colors.surfaceElevated,
-    borderRadius: radius.md, // 16px
-    padding: spacing.md, // 16px
     marginBottom: spacing.md, // 16px
-    borderLeftWidth: 3,
-    borderLeftColor: colors.accent,
   },
   verseText: {
     fontStyle: 'italic',
-    fontSize: 16,
-    lineHeight: 24,
+    lineHeight: 28,
     marginBottom: spacing.sm, // 8px
   },
   tabsContainer: {
+    flexDirection: 'row',
     gap: spacing.sm, // 8px
-    paddingBottom: spacing.sm, // 8px
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    paddingBottom: 2,
+    marginBottom: spacing.sm, // 8px
   },
   tab: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm, // 8px
-    paddingHorizontal: spacing.md, // 16px
-    paddingVertical: spacing.sm, // 8px
-    borderRadius: radius.full,
-    backgroundColor: colors.surfaceElevated,
-    borderWidth: 1,
-    borderColor: colors.border,
+    gap: 6,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
   },
   tabActive: {
-    borderColor: colors.accentBorder,
-    backgroundColor: colors.accentSoft,
+    borderBottomColor: colors.accent,
   },
   contentBox: {
     backgroundColor: colors.surfaceElevated,

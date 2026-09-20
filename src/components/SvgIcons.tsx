@@ -11,16 +11,14 @@ interface SvgIconProps {
 
 // 1. Navigation & Core Icons
 export const DiscoverSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', fill = 'none', strokeWidth = 2, style }) => (
-  <Svg width={size} height={size} viewBox="0 0 24 24" fill={fill} style={style}>
-    <Path
-      d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Circle cx="12" cy="12" r="10" stroke={color} strokeWidth={strokeWidth} />
+    <Polygon
+      points="16.24,7.76 14.12,14.12 7.76,16.24 9.88,9.88"
       stroke={color}
       strokeWidth={strokeWidth}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      fill={fill !== 'none' ? fill : 'none'}
+      fill={fill !== 'none' ? fill : color}
     />
-    <Circle cx="19" cy="5" r="1.5" fill={color} />
   </Svg>
 );
 

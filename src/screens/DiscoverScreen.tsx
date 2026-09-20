@@ -118,11 +118,9 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
         >
           {/* Category + Bookmark */}
           <View style={styles.factTopRow}>
-            <View style={styles.badge}>
-              <Text variant="label" color={colors.accent} weight="800">
-                {currentFact.category.toUpperCase()}
-              </Text>
-            </View>
+            <Text variant="caption" weight="700" color={colors.accent} style={{ letterSpacing: 0.5 }}>
+              {currentFact.category.toUpperCase()}
+            </Text>
             <TouchableOpacity
               onPress={() => toggleFavoriteFact(currentFact)}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -290,14 +288,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing.md, // 16px
   },
-  badge: {
-    paddingHorizontal: spacing.md, // 16px
-    paddingVertical: spacing.sm, // 8px
-    borderRadius: radius.full,
-    backgroundColor: colors.accentSoft,
-    borderWidth: 1,
-    borderColor: colors.accentBorder,
-  },
+
   scriptureRow: {
     marginBottom: spacing.md, // 16px
   },

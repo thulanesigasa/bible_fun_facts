@@ -25,16 +25,9 @@ export const ScriptureCard: React.FC<ScriptureCardProps> = ({ scripture, onPress
           <View style={styles.genreIconWrapper}>
             {getGenreSvg(scripture.genre, 16, colors.accent)}
           </View>
-          <View style={styles.testamentBadge}>
-            <Text variant="label" style={styles.testamentText}>
-              {scripture.testament}
-            </Text>
-          </View>
-          <View style={styles.genreBadge}>
-            <Text variant="label" style={styles.genreText}>
-              {scripture.genre}
-            </Text>
-          </View>
+          <Text variant="caption" weight="600" color={colors.textSecondary}>
+            {scripture.testament} • {scripture.genre}
+          </Text>
         </View>
         <Text variant="caption" color={colors.textSecondary} weight="600">
           {scripture.reference}
@@ -101,30 +94,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  testamentBadge: {
-    backgroundColor: colors.accentSoft,
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm, // 8px
-    paddingVertical: 4,
-    borderWidth: 1,
-    borderColor: colors.accentBorder,
-  },
-  testamentText: {
-    fontSize: 10,
-    color: colors.accent,
-  },
-  genreBadge: {
-    backgroundColor: colors.surfaceElevated,
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm, // 8px
-    paddingVertical: 4,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  genreText: {
-    fontSize: 10,
-    color: colors.textSecondary,
-  },
+
   bookName: {
     marginBottom: spacing.sm, // 8px
     color: colors.textPrimary,

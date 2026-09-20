@@ -14,7 +14,6 @@ import { useUser } from '../context/UserContext';
 import {
   FavoritesSvg,
   CheckSvg,
-  DiscoverSvg,
 } from '../components/SvgIcons';
 
 type FavTab = 'Facts' | 'Scriptures' | 'WOTD';
@@ -132,7 +131,6 @@ export default function FavoritesScreen({ navigation }: { navigation: any }) {
               onPress={() => navigation.navigate('Discover')}
               activeOpacity={0.85}
             >
-              <DiscoverSvg size={18} color="#FFFFFF" />
               <Text variant="h3" style={styles.discoverBtnText}>Explore Scriptures</Text>
             </TouchableOpacity>
           </View>
