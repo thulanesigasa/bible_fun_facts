@@ -10,6 +10,7 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSecurePasswordCapture } from '../hooks/useSecurePasswordCapture';
@@ -29,40 +30,28 @@ import {
   ChevronRightSvg,
   AtSvg,
   ShieldCheckSvg,
-  TargetSvg,
-  BookOpenSvg,
+  PhoneSvg,
 } from '../components/SvgIcons';
 
 type AuthMode = 'login' | 'signup';
-type SignUpStep = 1 | 2 | 3 | 4;
+type SignUpStep = 1 | 2 | 3;
 
-const TRANSLATIONS = [
-  { id: 'ESV', label: 'ESV (English Standard)' },
-  { id: 'KJV', label: 'KJV (King James)' },
-  { id: 'NASB', label: 'NASB (New American Standard)' },
-  { id: 'NIV', label: 'NIV (New International)' },
-  { id: 'CSB', label: 'CSB (Christian Standard)' },
-];
-
-const STUDY_FOCUSES = [
-  { id: 'Original Languages & Strong\'s', label: 'Original Languages (Hebrew / Greek)' },
-  { id: 'Historical & Cultural Context', label: 'Historical & Ancient Cultural Context' },
-  { id: 'Daily Devotional Reflection', label: 'Daily Devotional & Practical Wisdom' },
-  { id: 'Systematic Biblical Theology', label: 'Systematic Theology & Doctrine' },
-];
-
-const DAILY_GOALS = [
-  { id: '5 mins / day', label: '5 mins / day (Essential Verse)' },
-  { id: '15 mins / day', label: '15 mins / day (Verse + Theological Context)' },
-  { id: '30 mins / day', label: '30 mins / day (Full Exegesis & Original Roots)' },
-  { id: 'Deep Dive (45m+)', label: '45+ mins / day (Scholar Immersion)' },
-];
-
-const KNOWLEDGE_LEVELS = [
-  { id: 'Curious Seeker', label: 'Curious Seeker' },
-  { id: 'Growing Disciple', label: 'Growing Disciple' },
-  { id: 'Bible Teacher / Minister', label: 'Bible Teacher / Minister' },
-  { id: 'Theological Scholar', label: 'Theological Scholar' },
+const COUNTRY_CODES = [
+  { code: '+27', name: 'South Africa (ZA)' },
+  { code: '+1', name: 'United States / Canada (US/CA)' },
+  { code: '+44', name: 'United Kingdom (UK)' },
+  { code: '+234', name: 'Nigeria (NG)' },
+  { code: '+254', name: 'Kenya (KE)' },
+  { code: '+233', name: 'Ghana (GH)' },
+  { code: '+256', name: 'Uganda (UG)' },
+  { code: '+263', name: 'Zimbabwe (ZW)' },
+  { code: '+267', name: 'Botswana (BW)' },
+  { code: '+260', name: 'Zambia (ZM)' },
+  { code: '+61', name: 'Australia (AU)' },
+  { code: '+49', name: 'Germany (DE)' },
+  { code: '+33', name: 'France (FR)' },
+  { code: '+91', name: 'India (IN)' },
+  { code: '+55', name: 'Brazil (BR)' },
 ];
 
 export default function AuthScreen({ route, navigation }: { route?: any; navigation?: any }) {
@@ -72,13 +61,14 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
   const [step, setStep] = useState<SignUpStep>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Input Refs for smooth keyboard 'Next' focus advancement
+  // Input Refs for keyboard Next focus routing
   const firstNameRef = useRef<TextInput>(null);
   const lastNameRef = useRef<TextInput>(null);
   const usernameRef = useRef<TextInput>(null);
 
   const emailRef = useRef<TextInput>(null);
   const confirmEmailRef = useRef<TextInput>(null);
+  const phoneRef = useRef<TextInput>(null);
 
   const passwordRef = useRef<TextInput>(null);
   const confirmPasswordRef = useRef<TextInput>(null);
@@ -87,9 +77,6 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
   const loginPasswordRef = useRef<TextInput>(null);
 
   // Enterprise hardware-level screen recording & screenshot protection
-  // Under the hood on Android, ScreenCapture invokes Kotlin ScreenCaptureModule:
-  // activity.window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-  // Screen recorders capture a solid black/blank screen while the user types normally.
   const {
     isSecured,
     activateSecurity,
@@ -140,21 +127,18 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
     loading: boolean;
   }>({ checked: false, available: false, loading: false });
 
-  // Sign Up Step 2: Contact & Verification
+  // Sign Up Step 2: Contact & Phone Verification
   const [email, setEmail] = useState('');
   const [confirmEmail, setConfirmEmail] = useState('');
+  const [countryCode, setCountryCode] = useState('+27');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [showCountryPicker, setShowCountryPicker] = useState(false);
 
   // Sign Up Step 3: Security & Credentials
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  // Sign Up Step 4: Study Profile & Preferences
-  const [preferredTranslation, setPreferredTranslation] = useState('ESV');
-  const [studyFocus, setStudyFocus] = useState('Original Languages & Strong\'s');
-  const [dailyGoal, setDailyGoal] = useState('15 mins / day');
-  const [knowledgeLevel, setKnowledgeLevel] = useState('Growing Disciple');
 
   // Debounced username availability checker
   useEffect(() => {
@@ -182,13 +166,20 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
   const isEmailValid = (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim());
   const emailsMatch = email.trim().length > 0 && email.trim().toLowerCase() === confirmEmail.trim().toLowerCase();
 
+  // Phone Validation Trick: Leading zero (0) is automatically stripped
+  const handlePhoneChange = (val: string) => {
+    const digitsOnly = val.replace(/[^\d]/g, '');
+    const clean = digitsOnly.replace(/^0+/, '');
+    setPhoneNumber(clean);
+  };
+  const isPhoneValid = phoneNumber.replace(/^0+/, '').length >= 7;
+
   // Password Criteria
   const hasMinLen = password.length >= 8;
   const hasUpper = /[A-Z]/.test(password);
   const hasNumber = /[0-9]/.test(password);
   const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
   const passwordsMatch = password.length > 0 && password === confirmPassword;
-
   const passwordScore = [hasMinLen, hasUpper, hasNumber, hasSymbol].filter(Boolean).length;
 
   const getPasswordStrengthLabel = () => {
@@ -200,10 +191,14 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
   };
 
   // Step Validation Status
-  const canProceedStep1 = firstName.trim().length > 0 && lastName.trim().length > 0 && usernameStatus.checked && usernameStatus.available;
-  const canProceedStep2 = isEmailValid(email) && emailsMatch;
+  const canProceedStep1 =
+    firstName.trim().length > 0 &&
+    lastName.trim().length > 0 &&
+    usernameStatus.checked &&
+    usernameStatus.available;
+
+  const canProceedStep2 = isEmailValid(email) && emailsMatch && isPhoneValid;
   const canProceedStep3 = hasMinLen && passwordScore >= 3 && passwordsMatch;
-  const canProceedStep4 = true;
 
   const handleLoginSubmit = () => {
     const trimmed = loginEmail.trim();
@@ -218,35 +213,33 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
     login(trimmed, loginPassword);
   };
 
-
   const handleFinalSignUp = async () => {
+    if (!canProceedStep3) return;
     setIsSubmitting(true);
     try {
+      const cleanPhone = phoneNumber.replace(/^0+/, '');
       await signupExtended({
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         username: username.trim().toLowerCase(),
         email: email.trim().toLowerCase(),
         password,
-        preferredTranslation,
-        studyFocus,
-        dailyGoal,
-        knowledgeLevel,
+        countryCode,
+        phoneNumber: cleanPhone,
       });
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // Requirement: Legal disclaimer text matches surrounding text (no underline, no color change, no font change)
   const renderLegalDisclaimer = () => (
     <View style={styles.disclaimerContainer}>
       <Text variant="caption" color={colors.textSecondary} align="center" style={styles.disclaimer}>
         By continuing, you agree to our{' '}
         <Text
           variant="caption"
-          weight="700"
-          color={colors.accent}
-          style={styles.legalLink}
+          color={colors.textSecondary}
           onPress={() => navigation.navigate('TermsOfService')}
         >
           Terms of Service
@@ -254,9 +247,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
         and{' '}
         <Text
           variant="caption"
-          weight="700"
-          color={colors.accent}
-          style={styles.legalLink}
+          color={colors.textSecondary}
           onPress={() => navigation.navigate('PrivacyPolicy')}
         >
           Privacy Policy
@@ -269,12 +260,15 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 20}
         style={styles.keyboardView}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          automaticallyAdjustKeyboardInsets={true}
         >
           {/* Top Bar / Back to Welcome */}
           {navigation?.canGoBack?.() && (
@@ -431,14 +425,14 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
           )}
 
           {/* ================================================================ */}
-          {/* MODE: SIGN UP (MULTI-STEP WIZARD)                                 */}
+          {/* MODE: SIGN UP (3-STEP STREAMLINED WIZARD)                         */}
           {/* ================================================================ */}
           {mode === 'signup' && (
             <View style={styles.wizardContainer}>
-              {/* Wizard Step Indicator Bar (Direct Body Layout) */}
+              {/* Wizard Step Indicator Bar: 3 Steps */}
               <View style={styles.stepIndicatorSection}>
                 <View style={styles.stepPillsRow}>
-                  {[1, 2, 3, 4].map(s => {
+                  {[1, 2, 3].map(s => {
                     const isPassed = step > s;
                     const isCurrent = step === s;
                     return (
@@ -465,7 +459,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                             </Text>
                           )}
                         </View>
-                        {s < 4 && (
+                        {s < 3 && (
                           <View
                             style={[
                               styles.stepConnectorLine,
@@ -481,18 +475,17 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                 {/* Step Context Title */}
                 <View style={styles.stepTitleContainer}>
                   <Text variant="caption" weight="700" color={colors.accent}>
-                    STEP {step} OF 4
+                    STEP {step} OF 3
                   </Text>
                   <Text variant="h3" style={styles.stepHeading}>
                     {step === 1 && 'Personal Identity & Username'}
-                    {step === 2 && 'Contact & Email Verification'}
+                    {step === 2 && 'Contact & Phone Verification'}
                     {step === 3 && 'Security & Password Credentials'}
-                    {step === 4 && 'Biblical Study Journey & Preferences'}
                   </Text>
                 </View>
               </View>
 
-              {/* STEP 1: Personal Identity & Username (Direct Body Layout) */}
+              {/* STEP 1: Personal Identity & Username */}
               {step === 1 && (
                 <View style={styles.stepContentSection}>
                   <View style={styles.inputGroup}>
@@ -504,12 +497,11 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                       <TextInput
                         ref={firstNameRef}
                         style={styles.textInput}
-                        placeholder="e.g. Daniel"
+                        placeholder="John"
                         placeholderTextColor="#94A3B8"
                         value={firstName}
                         onChangeText={setFirstName}
                         autoCapitalize="words"
-                        autoCorrect={false}
                         returnKeyType="next"
                         blurOnSubmit={false}
                         onSubmitEditing={() => lastNameRef.current?.focus()}
@@ -519,19 +511,18 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
 
                   <View style={styles.inputGroup}>
                     <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.inputLabel}>
-                      SURNAME / LAST NAME
+                      LAST NAME / SURNAME
                     </Text>
                     <View style={[styles.inputWrapper, shadow.sm]}>
                       <UserSvg size={18} color="#94A3B8" style={styles.inputIcon} />
                       <TextInput
                         ref={lastNameRef}
                         style={styles.textInput}
-                        placeholder="e.g. Moyo"
+                        placeholder="Doe"
                         placeholderTextColor="#94A3B8"
                         value={lastName}
                         onChangeText={setLastName}
                         autoCapitalize="words"
-                        autoCorrect={false}
                         returnKeyType="next"
                         blurOnSubmit={false}
                         onSubmitEditing={() => usernameRef.current?.focus()}
@@ -555,7 +546,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                       <TextInput
                         ref={usernameRef}
                         style={styles.textInput}
-                        placeholder="e.g. daniel_exegesis"
+                        placeholder="johndoe_exegesis"
                         placeholderTextColor="#94A3B8"
                         value={username}
                         onChangeText={setUsername}
@@ -583,7 +574,6 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                       )}
                     </View>
 
-                    {/* Username Feedback Text */}
                     {usernameStatus.checked && (
                       <View style={styles.validationNotice}>
                         <Text
@@ -627,7 +617,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                 </View>
               )}
 
-              {/* STEP 2: Contact & Email Confirmation (Direct Body Layout) */}
+              {/* STEP 2: Contact & Phone Verification */}
               {step === 2 && (
                 <View style={styles.stepContentSection}>
                   <View style={styles.inputGroup}>
@@ -681,11 +671,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                         autoCorrect={false}
                         returnKeyType="next"
                         blurOnSubmit={false}
-                        onSubmitEditing={() => {
-                          if (canProceedStep2) {
-                            setStep(3);
-                          }
-                        }}
+                        onSubmitEditing={() => phoneRef.current?.focus()}
                       />
                       {confirmEmail.length > 0 && (
                         <View style={styles.statusIndicator}>
@@ -708,6 +694,52 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                         </Text>
                       </View>
                     )}
+                  </View>
+
+                  {/* Phone Number with Country Code (Leading zero auto-stripped) */}
+                  <View style={styles.inputGroup}>
+                    <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.inputLabel}>
+                      PHONE NUMBER
+                    </Text>
+                    <View style={styles.phoneRow}>
+                      <TouchableOpacity
+                        style={[styles.countryCodeBtn, shadow.sm]}
+                        onPress={() => setShowCountryPicker(true)}
+                        activeOpacity={0.8}
+                      >
+                        <Text variant="body" weight="700" color={colors.textPrimary}>
+                          {countryCode}
+                        </Text>
+                        <ChevronRightSvg size={14} color="#94A3B8" style={styles.countryChevron} />
+                      </TouchableOpacity>
+
+                      <View style={[styles.phoneInputWrapper, shadow.sm]}>
+                        <PhoneSvg size={18} color="#94A3B8" style={styles.inputIcon} />
+                        <TextInput
+                          ref={phoneRef}
+                          style={styles.textInput}
+                          placeholder="82 123 4567"
+                          placeholderTextColor="#94A3B8"
+                          value={phoneNumber}
+                          onChangeText={handlePhoneChange}
+                          keyboardType="phone-pad"
+                          returnKeyType="next"
+                          blurOnSubmit={false}
+                          onSubmitEditing={() => {
+                            if (canProceedStep2) {
+                              setStep(3);
+                            }
+                          }}
+                        />
+                        {isPhoneValid && (
+                          <CheckSvg size={16} color={colors.accent} style={styles.statusIndicator} />
+                        )}
+                      </View>
+                    </View>
+
+                    <Text variant="caption" color={colors.textSecondary} style={styles.phoneHint}>
+                      Leading zero (0) will be automatically excluded.
+                    </Text>
                   </View>
 
                   <View style={styles.stepBtnRow}>
@@ -734,10 +766,12 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                       <ChevronRightSvg size={18} color="#FFFFFF" />
                     </TouchableOpacity>
                   </View>
+
+                  {renderLegalDisclaimer()}
                 </View>
               )}
 
-              {/* STEP 3: Security & Password Strength Meter (Direct Body Layout) */}
+              {/* STEP 3: Security & Credentials -> Complete Account */}
               {step === 3 && (
                 <View style={styles.stepContentSection}>
                   <View style={styles.inputGroup}>
@@ -776,7 +810,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                     </View>
                   </View>
 
-                  {/* 60-30-10 Password Strength Progress Bar (Rule 1 Compliant) */}
+                  {/* 60-30-10 Password Strength Progress Bar */}
                   <View style={styles.strengthBox}>
                     <View style={styles.strengthHeader}>
                       <Text variant="caption" color={colors.textSecondary}>
@@ -863,15 +897,11 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                         secureTextEntry={!showConfirmPassword}
                         autoCapitalize="none"
                         autoCorrect={false}
-                        returnKeyType="next"
+                        returnKeyType="done"
                         blurOnSubmit={false}
                         onFocus={handlePasswordFocus}
                         onBlur={handlePasswordBlur}
-                        onSubmitEditing={() => {
-                          if (canProceedStep3) {
-                            setStep(4);
-                          }
-                        }}
+                        onSubmitEditing={handleFinalSignUp}
                       />
                       <TouchableOpacity
                         onPress={() => setShowConfirmPassword(prev => !prev)}
@@ -903,6 +933,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                       style={[styles.secondaryBtn, shadow.sm]}
                       onPress={() => setStep(2)}
                       activeOpacity={0.8}
+                      disabled={isSubmitting}
                     >
                       <ChevronLeftSvg size={18} color={colors.textPrimary} />
                       <Text variant="h3" style={styles.secondaryBtnText}>
@@ -910,163 +941,11 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                       </Text>
                     </TouchableOpacity>
 
+                    {/* Complete Account Button (Step 4 removed) */}
                     <TouchableOpacity
                       style={[styles.primaryBtnFlex, !canProceedStep3 && styles.primaryBtnDisabled, shadow.sm]}
-                      onPress={() => setStep(4)}
-                      disabled={!canProceedStep3}
-                      activeOpacity={0.85}
-                    >
-                      <Text variant="h3" style={styles.primaryBtnText}>
-                        Continue to Study Focus
-                      </Text>
-                      <ChevronRightSvg size={18} color="#FFFFFF" />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              )}
-
-              {/* STEP 4: Biblical Journey & Preferences (Direct Body Layout) */}
-              {step === 4 && (
-                <View style={styles.stepContentSection}>
-                  {/* Preferred Translation */}
-                  <View style={styles.preferenceSection}>
-                    <View style={styles.sectionHeaderRow}>
-                      <BookOpenSvg size={18} color={colors.accent} />
-                      <Text variant="caption" weight="700" color={colors.textPrimary}>
-                        PREFERRED SCRIPTURE TRANSLATION
-                      </Text>
-                    </View>
-                    <View style={styles.chipsWrap}>
-                      {TRANSLATIONS.map(t => {
-                        const isSelected = preferredTranslation === t.id;
-                        return (
-                          <TouchableOpacity
-                            key={t.id}
-                            style={[styles.chip, isSelected && styles.chipActive]}
-                            onPress={() => setPreferredTranslation(t.id)}
-                            activeOpacity={0.8}
-                          >
-                            <Text
-                              variant="caption"
-                              weight={isSelected ? '700' : '500'}
-                              style={[styles.chipText, isSelected && styles.chipTextActive]}
-                            >
-                              {t.label}
-                            </Text>
-                          </TouchableOpacity>
-                        );
-                      })}
-                    </View>
-                  </View>
-
-                  {/* Primary Study Focus */}
-                  <View style={styles.preferenceSection}>
-                    <View style={styles.sectionHeaderRow}>
-                      <TargetSvg size={18} color={colors.accent} />
-                      <Text variant="caption" weight="700" color={colors.textPrimary}>
-                        PRIMARY EXEGESIS FOCUS
-                      </Text>
-                    </View>
-                    <View style={styles.chipsWrap}>
-                      {STUDY_FOCUSES.map(f => {
-                        const isSelected = studyFocus === f.id;
-                        return (
-                          <TouchableOpacity
-                            key={f.id}
-                            style={[styles.chip, isSelected && styles.chipActive]}
-                            onPress={() => setStudyFocus(f.id)}
-                            activeOpacity={0.8}
-                          >
-                            <Text
-                              variant="caption"
-                              weight={isSelected ? '700' : '500'}
-                              style={[styles.chipText, isSelected && styles.chipTextActive]}
-                            >
-                              {f.label}
-                            </Text>
-                          </TouchableOpacity>
-                        );
-                      })}
-                    </View>
-                  </View>
-
-                  {/* Daily Study Cadence */}
-                  <View style={styles.preferenceSection}>
-                    <View style={styles.sectionHeaderRow}>
-                      <Text variant="caption" weight="700" color={colors.textPrimary}>
-                        DAILY DEVOTIONAL GOAL
-                      </Text>
-                    </View>
-                    <View style={styles.chipsWrap}>
-                      {DAILY_GOALS.map(g => {
-                        const isSelected = dailyGoal === g.id;
-                        return (
-                          <TouchableOpacity
-                            key={g.id}
-                            style={[styles.chip, isSelected && styles.chipActive]}
-                            onPress={() => setDailyGoal(g.id)}
-                            activeOpacity={0.8}
-                          >
-                            <Text
-                              variant="caption"
-                              weight={isSelected ? '700' : '500'}
-                              style={[styles.chipText, isSelected && styles.chipTextActive]}
-                            >
-                              {g.label}
-                            </Text>
-                          </TouchableOpacity>
-                        );
-                      })}
-                    </View>
-                  </View>
-
-                  {/* Biblical Knowledge Level */}
-                  <View style={styles.preferenceSection}>
-                    <View style={styles.sectionHeaderRow}>
-                      <Text variant="caption" weight="700" color={colors.textPrimary}>
-                        STUDY JOURNEY STAGE
-                      </Text>
-                    </View>
-                    <View style={styles.chipsWrap}>
-                      {KNOWLEDGE_LEVELS.map(k => {
-                        const isSelected = knowledgeLevel === k.id;
-                        return (
-                          <TouchableOpacity
-                            key={k.id}
-                            style={[styles.chip, isSelected && styles.chipActive]}
-                            onPress={() => setKnowledgeLevel(k.id)}
-                            activeOpacity={0.8}
-                          >
-                            <Text
-                              variant="caption"
-                              weight={isSelected ? '700' : '500'}
-                              style={[styles.chipText, isSelected && styles.chipTextActive]}
-                            >
-                              {k.label}
-                            </Text>
-                          </TouchableOpacity>
-                        );
-                      })}
-                    </View>
-                  </View>
-
-                  <View style={styles.stepBtnRow}>
-                    <TouchableOpacity
-                      style={[styles.secondaryBtn, shadow.sm]}
-                      onPress={() => setStep(3)}
-                      activeOpacity={0.8}
-                      disabled={isSubmitting}
-                    >
-                      <ChevronLeftSvg size={18} color={colors.textPrimary} />
-                      <Text variant="h3" style={styles.secondaryBtnText}>
-                        Back
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[styles.primaryBtnFlex, shadow.sm]}
                       onPress={handleFinalSignUp}
-                      disabled={isSubmitting}
+                      disabled={!canProceedStep3 || isSubmitting}
                       activeOpacity={0.85}
                     >
                       {isSubmitting ? (
@@ -1087,11 +966,63 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
               )}
             </View>
           )}
-
-          {/* Bottom Legal Disclaimer fallback */}
-          {renderLegalDisclaimer()}
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Country Code Picker Modal */}
+      <Modal
+        visible={showCountryPicker}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowCountryPicker(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowCountryPicker(false)}
+        >
+          <View style={[styles.modalSheet, shadow.lg]}>
+            <View style={styles.modalHeader}>
+              <Text variant="h3" weight="700" color={colors.textPrimary}>
+                Select Country Code
+              </Text>
+              <TouchableOpacity
+                onPress={() => setShowCountryPicker(false)}
+                style={styles.modalCloseBtn}
+              >
+                <CrossSvg size={18} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.countryList} showsVerticalScrollIndicator={false}>
+              {COUNTRY_CODES.map((item) => {
+                const isSelected = item.code === countryCode;
+                return (
+                  <TouchableOpacity
+                    key={item.code}
+                    style={[styles.countryItem, isSelected && styles.countryItemActive]}
+                    onPress={() => {
+                      setCountryCode(item.code);
+                      setShowCountryPicker(false);
+                      phoneRef.current?.focus();
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      variant="body"
+                      weight={isSelected ? '700' : '500'}
+                      color={isSelected ? colors.accent : colors.textPrimary}
+                    >
+                      {item.code}  {item.name}
+                    </Text>
+                    {isSelected && <CheckSvg size={16} color={colors.accent} />}
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -1105,93 +1036,93 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
+    paddingHorizontal: spacing.lg, // 24px
+    paddingTop: spacing.md, // 16px
+    paddingBottom: Platform.OS === 'ios' ? 40 : 160, // Large padding preventing keyboard overlay
     flexGrow: 1,
-    paddingHorizontal: spacing.md, // 16px grid margin per Rule 15
-    paddingTop: spacing.lg, // 24px
-    paddingBottom: spacing.xxl,
   },
   topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: spacing.md,
   },
   backBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 6,
-    paddingRight: spacing.sm,
+    gap: 4,
+    paddingVertical: 4,
   },
   backBtnText: {
-    marginLeft: 4,
+    fontSize: 13,
   },
   header: {
     alignItems: 'center',
-    marginBottom: spacing.xl,
+    marginBottom: spacing.lg,
   },
-  // Rule 15 & Rule 19: Auth Logo strictly 28x28
   authLogo: {
     width: 28,
     height: 28,
-    marginBottom: spacing.md, // 16px
+    marginBottom: spacing.sm,
+    borderRadius: 6,
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
+    lineHeight: 32,
+    fontWeight: '800',
     color: colors.textPrimary,
-    marginBottom: spacing.sm / 2,
+    letterSpacing: -0.5,
   },
   subtitle: {
+    fontSize: 13,
+    marginTop: 4,
     textAlign: 'center',
-    fontSize: 14,
-    lineHeight: 20,
-    maxWidth: 280,
+    paddingHorizontal: spacing.md,
   },
   tabSelector: {
     flexDirection: 'row',
     backgroundColor: colors.surfaceSecondary,
-    borderRadius: radius.full,
+    borderRadius: radius.md,
     padding: 4,
     marginBottom: spacing.xl,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   tabBtn: {
     flex: 1,
-    paddingVertical: spacing.sm,
+    paddingVertical: 10,
     alignItems: 'center',
-    borderRadius: radius.full,
+    justifyContent: 'center',
+    borderRadius: radius.sm,
   },
   tabBtnActive: {
     backgroundColor: colors.surface,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   tabBtnText: {
     fontSize: 14,
+    fontWeight: '600',
     color: colors.textSecondary,
-    fontWeight: '500',
   },
   tabBtnTextActive: {
-    color: colors.textPrimary,
+    color: colors.accent,
     fontWeight: '700',
   },
-  formCard: {
-    marginBottom: spacing.lg,
-  },
   formSection: {
-    marginBottom: spacing.lg,
+    width: '100%',
   },
   wizardContainer: {
-    marginBottom: spacing.lg,
-  },
-  stepIndicatorCard: {
-    paddingVertical: spacing.sm,
-    marginBottom: spacing.md,
+    width: '100%',
   },
   stepIndicatorSection: {
-    paddingVertical: spacing.sm,
-    marginBottom: spacing.md,
+    marginBottom: spacing.lg,
   },
   stepPillsRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
   },
   stepPillItem: {
     flexDirection: 'row',
@@ -1202,100 +1133,135 @@ const styles = StyleSheet.create({
     height: 28,
     borderRadius: 14,
     backgroundColor: colors.surfaceSecondary,
+    borderWidth: 1.5,
+    borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
   },
   stepCircleActive: {
-    backgroundColor: colors.accent,
     borderColor: colors.accent,
+    backgroundColor: colors.surface,
   },
   stepCircleCompleted: {
-    backgroundColor: colors.textPrimary,
-    borderColor: colors.textPrimary,
+    borderColor: colors.accent,
+    backgroundColor: colors.accent,
   },
   stepCircleText: {
     fontSize: 12,
     color: colors.textSecondary,
   },
   stepCircleTextActive: {
-    color: '#FFFFFF',
+    color: colors.accent,
   },
   stepConnectorLine: {
-    width: 32,
+    width: 48,
     height: 2,
     backgroundColor: colors.border,
     marginHorizontal: 4,
   },
   stepConnectorLineActive: {
-    backgroundColor: colors.textPrimary,
+    backgroundColor: colors.accent,
   },
   stepTitleContainer: {
     alignItems: 'center',
-    marginTop: 4,
   },
   stepHeading: {
-    fontSize: 15,
+    fontSize: 18,
+    lineHeight: 24,
+    fontWeight: '700',
+    color: colors.textPrimary,
     marginTop: 2,
-    textAlign: 'center',
-  },
-  stepContentCard: {
-    paddingVertical: 0,
   },
   stepContentSection: {
-    paddingVertical: 0,
+    width: '100%',
   },
   inputGroup: {
     marginBottom: spacing.md,
   },
   inputLabel: {
     fontSize: 11,
-    marginBottom: 4,
-    marginLeft: 4,
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
+    marginBottom: 6,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
+    height: 48,
     backgroundColor: colors.surface,
     borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.border,
     paddingHorizontal: spacing.md,
-    height: 48,
-  },
-  inputWrapperError: {
-    borderColor: colors.textSecondary,
-    backgroundColor: colors.surfaceSecondary,
   },
   inputWrapperSuccess: {
     borderColor: colors.accent,
   },
+  inputWrapperError: {
+    borderColor: '#EF4444',
+  },
   inputIcon: {
     marginRight: spacing.sm,
+  },
+  textInput: {
+    flex: 1,
+    height: '100%',
+    color: colors.textPrimary,
+    fontSize: 14,
+  },
+  eyeBtn: {
+    padding: 4,
   },
   statusIndicator: {
     marginLeft: spacing.sm,
   },
   validationNotice: {
     marginTop: 4,
-    marginLeft: 4,
+    paddingHorizontal: 4,
   },
-  textInput: {
+  // Phone Input with Country Code
+  phoneRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  countryCodeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    height: 48,
+    paddingHorizontal: spacing.md,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  countryChevron: {
+    transform: [{ rotate: '90deg' }],
+  },
+  phoneInputWrapper: {
     flex: 1,
-    fontSize: 15,
-    color: colors.textPrimary,
-    paddingVertical: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 48,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: spacing.md,
   },
-  eyeBtn: {
-    padding: spacing.sm,
+  phoneHint: {
+    fontSize: 11,
+    marginTop: 4,
+    paddingHorizontal: 4,
   },
+  // Password Strength Progress Bar
   strengthBox: {
+    marginTop: -4,
+    marginBottom: spacing.md,
+    padding: spacing.md,
     backgroundColor: colors.surfaceSecondary,
     borderRadius: radius.md,
-    padding: spacing.md,
-    marginBottom: spacing.md,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -1303,29 +1269,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: 6,
   },
   strengthBarTrack: {
     flexDirection: 'row',
     gap: 6,
-    marginBottom: spacing.md,
+    height: 4,
+    marginBottom: spacing.sm,
   },
   strengthSegment: {
     flex: 1,
-    height: 5,
-    borderRadius: 3,
+    height: '100%',
     backgroundColor: colors.border,
+    borderRadius: 2,
   },
   strengthSegmentFilled: {
-    backgroundColor: colors.accent, // 10% Accent #D97706
+    backgroundColor: colors.accent,
   },
   criteriaGrid: {
-    gap: 6,
+    gap: 4,
+    marginTop: 4,
   },
   criteriaItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: 6,
   },
   criteriaDot: {
     width: 14,
@@ -1338,57 +1306,24 @@ const styles = StyleSheet.create({
   criteriaDotMet: {
     backgroundColor: colors.accent,
   },
-  preferenceSection: {
-    marginBottom: spacing.lg,
-  },
-  sectionHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  chipsWrap: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-  },
-  chip: {
-    paddingVertical: 6,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.full,
-    backgroundColor: colors.surfaceSecondary,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  chipActive: {
-    backgroundColor: colors.accentSoft,
-    borderColor: colors.accent,
-  },
-  chipText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  chipTextActive: {
-    color: colors.accent,
-  },
   primaryBtn: {
     flexDirection: 'row',
-    backgroundColor: colors.accent, // 10% Accent #D97706
-    borderRadius: radius.md,
-    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: spacing.sm,
+    height: 50,
+    borderRadius: radius.md,
+    backgroundColor: colors.accent,
+    marginTop: spacing.md,
     gap: spacing.sm,
   },
   primaryBtnFlex: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: colors.accent,
-    borderRadius: radius.md,
-    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
+    height: 50,
+    borderRadius: radius.md,
+    backgroundColor: colors.accent,
     gap: spacing.sm,
   },
   primaryBtnDisabled: {
@@ -1396,8 +1331,8 @@ const styles = StyleSheet.create({
   },
   primaryBtnText: {
     color: '#FFFFFF',
-    fontWeight: '700',
     fontSize: 15,
+    fontWeight: '700',
   },
   stepBtnRow: {
     flexDirection: 'row',
@@ -1424,8 +1359,8 @@ const styles = StyleSheet.create({
   switchModeLink: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: spacing.md, // 16px
-    marginTop: spacing.sm, // 8px
+    paddingVertical: spacing.md,
+    marginTop: spacing.sm,
   },
   disclaimerContainer: {
     alignItems: 'center',
@@ -1438,7 +1373,46 @@ const styles = StyleSheet.create({
     fontSize: 11,
     lineHeight: 18,
   },
-  legalLink: {
-    textDecorationLine: 'underline',
+  // Modal Country Code Picker
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.45)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.lg,
+  },
+  modalSheet: {
+    width: '100%',
+    maxHeight: 400,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingBottom: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  modalCloseBtn: {
+    padding: 4,
+  },
+  countryList: {
+    marginTop: spacing.sm,
+  },
+  countryItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.sm,
+  },
+  countryItemActive: {
+    backgroundColor: 'rgba(217, 119, 6, 0.08)',
   },
 });

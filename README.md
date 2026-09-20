@@ -365,12 +365,9 @@ The authentication flow in `src/screens/AuthScreen.tsx` provides an airy, fricti
 - **Dynamic Scoping & Restoration**: Window security flags are scoped strictly to password interaction and are immediately released upon leaving password fields or unmounting.
 - **App Switcher Privacy Overlay**: Optionally integrates privacy blur protection when the application transitions to the background or app switcher.
 
-### 4. Dedicated Legal Screens with Prominent Clickable Text Links
-- **Omnipresent Legal Disclaimers**: In full compliance with privacy transparency standards, clickable Terms of Service and Privacy Policy disclaimers are placed prominently at every key entry point:
-  - **Welcome & Onboarding (`WelcomeScreen.tsx`)**: Prominently featured on the final slide directly beneath the "Sign In" link so users encounter the legal agreements before reaching authentication.
-  - **Login Mode (`AuthScreen.tsx`)**: Rendered directly beneath the "Create Account" mode-switch link without requiring viewport scrolling.
-  - **Sign Up Wizard Step 1 & Step 4 (`AuthScreen.tsx`)**: Displayed directly below the Step 1 identity actions and Step 4 final account completion button.
-  - **Universal Fallback**: Positioned persistently at the bottom of the auth scroll viewport.
+### 4. Dedicated Legal Screens with Uniform Clickable Text & Zero-Duplication Architecture
+- **Uniform Legal Disclaimers**: To preserve typographical balance, clickable Terms of Service and Privacy Policy text links match the surrounding caption typography exactly (no underline, no color deviation, no bold font) while retaining touch navigation to dedicated screens.
+- **Zero-Duplication Guarantee**: Disclaimers render exactly once per active view (directly beneath Login actions, and directly beneath the active step's bottom action button), eliminating redundant outer scroll fallbacks.
 - **Dedicated Standalone Legal Screens**:
   - **`TermsOfServiceScreen.tsx`**: 13 comprehensive, structured theological and service sections detailing scriptural integrity, account guidelines, Strong's concordance attribution, intellectual property, and theological disclaimers.
   - **`PrivacyPolicyScreen.tsx`**: 11 exhaustive sections covering GDPR/CCPA data protection, on-device AVIF avatar compression, cloud persistence in EU Central Supabase clusters, and zero ad-trackers.
@@ -379,15 +376,23 @@ The authentication flow in `src/screens/AuthScreen.tsx` provides an airy, fricti
 
 ---
 
-## Multi-Step Authentication & AVIF Profile Storage
+## Streamlined 3-Step Authentication & AVIF Profile Storage
 
 The mobile client integrates with Supabase for user authentication, profile data persistence, and compressed avatar storage:
 
-### 1. Multi-Step Sign Up Wizard (4 Steps)
+### 1. Streamlined Sign Up Wizard (3 Steps)
 - **Step 1: Personal Identity & Username**: First name, last name, and desired username with real-time availability check (queries reserved names and Supabase `profiles` table).
-- **Step 2: Contact & Verification**: Email address and confirmation email with real-time match verification.
-- **Step 3: Security & Credentials**: Password with 4-segment **60-30-10 Strength Progress Bar** (minimum 8 characters, uppercase, number, symbol) and confirm password matching.
-- **Step 4: Biblical Study Journey**: Captures preferred translation (`ESV`, `KJV`, `NASB`, `NIV`, `CSB`), study focus area (Original Languages, Historical Context, Devotionals, Theology), daily study cadence, and journey stage.
+- **Step 2: Contact, Email & Phone Verification**:
+  - Email address and confirmation email with real-time match verification.
+  - **Country Code Selector & Phone Input**: Supports international dial prefixes (`+27`, `+1`, `+44`, `+234`, `+254`, etc.) via interactive selector.
+  - **Leading Zero (0) Normalization**: Automatically strips redundant domestic leading trunk zeros (e.g. `082...` -> `82...`) in real-time and upon saving, guaranteeing compliant international E.164 database records.
+- **Step 3: Security, Credentials & Account Completion**: Password with 4-segment **60-30-10 Strength Progress Bar** (minimum 8 characters, uppercase, number, symbol), confirm password matching, and Android Kotlin `FLAG_SECURE` screen recording protection. Submitting Step 3 directly invokes account creation.
+
+### 2. Mobile Keyboard Avoidance Architecture
+- To prevent software keyboards from overlaying active input fields on mobile screens:
+  - `KeyboardAvoidingView` configured with `behavior={Platform.OS === 'ios' ? 'padding' : undefined}` and `keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 20}`.
+  - `ScrollView` configured with `automaticallyAdjustKeyboardInsets={true}`, `keyboardDismissMode="on-drag"`, `keyboardShouldPersistTaps="handled"`, and dynamic bottom padding (`paddingBottom: 160`).
+  - Smooth ref-based focus advancement routing (`returnKeyType="next"`) auto-advancing focus from field to field without manual tapping.
 
 ### 2. AVIF Profile Picture Upload & Compression
 - In the **Profile** tab, users can tap their avatar to select a profile photo from the camera roll.
