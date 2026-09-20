@@ -235,18 +235,18 @@ Immediately after the application boots up, new and unauthenticated users are gu
 
 ### 1. Slide 1: Welcome to exégeomai
 - **Narrative**: *"We hope this sacred companion illuminates God's Word in your heart. Explore the timeless treasures of Scripture with rich historical, linguistic, and ancient cultural clarity."*
-- **Visual Spec**: `WelcomeScripturesArtSvg` — Custom high-resolution vector illustration of the open Scriptures illuminated by divine rays of holy light and sacred aura.
+- **Visual Spec**: Custom high-resolution vector illustration with transparent background, seamlessly blending into the 60% slate canvas (`#F8FAFC`).
 - **Action**: Step indicator + circular forward button with white Chevron SVG (`#FFFFFF`) on amber background (`#D97706`).
 
 ### 2. Slide 2: What Does exégeomai Mean?
 - **Ancient Root**: *ἐξηγέομαι (Strong's Greek 1834)*
 - **Narrative**: *"From ἐκ (out) and ἡγέομαι (to lead) — 'to lead out, unfold, declare, and draw out the true meaning.' Just as Christ declared the Father, exégeomai unfolds the profound depth and original intent of Sacred Scripture."*
-- **Visual Spec**: `ExegeomaiMeaningArtSvg` — Custom vector artwork of an ancient unfolding parchment scroll with Strong's concordance magnifying glass and Greek letterform motifs.
+- **Visual Spec**: Custom vector artwork with transparent background of an unfolding parchment scroll and Greek concordance study.
 - **Action**: Step indicator + circular forward button to proceed to the purpose slide.
 
 ### 3. Slide 3: Our Sacred Purpose & Launch CTAs
 - **Narrative**: *"This application was created to help you better understand the scriptures, deepen your knowledge in the glory of the Lord, and strengthen your everyday walk of faith through sound biblical exegesis."*
-- **Visual Spec**: `SacredPurposeArtSvg` — Custom vector illustration depicting the ascending path of discipleship, the shield of faith, and the glory of the Lord.
+- **Visual Spec**: Custom vector illustration with transparent background depicting discipleship, study, and the Word of God.
 - **Primary CTA**: **"Get Started"** — Full-width button navigating directly into the 4-step Sign Up wizard.
 - **Secondary CTA**: **"Already have an account? Sign In"** — Navigates directly to Login mode.
 - **Header Skip Action**: "Skip" button located in the top-right header on Slides 1 & 2 allows users to jump straight into the application without swiping through all slides.
