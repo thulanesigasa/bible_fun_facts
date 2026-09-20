@@ -225,10 +225,10 @@ npm run dev
 ### Publishing Over-The-Air (OTA) Updates
 ```bash
 # Publish an OTA update to the production channel (targets runtimeVersion 1.0.1)
-npx eas update --branch production --message "Update description"
+npx eas-cli update --branch production --message "Update description"
 
 # Publish an OTA update to the preview channel
-npx eas update --branch preview --message "Preview update description"
+npx eas-cli update --branch preview --message "Preview update description"
 ```
 
 ### Compiling Native Binaries
@@ -236,10 +236,10 @@ Native builds can be triggered via GitHub Actions (`.github/workflows/compile-an
 
 ```bash
 # Compile preview APK for Android
-npx eas build --platform android --profile preview
+npx eas-cli build --platform android --profile preview
 
 # Compile production release bundle
-npx eas build --platform android --profile production
+npx eas-cli build --platform android --profile production
 ```
 
 ### Type Checking & Validation
