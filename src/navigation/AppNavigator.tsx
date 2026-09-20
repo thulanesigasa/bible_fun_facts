@@ -30,6 +30,12 @@ import { Fact, Scripture, WOTDEntry } from '../data/mockDatabase';
 import { colors } from '../theme/colors';
 import { useApp } from '../context/UserContext';
 import AuthScreen from '../screens/AuthScreen';
+import WelcomeScreen from '../screens/WelcomeScreen';
+
+export type AuthStackParamList = {
+  Welcome: undefined;
+  Auth: { initialMode?: 'login' | 'signup' } | undefined;
+};
 
 export type RootStackParamList = {
   Auth: undefined;
@@ -45,6 +51,7 @@ export type RootStackParamList = {
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 
 function DiscoverStack() {
   return (
@@ -170,9 +177,10 @@ export default function AppNavigator() {
   return (
     <NavigationContainer theme={navTheme}>
       {!userProfile ? (
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Auth" component={AuthScreen} />
-        </Stack.Navigator>
+        <AuthStack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
+          <AuthStack.Screen name="Welcome" component={WelcomeScreen} />
+          <AuthStack.Screen name="Auth" component={AuthScreen} />
+        </AuthStack.Navigator>
       ) : (
         <Tab.Navigator
           screenOptions={{
