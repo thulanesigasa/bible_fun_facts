@@ -147,8 +147,8 @@ All margins, paddings, gaps, and component dimensions follow strict multiples of
 
 ### 5. Profile & Authentication Architecture
 - **Profile Tab & Nested Saved Collection**: The fifth navigation tab features `ProfileScreen`, replacing the standalone Saved tab. It houses user identity, daily study streaks (`FlameSvg`), facts unfolded count (`StrongsIconSvg`), and one-tap access to the **Saved Collection** (`FavoritesScreen`).
-- **Study Preferences**: Interactive controls for daily devotional notifications (8:00 AM inspiration) and default Scripture translation selection (ESV, KJV, NASB, NIV).
-- **Dedicated Login & Sign Up**: `AuthScreen.tsx` provides toggleable **Sign In** and **Create Account** views with vector input icons (`UserSvg`, `MailSvg`, `LockSvg`), password visibility toggle, social auth (`GoogleSvg`, `AppleSvg`), and calibrated **28x28** brand logos per Rule 15/19.
+- **AVIF Profile Picture Upload**: Direct avatar selection and conversion using `expo-image-picker` and `expo-image-manipulator`, storing compressed lightweight AVIF images directly in Supabase Storage (`avatars` bucket).
+- **Dedicated Login & Multi-Step Registration**: `AuthScreen.tsx` provides toggleable **Sign In** and **Create Account** views with vector input icons (`UserSvg`, `MailSvg`, `LockSvg`), password visibility toggle, real-time username availability checks, password strength progress bar, study preferences, and calibrated **28x28** brand logos per Rule 15/19.
 - **Pure Vector SVGs & Zero Badges**: Strictly adheres to Rule 2 and Rule 4 (zero emojis, zero icon font libraries) and Rule 16 (zero development/status badges).
 
 ---
@@ -157,9 +157,6 @@ All margins, paddings, gaps, and component dimensions follow strict multiples of
 
 ```text
 exegeomai/
-├── .agents/
-│   └── rules/
-│       └── rule-21-mobile-ci-cd-standards.md # Rule 21 Mobile CI/CD, Native Compile & OTA standards
 ├── .github/
 │   └── workflows/
 │       └── compile-and-ota.yml           # GitHub Actions workflow for native compile and dual-channel OTA updates

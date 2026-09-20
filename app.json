@@ -11,7 +11,10 @@
     "updates": {
       "url": "https://u.expo.dev/c00f29d0-af3e-4a5c-859d-ea657fb0d515",
       "checkAutomatically": "ON_LOAD",
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "requestHeaders": {
+        "expo-channel-name": "production"
+      }
     },
     "splash": {
       "image": "./assets/splash-icon.png",
