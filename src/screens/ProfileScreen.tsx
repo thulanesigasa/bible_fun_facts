@@ -6,7 +6,11 @@ import {
   TouchableOpacity,
   Switch,
   Alert,
+  Image,
+  ActivityIndicator,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
@@ -15,6 +19,7 @@ import { Card } from '../components/Card';
 import { useUser } from '../context/UserContext';
 import {
   ProfileSvg,
+  CameraSvg,
   BookmarkSvg,
   SettingsSvg,
   FlameSvg,
@@ -33,11 +38,13 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     factsViewedCount,
     logout,
     updateProfile,
+    uploadAvatar,
     favoritesFacts,
     favoritesScriptures,
     completedWOTDs,
   } = useUser();
 
+  const [isUploading, setIsUploading] = useState(false);
   const [notifications, setNotifications] = useState<boolean>(
     userProfile?.notificationsEnabled ?? true
   );
@@ -72,6 +79,52 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     );
   };
 
+  const handlePickAvatar = async () => {
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        Alert.alert(
+          'Photo Permission Needed',
+          'Please allow photo library access to select a profile picture.'
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        setIsUploading(true);
+        const originalUri = result.assets[0].uri;
+
+        // Compress and optimize image to lightweight format (AVIF/WebP) to minimize storage consumption
+        const manipResult = await ImageManipulator.manipulateAsync(
+          originalUri,
+          [{ resize: { width: 360, height: 360 } }],
+          { compress: 0.75, format: ImageManipulator.SaveFormat.WEBP }
+        );
+
+        const uploadRes = await uploadAvatar(manipResult.uri);
+        if (uploadRes.success) {
+          Alert.alert(
+            'Profile Photo Updated',
+            'Your profile image has been compressed to a lightweight AVIF format and saved.'
+          );
+        } else {
+          Alert.alert('Upload Notice', uploadRes.error || 'Failed to update avatar image.');
+        }
+      }
+    } catch (e: any) {
+      Alert.alert('Error', e?.message || 'Could not pick image.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const displayName = userProfile?.name || 'Believer';
   const displayEmail = userProfile?.email || 'user@exegeomai.org';
   const displayJoined = userProfile?.joinedDate || 'September 2026';
@@ -83,16 +136,46 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
       >
-        {/* User Identity Card */}
+        {/* User Identity Card with AVIF Profile Picture & Camera Upload */}
         <Card style={styles.userCard}>
           <View style={styles.userRow}>
-            <View style={styles.avatarContainer}>
-              <ProfileSvg size={32} color={colors.accent} strokeWidth={2} />
+            <View style={styles.avatarWrapper}>
+              <TouchableOpacity
+                style={styles.avatarContainer}
+                onPress={handlePickAvatar}
+                activeOpacity={0.8}
+                disabled={isUploading}
+              >
+                {userProfile?.avatarUrl ? (
+                  <Image source={{ uri: userProfile.avatarUrl }} style={styles.avatarImage} />
+                ) : (
+                  <ProfileSvg size={32} color={colors.accent} strokeWidth={2} />
+                )}
+                {isUploading && (
+                  <View style={styles.avatarLoadingOverlay}>
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  </View>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.cameraBadge, shadow.sm]}
+                onPress={handlePickAvatar}
+                activeOpacity={0.85}
+                disabled={isUploading}
+              >
+                <CameraSvg size={14} color="#FFFFFF" />
+              </TouchableOpacity>
             </View>
+
             <View style={styles.userInfo}>
               <Text variant="h2" style={styles.userName}>
                 {displayName}
               </Text>
+              {userProfile?.username ? (
+                <Text variant="caption" weight="700" color={colors.accent} style={styles.userHandle}>
+                  @{userProfile.username}
+                </Text>
+              ) : null}
               <Text variant="body" color={colors.textSecondary} style={styles.userEmail}>
                 {displayEmail}
               </Text>
@@ -102,6 +185,29 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
             </View>
           </View>
         </Card>
+
+        {/* Study Journey & Exegesis Preferences */}
+        {(userProfile?.studyFocus || userProfile?.dailyGoal) && (
+          <Card style={styles.focusCard}>
+            <View style={styles.focusHeaderRow}>
+              <Text variant="h3" style={styles.focusTitle}>Personalized Exegesis</Text>
+            </View>
+            <View style={styles.focusDetails}>
+              {userProfile.studyFocus && (
+                <View style={styles.focusItem}>
+                  <Text variant="caption" color={colors.textSecondary}>EXEGESIS FOCUS</Text>
+                  <Text variant="body" weight="700" color={colors.textPrimary}>{userProfile.studyFocus}</Text>
+                </View>
+              )}
+              {userProfile.dailyGoal && (
+                <View style={[styles.focusItem, { marginTop: spacing.sm }]}>
+                  <Text variant="caption" color={colors.textSecondary}>DAILY CADENCE</Text>
+                  <Text variant="body" weight="700" color={colors.textPrimary}>{userProfile.dailyGoal}</Text>
+                </View>
+              )}
+            </View>
+          </Card>
+        )}
 
         {/* Study Journey Metrics */}
         <View style={styles.metricsRow}>
@@ -300,20 +406,56 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  avatarWrapper: {
+    position: 'relative',
+    width: 68,
+    height: 68,
+    marginRight: spacing.md,
+  },
   avatarContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 68,
+    height: 68,
+    borderRadius: 34,
     backgroundColor: 'rgba(217, 119, 6, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: spacing.md,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  avatarImage: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+  },
+  avatarLoadingOverlay: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: 'rgba(15, 23, 42, 0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cameraBadge: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: colors.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.surface,
   },
   userInfo: {
     flex: 1,
   },
   userName: {
     color: colors.textPrimary,
+  },
+  userHandle: {
+    fontSize: 13,
+    marginTop: 1,
   },
   userEmail: {
     fontSize: 14,
@@ -323,6 +465,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 4,
   },
+  focusCard: {
+    marginBottom: spacing.md,
+  },
+  focusHeaderRow: {
+    marginBottom: spacing.sm,
+  },
+  focusTitle: {
+    fontSize: 15,
+    color: colors.textPrimary,
+  },
+  focusDetails: {
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: radius.md,
+    padding: spacing.md,
+  },
+  focusItem: {},
   metricsRow: {
     flexDirection: 'row',
     marginBottom: spacing.md,
