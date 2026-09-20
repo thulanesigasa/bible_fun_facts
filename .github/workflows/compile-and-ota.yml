@@ -79,9 +79,9 @@ jobs:
           npx expo config --type public
 
       - name: Setup EAS CLI
-        uses: expo/eas-cli-action@v1
+        uses: expo/expo-github-action@v8
         with:
-          version: latest
+          eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
       # Publish to Production Channel
@@ -139,9 +139,9 @@ jobs:
         run: npx expo config --type public
 
       - name: Setup EAS CLI
-        uses: expo/eas-cli-action@v1
+        uses: expo/expo-github-action@v8
         with:
-          version: latest
+          eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Compile Native Binary via EAS Build
