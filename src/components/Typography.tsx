@@ -41,7 +41,7 @@ export const Text: React.FC<TypographyProps> = ({
       return replaceEmDashes(node);
     }
     if (Array.isArray(node)) {
-      return node.map((child, index) => <React.Fragment key={index}>{processChildren(child)}</React.Fragment>);
+      return node.map((child) => (typeof child === 'string' ? replaceEmDashes(child) : child));
     }
     return node;
   };
