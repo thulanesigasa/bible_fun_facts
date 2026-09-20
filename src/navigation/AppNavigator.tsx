@@ -205,6 +205,25 @@ export default function AppNavigator() {
               borderBottomWidth: 1,
               borderBottomColor: 'rgba(15, 23, 42, 0.08)',
             },
+            headerTitle: () => (
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Image
+                  source={require('../../assets/logo-transparent.png')}
+                  style={{ width: 24, height: 24, marginRight: 8 }}
+                  resizeMode="contain"
+                />
+                <Text
+                  style={{
+                    fontWeight: 'bold',
+                    color: '#0F172A',
+                    fontSize: 18,
+                    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+                  }}
+                >
+                  exégeomai
+                </Text>
+              </View>
+            ),
             headerTitleStyle: {
               fontWeight: 'bold',
               color: '#0F172A',
@@ -244,25 +263,6 @@ export default function AppNavigator() {
             options={{
               title: 'Feed',
               tabBarIcon: ({ color }) => <DiscoverSvg size={16} color={color} strokeWidth={2} />,
-              headerTitle: () => (
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Image
-                    source={require('../../assets/icon.png')}
-                    style={{ width: 24, height: 24, marginRight: 8, borderRadius: 5 }}
-                    resizeMode="contain"
-                  />
-                  <Text
-                    style={{
-                      fontWeight: 'bold',
-                      color: '#0F172A',
-                      fontSize: 18,
-                      fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
-                    }}
-                  >
-                    exégeomai
-                  </Text>
-                </View>
-              ),
             }}
           />
           <Tab.Screen
@@ -271,7 +271,6 @@ export default function AppNavigator() {
             options={{
               title: 'Word',
               tabBarIcon: ({ color }) => <WotdSvg size={16} color={color} strokeWidth={2} />,
-              headerTitle: 'Word of the Day',
             }}
           />
           <Tab.Screen
@@ -280,7 +279,6 @@ export default function AppNavigator() {
             options={{
               title: 'Verses',
               tabBarIcon: ({ color }) => <ScripturesSvg size={16} color={color} strokeWidth={2} />,
-              headerTitle: 'Scripture Library',
             }}
           />
           <Tab.Screen
@@ -289,7 +287,6 @@ export default function AppNavigator() {
             options={{
               title: 'Search',
               tabBarIcon: ({ color }) => <SearchSvg size={16} color={color} strokeWidth={2} />,
-              headerTitle: 'Search & Explore',
             }}
           />
           <Tab.Screen
@@ -298,7 +295,6 @@ export default function AppNavigator() {
             options={{
               title: 'Profile',
               tabBarIcon: ({ color }) => <ProfileSvg size={16} color={color} strokeWidth={2} />,
-              headerTitle: 'Account & Settings',
             }}
           />
         </Tab.Navigator>

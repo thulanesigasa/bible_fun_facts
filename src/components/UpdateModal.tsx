@@ -93,7 +93,7 @@ export const UpdateModal: React.FC = () => {
           {/* Rule 15 & Rule 19: In-app update / modal logos: 50x50 inside a 68x68 rounded container (border radius 18px, image border radius 12px) */}
           <View style={styles.logoContainer}>
             <Image
-              source={require('../../assets/icon.png')}
+              source={require('../../assets/logo-transparent.png')}
               style={styles.logoImage}
               resizeMode="contain"
             />
@@ -157,29 +157,22 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 340,
     backgroundColor: colors.surface,
-    borderRadius: radius.xl, // 32px
+    borderRadius: 0,
     padding: spacing.xl, // 32px
     alignItems: 'center',
     borderWidth: 1,
     borderColor: colors.border,
   },
-  // Rule 15 & Rule 19 Specification:
-  // In-app update / modal logos: 50x50 inside a 68x68 rounded container (border radius 18px, image border radius 12px)
   logoContainer: {
-    width: 68,
-    height: 68,
-    borderRadius: 18,
-    backgroundColor: colors.surfaceElevated,
+    width: 50,
+    height: 50,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.md, // 16px
-    borderWidth: 1,
-    borderColor: colors.border,
   },
   logoImage: {
     width: 50,
     height: 50,
-    borderRadius: 12,
   },
   title: {
     fontSize: 22,
@@ -202,7 +195,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: colors.accent,
     paddingVertical: spacing.md, // 16px
-    borderRadius: radius.md, // 16px
+    borderRadius: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },

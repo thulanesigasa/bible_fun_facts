@@ -197,7 +197,7 @@ export default function AuthScreen() {
           {/* Header Branding - Rule 15 & 19: Auth Logo strictly 28x28 */}
           <View style={styles.header}>
             <Image
-              source={require('../../assets/icon.png')}
+              source={require('../../assets/logo-transparent.png')}
               style={styles.authLogo}
               resizeMode="contain"
             />
@@ -963,7 +963,6 @@ const styles = StyleSheet.create({
   authLogo: {
     width: 28,
     height: 28,
-    borderRadius: 6,
     marginBottom: spacing.md, // 16px
   },
   title: {
