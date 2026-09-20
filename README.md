@@ -243,18 +243,21 @@ Immediately after the application boots up, new and unauthenticated users are gu
 ### 1. Slide 1: Welcome to exégeomai
 - **Narrative**: *"We hope this sacred companion illuminates God's Word in your heart. Explore the timeless treasures of Scripture with rich historical, linguistic, and ancient cultural clarity."*
 - **Visual Spec**: Custom high-resolution vector illustration with transparent background, seamlessly blending into the 60% slate canvas (`#F8FAFC`).
-- **Action**: Step indicator + circular forward button with white Chevron SVG (`#FFFFFF`) on amber background (`#D97706`).
+- **Action**: Persistent sliding tab locator at bottom-left + circular forward button with white Chevron SVG (`#FFFFFF`) on amber background (`#D97706`).
 
 ### 2. Slide 2: What Does exégeomai Mean?
 - **Ancient Root**: *ἐξηγέομαι (Strong's Greek 1834)*
 - **Narrative**: *"From ἐκ (out) and ἡγέομαι (to lead) — 'to lead out, unfold, declare, and draw out the true meaning.' Just as Christ declared the Father, exégeomai unfolds the profound depth and original intent of Sacred Scripture."*
 - **Visual Spec**: Custom vector artwork with transparent background of an unfolding parchment scroll and Greek concordance study.
-- **Action**: Step indicator + circular forward button to proceed to the purpose slide.
+- **Action**: Persistent sliding tab locator at bottom-left + circular forward button to proceed to the purpose slide.
 
-### 3. Slide 3: Our Sacred Purpose & Launch CTAs
+### 3. Slide 3: Our Sacred Purpose & Interactive "Swipe to Get Started"
 - **Narrative**: *"This application was created to help you better understand the scriptures, deepen your knowledge in the glory of the Lord, and strengthen your everyday walk of faith through sound biblical exegesis."*
 - **Visual Spec**: Custom vector illustration with transparent background depicting discipleship, study, and the Word of God.
-- **Primary CTA**: **"Get Started"** — Full-width button navigating directly into the 4-step Sign Up wizard.
+- **Interactive "Swipe to Get Started" Slider**: Replaced the static full-width button with a sleek 210px `PanResponder` slider track (`#FFFFFF` surface, hairline border `rgba(15, 23, 42, 0.08)`). Users drag an amber circular thumb (`#D97706`) with white Chevron SVG across the track to launch into registration. Swiping past 60% executes the launch transition, while releasing early gently springs back. Tapping also navigates for accessibility.
+- **Persistent Tab Locator (Zero Center-Jumping)**: The active tab locator stays firmly anchored at the bottom-left on all three slides, completely eliminating abrupt position shifts.
+- **Real-Time Sliding Liquid Pill**: The active indicator pill interpolates `translateX` and `width` dynamically via `scrollX`, sliding smoothly between dot slots as the user drags.
+- **Image Merge & Crossfade Canvas**: Vector illustrations are mounted in a shared center stage where opacities and subtle scales crossfade seamlessly based on `scrollX`, creating an organic morphing dissolve effect between slides rather than rigid horizontal block translations.
 - **Secondary CTA**: **"Already have an account? Sign In"** — Navigates directly to Login mode.
 - **Header Skip Action**: "Skip" button located in the top-right header on Slides 1 & 2 allows users to jump straight into the application without swiping through all slides.
 
@@ -313,6 +316,8 @@ bible_fun_facts/
 │   │   └── UserContext.tsx          # Global authentication, preferences, streak state
 │   ├── data/
 │   │   └── mockDatabase.ts          # Offline database: 120 facts, 24 scriptures, WOTD
+│   ├── hooks/
+│   │   └── useSecurePasswordCapture.ts # Hardware FLAG_SECURE blackout protection & app switcher privacy
 │   ├── navigation/
 │   │   └── AppNavigator.tsx         # Tab navigation, AuthStack, ProfileStack, Root routes
 │   ├── screens/
@@ -353,10 +358,12 @@ The authentication flow in `src/screens/AuthScreen.tsx` provides an airy, fricti
 - **Seamless Field Transition**: Every input across Login and Sign Up is equipped with `returnKeyType="next"`, `blurOnSubmit={false}`, and ref-based focus routing.
 - **Natural Progress**: Typing First Name advances to Last Name, which advances to Username, which triggers validation and steps forward into Contact Details, immediately auto-focusing Email.
 
-### 3. Android Kotlin `FLAG_SECURE` Screen Recording Protection
-- **Hardware-Level Privacy**: Integrated `expo-screen-capture`. When the user is on the password creation step or focuses any password input, the native Android Kotlin cradle (`ScreenCaptureModule.kt`) applies `WindowManager.LayoutParams.FLAG_SECURE` to the activity window.
-- **Blackout Protection**: The user sees and types their password normally, but any screen recorder (system built-in recorder or third-party recording application) and screenshot utility captures a pure blank/black frame.
-- **Graceful Restoration**: Window security flags are immediately released upon leaving password inputs or navigating to other application screens.
+### 3. Android Kotlin `FLAG_SECURE` Screen Recording Protection & Enterprise Hook
+- **Dedicated Security Hook (`src/hooks/useSecurePasswordCapture.ts`)**: Encapsulates hardware-level window protection via `expo-screen-capture` with explicit named key tracking (`'password-protection'`), module availability verification (`ScreenCapture.isAvailableAsync()`), and unmount safety.
+- **Hardware-Level Blackout Protection**: When the user enters the password creation step or focuses any password input (`loginPassword`, `password`, `confirmPassword`), the native Android Kotlin cradle (`ScreenCaptureModule.kt`) applies `WindowManager.LayoutParams.FLAG_SECURE` to the current window.
+- **Blackout vs. User Experience**: The user holding the device sees and interacts with the screen normally, but any screen recorder (system built-in recorder or third-party recording application such as AZ Recorder, XRecorder, Mobizen, ADB screenrecord, or screen sharing) records a pure blank/black frame.
+- **Dynamic Scoping & Restoration**: Window security flags are scoped strictly to password interaction and are immediately released upon leaving password fields or unmounting.
+- **App Switcher Privacy Overlay**: Optionally integrates privacy blur protection when the application transitions to the background or app switcher.
 
 ### 4. Dedicated Legal Screens with Prominent Clickable Text Links
 - **Omnipresent Legal Disclaimers**: In full compliance with privacy transparency standards, clickable Terms of Service and Privacy Policy disclaimers are placed prominently at every key entry point:

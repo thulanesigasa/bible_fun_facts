@@ -4,7 +4,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  FlatList,
+  Animated,
+  PanResponder,
   useWindowDimensions,
   Platform,
   NativeSyntheticEvent,
@@ -51,12 +52,87 @@ const SLIDES: OnboardingSlide[] = [
   },
 ];
 
+/**
+ * Interactive Swipe-to-Start Button with PanResponder.
+ * Fulfills requirement 2: "the third screen has a get started button, that button should be changed into the swipe to get started and the user can swipe to get started".
+ */
+function SwipeToStartButton({ onComplete }: { onComplete: () => void }) {
+  const panX = useRef(new Animated.Value(0)).current;
+  const trackWidth = 210;
+  const thumbSize = 44;
+  const maxDrag = trackWidth - thumbSize - 8; // ~158px travel
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderMove: (_, gestureState) => {
+        if (gestureState.dx > 0) {
+          const clamped = Math.min(gestureState.dx, maxDrag);
+          panX.setValue(clamped);
+        }
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dx > maxDrag * 0.6) {
+          // Swipe completed successfully
+          Animated.timing(panX, {
+            toValue: maxDrag,
+            duration: 120,
+            useNativeDriver: true,
+          }).start(() => {
+            onComplete();
+          });
+        } else {
+          // Snap back with gentle spring
+          Animated.spring(panX, {
+            toValue: 0,
+            useNativeDriver: true,
+            bounciness: 8,
+          }).start();
+        }
+      },
+    })
+  ).current;
+
+  return (
+    <View style={[styles.swipeTrack, shadow.sm]}>
+      <Text
+        variant="caption"
+        weight="700"
+        color={colors.textSecondary}
+        style={styles.swipeTrackText}
+      >
+        Swipe to start  ››
+      </Text>
+      <Animated.View
+        {...panResponder.panHandlers}
+        style={[
+          styles.swipeThumb,
+          shadow.md,
+          {
+            transform: [{ translateX: panX }],
+          },
+        ]}
+      >
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={onComplete}
+          style={styles.swipeThumbTouchable}
+        >
+          <ChevronRightSvg size={20} color="#FFFFFF" strokeWidth={2.5} />
+        </TouchableOpacity>
+      </Animated.View>
+    </View>
+  );
+}
+
 export default function WelcomeScreen({ navigation }: { navigation: any }) {
   const { width } = useWindowDimensions();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const flatListRef = useRef<FlatList>(null);
+  const flatListRef = useRef<any>(null);
+  const scrollX = useRef(new Animated.Value(0)).current;
 
-  const artSize = Math.min(width * 0.72, 280);
+  const artSize = Math.min(width * 0.66, 260);
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offsetX = event.nativeEvent.contentOffset.x;
@@ -80,6 +156,20 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
   const navigateToAuth = (initialMode: 'login' | 'signup') => {
     navigation.navigate('Auth', { initialMode });
   };
+
+  // Requirement 3: Smooth sliding tab locator interpolation
+  // 3 dots spaced by 16px (6px dot + 10px gap).
+  const pillTranslateX = scrollX.interpolate({
+    inputRange: [0, width, 2 * width],
+    outputRange: [0, 16, 32],
+    extrapolate: 'clamp',
+  });
+
+  const pillWidth = scrollX.interpolate({
+    inputRange: [0, width * 0.5, width, width * 1.5, 2 * width],
+    outputRange: [22, 28, 22, 28, 22],
+    extrapolate: 'clamp',
+  });
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom', 'left', 'right']}>
@@ -109,158 +199,181 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
         )}
       </View>
 
-      {/* Paging Slides */}
-      <FlatList
-        ref={flatListRef}
-        data={SLIDES}
-        keyExtractor={(item) => item.id}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        bounces={false}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        renderItem={({ item }) => (
-          <View style={[styles.slideContainer, { width }]}>
-            {/* Visual Art */}
-            <View style={styles.artWrapper}>
-              <Image
-                source={item.image}
-                style={{ width: artSize, height: artSize }}
-                resizeMode="contain"
-              />
-            </View>
+      {/* Main Slide Content Area */}
+      <View style={styles.mainContent}>
+        {/* Requirement 4: Image Merge / Crossfade Shared Canvas */}
+        <View style={[styles.sharedArtContainer, { height: artSize }]}>
+          {SLIDES.map((slide, index) => {
+            const inputRange = [
+              (index - 1) * width,
+              index * width,
+              (index + 1) * width,
+            ];
 
-            {/* Content Area */}
-            <View style={styles.textWrapper}>
-              {item.lemma && item.strongs && (
-                <View style={styles.lemmaContainer}>
-                  <Text variant="h3" color={colors.accent} weight="700" style={styles.lemmaText}>
-                    {item.lemma}
-                  </Text>
-                  <Text variant="label" color={colors.textSecondary} style={styles.strongsText}>
-                    • {item.strongs}
-                  </Text>
-                </View>
-              )}
+            const opacity = scrollX.interpolate({
+              inputRange,
+              outputRange: [0, 1, 0],
+              extrapolate: 'clamp',
+            });
 
-              <Text variant="h1" align="center" style={styles.slideTitle}>
-                {item.title}
-              </Text>
+            const scale = scrollX.interpolate({
+              inputRange,
+              outputRange: [0.88, 1, 0.88],
+              extrapolate: 'clamp',
+            });
 
-              <Text
-                variant="body"
-                align="center"
-                color={colors.textSecondary}
-                style={styles.slideDescription}
+            return (
+              <Animated.View
+                key={slide.id}
+                pointerEvents="none"
+                style={[
+                  styles.sharedArtSlide,
+                  {
+                    opacity,
+                    transform: [{ scale }],
+                  },
+                ]}
               >
-                {item.description}
-              </Text>
-            </View>
-          </View>
-        )}
-      />
+                <Image
+                  source={slide.image}
+                  style={{ width: artSize, height: artSize }}
+                  resizeMode="contain"
+                />
+              </Animated.View>
+            );
+          })}
+        </View>
 
-      {/* Bottom Controls Area */}
+        {/* Paging Text Content */}
+        <Animated.FlatList
+          ref={flatListRef}
+          data={SLIDES}
+          keyExtractor={(item) => item.id}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          bounces={false}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+            {
+              useNativeDriver: false,
+              listener: handleScroll,
+            }
+          )}
+          scrollEventThrottle={16}
+          renderItem={({ item }) => (
+            <View style={[styles.slideTextContainer, { width }]}>
+              <View style={styles.textWrapper}>
+                {item.lemma && item.strongs && (
+                  <View style={styles.lemmaContainer}>
+                    <Text variant="h3" color={colors.accent} weight="700" style={styles.lemmaText}>
+                      {item.lemma}
+                    </Text>
+                    <Text variant="label" color={colors.textSecondary} style={styles.strongsText}>
+                      • {item.strongs}
+                    </Text>
+                  </View>
+                )}
+
+                <Text variant="h1" align="center" style={styles.slideTitle}>
+                  {item.title}
+                </Text>
+
+                <Text
+                  variant="body"
+                  align="center"
+                  color={colors.textSecondary}
+                  style={styles.slideDescription}
+                >
+                  {item.description}
+                </Text>
+              </View>
+            </View>
+          )}
+        />
+      </View>
+
+      {/* Persistent Bottom Controls Area */}
+      {/* Requirement 1: Active tab locator remains at bottom-left on ALL screens (including slide 3) */}
       <View style={styles.bottomArea}>
-        {currentIndex < SLIDES.length - 1 ? (
-          <View style={styles.controlsRow}>
-            {/* Step Progress Indicators */}
-            <View style={styles.indicatorRow}>
-              {SLIDES.map((_, index) => {
-                const isActive = index === currentIndex;
-                return (
-                  <View
-                    key={index}
-                    style={[
-                      styles.indicatorDot,
-                      isActive ? styles.indicatorActive : styles.indicatorInactive,
-                    ]}
-                  />
-                );
-              })}
+        <View style={styles.controlsRow}>
+          {/* Requirement 1 & 3: Sliding Tab Locator */}
+          <View style={styles.indicatorContainer}>
+            {/* 3 Stationary dot slots */}
+            <View style={styles.trackDotSlots}>
+              {SLIDES.map((_, i) => (
+                <View key={i} style={styles.indicatorTrackDot} />
+              ))}
             </View>
 
-            {/* Circular Forward Next Button */}
+            {/* Dynamic sliding liquid pill */}
+            <Animated.View
+              style={[
+                styles.slidingPill,
+                {
+                  transform: [{ translateX: pillTranslateX }],
+                  width: pillWidth,
+                },
+              ]}
+            />
+          </View>
+
+          {/* Requirement 2: Button on the right */}
+          {/* On screen 1 & 2: Circular forward next button */}
+          {/* On screen 3: Interactive Swipe-to-Get-Started slider track */}
+          {currentIndex < SLIDES.length - 1 ? (
             <TouchableOpacity
               style={[styles.nextCircleBtn, shadow.md]}
               onPress={handleNext}
               activeOpacity={0.85}
+              accessibilityLabel="Next slide"
             >
               <ChevronRightSvg size={22} color="#FFFFFF" strokeWidth={2.5} />
             </TouchableOpacity>
-          </View>
-        ) : (
-          <View style={styles.finalActionsContainer}>
-            {/* Step Progress Indicators */}
-            <View style={[styles.indicatorRow, styles.centerIndicatorRow]}>
-              {SLIDES.map((_, index) => {
-                const isActive = index === currentIndex;
-                return (
-                  <View
-                    key={index}
-                    style={[
-                      styles.indicatorDot,
-                      isActive ? styles.indicatorActive : styles.indicatorInactive,
-                    ]}
-                  />
-                );
-              })}
-            </View>
+          ) : (
+            <SwipeToStartButton onComplete={() => navigateToAuth('signup')} />
+          )}
+        </View>
 
-            {/* Primary Action Button */}
-            <TouchableOpacity
-              style={[styles.getStartedBtn, shadow.md]}
-              onPress={() => navigateToAuth('signup')}
-              activeOpacity={0.85}
+        {/* Secondary Link: Sign In */}
+        <TouchableOpacity
+          style={styles.signInLink}
+          onPress={() => navigateToAuth('login')}
+          activeOpacity={0.7}
+        >
+          <Text variant="body" color={colors.textSecondary} align="center">
+            Already have an account?{' '}
+            <Text variant="body" color={colors.accent} weight="700">
+              Sign In
+            </Text>
+          </Text>
+        </TouchableOpacity>
+
+        {/* Terms of Service & Privacy Policy Disclaimer */}
+        <View style={styles.disclaimerContainer}>
+          <Text variant="caption" color={colors.textSecondary} align="center" style={styles.disclaimerText}>
+            By continuing, you agree to our{' '}
+            <Text
+              variant="caption"
+              weight="700"
+              color={colors.accent}
+              style={styles.legalLink}
+              onPress={() => navigation.navigate('TermsOfService')}
             >
-              <Text variant="h3" color="#FFFFFF" weight="800" style={styles.btnText}>
-                Get Started
-              </Text>
-              <ChevronRightSvg size={20} color="#FFFFFF" strokeWidth={2.5} />
-            </TouchableOpacity>
-
-            {/* Secondary Link: Sign In */}
-            <TouchableOpacity
-              style={styles.signInLink}
-              onPress={() => navigateToAuth('login')}
-              activeOpacity={0.7}
+              Terms of Service
+            </Text>{' '}
+            and{' '}
+            <Text
+              variant="caption"
+              weight="700"
+              color={colors.accent}
+              style={styles.legalLink}
+              onPress={() => navigation.navigate('PrivacyPolicy')}
             >
-              <Text variant="body" color={colors.textSecondary} align="center">
-                Already have an account?{' '}
-                <Text variant="body" color={colors.accent} weight="700">
-                  Sign In
-                </Text>
-              </Text>
-            </TouchableOpacity>
-
-            {/* Terms of Service & Privacy Policy Disclaimer */}
-            <View style={styles.disclaimerContainer}>
-              <Text variant="caption" color={colors.textSecondary} align="center" style={styles.disclaimerText}>
-                By continuing, you agree to our{' '}
-                <Text
-                  variant="caption"
-                  weight="700"
-                  color={colors.accent}
-                  style={styles.legalLink}
-                  onPress={() => navigation.navigate('TermsOfService')}
-                >
-                  Terms of Service
-                </Text>{' '}
-                and{' '}
-                <Text
-                  variant="caption"
-                  weight="700"
-                  color={colors.accent}
-                  style={styles.legalLink}
-                  onPress={() => navigation.navigate('PrivacyPolicy')}
-                >
-                  Privacy Policy
-                </Text>.
-              </Text>
-            </View>
-          </View>
-        )}
+              Privacy Policy
+            </Text>.
+          </Text>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -301,16 +414,27 @@ const styles = StyleSheet.create({
   skipPlaceholder: {
     width: 48,
   },
-  slideContainer: {
+  mainContent: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: spacing.xl, // 32px
   },
-  artWrapper: {
-    marginBottom: spacing.xl, // 32px
+  sharedArtContainer: {
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  sharedArtSlide: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  slideTextContainer: {
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingHorizontal: spacing.xl, // 32px
   },
   textWrapper: {
     width: '100%',
@@ -330,47 +454,53 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   slideTitle: {
-    fontSize: 26,
-    lineHeight: 34,
+    fontSize: 24,
+    lineHeight: 32,
     color: colors.textPrimary,
-    marginBottom: spacing.md, // 16px
+    marginBottom: spacing.sm, // 8px
   },
   slideDescription: {
-    fontSize: 15,
-    lineHeight: 24,
+    fontSize: 14,
+    lineHeight: 22,
     paddingHorizontal: spacing.sm, // 8px
   },
   bottomArea: {
     paddingHorizontal: spacing.lg, // 24px
     paddingBottom: spacing.lg, // 24px
-    minHeight: 112, // Multiple of 8
+    minHeight: 128, // Invariant height across all 3 slides
     justifyContent: 'center',
   },
   controlsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    height: 56,
+    marginBottom: spacing.sm,
   },
-  indicatorRow: {
+  // Sliding Tab Indicator (Requirement 1 & 3)
+  indicatorContainer: {
+    width: 56,
+    height: 16,
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  trackDotSlots: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm, // 8px
+    gap: 10,
   },
-  centerIndicatorRow: {
-    justifyContent: 'center',
-    marginBottom: spacing.md, // 16px
-  },
-  indicatorDot: {
+  indicatorTrackDot: {
+    width: 6,
     height: 6,
     borderRadius: 3,
-  },
-  indicatorActive: {
-    width: 24,
-    backgroundColor: colors.accent, // 10% amber gold (#D97706)
-  },
-  indicatorInactive: {
-    width: 6,
     backgroundColor: 'rgba(15, 23, 42, 0.16)',
+  },
+  slidingPill: {
+    position: 'absolute',
+    left: 0,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.accent, // 10% amber gold (#D97706)
   },
   nextCircleBtn: {
     width: 52,
@@ -380,21 +510,41 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  finalActionsContainer: {
-    width: '100%',
-  },
-  getStartedBtn: {
+  // Swipe to Start Slider (Requirement 2)
+  swipeTrack: {
+    width: 210,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: colors.surface, // 30% panel surface
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.sm, // 8px
-    backgroundColor: colors.accent, // 10% accent (#D97706)
-    paddingVertical: spacing.md, // 16px
-    borderRadius: radius.md, // 16px
-    marginBottom: spacing.md, // 16px
+    position: 'relative',
+    paddingHorizontal: 4,
   },
-  btnText: {
+  swipeTrackText: {
+    fontSize: 12,
     letterSpacing: 0.5,
+    marginLeft: 32,
+  },
+  swipeThumb: {
+    position: 'absolute',
+    left: 4,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.accent, // 10% amber gold
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  swipeThumbTouchable: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   signInLink: {
     paddingVertical: 4,
@@ -402,7 +552,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   disclaimerContainer: {
-    marginTop: spacing.md, // 16px
+    marginTop: 4,
     paddingHorizontal: spacing.sm, // 8px
   },
   disclaimerText: {
