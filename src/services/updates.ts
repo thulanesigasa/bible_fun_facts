@@ -4,7 +4,16 @@ export interface UpdateStatus {
   isAvailable: boolean;
   isDownloading: boolean;
   isDownloaded: boolean;
+  channel: string;
+  runtimeVersion: string | null;
   error: Error | null;
+}
+
+/**
+ * Retrieve current active OTA update channel (e.g. 'production' or 'preview').
+ */
+export function getCurrentChannel(): string {
+  return Updates.channel || 'development';
 }
 
 /**
