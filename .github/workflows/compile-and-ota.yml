@@ -66,6 +66,7 @@ jobs:
     name: Publish Expo OTA Updates
     if: github.event_name == 'push' || inputs.action == 'publish_ota' || inputs.action == 'both'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -111,6 +112,7 @@ jobs:
     name: Compile Native Android APK on GitHub
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (inputs.action == 'compile_native_app' || inputs.action == 'both'))
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -153,12 +155,18 @@ jobs:
       - name: Prebuild Native Android Project
         run: |
           npx expo prebuild --platform android --no-install
+          # Configure Gradle memory limits to prevent Metaspace OutOfMemoryError on GitHub runners
+          echo "org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8" >> android/gradle.properties
+          echo "org.gradle.parallel=false" >> android/gradle.properties
 
       - name: Build Android Release APK with Gradle
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease -x lint -x test --no-daemon
+          ./gradlew assembleRelease -x lint -x test --no-daemon --stacktrace
+        env:
+          _JAVA_OPTIONS: "-Xmx4096m -XX:MaxMetaspaceSize=1024m"
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dorg.gradle.parallel=false"
 
       - name: Prepare APK Artifact
         run: |
