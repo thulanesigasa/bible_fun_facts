@@ -91,7 +91,7 @@ jobs:
       - name: Publish OTA Update to Production Channel
         if: github.event_name == 'push' || inputs.ota_channel == 'production' || inputs.ota_channel == 'both'
         run: |
-          npx eas update --branch production --message "${{ github.event.head_commit.message || 'Automated OTA production update from GitHub' }}" --non-interactive
+          eas update --branch production --message "${{ github.event.head_commit.message || 'Automated OTA production update from GitHub' }}" --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
@@ -99,7 +99,7 @@ jobs:
       - name: Publish OTA Update to Preview Channel
         if: github.event_name == 'push' || inputs.ota_channel == 'preview' || inputs.ota_channel == 'both'
         run: |
-          npx eas update --branch preview --message "${{ github.event.head_commit.message || 'Automated OTA preview update from GitHub' }}" --non-interactive
+          eas update --branch preview --message "${{ github.event.head_commit.message || 'Automated OTA preview update from GitHub' }}" --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
@@ -149,6 +149,6 @@ jobs:
 
       - name: Compile Native Binary via EAS Build
         run: |
-          npx eas build --platform ${{ inputs.platform }} --profile ${{ inputs.build_profile }} --non-interactive
+          eas build --platform ${{ inputs.platform }} --profile ${{ inputs.build_profile }} --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
