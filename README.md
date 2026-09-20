@@ -300,11 +300,11 @@ npx eas-cli update --branch preview --message "Preview update description"
 ```
 
 ### Compiling Native Binaries on GitHub Actions
-Native compilation runs directly on GitHub Actions compute runners (Java 17 + Android SDK + Gradle) without relying on EAS Cloud build servers:
+Native compilation runs automatically on push to `main` directly on GitHub Actions compute runners (Java 17 + runner-native Android SDK + Gradle) without relying on EAS Cloud build servers:
 
 - **Workflow**: `.github/workflows/compile-and-ota.yml` (`compile_native_app` job)
-- **Engine**: `npx expo prebuild` + `./gradlew assembleRelease`
-- **Output**: Generates `exegeomai-v1.0.1.apk` and uploads it directly to the repository's GitHub Releases page under **Assets**.
+- **Engine**: `npx expo prebuild --platform android --no-install` + `./gradlew assembleRelease -x lint -x test --no-daemon`
+- **Output**: Generates `exegeomai-v1.0.1.apk` and uploads it directly to the repository's GitHub Releases page under **Assets** with automatic clobbering.
 
 ### GitHub Releases vs. Over-The-Air (OTA) Updates
 - **GitHub Releases (`/releases`)**: Houses official version tags (e.g. `v1.0.1`), changelogs, and direct `.apk` binary downloads compiled directly on GitHub Actions.
