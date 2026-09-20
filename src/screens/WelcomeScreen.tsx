@@ -233,6 +233,32 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
                 </Text>
               </Text>
             </TouchableOpacity>
+
+            {/* Terms of Service & Privacy Policy Disclaimer */}
+            <View style={styles.disclaimerContainer}>
+              <Text variant="caption" color={colors.textSecondary} align="center" style={styles.disclaimerText}>
+                By continuing, you agree to our{' '}
+                <Text
+                  variant="caption"
+                  weight="700"
+                  color={colors.accent}
+                  style={styles.legalLink}
+                  onPress={() => navigation.navigate('TermsOfService')}
+                >
+                  Terms of Service
+                </Text>{' '}
+                and{' '}
+                <Text
+                  variant="caption"
+                  weight="700"
+                  color={colors.accent}
+                  style={styles.legalLink}
+                  onPress={() => navigation.navigate('PrivacyPolicy')}
+                >
+                  Privacy Policy
+                </Text>.
+              </Text>
+            </View>
           </View>
         )}
       </View>
@@ -374,5 +400,16 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  disclaimerContainer: {
+    marginTop: spacing.md, // 16px
+    paddingHorizontal: spacing.sm, // 8px
+  },
+  disclaimerText: {
+    fontSize: 11,
+    lineHeight: 16,
+  },
+  legalLink: {
+    textDecorationLine: 'underline',
   },
 });

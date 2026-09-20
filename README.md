@@ -358,11 +358,17 @@ The authentication flow in `src/screens/AuthScreen.tsx` provides an airy, fricti
 - **Blackout Protection**: The user sees and types their password normally, but any screen recorder (system built-in recorder or third-party recording application) and screenshot utility captures a pure blank/black frame.
 - **Graceful Restoration**: Window security flags are immediately released upon leaving password inputs or navigating to other application screens.
 
-### 4. Dedicated Legal Screens with Clickable Text Links
-- **Interactive Disclaimers**: The authentication terms disclaimer features clickable text links navigating to dedicated, standalone screens:
+### 4. Dedicated Legal Screens with Prominent Clickable Text Links
+- **Omnipresent Legal Disclaimers**: In full compliance with privacy transparency standards, clickable Terms of Service and Privacy Policy disclaimers are placed prominently at every key entry point:
+  - **Welcome & Onboarding (`WelcomeScreen.tsx`)**: Prominently featured on the final slide directly beneath the "Sign In" link so users encounter the legal agreements before reaching authentication.
+  - **Login Mode (`AuthScreen.tsx`)**: Rendered directly beneath the "Create Account" mode-switch link without requiring viewport scrolling.
+  - **Sign Up Wizard Step 1 & Step 4 (`AuthScreen.tsx`)**: Displayed directly below the Step 1 identity actions and Step 4 final account completion button.
+  - **Universal Fallback**: Positioned persistently at the bottom of the auth scroll viewport.
+- **Dedicated Standalone Legal Screens**:
   - **`TermsOfServiceScreen.tsx`**: 13 comprehensive, structured theological and service sections detailing scriptural integrity, account guidelines, Strong's concordance attribution, intellectual property, and theological disclaimers.
   - **`PrivacyPolicyScreen.tsx`**: 11 exhaustive sections covering GDPR/CCPA data protection, on-device AVIF avatar compression, cloud persistence in EU Central Supabase clusters, and zero ad-trackers.
 - **Universal Availability**: Both legal screens are registered in both `AuthStack` and `ProfileStack`, allowing users to review terms both before creating an account and anytime from their profile settings.
+- **Android Shadow Node Typography Fix (`Typography.tsx`)**: Refactored `Typography.tsx`'s `processChildren` to map array elements directly without wrapping them in `<React.Fragment>`. This guarantees React Native's Android shadow nodes (`RCTVirtualText`) preserve inline touch responder listeners on nested clickable `<Text>` elements without dropping virtual text spans.
 
 ---
 

@@ -246,6 +246,33 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
     }
   };
 
+  const renderLegalDisclaimer = () => (
+    <View style={styles.disclaimerContainer}>
+      <Text variant="caption" color={colors.textSecondary} align="center" style={styles.disclaimer}>
+        By continuing, you agree to our{' '}
+        <Text
+          variant="caption"
+          weight="700"
+          color={colors.accent}
+          style={styles.legalLink}
+          onPress={() => navigation.navigate('TermsOfService')}
+        >
+          Terms of Service
+        </Text>{' '}
+        and{' '}
+        <Text
+          variant="caption"
+          weight="700"
+          color={colors.accent}
+          style={styles.legalLink}
+          onPress={() => navigation.navigate('PrivacyPolicy')}
+        >
+          Privacy Policy
+        </Text>.
+      </Text>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -406,6 +433,8 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                   </Text>
                 </Text>
               </TouchableOpacity>
+
+              {renderLegalDisclaimer()}
             </View>
           )}
 
@@ -601,6 +630,8 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                       </Text>
                     </Text>
                   </TouchableOpacity>
+
+                  {renderLegalDisclaimer()}
                 </View>
               )}
 
@@ -1058,34 +1089,15 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                       )}
                     </TouchableOpacity>
                   </View>
+
+                  {renderLegalDisclaimer()}
                 </View>
               )}
             </View>
           )}
 
-          {/* Terms & Privacy Clickable Disclaimer */}
-          <Text variant="caption" color={colors.textTertiary} style={styles.disclaimer}>
-            By continuing, you agree to our{' '}
-            <Text
-              variant="caption"
-              weight="700"
-              color={colors.accent}
-              style={styles.legalLink}
-              onPress={() => navigation.navigate('TermsOfService')}
-            >
-              Terms of Service
-            </Text>{' '}
-            and{' '}
-            <Text
-              variant="caption"
-              weight="700"
-              color={colors.accent}
-              style={styles.legalLink}
-              onPress={() => navigation.navigate('PrivacyPolicy')}
-            >
-              Privacy Policy
-            </Text>.
-          </Text>
+          {/* Bottom Legal Disclaimer fallback */}
+          {renderLegalDisclaimer()}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -1423,11 +1435,16 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md, // 16px
     marginTop: spacing.sm, // 8px
   },
+  disclaimerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: spacing.md,
+    paddingHorizontal: spacing.sm,
+  },
   disclaimer: {
     textAlign: 'center',
     fontSize: 11,
     lineHeight: 18,
-    marginTop: spacing.sm,
   },
   legalLink: {
     textDecorationLine: 'underline',
