@@ -242,6 +242,10 @@ npx eas-cli build --platform android --profile preview
 npx eas-cli build --platform android --profile production
 ```
 
+### GitHub Releases vs. Over-The-Air (OTA) Updates
+- **GitHub Releases (`/releases`)**: Houses official version tags (e.g. `v1.0.1`), native build records, changelogs, and direct download links for compiled standalone Android APKs and Google Play App Bundles (AAB).
+- **Expo EAS OTA Updates**: Seamless JavaScript and asset updates deployed directly to user devices over the air across the `production` and `preview` channels without requiring a manual APK reinstall.
+
 ### Type Checking & Validation
 ```bash
 npx tsc --noEmit

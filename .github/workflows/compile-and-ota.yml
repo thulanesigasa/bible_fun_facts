@@ -57,6 +57,9 @@ on:
         type: string
         default: ''
 
+permissions:
+  contents: write
+
 jobs:
   # Job 1: Publish Over-The-Air Updates (Both Preview & Production Channels)
   publish_ota:
@@ -152,3 +155,29 @@ jobs:
           eas build --platform ${{ inputs.platform }} --profile ${{ inputs.build_profile }} --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Publish GitHub Release for Native Build
+        run: |
+          BUILD_NUM="${{ inputs.compile_build_number || github.run_number }}"
+          RELEASE_TAG="v1.0.1"
+          RELEASE_TITLE="exégeomai v1.0.1 (Native Build #${BUILD_NUM})"
+          
+          RELEASE_BODY="### Native Build Artifacts
+
+          - **Platform**: ${{ inputs.platform }}
+          - **Profile**: ${{ inputs.build_profile }}
+          - **Native Build Number**: ${BUILD_NUM}
+          - **Runtime Version**: 1.0.1
+          - **EAS Project**: [exegeomai on Expo](https://expo.dev/accounts/thulanesigasa0/projects/exegeomai/builds)
+
+          To download the standalone APK or App Bundle, visit [EAS Cloud Builds](https://expo.dev/accounts/thulanesigasa0/projects/exegeomai/builds)."
+
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "Updating existing release $RELEASE_TAG..."
+            gh release edit "$RELEASE_TAG" --notes "$RELEASE_BODY"
+          else
+            echo "Creating new release $RELEASE_TAG..."
+            gh release create "$RELEASE_TAG" --title "$RELEASE_TITLE" --notes "$RELEASE_BODY"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
