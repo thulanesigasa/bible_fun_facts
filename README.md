@@ -27,14 +27,14 @@ graph TD
     App["App.tsx"] --> Providers["UserProvider + SafeAreaProvider"]
     Providers --> Nav["AppNavigator"]
     Providers --> UpdateModal["UpdateModal (Update Now / Remind Me Later)"]
-    Nav --> Auth["AuthScreen (28x28 Calibrated Logo)"]
+    Nav --> Auth["AuthScreen (Login / Sign Up - 28x28 Logo)"]
     Nav --> Tabs["Rule 20 Floating Pill Tab Bar (280px)"]
     
     Tabs --> DiscoverStack["Discover Stack"]
     Tabs --> WOTDScreen["Word of the Day (4 Lenses)"]
     Tabs --> ScripturesStack["Scriptures Stack"]
     Tabs --> SearchStack["Search Stack"]
-    Tabs --> FavoritesStack["Favorites Stack"]
+    Tabs --> ProfileStack["Profile Stack"]
     
     DiscoverStack --> DiscoverMain["DiscoverScreen"]
     DiscoverStack --> FactDetails["FactDetailsScreen (PageSheet)"]
@@ -43,7 +43,8 @@ graph TD
     ScripturesStack --> ScriptureDetails["ScriptureDetailsScreen (PageSheet)"]
     
     SearchStack --> SearchMain["SearchScreen"]
-    FavoritesStack --> FavoritesMain["FavoritesScreen"]
+    ProfileStack --> ProfileMain["ProfileScreen (Settings, Translation, Streak)"]
+    ProfileStack --> FavoritesMain["FavoritesScreen (Saved Collection)"]
     
     subgraph DataUpdates["Data, State and Updates"]
         AsyncStorage[("AsyncStorage")] <--> UserContext["UserContext (useApp / useUser)"]
@@ -115,12 +116,12 @@ The bottom navigation bar adheres strictly to the floating pill / curved rectang
 - **Surface & Shadow**: `backgroundColor: '#FFFFFF'` (30% panel surface), hairline border `borderWidth: 1, borderColor: 'rgba(15, 23, 42, 0.08)', borderTopWidth: 0`, soft elevation shadow (`shadowColor: '#0F172A', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 5`)
 - **Dynamic Context State**: Reads `hideTabBar` and `accent` from `useApp()` hook
 - **Custom Label with Focused Indicator Dot**: Centered column with `fontSize: 8.5`, `fontWeight: focused ? '700' : '500'`, `color: focused ? accent : '#64748B'`, and when `focused`, a `4x4` rounded dot (`width: 4, height: 4, borderRadius: 2, backgroundColor: accent, marginTop: 2`)
-- **Iconography**: Compact `16px` Lucide icons (`<Icon size={16} color={color} />`)
-  - Feed / Discover: `BookOpen`
-  - Word of the Day: `Calendar`
-  - Scriptures Library: `Scroll`
-  - Search & Explore: `Search`
-  - Saved Collection: `Bookmark`
+- **Iconography**: Pure vector `16px` SVGs (`react-native-svg`) adhering strictly to Rule 2 and Rule 4 (zero emojis, zero built-in icon fonts):
+  - Feed / Discover: `DiscoverSvg`
+  - Word of the Day: `WotdSvg`
+  - Scriptures Library: `ScripturesSvg`
+  - Search & Explore: `SearchSvg`
+  - Profile & Settings: `ProfileSvg` (replaces Saved; Saved Collection is nested within Profile)
 - **Header Standard**: Flat clean white header (`backgroundColor: '#FFFFFF', shadowColor: 'transparent', elevation: 0, borderBottomWidth: 1, borderBottomColor: 'rgba(15, 23, 42, 0.08)'`), `fontFamily: 'SpaceMono', fontSize: 18`, and on the primary tab, include the `24x24` brand logo with `borderRadius: 5`
 
 ### 3. App Icon, Launcher & In-App Logo Calibration (Rule 15 & Rule 19)
@@ -141,6 +142,12 @@ All margins, paddings, gaps, and component dimensions follow strict multiples of
 - `spacing.nav`: `56px`
 - `spacing.huge`: `64px`
 - **Bottom Content Clearance**: All scrollable screens implement `paddingBottom: 96` (`12 * 8px`) so card content can be scrolled completely clear of the floating pill tab bar.
+
+### 5. Profile & Authentication Architecture
+- **Profile Tab & Nested Saved Collection**: The fifth navigation tab features `ProfileScreen`, replacing the standalone Saved tab. It houses user identity, daily study streaks (`FlameSvg`), facts unfolded count (`StrongsIconSvg`), and one-tap access to the **Saved Collection** (`FavoritesScreen`).
+- **Study Preferences**: Interactive controls for daily devotional notifications (8:00 AM inspiration) and default Scripture translation selection (ESV, KJV, NASB, NIV).
+- **Dedicated Login & Sign Up**: `AuthScreen.tsx` provides toggleable **Sign In** and **Create Account** views with vector input icons (`UserSvg`, `MailSvg`, `LockSvg`), password visibility toggle, social auth (`GoogleSvg`, `AppleSvg`), and calibrated **28x28** brand logos per Rule 15/19.
+- **Pure Vector SVGs & Zero Badges**: Strictly adheres to Rule 2 and Rule 4 (zero emojis, zero icon font libraries) and Rule 16 (zero development/status badges).
 
 ---
 
@@ -178,11 +185,12 @@ exegeomai/
 │   ├── navigation/
 │   │   └── AppNavigator.tsx              # Rule 20 floating pill tab navigation & stack navigators
 │   ├── screens/                          # Application views
-│   │   ├── AuthScreen.tsx                # Onboarding with 28x28 calibrated logo
+│   │   ├── AuthScreen.tsx                # Dedicated Login & Sign Up with 28x28 calibrated logo
 │   │   ├── DiscoverScreen.tsx            # Daily fact discovery view (paddingBottom: 96)
 │   │   ├── FactDetailsScreen.tsx         # In-depth modal sheet for biblical facts
 │   │   ├── FavoritesScreen.tsx           # Saved collection (Facts, Scriptures, WOTD)
 │   │   ├── HomeScreen.tsx                # Alternate home showcase
+│   │   ├── ProfileScreen.tsx             # Profile tab (Study streak, translation, Saved, Sign out)
 │   │   ├── ScriptureDetailsScreen.tsx    # In-depth modal sheet for scripture texts
 │   │   ├── ScripturesScreen.tsx          # Categorized scripture library
 │   │   ├── SearchScreen.tsx              # Unified search interface
