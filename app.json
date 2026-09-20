@@ -32,6 +32,7 @@
     "android": {
       "package": "com.thulanesigasa.exegeomai",
       "versionCode": 1,
+      "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundColor": "#FFFFFF"

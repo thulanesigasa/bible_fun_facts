@@ -10,6 +10,7 @@ import {
   Platform,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  Text as RNText,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -393,24 +394,22 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
 
         {/* Terms of Service & Privacy Policy Disclaimer: Uniform styling (no underline, no color change, no font change) */}
         <View style={styles.disclaimerContainer}>
-          <Text variant="caption" color={colors.textSecondary} align="center" style={styles.disclaimerText}>
+          <RNText style={styles.disclaimerText}>
             By continuing, you agree to our{' '}
-            <Text
-              variant="caption"
-              color={colors.textSecondary}
+            <RNText
+              style={styles.disclaimerText}
               onPress={() => navigation.navigate('TermsOfService')}
             >
               Terms of Service
-            </Text>{' '}
+            </RNText>{' '}
             and{' '}
-            <Text
-              variant="caption"
-              color={colors.textSecondary}
+            <RNText
+              style={styles.disclaimerText}
               onPress={() => navigation.navigate('PrivacyPolicy')}
             >
               Privacy Policy
-            </Text>.
-          </Text>
+            </RNText>.
+          </RNText>
         </View>
       </View>
     </SafeAreaView>
@@ -599,9 +598,14 @@ const styles = StyleSheet.create({
   disclaimerContainer: {
     marginTop: 4,
     paddingHorizontal: spacing.sm, // 8px
+    alignItems: 'center',
   },
   disclaimerText: {
     fontSize: 11,
     lineHeight: 16,
+    fontWeight: '400',
+    color: colors.textSecondary,
+    textAlign: 'center',
+    textDecorationLine: 'none',
   },
 });
