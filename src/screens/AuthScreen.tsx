@@ -17,8 +17,6 @@ import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
 import { useUser } from '../context/UserContext';
 import {
-  GoogleSvg,
-  AppleSvg,
   MailSvg,
   LockSvg,
   UserSvg,
@@ -165,25 +163,6 @@ export default function AuthScreen() {
     login(trimmed, loginPassword);
   };
 
-  const handleSocialAuth = (provider: 'Google' | 'Apple') => {
-    const mockName = provider === 'Google' ? 'Daniel Moyo' : 'Sarah Adams';
-    const mockEmail = `${mockName.toLowerCase().replace(/\s+/g, '')}@example.com`;
-    if (mode === 'signup') {
-      signupExtended({
-        firstName: mockName.split(' ')[0],
-        lastName: mockName.split(' ')[1] || '',
-        username: mockName.toLowerCase().replace(/\s+/g, '_'),
-        email: mockEmail,
-        password: 'SocialLogin123!',
-        preferredTranslation,
-        studyFocus,
-        dailyGoal,
-        knowledgeLevel,
-      });
-    } else {
-      login(mockEmail, undefined, mockName);
-    }
-  };
 
   const handleFinalSignUp = async () => {
     setIsSubmitting(true);
@@ -321,6 +300,22 @@ export default function AuthScreen() {
               >
                 <Text variant="h3" style={styles.primaryBtnText}>
                   Sign In
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.switchModeLink}
+                onPress={() => {
+                  setMode('signup');
+                  setStep(1);
+                }}
+                activeOpacity={0.7}
+              >
+                <Text variant="caption" color={colors.textSecondary}>
+                  Don't have an account?{' '}
+                  <Text variant="caption" weight="700" color={colors.accent}>
+                    Create Account
+                  </Text>
                 </Text>
               </TouchableOpacity>
             </View>
@@ -488,6 +483,19 @@ export default function AuthScreen() {
                       Continue to Contact Details
                     </Text>
                     <ChevronRightSvg size={18} color="#FFFFFF" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.switchModeLink}
+                    onPress={() => setMode('login')}
+                    activeOpacity={0.7}
+                  >
+                    <Text variant="caption" color={colors.textSecondary}>
+                      Already have an account?{' '}
+                      <Text variant="caption" weight="700" color={colors.accent}>
+                        Sign In
+                      </Text>
+                    </Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -923,40 +931,6 @@ export default function AuthScreen() {
             </View>
           )}
 
-          {/* Social Divider */}
-          <View style={styles.dividerRow}>
-            <View style={styles.dividerLine} />
-            <Text variant="caption" color={colors.textTertiary} style={styles.dividerText}>
-              OR CONTINUE WITH
-            </Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          {/* Social Buttons */}
-          <View style={styles.socialRow}>
-            <TouchableOpacity
-              style={[styles.socialBtn, shadow.sm]}
-              onPress={() => handleSocialAuth('Google')}
-              activeOpacity={0.85}
-            >
-              <GoogleSvg size={18} color="#0F172A" />
-              <Text variant="caption" weight="700" style={styles.socialBtnText}>
-                Google
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.socialBtn, shadow.sm]}
-              onPress={() => handleSocialAuth('Apple')}
-              activeOpacity={0.85}
-            >
-              <AppleSvg size={18} color={colors.textPrimary} />
-              <Text variant="caption" weight="700" style={styles.socialBtnText}>
-                Apple
-              </Text>
-            </TouchableOpacity>
-          </View>
-
           {/* Terms Disclaimer */}
           <Text variant="caption" color={colors.textTertiary} style={styles.disclaimer}>
             By continuing, you agree to our Terms of Service and Privacy Policy.
@@ -977,8 +951,8 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: spacing.xl, // 32px
-    paddingTop: spacing.xl,
+    paddingHorizontal: spacing.md, // 16px grid margin per Rule 15
+    paddingTop: spacing.lg, // 24px
     paddingBottom: spacing.xxl,
   },
   header: {
@@ -1277,41 +1251,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textPrimary,
   },
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: colors.border,
-  },
-  dividerText: {
-    fontSize: 11,
-    marginHorizontal: spacing.md,
-    letterSpacing: 0.5,
-  },
-  socialRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    marginBottom: spacing.xl,
-  },
-  socialBtn: {
-    flex: 1,
-    flexDirection: 'row',
+  switchModeLink: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    height: 46,
-    borderWidth: 1,
-    borderColor: colors.border,
-    gap: spacing.sm,
-  },
-  socialBtnText: {
-    color: colors.textPrimary,
-    fontSize: 14,
+    paddingVertical: spacing.md, // 16px
+    marginTop: spacing.sm, // 8px
   },
   disclaimer: {
     textAlign: 'center',

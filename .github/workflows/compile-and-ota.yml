@@ -109,7 +109,7 @@ jobs:
   # Job 2: Compile Native Android APK directly on GitHub Actions Runners
   compile_native_app:
     name: Compile Native Android APK on GitHub
-    if: github.event_name == 'workflow_dispatch' && (inputs.action == 'compile_native_app' || inputs.action == 'both')
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (inputs.action == 'compile_native_app' || inputs.action == 'both'))
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
