@@ -7,10 +7,29 @@ import { supabase, SUPABASE_ANON_KEY } from '../services/supabase';
 
 export interface UserProfile {
   name: string;
+  firstName?: string;
+  lastName?: string;
+  username: string;
+  avatarUrl?: string;
   email: string;
   joinedDate: string;
   preferredTranslation: string;
   notificationsEnabled: boolean;
+  studyFocus?: string;
+  dailyGoal?: string;
+  knowledgeLevel?: string;
+}
+
+export interface SignUpExtendedParams {
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  password: string;
+  preferredTranslation?: string;
+  studyFocus?: string;
+  dailyGoal?: string;
+  knowledgeLevel?: string;
 }
 
 interface UserState {
@@ -30,6 +49,9 @@ interface AppContextType extends UserState {
   setAccent: (accent: string) => void;
   login: (emailOrName: string, password?: string, name?: string) => void;
   signup: (name: string, email: string, password?: string) => void;
+  signupExtended: (params: SignUpExtendedParams) => Promise<{ success: boolean; error?: string }>;
+  checkUsernameAvailability: (username: string) => Promise<{ available: boolean; reason?: string }>;
+  uploadAvatar: (uri: string) => Promise<{ success: boolean; avatarUrl?: string; error?: string }>;
   updateProfile: (updates: Partial<UserProfile>) => void;
   logout: () => void;
   toggleFavoriteFact: (fact: Fact) => void;
@@ -82,15 +104,23 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session?.user) {
           const user = session.user;
-          const metaName = (user.user_metadata as any)?.name || user.email?.split('@')[0] || 'Believer';
+          const meta = user.user_metadata as any || {};
+          const metaName = meta.name || user.email?.split('@')[0] || 'Believer';
+          const metaUsername = meta.username || user.email?.split('@')[0] || 'believer';
           setState(prev => ({
             ...prev,
             userProfile: {
               name: metaName,
+              firstName: meta.firstName,
+              lastName: meta.lastName,
+              username: metaUsername,
               email: user.email || '',
               joinedDate: new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-              preferredTranslation: prev.userProfile?.preferredTranslation || 'ESV',
+              preferredTranslation: meta.preferredTranslation || prev.userProfile?.preferredTranslation || 'ESV',
               notificationsEnabled: prev.userProfile?.notificationsEnabled ?? true,
+              studyFocus: meta.studyFocus || prev.userProfile?.studyFocus,
+              dailyGoal: meta.dailyGoal || prev.userProfile?.dailyGoal,
+              knowledgeLevel: meta.knowledgeLevel || prev.userProfile?.knowledgeLevel,
             },
           }));
         }
@@ -101,15 +131,23 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
         if (session?.user) {
           const user = session.user;
-          const metaName = (user.user_metadata as any)?.name || user.email?.split('@')[0] || 'Believer';
+          const meta = user.user_metadata as any || {};
+          const metaName = meta.name || user.email?.split('@')[0] || 'Believer';
+          const metaUsername = meta.username || user.email?.split('@')[0] || 'believer';
           setState(prev => ({
             ...prev,
             userProfile: {
               name: metaName,
+              firstName: meta.firstName,
+              lastName: meta.lastName,
+              username: metaUsername,
               email: user.email || '',
               joinedDate: new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-              preferredTranslation: prev.userProfile?.preferredTranslation || 'ESV',
+              preferredTranslation: meta.preferredTranslation || prev.userProfile?.preferredTranslation || 'ESV',
               notificationsEnabled: prev.userProfile?.notificationsEnabled ?? true,
+              studyFocus: meta.studyFocus || prev.userProfile?.studyFocus,
+              dailyGoal: meta.dailyGoal || prev.userProfile?.dailyGoal,
+              knowledgeLevel: meta.knowledgeLevel || prev.userProfile?.knowledgeLevel,
             },
           }));
         } else if (_event === 'SIGNED_OUT') {
@@ -172,15 +210,24 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return;
         }
         if (data.user) {
-          const metaName = (data.user.user_metadata as any)?.name || formattedName;
+          const meta = (data.user.user_metadata as any) || {};
+          const metaName = meta.name || formattedName;
+          const metaUsername = meta.username || email.split('@')[0].toLowerCase().replace(/\s+/g, '_');
           setState(prev => ({
             ...prev,
             userProfile: {
               name: metaName,
+              firstName: meta.firstName || formattedName.split(' ')[0],
+              lastName: meta.lastName || formattedName.split(' ').slice(1).join(' '),
+              username: metaUsername,
+              avatarUrl: meta.avatarUrl || prev.userProfile?.avatarUrl,
               email: data.user!.email || email,
               joinedDate: new Date(data.user!.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-              preferredTranslation: prev.userProfile?.preferredTranslation || 'ESV',
+              preferredTranslation: meta.preferredTranslation || prev.userProfile?.preferredTranslation || 'ESV',
               notificationsEnabled: prev.userProfile?.notificationsEnabled ?? true,
+              studyFocus: meta.studyFocus || prev.userProfile?.studyFocus,
+              dailyGoal: meta.dailyGoal || prev.userProfile?.dailyGoal,
+              knowledgeLevel: meta.knowledgeLevel || prev.userProfile?.knowledgeLevel,
             },
           }));
           return;
@@ -196,28 +243,150 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ...prev,
       userProfile: {
         name: prev.userProfile?.name || formattedName,
+        firstName: prev.userProfile?.firstName || formattedName.split(' ')[0],
+        lastName: prev.userProfile?.lastName || formattedName.split(' ').slice(1).join(' '),
+        username: prev.userProfile?.username || emailOrName.split('@')[0].toLowerCase().replace(/\s+/g, '_'),
+        avatarUrl: prev.userProfile?.avatarUrl,
         email: prev.userProfile?.email || email,
         joinedDate: prev.userProfile?.joinedDate || 'September 2026',
         preferredTranslation: prev.userProfile?.preferredTranslation || 'ESV',
         notificationsEnabled: prev.userProfile?.notificationsEnabled ?? true,
+        studyFocus: prev.userProfile?.studyFocus,
+        dailyGoal: prev.userProfile?.dailyGoal,
+        knowledgeLevel: prev.userProfile?.knowledgeLevel,
       },
     }));
   };
 
-  const signup = async (name: string, email: string, password?: string) => {
+  const uploadAvatar = async (uri: string): Promise<{ success: boolean; avatarUrl?: string; error?: string }> => {
+    try {
+      if (SUPABASE_ANON_KEY) {
+        try {
+          const userSession = (await supabase.auth.getSession()).data.session?.user;
+          const userId = userSession?.id || state.userProfile?.username || 'user';
+          const fileName = `${userId}/avatar_${Date.now()}.avif`;
+
+          const response = await fetch(uri);
+          const blob = await response.blob();
+
+          const { data, error } = await supabase.storage
+            .from('avatars')
+            .upload(fileName, blob, {
+              contentType: 'image/avif',
+              upsert: true,
+            });
+
+          if (!error && data) {
+            const { data: publicUrlData } = supabase.storage
+              .from('avatars')
+              .getPublicUrl(fileName);
+
+            const publicUrl = publicUrlData.publicUrl;
+
+            await supabase.auth.updateUser({
+              data: { avatarUrl: publicUrl },
+            });
+
+            updateProfile({ avatarUrl: publicUrl });
+            return { success: true, avatarUrl: publicUrl };
+          }
+        } catch (storageErr) {
+          console.log('Supabase storage upload fallback:', storageErr);
+        }
+      }
+
+      // Offline / local fallback
+      updateProfile({ avatarUrl: uri });
+      return { success: true, avatarUrl: uri };
+    } catch (e: any) {
+      return { success: false, error: e?.message || 'Failed to update avatar' };
+    }
+  };
+
+  const RESERVED_USERNAMES = [
+    'admin', 'administrator', 'root', 'daniel', 'sarah', 'paul', 'john',
+    'david', 'grace', 'mary', 'moses', 'peter', 'james', 'exegeomai', 'moderator',
+    'thulane', 'system', 'support', 'help'
+  ];
+
+  const checkUsernameAvailability = async (username: string): Promise<{ available: boolean; reason?: string }> => {
+    const clean = username.trim().toLowerCase();
+    if (!clean) {
+      return { available: false, reason: 'Username cannot be blank.' };
+    }
+    if (clean.length < 3) {
+      return { available: false, reason: 'Username must be at least 3 characters long.' };
+    }
+    if (clean.length > 20) {
+      return { available: false, reason: 'Username must not exceed 20 characters.' };
+    }
+    if (!/^[a-z0-9_]+$/.test(clean)) {
+      return { available: false, reason: 'Only lowercase letters, numbers, and underscores are allowed.' };
+    }
+
+    // Check reserved / existing names
+    if (RESERVED_USERNAMES.includes(clean)) {
+      return { available: false, reason: `Username '@${clean}' is already in use.` };
+    }
+
+    // Check Supabase if configured
+    if (SUPABASE_ANON_KEY) {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('username', clean)
+          .maybeSingle();
+
+        if (!error && data && (data as any).username) {
+          return { available: false, reason: `Username '@${clean}' is already in use.` };
+        }
+      } catch (e) {
+        console.log('Supabase check username notice:', e);
+      }
+    }
+
+    return { available: true };
+  };
+
+  const signupExtended = async (params: SignUpExtendedParams): Promise<{ success: boolean; error?: string }> => {
+    const {
+      firstName,
+      lastName,
+      username,
+      email,
+      password,
+      preferredTranslation = 'ESV',
+      studyFocus = 'Original Languages & Strong\'s',
+      dailyGoal = '15 mins / day',
+      knowledgeLevel = 'Growing Disciple',
+    } = params;
+
+    const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+    const cleanUsername = username.trim().toLowerCase();
+
     if (SUPABASE_ANON_KEY && password) {
       try {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: { name },
+            data: {
+              name: fullName,
+              firstName: firstName.trim(),
+              lastName: lastName.trim(),
+              username: cleanUsername,
+              preferredTranslation,
+              studyFocus,
+              dailyGoal,
+              knowledgeLevel,
+            },
           },
         });
         if (error) {
           console.warn('Supabase signup error:', error.message);
           Alert.alert('Sign Up Notice', error.message);
-          return;
+          return { success: false, error: error.message };
         }
         if (data.user) {
           if (!data.session) {
@@ -229,32 +398,56 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setState(prev => ({
             ...prev,
             userProfile: {
-              name,
+              name: fullName,
+              firstName: firstName.trim(),
+              lastName: lastName.trim(),
+              username: cleanUsername,
               email,
               joinedDate: new Date(data.user!.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-              preferredTranslation: 'ESV',
+              preferredTranslation,
               notificationsEnabled: true,
+              studyFocus,
+              dailyGoal,
+              knowledgeLevel,
             },
           }));
-          return;
+          return { success: true };
         }
       } catch (err: any) {
         console.warn('Supabase signup network notice:', err);
         Alert.alert('Network Error', err?.message || 'Unable to connect to Supabase authentication service.');
-        return;
+        return { success: false, error: err?.message };
       }
     }
 
+    // Offline / fallback signup
     setState(prev => ({
       ...prev,
       userProfile: {
-        name,
+        name: fullName,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        username: cleanUsername,
         email,
         joinedDate: 'September 2026',
-        preferredTranslation: 'ESV',
+        preferredTranslation,
         notificationsEnabled: true,
+        studyFocus,
+        dailyGoal,
+        knowledgeLevel,
       },
     }));
+    return { success: true };
+  };
+
+  const signup = async (name: string, email: string, password?: string) => {
+    return signupExtended({
+      firstName: name.split(' ')[0] || name,
+      lastName: name.split(' ').slice(1).join(' ') || '',
+      username: name.toLowerCase().replace(/\s+/g, '_'),
+      email,
+      password: password || 'SecurePass123!',
+    });
   };
 
   const updateProfile = (updates: Partial<UserProfile>) => {
@@ -320,6 +513,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setAccent,
       login,
       signup,
+      signupExtended,
+      checkUsernameAvailability,
+      uploadAvatar,
       updateProfile,
       logout,
       toggleFavoriteFact,

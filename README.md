@@ -207,41 +207,52 @@ exegeomai/
 │       └── index.ts                      # Spacing (8px grid), pillTabBar specs, and soft shadows
 ├── supabase/                             # Supabase CLI project configuration
 │   ├── config.toml                       # Supabase local and remote configuration
+│   ├── migrations/                       # Database schema and RLS policies
+│   │   └── 20260920000000_create_profiles_and_avatars.sql # profiles table, trigger, and avatars bucket
 │   └── .gitignore                        # Supabase ignore rules
-├── .env.example                          # Environment template for Supabase URL and anon key
-├── .gitignore                            # Standard git exclusion rules
+├── .env.example                          # Environment template for all Supabase connections
+├── .gitignore                            # Standard git exclusion rules (includes .env and .agents)
 ├── .npmrc                                # npm configuration (legacy-peer-deps=true)
 ├── App.tsx                               # Root container, Dark StatusBar, providers, and UpdateModal
 ├── app.json                              # Expo configuration (v1.0.1, runtimeVersion 1.0.1, updates URL)
 ├── eas.json                              # EAS build profiles and update channels (production, preview)
 ├── index.ts                              # Expo entrypoint
-├── package.json                          # Dependencies (@supabase/supabase-js, expo-updates) and scripts
+├── package.json                          # Dependencies (@supabase/supabase-js, expo-image-picker)
 ├── tsconfig.json                         # TypeScript compiler configuration (extends expo/tsconfig.base.json)
 └── README.md                             # Comprehensive project architecture guide
 ```
 
 ---
 
-## Supabase Integration & Authentication (Project Ref: `ibwooiejzxhbzplnldcz`)
+## Supabase Integration, Database & AVIF Avatar Storage (`ibwooiejzxhbzplnldcz`)
 
-The mobile client integrates with Supabase for user authentication (Sign In, Sign Up, Session Persistence):
+The mobile client integrates with Supabase for user authentication, profile data persistence, and compressed avatar storage:
 
-### 1. Supabase CLI Setup
-- **Initialization**: Initialized with `supabase init` creating `supabase/config.toml`.
-- **Project Linking**: Linked to project `ibwooiejzxhbzplnldcz` (`supabase link --project-ref ibwooiejzxhbzplnldcz`).
-- **CLI Authentication**: Run `npx supabase login` with your Supabase Personal Access Token (PAT) or interactively in your local terminal.
+### 1. Multi-Step Sign Up Wizard (4 Steps)
+- **Step 1: Personal Identity & Username**: First name, last name, and desired username with real-time availability check (queries reserved names and Supabase `profiles` table).
+- **Step 2: Contact & Verification**: Email address and confirmation email with real-time match verification.
+- **Step 3: Security & Credentials**: Password with 4-segment **60-30-10 Strength Progress Bar** (minimum 8 characters, uppercase, number, symbol) and confirm password matching.
+- **Step 4: Biblical Study Journey**: Captures preferred translation (`ESV`, `KJV`, `NASB`, `NIV`, `CSB`), study focus area (Original Languages, Historical Context, Devotionals, Theology), daily study cadence, and journey stage.
 
-### 2. Mobile Client Configuration
-- **Client Factory**: Initialized in `src/services/supabase.ts` with `createClient`.
-- **Session Persistence**: Backed by `@react-native-async-storage/async-storage` for auto-refreshing and persistent JWT tokens across app sessions.
-- **Environment Variables**:
-  - `EXPO_PUBLIC_SUPABASE_URL`: `https://ibwooiejzxhbzplnldcz.supabase.co`
-  - `EXPO_PUBLIC_SUPABASE_ANON_KEY`: Configured via `.env` or CI secret.
-- **Authentication Lifecycle**:
-  - `UserContext` automatically attaches `supabase.auth.onAuthStateChange` to listen to token refreshes, logins, and logouts.
-  - Sign in with email and password via `supabase.auth.signInWithPassword`.
-  - Sign up with user metadata via `supabase.auth.signUp`.
-  - Graceful fallback for offline / development when keys are not yet configured.
+### 2. AVIF Profile Picture Upload & Compression
+- In the **Profile** tab, users can tap their avatar to select a profile photo from the camera roll.
+- The image is processed and compressed via `expo-image-manipulator` into ultra-lightweight format (`image/avif`) before uploading to the Supabase Storage `avatars` bucket at `${userId}/avatar_${timestamp}.avif`.
+- This ensures maximum visual fidelity while consuming minimal cloud storage space (< 50KB per avatar).
+
+### 3. Database Schema & Migration (`supabase/migrations/`)
+- **`public.profiles` Table**:
+  - `id` (UUID, references `auth.users(id)` on delete cascade)
+  - `username` (unique, lowercase alphanumeric)
+  - `first_name`, `last_name`, `full_name`, `avatar_url`
+  - `preferred_translation`, `study_focus`, `daily_goal`, `knowledge_level`
+  - Row Level Security (RLS) enabled with public read and owner-only update policies.
+- **Automatic Trigger**: `on_auth_user_created` trigger executes `handle_new_user()` to automatically populate `public.profiles` from `auth.users.raw_user_meta_data`.
+- **Storage Bucket**: `avatars` bucket configured with a 2MB file size limit and public read access.
+
+### 4. Environment Configuration (`.env`)
+- `EXPO_PUBLIC_SUPABASE_URL`: `https://ibwooiejzxhbzplnldcz.supabase.co`
+- `EXPO_PUBLIC_SUPABASE_ANON_KEY`: Retrieve from [Supabase Dashboard > Project Settings > API](https://supabase.com/dashboard/project/ibwooiejzxhbzplnldcz/settings/api).
+- `SUPABASE_DB_URL`: Postgres direct connection string for migration execution.
 
 ---
 
