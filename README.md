@@ -28,7 +28,8 @@ graph TD
     App["App.tsx"] --> Providers["UserProvider + SafeAreaProvider"]
     Providers --> Nav["AppNavigator"]
     Providers --> UpdateModal["UpdateModal (Update Now / Remind Me Later)"]
-    Nav --> Auth["AuthScreen (Login / Sign Up - 28x28 Logo)"]
+    Nav --> Welcome["WelcomeScreen (3-Step Onboarding Flow)"]
+    Welcome --> Auth["AuthScreen (Login / Sign Up - 28x28 Logo)"]
     Nav --> Tabs["Rule 20 Floating Pill Tab Bar (280px)"]
     
     Tabs --> DiscoverStack["Discover Stack"]
@@ -195,6 +196,7 @@ exegeomai/
 │   │   ├── ScriptureDetailsScreen.tsx    # In-depth modal sheet for scripture texts
 │   │   ├── ScripturesScreen.tsx          # Categorized scripture library
 │   │   ├── SearchScreen.tsx              # Unified search interface
+│   │   ├── WelcomeScreen.tsx             # 3-step onboarding flow with custom vector art & dual CTAs
 │   │   ├── WOTDDetailsScreen.tsx         # Deep-dive view for Word of the Day
 │   │   └── WOTDScreen.tsx                # Daily devotional with 4 analytical lenses
 │   ├── services/
@@ -224,6 +226,30 @@ exegeomai/
 ├── tsconfig.json                         # TypeScript compiler configuration (extends expo/tsconfig.base.json)
 └── README.md                             # Comprehensive project architecture guide
 ```
+
+---
+
+## 3-Step Welcome & Onboarding Screen Flow
+
+Immediately after the application boots up, new and unauthenticated users are guided through an elegant, interactive 3-step Welcome & Onboarding walkthrough before reaching Login or Sign Up:
+
+### 1. Slide 1: Welcome to exégeomai
+- **Narrative**: *"We hope this sacred companion illuminates God's Word in your heart. Explore the timeless treasures of Scripture with rich historical, linguistic, and ancient cultural clarity."*
+- **Visual Spec**: `WelcomeScripturesArtSvg` — Custom high-resolution vector illustration of the open Scriptures illuminated by divine rays of holy light and sacred aura.
+- **Action**: Step indicator + circular forward button with white Chevron SVG (`#FFFFFF`) on amber background (`#D97706`).
+
+### 2. Slide 2: What Does exégeomai Mean?
+- **Ancient Root**: *ἐξηγέομαι (Strong's Greek 1834)*
+- **Narrative**: *"From ἐκ (out) and ἡγέομαι (to lead) — 'to lead out, unfold, declare, and draw out the true meaning.' Just as Christ declared the Father, exégeomai unfolds the profound depth and original intent of Sacred Scripture."*
+- **Visual Spec**: `ExegeomaiMeaningArtSvg` — Custom vector artwork of an ancient unfolding parchment scroll with Strong's concordance magnifying glass and Greek letterform motifs.
+- **Action**: Step indicator + circular forward button to proceed to the purpose slide.
+
+### 3. Slide 3: Our Sacred Purpose & Launch CTAs
+- **Narrative**: *"This application was created to help you better understand the scriptures, deepen your knowledge in the glory of the Lord, and strengthen your everyday walk of faith through sound biblical exegesis."*
+- **Visual Spec**: `SacredPurposeArtSvg` — Custom vector illustration depicting the ascending path of discipleship, the shield of faith, and the glory of the Lord.
+- **Primary CTA**: **"Get Started"** — Full-width button navigating directly into the 4-step Sign Up wizard.
+- **Secondary CTA**: **"Already have an account? Sign In"** — Navigates directly to Login mode.
+- **Header Skip Action**: "Skip" button located in the top-right header on Slides 1 & 2 allows users to jump straight into the application without swiping through all slides.
 
 ---
 

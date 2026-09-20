@@ -63,11 +63,19 @@ const KNOWLEDGE_LEVELS = [
   { id: 'Theological Scholar', label: 'Theological Scholar' },
 ];
 
-export default function AuthScreen() {
+export default function AuthScreen({ route, navigation }: { route?: any; navigation?: any }) {
   const { login, signupExtended, checkUsernameAvailability } = useUser();
-  const [mode, setMode] = useState<AuthMode>('login');
+  const initialMode: AuthMode = route?.params?.initialMode === 'signup' ? 'signup' : 'login';
+  const [mode, setMode] = useState<AuthMode>(initialMode);
   const [step, setStep] = useState<SignUpStep>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (route?.params?.initialMode) {
+      setMode(route.params.initialMode);
+      setStep(1);
+    }
+  }, [route?.params?.initialMode]);
 
   // Login Form States
   const [loginEmail, setLoginEmail] = useState('');
@@ -194,6 +202,22 @@ export default function AuthScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
+          {/* Top Bar / Back to Welcome */}
+          {navigation?.canGoBack?.() && (
+            <View style={styles.topBar}>
+              <TouchableOpacity
+                style={styles.backBtn}
+                onPress={() => navigation.goBack()}
+                activeOpacity={0.7}
+              >
+                <ChevronLeftSvg size={18} color={colors.textPrimary} />
+                <Text variant="label" color={colors.textPrimary} weight="600" style={styles.backBtnText}>
+                  Welcome
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
           {/* Header Branding - Rule 15 & 19: Auth Logo strictly 28x28 */}
           <View style={styles.header}>
             <Image
@@ -954,6 +978,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md, // 16px grid margin per Rule 15
     paddingTop: spacing.lg, // 24px
     paddingBottom: spacing.xxl,
+  },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  backBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+    paddingRight: spacing.sm,
+  },
+  backBtnText: {
+    marginLeft: 4,
   },
   header: {
     alignItems: 'center',
