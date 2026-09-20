@@ -106,9 +106,9 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-  # Job 2: Compile Native Binary on GitHub Actions
+  # Job 2: Compile Native Android APK directly on GitHub Actions Runners
   compile_native_app:
-    name: Compile Native Binary
+    name: Compile Native Android APK on GitHub
     if: github.event_name == 'workflow_dispatch' && (inputs.action == 'compile_native_app' || inputs.action == 'both')
     runs-on: ubuntu-latest
     steps:
@@ -121,16 +121,21 @@ jobs:
           node-version: 22
           cache: 'npm'
 
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Install dependencies
         run: npm install --legacy-peer-deps --prefer-offline --no-audit
 
       - name: Inject Incremental Compilation Build Version
         run: |
-          # Set dynamic build number while preserving version 1.0.1 and runtimeVersion 1.0.1
-          BUILD_NUM="${{ inputs.compile_build_number }}"
-          if [ -z "$BUILD_NUM" ]; then
-            BUILD_NUM="${{ github.run_number }}"
-          fi
+          BUILD_NUM="${{ inputs.compile_build_number || github.run_number }}"
           echo "Compiling native build with dynamic build number: $BUILD_NUM (runtimeVersion remains 1.0.1)"
           node -e "
             const fs = require('fs');
@@ -141,36 +146,44 @@ jobs:
           "
           git diff app.json
 
-      - name: Verify Configuration
-        run: npx expo config --type public
-
-      - name: Setup EAS CLI
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Compile Native Binary via EAS Build
+      - name: Prebuild Native Android Project
         run: |
-          eas build --platform ${{ inputs.platform }} --profile ${{ inputs.build_profile }} --non-interactive
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          npx expo prebuild --platform android --no-install
 
-      - name: Publish GitHub Release for Native Build
+      - name: Build Android Release APK with Gradle
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease -x lint -x test --no-daemon
+
+      - name: Prepare APK Artifact
+        run: |
+          mkdir -p build-output
+          cp android/app/build/outputs/apk/release/app-release.apk build-output/exegeomai-v1.0.1.apk
+          ls -lh build-output/
+
+      - name: Upload APK to GitHub Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: exegeomai-v1.0.1-apk
+          path: build-output/exegeomai-v1.0.1.apk
+
+      - name: Publish APK to GitHub Release Assets
         run: |
           BUILD_NUM="${{ inputs.compile_build_number || github.run_number }}"
           RELEASE_TAG="v1.0.1"
-          RELEASE_TITLE="exégeomai v1.0.1 (Native Build #${BUILD_NUM})"
+          RELEASE_TITLE="exégeomai v1.0.1"
           
-          RELEASE_BODY="### Native Build Artifacts
+          RELEASE_BODY="### Native Build Artifacts (Built on GitHub Actions)
 
-          - **Platform**: ${{ inputs.platform }}
-          - **Profile**: ${{ inputs.build_profile }}
+          - **Platform**: Android
+          - **Artifact**: \`exegeomai-v1.0.1.apk\`
+          - **Build Environment**: GitHub Actions Ubuntu Runner (Java 17 + Gradle)
           - **Native Build Number**: ${BUILD_NUM}
           - **Runtime Version**: 1.0.1
-          - **EAS Project**: [exegeomai on Expo](https://expo.dev/accounts/thulanesigasa0/projects/exegeomai/builds)
+          - **OTA Update Support**: Enabled via Expo Updates (runtimeVersion 1.0.1)
 
-          To download the standalone APK or App Bundle, visit [EAS Cloud Builds](https://expo.dev/accounts/thulanesigasa0/projects/exegeomai/builds)."
+          Download the standalone \`exegeomai-v1.0.1.apk\` below directly from the release Assets."
 
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             echo "Updating existing release $RELEASE_TAG..."
@@ -179,5 +192,8 @@ jobs:
             echo "Creating new release $RELEASE_TAG..."
             gh release create "$RELEASE_TAG" --title "$RELEASE_TITLE" --notes "$RELEASE_BODY"
           fi
+
+          echo "Uploading APK to GitHub Release $RELEASE_TAG assets..."
+          gh release upload "$RELEASE_TAG" build-output/exegeomai-v1.0.1.apk --clobber
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -231,19 +231,15 @@ npx eas-cli update --branch production --message "Update description"
 npx eas-cli update --branch preview --message "Preview update description"
 ```
 
-### Compiling Native Binaries
-Native builds can be triggered via GitHub Actions (`.github/workflows/compile-and-ota.yml`) or locally via EAS CLI:
+### Compiling Native Binaries on GitHub Actions
+Native compilation runs directly on GitHub Actions compute runners (Java 17 + Android SDK + Gradle) without relying on EAS Cloud build servers:
 
-```bash
-# Compile preview APK for Android
-npx eas-cli build --platform android --profile preview
-
-# Compile production release bundle
-npx eas-cli build --platform android --profile production
-```
+- **Workflow**: `.github/workflows/compile-and-ota.yml` (`compile_native_app` job)
+- **Engine**: `npx expo prebuild` + `./gradlew assembleRelease`
+- **Output**: Generates `exegeomai-v1.0.1.apk` and uploads it directly to the repository's GitHub Releases page under **Assets**.
 
 ### GitHub Releases vs. Over-The-Air (OTA) Updates
-- **GitHub Releases (`/releases`)**: Houses official version tags (e.g. `v1.0.1`), native build records, changelogs, and direct download links for compiled standalone Android APKs and Google Play App Bundles (AAB).
+- **GitHub Releases (`/releases`)**: Houses official version tags (e.g. `v1.0.1`), changelogs, and direct `.apk` binary downloads compiled directly on GitHub Actions.
 - **Expo EAS OTA Updates**: Seamless JavaScript and asset updates deployed directly to user devices over the air across the `production` and `preview` channels without requiring a manual APK reinstall.
 
 ### Type Checking & Validation
