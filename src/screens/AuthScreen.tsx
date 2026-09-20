@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as ScreenCapture from 'expo-screen-capture';
 import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
@@ -51,9 +52,10 @@ const STUDY_FOCUSES = [
 ];
 
 const DAILY_GOALS = [
-  { id: '5 mins / day', label: '5 mins / day (Quick Exegesis)' },
-  { id: '15 mins / day', label: '15 mins / day (Standard Study)' },
-  { id: '30+ mins / day', label: '30+ mins / day (Scholarly Deep Dive)' },
+  { id: '5 mins / day', label: '5 mins / day (Essential Verse)' },
+  { id: '15 mins / day', label: '15 mins / day (Verse + Theological Context)' },
+  { id: '30 mins / day', label: '30 mins / day (Full Exegesis & Original Roots)' },
+  { id: 'Deep Dive (45m+)', label: '45+ mins / day (Scholar Immersion)' },
 ];
 
 const KNOWLEDGE_LEVELS = [
@@ -69,6 +71,59 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [step, setStep] = useState<SignUpStep>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Input Refs for smooth keyboard 'Next' focus advancement
+  const firstNameRef = useRef<TextInput>(null);
+  const lastNameRef = useRef<TextInput>(null);
+  const usernameRef = useRef<TextInput>(null);
+
+  const emailRef = useRef<TextInput>(null);
+  const confirmEmailRef = useRef<TextInput>(null);
+
+  const passwordRef = useRef<TextInput>(null);
+  const confirmPasswordRef = useRef<TextInput>(null);
+
+  const loginEmailRef = useRef<TextInput>(null);
+  const loginPasswordRef = useRef<TextInput>(null);
+
+  // Screen recording & screenshot protection for sensitive password inputs
+  // Under the hood on Android, ScreenCapture invokes Kotlin ScreenCaptureModule:
+  // activity.window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+  // This causes screen recorders (built-in or third party) to capture a solid black/blank screen.
+  const handlePasswordFocus = () => {
+    ScreenCapture.preventScreenCaptureAsync().catch(() => {});
+  };
+
+  const handlePasswordBlur = () => {
+    if (step !== 3) {
+      ScreenCapture.allowScreenCaptureAsync().catch(() => {});
+    }
+  };
+
+  useEffect(() => {
+    if (mode === 'signup' && step === 3) {
+      ScreenCapture.preventScreenCaptureAsync().catch(() => {});
+    } else {
+      ScreenCapture.allowScreenCaptureAsync().catch(() => {});
+    }
+  }, [step, mode]);
+
+  useEffect(() => {
+    return () => {
+      ScreenCapture.allowScreenCaptureAsync().catch(() => {});
+    };
+  }, []);
+
+  // Auto-focus next field when transitioning wizard steps
+  useEffect(() => {
+    if (mode === 'signup') {
+      if (step === 2) {
+        setTimeout(() => emailRef.current?.focus(), 150);
+      } else if (step === 3) {
+        setTimeout(() => passwordRef.current?.focus(), 150);
+      }
+    }
+  }, [step, mode]);
 
   useEffect(() => {
     if (route?.params?.initialMode) {
@@ -267,7 +322,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
           {/* MODE: LOGIN                                                      */}
           {/* ================================================================ */}
           {mode === 'login' && (
-            <View style={styles.formCard}>
+            <View style={styles.formSection}>
               <View style={styles.inputGroup}>
                 <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.inputLabel}>
                   EMAIL OR USERNAME
@@ -275,6 +330,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                 <View style={[styles.inputWrapper, shadow.sm]}>
                   <MailSvg size={18} color="#94A3B8" style={styles.inputIcon} />
                   <TextInput
+                    ref={loginEmailRef}
                     style={styles.textInput}
                     placeholder="name@example.com"
                     placeholderTextColor="#94A3B8"
@@ -283,6 +339,9 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                     keyboardType="email-address"
                     autoCapitalize="none"
                     autoCorrect={false}
+                    returnKeyType="next"
+                    blurOnSubmit={false}
+                    onSubmitEditing={() => loginPasswordRef.current?.focus()}
                   />
                 </View>
               </View>
@@ -294,6 +353,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                 <View style={[styles.inputWrapper, shadow.sm]}>
                   <LockSvg size={18} color="#94A3B8" style={styles.inputIcon} />
                   <TextInput
+                    ref={loginPasswordRef}
                     style={styles.textInput}
                     placeholder="Enter your password"
                     placeholderTextColor="#94A3B8"
@@ -302,6 +362,10 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                     secureTextEntry={!showLoginPassword}
                     autoCapitalize="none"
                     autoCorrect={false}
+                    returnKeyType="done"
+                    onFocus={handlePasswordFocus}
+                    onBlur={handlePasswordBlur}
+                    onSubmitEditing={handleLoginSubmit}
                   />
                   <TouchableOpacity
                     onPress={() => setShowLoginPassword(prev => !prev)}
@@ -350,8 +414,8 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
           {/* ================================================================ */}
           {mode === 'signup' && (
             <View style={styles.wizardContainer}>
-              {/* Wizard Step Indicator Bar */}
-              <View style={[styles.stepIndicatorCard, shadow.sm]}>
+              {/* Wizard Step Indicator Bar (Direct Body Layout) */}
+              <View style={styles.stepIndicatorSection}>
                 <View style={styles.stepPillsRow}>
                   {[1, 2, 3, 4].map(s => {
                     const isPassed = step > s;
@@ -407,9 +471,9 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                 </View>
               </View>
 
-              {/* STEP 1: Personal Identity & Username */}
+              {/* STEP 1: Personal Identity & Username (Direct Body Layout) */}
               {step === 1 && (
-                <View style={styles.stepContentCard}>
+                <View style={styles.stepContentSection}>
                   <View style={styles.inputGroup}>
                     <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.inputLabel}>
                       FIRST NAME
@@ -417,6 +481,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                     <View style={[styles.inputWrapper, shadow.sm]}>
                       <UserSvg size={18} color="#94A3B8" style={styles.inputIcon} />
                       <TextInput
+                        ref={firstNameRef}
                         style={styles.textInput}
                         placeholder="e.g. Daniel"
                         placeholderTextColor="#94A3B8"
@@ -424,6 +489,9 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                         onChangeText={setFirstName}
                         autoCapitalize="words"
                         autoCorrect={false}
+                        returnKeyType="next"
+                        blurOnSubmit={false}
+                        onSubmitEditing={() => lastNameRef.current?.focus()}
                       />
                     </View>
                   </View>
@@ -435,6 +503,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                     <View style={[styles.inputWrapper, shadow.sm]}>
                       <UserSvg size={18} color="#94A3B8" style={styles.inputIcon} />
                       <TextInput
+                        ref={lastNameRef}
                         style={styles.textInput}
                         placeholder="e.g. Moyo"
                         placeholderTextColor="#94A3B8"
@@ -442,6 +511,9 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                         onChangeText={setLastName}
                         autoCapitalize="words"
                         autoCorrect={false}
+                        returnKeyType="next"
+                        blurOnSubmit={false}
+                        onSubmitEditing={() => usernameRef.current?.focus()}
                       />
                     </View>
                   </View>
@@ -460,6 +532,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                     >
                       <AtSvg size={18} color="#94A3B8" style={styles.inputIcon} />
                       <TextInput
+                        ref={usernameRef}
                         style={styles.textInput}
                         placeholder="e.g. daniel_exegesis"
                         placeholderTextColor="#94A3B8"
@@ -467,6 +540,13 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                         onChangeText={setUsername}
                         autoCapitalize="none"
                         autoCorrect={false}
+                        returnKeyType="next"
+                        blurOnSubmit={false}
+                        onSubmitEditing={() => {
+                          if (canProceedStep1) {
+                            setStep(2);
+                          }
+                        }}
                       />
                       {usernameStatus.loading && (
                         <ActivityIndicator size="small" color={colors.accent} style={styles.statusIndicator} />
@@ -524,9 +604,9 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                 </View>
               )}
 
-              {/* STEP 2: Contact & Email Confirmation */}
+              {/* STEP 2: Contact & Email Confirmation (Direct Body Layout) */}
               {step === 2 && (
-                <View style={styles.stepContentCard}>
+                <View style={styles.stepContentSection}>
                   <View style={styles.inputGroup}>
                     <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.inputLabel}>
                       EMAIL ADDRESS
@@ -534,6 +614,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                     <View style={[styles.inputWrapper, shadow.sm]}>
                       <MailSvg size={18} color="#94A3B8" style={styles.inputIcon} />
                       <TextInput
+                        ref={emailRef}
                         style={styles.textInput}
                         placeholder="name@example.com"
                         placeholderTextColor="#94A3B8"
@@ -542,6 +623,9 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                         keyboardType="email-address"
                         autoCapitalize="none"
                         autoCorrect={false}
+                        returnKeyType="next"
+                        blurOnSubmit={false}
+                        onSubmitEditing={() => confirmEmailRef.current?.focus()}
                       />
                       {isEmailValid(email) && (
                         <CheckSvg size={16} color={colors.accent} style={styles.statusIndicator} />
@@ -563,6 +647,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                     >
                       <MailSvg size={18} color="#94A3B8" style={styles.inputIcon} />
                       <TextInput
+                        ref={confirmEmailRef}
                         style={styles.textInput}
                         placeholder="Repeat your email address"
                         placeholderTextColor="#94A3B8"
@@ -571,6 +656,13 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                         keyboardType="email-address"
                         autoCapitalize="none"
                         autoCorrect={false}
+                        returnKeyType="next"
+                        blurOnSubmit={false}
+                        onSubmitEditing={() => {
+                          if (canProceedStep2) {
+                            setStep(3);
+                          }
+                        }}
                       />
                       {confirmEmail.length > 0 && (
                         <View style={styles.statusIndicator}>
@@ -622,9 +714,9 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                 </View>
               )}
 
-              {/* STEP 3: Security & Password Strength Meter */}
+              {/* STEP 3: Security & Password Strength Meter (Direct Body Layout) */}
               {step === 3 && (
-                <View style={styles.stepContentCard}>
+                <View style={styles.stepContentSection}>
                   <View style={styles.inputGroup}>
                     <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.inputLabel}>
                       CREATE PASSWORD
@@ -632,6 +724,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                     <View style={[styles.inputWrapper, shadow.sm]}>
                       <LockSvg size={18} color="#94A3B8" style={styles.inputIcon} />
                       <TextInput
+                        ref={passwordRef}
                         style={styles.textInput}
                         placeholder="Create a strong password"
                         placeholderTextColor="#94A3B8"
@@ -640,6 +733,11 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                         secureTextEntry={!showPassword}
                         autoCapitalize="none"
                         autoCorrect={false}
+                        returnKeyType="next"
+                        blurOnSubmit={false}
+                        onFocus={handlePasswordFocus}
+                        onBlur={handlePasswordBlur}
+                        onSubmitEditing={() => confirmPasswordRef.current?.focus()}
                       />
                       <TouchableOpacity
                         onPress={() => setShowPassword(prev => !prev)}
@@ -733,6 +831,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                     >
                       <ShieldCheckSvg size={18} color="#94A3B8" style={styles.inputIcon} />
                       <TextInput
+                        ref={confirmPasswordRef}
                         style={styles.textInput}
                         placeholder="Re-enter your password"
                         placeholderTextColor="#94A3B8"
@@ -741,6 +840,15 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                         secureTextEntry={!showConfirmPassword}
                         autoCapitalize="none"
                         autoCorrect={false}
+                        returnKeyType="next"
+                        blurOnSubmit={false}
+                        onFocus={handlePasswordFocus}
+                        onBlur={handlePasswordBlur}
+                        onSubmitEditing={() => {
+                          if (canProceedStep3) {
+                            setStep(4);
+                          }
+                        }}
                       />
                       <TouchableOpacity
                         onPress={() => setShowConfirmPassword(prev => !prev)}
@@ -794,9 +902,9 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                 </View>
               )}
 
-              {/* STEP 4: Biblical Journey & Preferences */}
+              {/* STEP 4: Biblical Journey & Preferences (Direct Body Layout) */}
               {step === 4 && (
-                <View style={styles.stepContentCard}>
+                <View style={styles.stepContentSection}>
                   {/* Preferred Translation */}
                   <View style={styles.preferenceSection}>
                     <View style={styles.sectionHeaderRow}>
@@ -955,9 +1063,28 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
             </View>
           )}
 
-          {/* Terms Disclaimer */}
+          {/* Terms & Privacy Clickable Disclaimer */}
           <Text variant="caption" color={colors.textTertiary} style={styles.disclaimer}>
-            By continuing, you agree to our Terms of Service and Privacy Policy.
+            By continuing, you agree to our{' '}
+            <Text
+              variant="caption"
+              weight="700"
+              color={colors.accent}
+              style={styles.legalLink}
+              onPress={() => navigation.navigate('TermsOfService')}
+            >
+              Terms of Service
+            </Text>{' '}
+            and{' '}
+            <Text
+              variant="caption"
+              weight="700"
+              color={colors.accent}
+              style={styles.legalLink}
+              onPress={() => navigation.navigate('PrivacyPolicy')}
+            >
+              Privacy Policy
+            </Text>.
           </Text>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -1042,16 +1169,19 @@ const styles = StyleSheet.create({
   formCard: {
     marginBottom: spacing.lg,
   },
+  formSection: {
+    marginBottom: spacing.lg,
+  },
   wizardContainer: {
     marginBottom: spacing.lg,
   },
   stepIndicatorCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  stepIndicatorSection: {
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.md,
   },
   stepPillsRow: {
     flexDirection: 'row',
@@ -1107,11 +1237,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   stepContentCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
+    paddingVertical: 0,
+  },
+  stepContentSection: {
+    paddingVertical: 0,
   },
   inputGroup: {
     marginBottom: spacing.md,
@@ -1297,6 +1426,10 @@ const styles = StyleSheet.create({
   disclaimer: {
     textAlign: 'center',
     fontSize: 11,
-    lineHeight: 16,
+    lineHeight: 18,
+    marginTop: spacing.sm,
+  },
+  legalLink: {
+    textDecorationLine: 'underline',
   },
 });

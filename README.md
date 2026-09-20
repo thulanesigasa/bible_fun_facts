@@ -7,7 +7,10 @@
   <img src="https://img.shields.io/badge/Supabase-Auth%20&%20Backend-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase Backend" />
   <img src="https://img.shields.io/badge/CI%2FCD-Rule%2021%20Compliant-10B981?style=for-the-badge&logo=githubactions&logoColor=white" alt="Rule 21 Compliant" />
   <img src="https://img.shields.io/badge/EAS%20Channels-Production%20%7C%20Preview-000000?style=for-the-badge&logo=expo&logoColor=white" alt="EAS Channels" />
+  <img src="https://img.shields.io/badge/Outer%20Release-v1.0.2-2563EB?style=for-the-badge&logo=android&logoColor=white" alt="Outer Release v1.0.2" />
   <img src="https://img.shields.io/badge/EAS%20OTA%20Updates-Active%20(v1.0.1)-000000?style=for-the-badge&logo=expo&logoColor=white" alt="EAS OTA Updates" />
+  <img src="https://img.shields.io/badge/Security-Kotlin%20FLAG__SECURE-DC2626?style=for-the-badge&logo=android&logoColor=white" alt="Kotlin FLAG_SECURE" />
+  <img src="https://img.shields.io/badge/Legal-Terms%20&%20Privacy%20Screens-475569?style=for-the-badge" alt="Terms & Privacy Screens" />
   <img src="https://img.shields.io/badge/GitHub%20Actions-Compilation%20&%20OTA-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions" />
   <img src="https://img.shields.io/badge/Tab%20Architecture-Floating%20Pill%20280px-D97706?style=for-the-badge" alt="Floating Pill Tab Bar" />
   <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
@@ -29,7 +32,9 @@ graph TD
     Providers --> Nav["AppNavigator"]
     Providers --> UpdateModal["UpdateModal (Update Now / Remind Me Later)"]
     Nav --> Welcome["WelcomeScreen (3-Step Onboarding Flow)"]
-    Welcome --> Auth["AuthScreen (Login / Sign Up - 28x28 Logo)"]
+    Welcome --> Auth["AuthScreen (Direct-Body Layout + Keyboard Next + FLAG_SECURE)"]
+    Auth --> Terms["TermsOfServiceScreen (13 Theological & Legal Sections)"]
+    Auth --> Privacy["PrivacyPolicyScreen (11 Data Protection Sections)"]
     Nav --> Tabs["Rule 20 Floating Pill Tab Bar (280px)"]
     
     Tabs --> DiscoverStack["Discover Stack"]
@@ -47,6 +52,8 @@ graph TD
     SearchStack --> SearchMain["SearchScreen"]
     ProfileStack --> ProfileMain["ProfileScreen (Settings, Translation, Streak)"]
     ProfileStack --> FavoritesMain["FavoritesScreen (Saved Collection)"]
+    ProfileStack --> Terms
+    ProfileStack --> Privacy
     
     subgraph DataUpdates["Data, State, Auth and Updates"]
         AsyncStorage[("AsyncStorage")] <--> UserContext["UserContext (useApp / useUser)"]
@@ -281,6 +288,84 @@ In strict adherence to Rule 16 and clean typography principles:
 
 ---
 
+## Project Directory Structure (Rule 12 & Rule 13)
+
+```
+bible_fun_facts/
+├── .github/
+│   └── workflows/
+│       └── compile-and-ota.yml      # CI/CD: Direct GitHub Actions Android compile & EAS OTA
+├── assets/
+│   ├── android-icon-foreground.png  # Calibrated launcher icon (96px centered, Rule 15/19)
+│   ├── icon.png                     # In-app brand icon (1024x1024, 800px symbol)
+│   ├── splash-icon.png              # Splash screen asset
+│   └── onboarding/                  # Compressed, transparent PNG onboarding slides (1, 2, 3)
+├── src/
+│   ├── components/                  # Reusable UI components strictly adhering to 60-30-10
+│   │   ├── Card.tsx                 # Flat surface card with soft elevation shadow
+│   │   ├── FactCard.tsx             # Fact presentation card with zero badges
+│   │   ├── ScriptureCard.tsx        # Scripture reading card with inline typography
+│   │   ├── SvgIcons.tsx             # Curated SVG icon collection (zero emojis)
+│   │   ├── Typography.tsx           # Scaled typographic components
+│   │   ├── UpdateModal.tsx          # Dual-action OTA update prompt with 30m snooze
+│   │   └── WOTDCard.tsx             # Word of the Day analytical lens viewer
+│   ├── context/
+│   │   └── UserContext.tsx          # Global authentication, preferences, streak state
+│   ├── data/
+│   │   └── mockDatabase.ts          # Offline database: 120 facts, 24 scriptures, WOTD
+│   ├── navigation/
+│   │   └── AppNavigator.tsx         # Tab navigation, AuthStack, ProfileStack, Root routes
+│   ├── screens/
+│   │   ├── AuthScreen.tsx           # Flattened body canvas, keyboard next, FLAG_SECURE
+│   │   ├── DiscoverScreen.tsx       # Daily scripture, fact feeds, search jump
+│   │   ├── FactDetailsScreen.tsx    # Modal sheet fact inspection
+│   │   ├── FavoritesScreen.tsx      # Saved collections persisted offline
+│   │   ├── PrivacyPolicyScreen.tsx  # 11-section GDPR/CCPA privacy policy screen
+│   │   ├── ProfileScreen.tsx        # Profile management, study streak, legal navigation
+│   │   ├── ScriptureDetailsScreen.tsx # In-depth chapter & linguistic breakdown
+│   │   ├── ScripturesScreen.tsx     # Testament & genre catalog
+│   │   ├── SearchScreen.tsx         # Unified biblical search across facts & scriptures
+│   │   ├── TermsOfServiceScreen.tsx # 13-section theological & service terms screen
+│   │   ├── WelcomeScreen.tsx        # 3-step onboarding introduction
+│   │   ├── WOTDDetailsScreen.tsx    # Full 4-lens exegesis & prayer focus
+│   │   └── WOTDScreen.tsx           # Daily Word of the Day dashboard
+│   ├── services/
+│   │   ├── supabase.ts              # Defensive Supabase client with fallback anon keys
+│   │   └── updates.ts               # Background OTA update listener & dispatcher
+│   └── theme/                       # 60-30-10 color tokens, 8px grid spacing, radius, shadow
+├── App.tsx                          # Root provider wrapper & safe area initialization
+├── app.json                         # Expo configuration (version: 1.0.1, runtimeVersion: 1.0.1)
+├── package.json                     # Dependency manifests (expo-screen-capture, etc.)
+└── tsconfig.json                    # Strict TypeScript configuration extending Expo base
+```
+
+---
+
+## Direct-Body Authentication, Keyboard Flow & Screen Privacy
+
+The authentication flow in `src/screens/AuthScreen.tsx` provides an airy, frictionless user experience:
+
+### 1. Direct-Body Canvas Architecture (Elimination of Nested "Divs")
+- **Clean Screen Surface**: Removed all outer card wrappers (`stepIndicatorCard`, `stepContentCard`, `formCard`).
+- **Unified Body Placement**: The step progress bar, step pills, contextual heading, input fields, and action buttons sit directly on the application canvas (`#F8FAFC`), avoiding card-in-card visual clutter while maintaining 48px tactile input surfaces.
+
+### 2. Smooth Keyboard "Next" Button Advancement
+- **Seamless Field Transition**: Every input across Login and Sign Up is equipped with `returnKeyType="next"`, `blurOnSubmit={false}`, and ref-based focus routing.
+- **Natural Progress**: Typing First Name advances to Last Name, which advances to Username, which triggers validation and steps forward into Contact Details, immediately auto-focusing Email.
+
+### 3. Android Kotlin `FLAG_SECURE` Screen Recording Protection
+- **Hardware-Level Privacy**: Integrated `expo-screen-capture`. When the user is on the password creation step or focuses any password input, the native Android Kotlin cradle (`ScreenCaptureModule.kt`) applies `WindowManager.LayoutParams.FLAG_SECURE` to the activity window.
+- **Blackout Protection**: The user sees and types their password normally, but any screen recorder (system built-in recorder or third-party recording application) and screenshot utility captures a pure blank/black frame.
+- **Graceful Restoration**: Window security flags are immediately released upon leaving password inputs or navigating to other application screens.
+
+### 4. Dedicated Legal Screens with Clickable Text Links
+- **Interactive Disclaimers**: The authentication terms disclaimer features clickable text links navigating to dedicated, standalone screens:
+  - **`TermsOfServiceScreen.tsx`**: 13 comprehensive, structured theological and service sections detailing scriptural integrity, account guidelines, Strong's concordance attribution, intellectual property, and theological disclaimers.
+  - **`PrivacyPolicyScreen.tsx`**: 11 exhaustive sections covering GDPR/CCPA data protection, on-device AVIF avatar compression, cloud persistence in EU Central Supabase clusters, and zero ad-trackers.
+- **Universal Availability**: Both legal screens are registered in both `AuthStack` and `ProfileStack`, allowing users to review terms both before creating an account and anytime from their profile settings.
+
+---
+
 ## Multi-Step Authentication & AVIF Profile Storage
 
 The mobile client integrates with Supabase for user authentication, profile data persistence, and compressed avatar storage:
@@ -293,7 +378,7 @@ The mobile client integrates with Supabase for user authentication, profile data
 
 ### 2. AVIF Profile Picture Upload & Compression
 - In the **Profile** tab, users can tap their avatar to select a profile photo from the camera roll.
-- The image is processed and compressed via `expo-image-manipulator` into ultra-lightweight format (`image/avif`) before uploading to the Supabase Storage `avatars` bucket at `${userId}/avatar_${timestamp}.avif`.
+- The image is processed and compressed via `expo-image-manipulator` into ultra-lightweight format (`image/avif`) before uploading to the Supabase Storage `avatars` bucket at `user_id/avatar_timestamp.avif`.
 - This ensures maximum visual fidelity while consuming minimal cloud storage space (< 50KB per avatar).
 
 ### 3. Environment Configuration (`.env`)
@@ -311,8 +396,8 @@ This project strictly adheres to **Rule 21** of our global mobile standards:
 | :--- | :--- |
 | **Direct Runner Compilation** | Android APKs compile on `ubuntu-latest` GitHub Actions runners using Java 17 Temurin, Android SDK, and `./gradlew assembleRelease`, bypassing cloud build queues entirely. |
 | **EAS Exclusively for OTA** | EAS CLI is reserved exclusively for Over-The-Air updates (`production` and `preview` channels) via `npx eas-cli update`. |
-| **Automated Release Distribution** | Compiled APKs are automatically uploaded to GitHub Releases (`exegeomai-v1.0.1.apk`) using `gh release upload --clobber`. |
-| **Locked Runtime Versioning** | `runtimeVersion` is explicitly locked to `1.0.1` in `app.json`, guaranteeing continuous OTA compatibility while CI injects dynamic `versionCode = github.run_number`. |
+| **Automated Release Distribution** | Compiled APKs are automatically uploaded to GitHub Releases (`exegeomai-v1.0.2.apk` under release tag `v1.0.2`) using `gh release upload --clobber`. |
+| **Locked Runtime Versioning** | `runtimeVersion` is explicitly locked to `1.0.1` in `app.json`, guaranteeing continuous OTA compatibility across all installed clients while CI injects dynamic `versionCode = github.run_number`. |
 | **In-App Update Modal** | Implemented in `src/components/UpdateModal.tsx` with foreground resume listening, "Update Now", and 30-minute "Remind Me Later" snooze. |
 | **Peer Dependency Stability** | `.npmrc` with `legacy-peer-deps=true` committed at root to prevent React 19 / Expo peer dependency collisions. |
 | **TypeScript Base Config** | `tsconfig.json` extends `expo/tsconfig.base.json` with explicit `jsx: "react-jsx"` and `esModuleInterop: true`. |
@@ -357,11 +442,11 @@ Native compilation runs automatically on push to `main` directly on GitHub Actio
 
 - **Workflow**: `.github/workflows/compile-and-ota.yml` (`compile_native_app` job)
 - **Engine**: `npx expo prebuild --platform android --no-install` + `./gradlew assembleRelease -x lint -x test --no-daemon`
-- **Output**: Generates `exegeomai-v1.0.1.apk` and uploads it directly to the repository's GitHub Releases page under **Assets** with automatic clobbering.
+- **Output**: Generates `exegeomai-v1.0.2.apk` and uploads it directly to the repository's GitHub Releases page under **Assets** with automatic clobbering.
 
 ### GitHub Releases vs. Over-The-Air (OTA) Updates
-- **GitHub Releases (`/releases`)**: Houses official version tags (e.g. `v1.0.1`), changelogs, and direct `.apk` binary downloads compiled directly on GitHub Actions.
-- **Expo EAS OTA Updates**: Seamless JavaScript and asset updates deployed directly to user devices over the air across the `production` and `preview` channels without requiring a manual APK reinstall.
+- **GitHub Releases (`/releases`)**: Houses official version tags (e.g. `v1.0.2`), changelogs, and direct `.apk` binary downloads compiled directly on GitHub Actions.
+- **Expo EAS OTA Updates**: Seamless JavaScript and asset updates deployed directly to user devices over the air across the `production` and `preview` channels (targeting `runtimeVersion: 1.0.1`) without requiring a manual APK reinstall.
 
 ### Type Checking & Validation
 ```bash

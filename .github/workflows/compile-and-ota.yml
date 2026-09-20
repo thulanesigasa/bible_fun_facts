@@ -177,31 +177,32 @@ jobs:
       - name: Prepare APK Artifact
         run: |
           mkdir -p build-output
-          cp android/app/build/outputs/apk/release/app-release.apk build-output/exegeomai-v1.0.1.apk
+          cp android/app/build/outputs/apk/release/app-release.apk build-output/exegeomai-v1.0.2.apk
           ls -lh build-output/
 
       - name: Upload APK to GitHub Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: exegeomai-v1.0.1-apk
-          path: build-output/exegeomai-v1.0.1.apk
+          name: exegeomai-v1.0.2-apk
+          path: build-output/exegeomai-v1.0.2.apk
 
       - name: Publish APK to GitHub Release Assets
         run: |
           BUILD_NUM="${{ inputs.compile_build_number || github.run_number }}"
-          RELEASE_TAG="v1.0.1"
-          RELEASE_TITLE="exégeomai v1.0.1"
+          RELEASE_TAG="v1.0.2"
+          RELEASE_TITLE="exégeomai v1.0.2"
           
           RELEASE_BODY="### Native Build Artifacts (Built on GitHub Actions)
 
           - **Platform**: Android
-          - **Artifact**: \`exegeomai-v1.0.1.apk\`
+          - **Artifact**: \`exegeomai-v1.0.2.apk\`
+          - **Release Tag**: v1.0.2
           - **Build Environment**: GitHub Actions Ubuntu Runner (Java 17 + Gradle)
           - **Native Build Number**: ${BUILD_NUM}
           - **Runtime Version**: 1.0.1
           - **OTA Update Support**: Enabled via Expo Updates (runtimeVersion 1.0.1)
 
-          Download the standalone \`exegeomai-v1.0.1.apk\` below directly from the release Assets."
+          Download the standalone \`exegeomai-v1.0.2.apk\` below directly from the release Assets."
 
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             echo "Updating existing release $RELEASE_TAG..."
@@ -212,6 +213,6 @@ jobs:
           fi
 
           echo "Uploading APK to GitHub Release $RELEASE_TAG assets..."
-          gh release upload "$RELEASE_TAG" build-output/exegeomai-v1.0.1.apk --clobber
+          gh release upload "$RELEASE_TAG" build-output/exegeomai-v1.0.2.apk --clobber
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
