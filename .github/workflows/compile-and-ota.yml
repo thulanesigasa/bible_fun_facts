@@ -158,14 +158,16 @@ jobs:
           # Configure Gradle memory limits to prevent Metaspace OutOfMemoryError on GitHub runners
           echo "org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8" >> android/gradle.properties
           echo "org.gradle.parallel=false" >> android/gradle.properties
+          # Configure inline modules property to prevent ExpoAutolinkingPlugin from crashing on empty command line argument
+          echo "expo.inlineModules.watchedDirectories=[]" >> android/gradle.properties
 
       - name: Build Android Release APK with Gradle
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease -x lint -x test --no-daemon --stacktrace
+          ./gradlew assembleRelease -Pexpo.inlineModules.watchedDirectories="[]" -x lint -x test --no-daemon --stacktrace
         env:
-          _JAVA_OPTIONS: "-Xmx4096m -XX:MaxMetaspaceSize=1024m"
+          NODE_OPTIONS: "--max-old-space-size=4096"
           GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dorg.gradle.parallel=false"
 
       - name: Prepare APK Artifact
