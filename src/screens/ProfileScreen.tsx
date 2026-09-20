@@ -29,6 +29,8 @@ import {
   ChevronRightSvg,
   LogOutSvg,
   CheckSvg,
+  BookOpenSvg,
+  ShieldCheckSvg,
 } from '../components/SvgIcons';
 
 export default function ProfileScreen({ navigation }: { navigation: any }) {
@@ -343,6 +345,54 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           </Card>
         </View>
 
+        {/* Legal & Privacy Section */}
+        <View style={styles.section}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+            LEGAL & PRIVACY
+          </Text>
+          <TouchableOpacity
+            style={[styles.actionCard, shadow.sm, { marginBottom: spacing.sm }]}
+            onPress={() => navigation.navigate('TermsOfService')}
+            activeOpacity={0.8}
+          >
+            <View style={styles.actionCardLeft}>
+              <View style={styles.iconCircle}>
+                <BookOpenSvg size={20} color={colors.accent} />
+              </View>
+              <View>
+                <Text variant="h3" style={{ color: colors.textPrimary }}>
+                  Terms of Service
+                </Text>
+                <Text variant="caption" color={colors.textSecondary}>
+                  Theological integrity & terms of usage
+                </Text>
+              </View>
+            </View>
+            <ChevronRightSvg size={20} color="#94A3B8" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.actionCard, shadow.sm]}
+            onPress={() => navigation.navigate('PrivacyPolicy')}
+            activeOpacity={0.8}
+          >
+            <View style={styles.actionCardLeft}>
+              <View style={styles.iconCircle}>
+                <ShieldCheckSvg size={20} color={colors.accent} />
+              </View>
+              <View>
+                <Text variant="h3" style={{ color: colors.textPrimary }}>
+                  Privacy Policy
+                </Text>
+                <Text variant="caption" color={colors.textSecondary}>
+                  Zero ad-trackers & encrypted persistence
+                </Text>
+              </View>
+            </View>
+            <ChevronRightSvg size={20} color="#94A3B8" />
+          </TouchableOpacity>
+        </View>
+
         {/* Application Information */}
         <View style={styles.section}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
@@ -351,10 +401,18 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           <Card style={styles.aboutCard}>
             <View style={styles.aboutRow}>
               <Text variant="body" color={colors.textSecondary}>
-                Runtime Version
+                Outer Release
               </Text>
               <Text variant="h3" style={{ color: colors.textPrimary }}>
-                v1.0.1
+                v1.0.2
+              </Text>
+            </View>
+            <View style={[styles.aboutRow, { marginTop: spacing.sm }]}>
+              <Text variant="body" color={colors.textSecondary}>
+                OTA Runtime
+              </Text>
+              <Text variant="caption" color={colors.accent} style={{ fontWeight: '700' }}>
+                v1.0.1 (Active Continuous Updates)
               </Text>
             </View>
             <View style={[styles.aboutRow, { marginTop: spacing.sm }]}>

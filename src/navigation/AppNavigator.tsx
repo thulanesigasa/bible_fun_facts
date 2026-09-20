@@ -31,10 +31,14 @@ import { colors } from '../theme/colors';
 import { useApp } from '../context/UserContext';
 import AuthScreen from '../screens/AuthScreen';
 import WelcomeScreen from '../screens/WelcomeScreen';
+import TermsOfServiceScreen from '../screens/TermsOfServiceScreen';
+import PrivacyPolicyScreen from '../screens/PrivacyPolicyScreen';
 
 export type AuthStackParamList = {
   Welcome: undefined;
   Auth: { initialMode?: 'login' | 'signup' } | undefined;
+  TermsOfService: undefined;
+  PrivacyPolicy: undefined;
 };
 
 export type RootStackParamList = {
@@ -47,6 +51,8 @@ export type RootStackParamList = {
   WOTDDetails: { wotd: WOTDEntry };
   ProfileMain: undefined;
   Favorites: undefined;
+  TermsOfService: undefined;
+  PrivacyPolicy: undefined;
 };
 
 const Tab = createBottomTabNavigator();
@@ -153,6 +159,22 @@ function ProfileStack() {
           contentStyle: { backgroundColor: colors.background },
         }}
       />
+      <Stack.Screen
+        name="TermsOfService"
+        component={TermsOfServiceScreen}
+        options={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="PrivacyPolicy"
+        component={PrivacyPolicyScreen}
+        options={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -180,6 +202,8 @@ export default function AppNavigator() {
         <AuthStack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
           <AuthStack.Screen name="Welcome" component={WelcomeScreen} />
           <AuthStack.Screen name="Auth" component={AuthScreen} />
+          <AuthStack.Screen name="TermsOfService" component={TermsOfServiceScreen} />
+          <AuthStack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
         </AuthStack.Navigator>
       ) : (
         <Tab.Navigator
