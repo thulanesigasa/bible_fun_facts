@@ -127,8 +127,8 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
               <BookOpenSvg size={18} color={colors.accent} />
             </View>
             <View style={styles.continueTextWrap}>
-              <Text variant="caption" color={colors.accent} weight="700" style={styles.continueTag}>
-                RESUME READING
+              <Text variant="caption" color={colors.accent} weight="700">
+                Resume Reading
               </Text>
               <Text variant="h3" style={styles.continueTitle}>
                 {lastReadBible.book} Chapter {lastReadBible.chapter}
@@ -145,10 +145,10 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
         {/* 2. Today's Original Root Word (Strong's Exegesis) */}
         <Card style={styles.rootCard}>
           <View style={styles.cardSectionHeader}>
-            <View style={styles.sectionBadge}>
-              <StrongsIconSvg size={12} color={colors.accent} />
-              <Text variant="caption" weight="700" color={colors.accent} style={styles.badgeText}>
-                ORIGINAL LANGUAGE ROOT
+            <View style={styles.cardHeaderTitleRow}>
+              <StrongsIconSvg size={15} color={colors.accent} />
+              <Text variant="h3" color={colors.accent} style={styles.sectionHeaderTitle}>
+                Original Language Root
               </Text>
             </View>
             <Text variant="caption" color={colors.textTertiary}>
@@ -165,11 +165,6 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
                 Strong's {languageFact.strongs_number} • <Text variant="caption" weight="600" color={colors.textPrimary}>{languageFact.strongs_transliteration}</Text>
               </Text>
             </View>
-            <View style={styles.rootCategoryTag}>
-              <Text variant="caption" color={colors.textSecondary} style={{ fontSize: 11 }}>
-                {languageFact.category}
-              </Text>
-            </View>
           </View>
 
           <View style={styles.rootDefBox}>
@@ -178,7 +173,7 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
             </Text>
           </View>
 
-          <Text variant="caption" color={colors.textSecondary} numberOfLines={2} style={styles.rootContextSnippet}>
+          <Text variant="body" color={colors.textSecondary} style={styles.rootContextSnippet}>
             {languageFact.historical_context}
           </Text>
         </Card>
@@ -186,10 +181,10 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
         {/* 3. Archaeological & Historical Discovery Card (With In-Place Shuffle) */}
         <Card style={styles.discoveryCard}>
           <View style={styles.cardSectionHeader}>
-            <View style={styles.sectionBadge}>
-              <LandmarkSvg size={12} color={colors.accent} />
-              <Text variant="caption" weight="700" color={colors.accent} style={styles.badgeText}>
-                ARCHAEOLOGY & CUSTOMS
+            <View style={styles.cardHeaderTitleRow}>
+              <LandmarkSvg size={15} color={colors.accent} />
+              <Text variant="h3" color={colors.accent} style={styles.sectionHeaderTitle}>
+                Archaeology & Customs
               </Text>
             </View>
             <Text variant="caption" color={colors.textTertiary}>
@@ -202,12 +197,12 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
           </Text>
 
           <View style={styles.discoveryVerseBox}>
-            <Text variant="body" style={styles.discoveryVerseText} numberOfLines={2}>
+            <Text variant="body" style={styles.discoveryVerseText}>
               "{currentFact.verse_text}"
             </Text>
           </View>
 
-          <Text variant="body" color={colors.textSecondary} numberOfLines={3} style={styles.discoveryContext}>
+          <Text variant="body" color={colors.textSecondary} style={styles.discoveryContext}>
             {currentFact.historical_context}
           </Text>
 
@@ -352,20 +347,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    marginBottom: 8,
   },
-  sectionBadge: {
+  cardHeaderTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: radius.sm,
+    gap: 6,
   },
-  badgeText: {
-    fontSize: 10,
-    letterSpacing: 0.6,
+  sectionHeaderTitle: {
+    fontSize: 15,
+    fontWeight: '700',
   },
   rootWordRow: {
     flexDirection: 'row',
@@ -380,17 +371,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '800',
   },
-  rootCategoryTag: {
-    backgroundColor: 'rgba(15, 23, 42, 0.04)',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: radius.sm,
-  },
   rootDefBox: {
     backgroundColor: 'rgba(15, 23, 42, 0.02)',
     borderRadius: radius.sm,
     paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingVertical: 8,
     marginVertical: 6,
     borderLeftWidth: 2,
     borderLeftColor: colors.accent,
@@ -400,8 +385,9 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   rootContextSnippet: {
-    lineHeight: 16,
-    marginTop: 2,
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: 4,
   },
 
   // Discovery Card

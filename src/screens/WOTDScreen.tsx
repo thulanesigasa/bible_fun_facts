@@ -749,9 +749,9 @@ export default function WOTDScreen() {
           {/* Active Lens Insight Card */}
           <Card style={styles.lensCard}>
             <View style={styles.lensCardHeader}>
-              <View style={styles.lensBadge}>
+              <View style={styles.lensHeaderTitleRow}>
                 {getLensIcon(activeLens, colors.accent)}
-                <Text variant="label" color={colors.accent} style={styles.lensBadgeText}>
+                <Text variant="label" color={colors.accent} style={styles.lensHeaderTitle}>
                   {activeLens.replace('_', ' ').toUpperCase()}
                 </Text>
               </View>
@@ -1246,12 +1246,12 @@ const styles = StyleSheet.create({
   lensCardHeader: {
     marginBottom: spacing.md,
   },
-  lensBadge: {
+  lensHeaderTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
   },
-  lensBadgeText: {
+  lensHeaderTitle: {
     letterSpacing: 1,
   },
   lensContentText: {
