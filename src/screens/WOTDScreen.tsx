@@ -160,6 +160,16 @@ export default function WOTDScreen() {
   const theme = THEMES[readerTheme];
 
   // ── Chapter Fetch ─────────────────────────────────────────────────────────
+  // Store setLastReadBible in a ref so loadCurrentChapter stays stable.
+  // Without this, every render gives setLastReadBible a new reference (it's
+  // not useCallback-wrapped in the context), which causes loadCurrentChapter
+  // to get a new reference too, which triggers the useEffect, which reloads
+  // the chapter — even when only selectedVerses changed.
+  const setLastReadBibleRef = useRef(setLastReadBible);
+  useEffect(() => {
+    setLastReadBibleRef.current = setLastReadBible;
+  });
+
   const loadCurrentChapter = useCallback(
     async (bookName: string, chapterNum: number, trans: BibleTranslation) => {
       setLoading(true);
@@ -168,19 +178,20 @@ export default function WOTDScreen() {
       try {
         const data = await fetchChapter(bookName, chapterNum, trans);
         setChapterData(data);
-        setLastReadBible(bookName, chapterNum, trans);
+        setLastReadBibleRef.current(bookName, chapterNum, trans);
       } catch {
         setErrorMsg('Unable to load chapter. Please check your connection.');
       } finally {
         setLoading(false);
       }
     },
-    [setLastReadBible]
+    [] // ← zero deps: stable forever, never recreated on re-render
   );
 
   useEffect(() => {
     loadCurrentChapter(selectedBook.name, selectedChapter, translation);
   }, [selectedBook.name, selectedChapter, translation, loadCurrentChapter]);
+
 
   // ── Chapter Navigation ────────────────────────────────────────────────────
   const handlePrevChapter = () => {
