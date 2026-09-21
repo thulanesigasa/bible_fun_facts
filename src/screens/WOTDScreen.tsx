@@ -442,42 +442,45 @@ export default function WOTDScreen() {
                 </TouchableOpacity>
               </View>
             ) : (
-              /* ── YouVersion inline paragraph flow ── */
-              <Text
-                style={[
-                  styles.scriptureParagraph,
-                  {
-                    fontSize: fontSize,
-                    fontFamily: getFontFamily(fontType),
-                    lineHeight: fontSize * 1.75,
-                    color: theme.text,
-                  },
-                ]}
-              >
+              /* ── YouVersion verse flow: flexWrap row of pressable verse units ── */
+              /* Each verse is its own TouchableOpacity so taps are 100% reliable  */
+              <View style={styles.verseParagraphWrap}>
                 {chapterData?.verses.map((v: BibleVerse) => {
                   const isSelected = selectedVerses.includes(v.verse);
                   const hlColor = bibleHighlights[verseKey(v.verse)];
                   const isFav = isScriptureFavorited(`bible_${selectedBook.id}_${selectedChapter}_${v.verse}`);
                   return (
-                    <Text
+                    <TouchableOpacity
                       key={v.verse}
                       onPress={() => toggleVerseSelection(v.verse)}
+                      activeOpacity={0.75}
                       style={[
-                        isSelected && { backgroundColor: '#FDD22333' },
-                        hlColor ? { backgroundColor: hlColor + '55' } : null,
+                        styles.versePressable,
+                        isSelected && { backgroundColor: '#FDD22340', borderRadius: 4 },
+                        hlColor ? { backgroundColor: hlColor + '66', borderRadius: 4 } : null,
                       ]}
                     >
-                      {/* Inline [N] verse number */}
-                      <Text style={[styles.verseNumInline, { color: colors.accent }]}>
-                        [{v.verse}]
+                      <Text
+                        style={[
+                          styles.verseUnit,
+                          {
+                            fontSize: fontSize,
+                            fontFamily: getFontFamily(fontType),
+                            lineHeight: fontSize * 1.75,
+                            color: theme.text,
+                          },
+                        ]}
+                      >
+                        <Text style={[styles.verseNumInline, { color: colors.accent }]}>
+                          [{v.verse}]
+                        </Text>
+                        {' '}{v.text.trim()}
+                        {isFav ? <Text style={{ color: colors.accent }}> ♥</Text> : null}
                       </Text>
-                      {v.text.trim()}
-                      {isFav ? <Text style={{ color: colors.accent }}>♥</Text> : null}
-                      {'  '}
-                    </Text>
+                    </TouchableOpacity>
                   );
                 })}
-              </Text>
+              </View>
             )}
 
             {/* ── Chapter Stepper ── */}
@@ -521,60 +524,67 @@ export default function WOTDScreen() {
           </ScrollView>
 
           {/* ── Floating YouVersion Action Bar ── */}
-          <Animated.View
-            style={[
-              styles.floatingActionBar,
-              {
-                transform: [{ translateY: actionBarTranslateY }],
-                opacity: actionBarAnim,
-                backgroundColor: theme.surface,
-              },
-            ]}
-            pointerEvents={selectedVerses.length > 0 ? 'auto' : 'none'}
-          >
-            {/* Reference header */}
-            <View style={styles.fabHeader}>
-              <Text style={[styles.fabRef, { color: colors.accent }]} numberOfLines={1}>
-                {getSelectionRef()}
-              </Text>
-              <TouchableOpacity onPress={() => setSelectedVerses([])} style={styles.fabClose}>
-                <XCloseSvg size={18} color={theme.textSecondary} />
-              </TouchableOpacity>
-            </View>
+          {selectedVerses.length > 0 && (
+            <Animated.View
+              style={[
+                styles.floatingActionBar,
+                {
+                  transform: [{ translateY: actionBarTranslateY }],
+                  opacity: actionBarAnim,
+                  backgroundColor: theme.surface,
+                },
+              ]}
+            >
+              {/* Reference header */}
+              <View style={styles.fabHeader}>
+                <View style={styles.fabRefRow}>
+                  <View style={styles.fabVerseCountBadge}>
+                    <Text style={styles.fabVerseCountText}>{selectedVerses.length}</Text>
+                  </View>
+                  <Text style={[styles.fabRef, { color: theme.text }]} numberOfLines={1}>
+                    {getSelectionRef()}
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={() => setSelectedVerses([])} style={styles.fabClose}>
+                  <XCloseSvg size={18} color={theme.textSecondary} />
+                </TouchableOpacity>
+              </View>
 
-            {/* Highlight color row */}
-            <View style={styles.fabColorRow}>
-              {HIGHLIGHT_COLORS.map(hc => (
-                <TouchableOpacity
-                  key={hc.id}
-                  style={[styles.fabColorDot, { backgroundColor: hc.hex }]}
-                  onPress={() => onHighlight(hc.hex)}
-                  activeOpacity={0.8}
-                />
-              ))}
-              <TouchableOpacity style={[styles.fabColorDot, styles.fabEraseDot]} onPress={onEraseHighlight} activeOpacity={0.8}>
-                <XCloseSvg size={14} color="#64748B" />
-              </TouchableOpacity>
-            </View>
+              {/* Highlight color row */}
+              <View style={styles.fabColorRow}>
+                <Text style={[styles.fabSectionLabel, { color: theme.textSecondary }]}>Highlight</Text>
+                {HIGHLIGHT_COLORS.map(hc => (
+                  <TouchableOpacity
+                    key={hc.id}
+                    style={[styles.fabColorDot, { backgroundColor: hc.hex }]}
+                    onPress={() => onHighlight(hc.hex)}
+                    activeOpacity={0.8}
+                  />
+                ))}
+                <TouchableOpacity style={[styles.fabColorDot, styles.fabEraseDot]} onPress={onEraseHighlight} activeOpacity={0.8}>
+                  <XCloseSvg size={14} color="#64748B" />
+                </TouchableOpacity>
+              </View>
 
-            {/* Action buttons */}
-            <View style={styles.fabActions}>
-              <TouchableOpacity style={styles.fabActionBtn} onPress={onCopy}>
-                <CopySvg size={18} color={colors.accent} />
-                <Text style={[styles.fabActionLabel, { color: theme.textSecondary }]}>Copy</Text>
-              </TouchableOpacity>
-              <View style={[styles.fabDivider, { backgroundColor: readerTheme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }]} />
-              <TouchableOpacity style={styles.fabActionBtn} onPress={onBookmark}>
-                <BookmarkSvg size={18} color={colors.accent} />
-                <Text style={[styles.fabActionLabel, { color: theme.textSecondary }]}>Bookmark</Text>
-              </TouchableOpacity>
-              <View style={[styles.fabDivider, { backgroundColor: readerTheme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }]} />
-              <TouchableOpacity style={styles.fabActionBtn} onPress={onShare}>
-                <ShareSvg size={18} color={colors.accent} />
-                <Text style={[styles.fabActionLabel, { color: theme.textSecondary }]}>Share</Text>
-              </TouchableOpacity>
-            </View>
-          </Animated.View>
+              {/* Action buttons */}
+              <View style={styles.fabActions}>
+                <TouchableOpacity style={styles.fabActionBtn} onPress={onCopy}>
+                  <CopySvg size={20} color={colors.accent} />
+                  <Text style={[styles.fabActionLabel, { color: theme.textSecondary }]}>Copy</Text>
+                </TouchableOpacity>
+                <View style={[styles.fabDivider, { backgroundColor: readerTheme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }]} />
+                <TouchableOpacity style={styles.fabActionBtn} onPress={onBookmark}>
+                  <BookmarkSvg size={20} color={colors.accent} />
+                  <Text style={[styles.fabActionLabel, { color: theme.textSecondary }]}>Bookmark</Text>
+                </TouchableOpacity>
+                <View style={[styles.fabDivider, { backgroundColor: readerTheme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }]} />
+                <TouchableOpacity style={styles.fabActionBtn} onPress={onShare}>
+                  <ShareSvg size={20} color={colors.accent} />
+                  <Text style={[styles.fabActionLabel, { color: theme.textSecondary }]}>Share</Text>
+                </TouchableOpacity>
+              </View>
+            </Animated.View>
+          )}
 
           {/* ── 3-Step Canonical Navigator Modal ── */}
           <Modal visible={isNavOpen} animationType="slide" transparent={false} onRequestClose={() => setIsNavOpen(false)}>
@@ -921,9 +931,18 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 
-  // Verse inline paragraph
-  scriptureParagraph: {
-    // base text style — overridden inline with fontSize/fontFamily/color
+  // ── Verse flow (flexWrap row of pressable units) ─────────────────────────
+  verseParagraphWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    rowGap: 0,
+    columnGap: 0,
+  },
+  versePressable: {
+    // no fixed width — wraps to content so text flows naturally
+  },
+  verseUnit: {
+    // text style applied inline per-verse
   },
   verseNumInline: {
     fontWeight: '700',
@@ -990,15 +1009,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  // ── Floating Action Bar ─────────────────────────────────────────────────────
+  // ── FAB ─────────────────────────────────────────────────────────────────────
   floatingActionBar: {
     position: 'absolute',
     bottom: 90,
-    left: 16,
-    right: 16,
-    borderRadius: 16,
+    left: 12,
+    right: 12,
+    borderRadius: 18,
     ...shadow.md,
     padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(15,23,42,0.06)',
   },
   fabHeader: {
     flexDirection: 'row',
@@ -1006,24 +1027,50 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 12,
   },
+  fabRefRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flex: 1,
+    marginRight: 8,
+  },
+  fabVerseCountBadge: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: colors.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fabVerseCountText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '800',
+  },
   fabRef: {
     fontSize: 13,
     fontWeight: '700',
     flex: 1,
-    marginRight: 8,
   },
   fabClose: {
     padding: 4,
+  },
+  fabSectionLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    marginRight: 4,
   },
   fabColorRow: {
     flexDirection: 'row',
     gap: 10,
     marginBottom: 14,
+    alignItems: 'center',
   },
   fabColorDot: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     ...shadow.sm,
   },
   fabEraseDot: {
@@ -1041,7 +1088,8 @@ const styles = StyleSheet.create({
   fabActionBtn: {
     flex: 1,
     alignItems: 'center',
-    gap: 4,
+    gap: 5,
+    paddingVertical: 4,
   },
   fabActionLabel: {
     fontSize: 11,
@@ -1049,7 +1097,7 @@ const styles = StyleSheet.create({
   },
   fabDivider: {
     width: 1,
-    height: 32,
+    height: 36,
     marginHorizontal: 4,
   },
 
