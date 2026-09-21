@@ -12,8 +12,9 @@ import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
 import { Card } from '../components/Card';
-import { scriptures, Scripture, Genre } from '../data/mockDatabase';
+import { scriptures as initialScriptures, Scripture, Genre } from '../data/mockDatabase';
 import { useUser } from '../context/UserContext';
+import { supabase } from '../services/supabase';
 import {
   SearchSvg,
   ScripturesSvg,
@@ -41,11 +42,30 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
   const [searchText, setSearchText] = useState('');
   const [activeGenre, setActiveGenre] = useState<Genre | 'All'>('All');
   const [displayCount, setDisplayCount] = useState(3);
+  const [liveScriptures, setLiveScriptures] = useState<Scripture[]>(initialScriptures);
 
   const { isScriptureFavorited, toggleFavoriteScripture } = useUser();
 
+  const fetchLiveScriptures = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('scriptures')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (data && !error && data.length > 0) {
+        setLiveScriptures(data as Scripture[]);
+      }
+    } catch (err) {
+      console.warn('Live scriptures fetch notice:', err);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchLiveScriptures();
+  }, []);
+
   const filteredScriptures = useMemo(() => {
-    return scriptures.filter((s) => {
+    return liveScriptures.filter((s) => {
       const q = searchText.toLowerCase().trim();
       const matchSearch =
         q === '' ||
@@ -61,7 +81,7 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
 
       return matchSearch && matchGenre;
     });
-  }, [searchText, activeGenre]);
+  }, [liveScriptures, searchText, activeGenre]);
 
   const displayedList = useMemo(() => {
     // If searching actively, show up to 4 exact matches to keep view focused

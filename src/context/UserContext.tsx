@@ -97,7 +97,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     streak: 0,
     factsViewedCount: 0,
     lastLoginDate: null,
-    followedUserIds: ['user_1'],
+    followedUserIds: [],
     lastReadBible: { book: 'John', chapter: 3, translation: 'web' },
   });
 
@@ -108,7 +108,28 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const saved = await AsyncStorage.getItem(STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
-          setState(prev => ({ ...prev, ...parsed }));
+          // Purge any legacy hardcoded mock followers or user_1
+          const cleanFollowed = (parsed.followedUserIds || []).filter(
+            (id: string) => !id.startsWith('user_')
+          );
+          const cleanProfile = parsed.userProfile
+            ? {
+                ...parsed.userProfile,
+                followersCount:
+                  parsed.userProfile.followersCount === 248 ? 0 : (parsed.userProfile.followersCount || 0),
+                followingCount:
+                  parsed.userProfile.followingCount === 182
+                    ? cleanFollowed.length
+                    : (parsed.userProfile.followingCount || cleanFollowed.length),
+              }
+            : null;
+
+          setState(prev => ({
+            ...prev,
+            ...parsed,
+            followedUserIds: cleanFollowed,
+            userProfile: cleanProfile,
+          }));
           checkStreak(parsed.lastLoginDate, parsed.streak);
         } else {
           // First time user
@@ -171,8 +192,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
               knowledgeLevel: meta.knowledgeLevel || prev.userProfile?.knowledgeLevel,
               fontSize: meta.fontSize || prev.userProfile?.fontSize || 16,
               fontType: meta.fontType || prev.userProfile?.fontType || 'serif',
-              followersCount: meta.followersCount || prev.userProfile?.followersCount || 248,
-              followingCount: meta.followingCount || prev.userProfile?.followingCount || 182,
+              followersCount: 0,
+              followingCount: prev.followedUserIds?.length || 0,
             },
           }));
         } else if (_event === 'SIGNED_OUT') {
@@ -255,8 +276,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
               knowledgeLevel: meta.knowledgeLevel || prev.userProfile?.knowledgeLevel,
               fontSize: meta.fontSize || prev.userProfile?.fontSize || 16,
               fontType: meta.fontType || prev.userProfile?.fontType || 'serif',
-              followersCount: meta.followersCount || prev.userProfile?.followersCount || 248,
-              followingCount: meta.followingCount || prev.userProfile?.followingCount || 182,
+              followersCount: 0,
+              followingCount: prev.followedUserIds?.length || 0,
             },
           }));
           return;
@@ -285,8 +306,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         knowledgeLevel: prev.userProfile?.knowledgeLevel,
         fontSize: prev.userProfile?.fontSize || 16,
         fontType: prev.userProfile?.fontType || 'serif',
-        followersCount: prev.userProfile?.followersCount || 248,
-        followingCount: prev.userProfile?.followingCount || 182,
+        followersCount: 0,
+        followingCount: prev.followedUserIds?.length || 0,
       },
     }));
   };
@@ -552,15 +573,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ? prev.followedUserIds.filter(id => id !== userId)
         : [...prev.followedUserIds, userId];
 
-      const currentFollowing = prev.userProfile?.followingCount ?? 182;
-      const updatedFollowing = isFollowed ? Math.max(0, currentFollowing - 1) : currentFollowing + 1;
-
       return {
         ...prev,
         followedUserIds: newFollowed,
         userProfile: prev.userProfile ? {
           ...prev.userProfile,
-          followingCount: updatedFollowing,
+          followingCount: newFollowed.length,
         } : null,
       };
     });
