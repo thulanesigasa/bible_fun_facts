@@ -191,7 +191,7 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
                         </Text>
                       </View>
                     ) : (
-                      <Text variant="caption" weight="700" color="#FFFFFF">
+                      <Text variant="caption" weight="700" color="#0F172A">
                         + Follow
                       </Text>
                     )}
@@ -330,7 +330,7 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
                     </Text>
                   </View>
                 ) : (
-                  <Text variant="body" weight="700" color="#FFFFFF">
+                  <Text variant="body" weight="700" color="#0F172A">
                     + Follow Scholar
                   </Text>
                 )}
@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   filterTabTextActive: {
-    color: '#FFFFFF',
+    color: '#0F172A',
   },
   resultsMetaRow: {
     marginBottom: spacing.sm,
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(217, 119, 6, 0.2)',
+    borderColor: 'rgba(253, 210, 35, 0.2)',
   },
   userInfoWrap: {
     flex: 1,
@@ -681,7 +681,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accentSoft,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(217, 119, 6, 0.2)',
+    borderColor: 'rgba(253, 210, 35, 0.2)',
   },
   fullBioText: {
     lineHeight: 22,

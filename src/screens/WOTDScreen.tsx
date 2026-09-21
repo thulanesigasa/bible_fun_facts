@@ -870,7 +870,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: radius.sm,
     borderWidth: 1,
-    borderColor: 'rgba(217, 119, 6, 0.2)',
+    borderColor: 'rgba(253, 210, 35, 0.2)',
   },
   translationText: {
     color: colors.accent,

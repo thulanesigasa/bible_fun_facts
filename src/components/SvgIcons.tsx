@@ -439,18 +439,18 @@ export const WelcomeScripturesArtSvg: React.FC<{ size?: number; style?: any }> =
   <Svg width={size} height={size} viewBox="0 0 240 240" fill="none" style={style}>
     {/* Ambient Radiant Halo */}
     <Circle cx="120" cy="120" r="100" fill="#F8FAFC" />
-    <Circle cx="120" cy="120" r="92" stroke="#D97706" strokeWidth="1" strokeDasharray="4 4" strokeOpacity="0.3" />
-    <Circle cx="120" cy="120" r="76" fill="#FEF3C7" fillOpacity="0.4" />
+    <Circle cx="120" cy="120" r="92" stroke="#FDD223" strokeWidth="1" strokeDasharray="4 4" strokeOpacity="0.3" />
+    <Circle cx="120" cy="120" r="76" fill="#FEF9C3" fillOpacity="0.4" />
 
     {/* Radiant Divine Beams */}
-    <Path d="M120 28V48" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.8" />
-    <Path d="M120 192V212" stroke="#D97706" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.4" />
-    <Path d="M28 120H48" stroke="#D97706" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.4" />
-    <Path d="M192 120H212" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.8" />
-    <Path d="M55 55L69 69" stroke="#D97706" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.5" />
-    <Path d="M171 171L185 185" stroke="#D97706" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.4" />
-    <Path d="M185 55L171 69" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.7" />
-    <Path d="M69 171L55 185" stroke="#D97706" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.4" />
+    <Path d="M120 28V48" stroke="#FDD223" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.8" />
+    <Path d="M120 192V212" stroke="#FDD223" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.4" />
+    <Path d="M28 120H48" stroke="#FDD223" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.4" />
+    <Path d="M192 120H212" stroke="#FDD223" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.8" />
+    <Path d="M55 55L69 69" stroke="#FDD223" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.5" />
+    <Path d="M171 171L185 185" stroke="#FDD223" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.4" />
+    <Path d="M185 55L171 69" stroke="#FDD223" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.7" />
+    <Path d="M69 171L55 185" stroke="#FDD223" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.4" />
 
     {/* Open Sacred Book / Bible Structure */}
     {/* Book Base / Outer Cover */}
@@ -492,8 +492,8 @@ export const WelcomeScripturesArtSvg: React.FC<{ size?: number; style?: any }> =
     {/* Sacred Bookmark Ribbon */}
     <Path
       d="M120 96V184L127 176L134 184V96"
-      fill="#D97706"
-      stroke="#B45309"
+      fill="#FDD223"
+      stroke="#C99A00"
       strokeWidth="1"
     />
 
@@ -502,21 +502,21 @@ export const WelcomeScripturesArtSvg: React.FC<{ size?: number; style?: any }> =
     <Path d="M56 118H104" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" />
     <Path d="M56 128H96" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" />
     <Path d="M56 138H100" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" />
-    <Path d="M56 148H84" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.8" />
+    <Path d="M56 148H84" stroke="#FDD223" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.8" />
 
     {/* Scripture Text Calligraphy Lines (Right Page) */}
     <Path d="M136 108H184" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" />
     <Path d="M136 118H184" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" />
     <Path d="M136 128H176" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" />
     <Path d="M136 138H180" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" />
-    <Path d="M136 148H164" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.8" />
+    <Path d="M136 148H164" stroke="#FDD223" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.8" />
 
     {/* Divine Sparkles & Light Orbs */}
-    <Circle cx="120" cy="68" r="5" fill="#D97706" />
-    <Circle cx="90" cy="54" r="3" fill="#D97706" fillOpacity="0.7" />
-    <Circle cx="152" cy="56" r="3" fill="#D97706" fillOpacity="0.7" />
-    <Circle cx="72" cy="74" r="2" fill="#D97706" fillOpacity="0.5" />
-    <Circle cx="168" cy="74" r="2" fill="#D97706" fillOpacity="0.5" />
+    <Circle cx="120" cy="68" r="5" fill="#FDD223" />
+    <Circle cx="90" cy="54" r="3" fill="#FDD223" fillOpacity="0.7" />
+    <Circle cx="152" cy="56" r="3" fill="#FDD223" fillOpacity="0.7" />
+    <Circle cx="72" cy="74" r="2" fill="#FDD223" fillOpacity="0.5" />
+    <Circle cx="168" cy="74" r="2" fill="#FDD223" fillOpacity="0.5" />
   </Svg>
 );
 
@@ -524,15 +524,15 @@ export const ExegeomaiMeaningArtSvg: React.FC<{ size?: number; style?: any }> = 
   <Svg width={size} height={size} viewBox="0 0 240 240" fill="none" style={style}>
     {/* Soft Circular Backdrop */}
     <Circle cx="120" cy="120" r="100" fill="#F8FAFC" />
-    <Circle cx="120" cy="120" r="88" stroke="#D97706" strokeWidth="1" strokeDasharray="6 6" strokeOpacity="0.3" />
-    <Circle cx="120" cy="120" r="74" fill="#FEF3C7" fillOpacity="0.35" />
+    <Circle cx="120" cy="120" r="88" stroke="#FDD223" strokeWidth="1" strokeDasharray="6 6" strokeOpacity="0.3" />
+    <Circle cx="120" cy="120" r="74" fill="#FEF9C3" fillOpacity="0.35" />
 
     {/* Ancient Unfolding Parchment Scroll */}
     {/* Back Roll Shadow */}
     <Path
       d="M58 56C58 48 66 44 76 44H164C174 44 182 48 182 56V172C182 180 174 184 164 184H76C66 184 58 180 58 172V56Z"
-      fill="#FEF3C7"
-      stroke="#D97706"
+      fill="#FEF9C3"
+      stroke="#FDD223"
       strokeWidth="1.5"
     />
     <Path
@@ -543,35 +543,35 @@ export const ExegeomaiMeaningArtSvg: React.FC<{ size?: number; style?: any }> = 
     />
 
     {/* Scroll Wooden End Rollers */}
-    <Rect x="52" y="40" width="12" height="152" rx="4" fill="#B45309" stroke="#78350F" strokeWidth="1" />
-    <Rect x="176" y="40" width="12" height="152" rx="4" fill="#B45309" stroke="#78350F" strokeWidth="1" />
-    <Circle cx="58" cy="38" r="6" fill="#D97706" />
-    <Circle cx="58" cy="194" r="6" fill="#D97706" />
-    <Circle cx="182" cy="38" r="6" fill="#D97706" />
-    <Circle cx="182" cy="194" r="6" fill="#D97706" />
+    <Rect x="52" y="40" width="12" height="152" rx="4" fill="#C99A00" stroke="#78350F" strokeWidth="1" />
+    <Rect x="176" y="40" width="12" height="152" rx="4" fill="#C99A00" stroke="#78350F" strokeWidth="1" />
+    <Circle cx="58" cy="38" r="6" fill="#FDD223" />
+    <Circle cx="58" cy="194" r="6" fill="#FDD223" />
+    <Circle cx="182" cy="38" r="6" fill="#FDD223" />
+    <Circle cx="182" cy="194" r="6" fill="#FDD223" />
 
     {/* Ancient Greek / Hebrew Calligraphy Glyphs */}
     {/* Alpha (A) & Omega (Ω) Motifs */}
-    <Path d="M84 72L94 92H74L84 72Z" stroke="#D97706" strokeWidth="1.5" strokeLinejoin="round" />
-    <Path d="M78 86H90" stroke="#D97706" strokeWidth="1.5" />
-    <Path d="M146 90H152C156 90 158 84 154 80C150 76 162 76 158 80C154 84 156 90 160 90H166" stroke="#D97706" strokeWidth="1.5" strokeLinecap="round" />
+    <Path d="M84 72L94 92H74L84 72Z" stroke="#FDD223" strokeWidth="1.5" strokeLinejoin="round" />
+    <Path d="M78 86H90" stroke="#FDD223" strokeWidth="1.5" />
+    <Path d="M146 90H152C156 90 158 84 154 80C150 76 162 76 158 80C154 84 156 90 160 90H166" stroke="#FDD223" strokeWidth="1.5" strokeLinecap="round" />
 
     {/* Exegesis Analytical Compass / Magnifier Lens */}
-    <Circle cx="120" cy="116" r="32" fill="#FFFFFF" stroke="#D97706" strokeWidth="2.5" />
-    <Circle cx="120" cy="116" r="26" fill="#FEF3C7" fillOpacity="0.4" stroke="#FDE68A" strokeWidth="1" />
+    <Circle cx="120" cy="116" r="32" fill="#FFFFFF" stroke="#FDD223" strokeWidth="2.5" />
+    <Circle cx="120" cy="116" r="26" fill="#FEF9C3" fillOpacity="0.4" stroke="#FEEA70" strokeWidth="1" />
 
     {/* Compass Needle (Symbolizing True Direction & Unfolding Truth) */}
-    <Polygon points="120,94 126,116 120,122 114,116" fill="#D97706" />
+    <Polygon points="120,94 126,116 120,122 114,116" fill="#FDD223" />
     <Polygon points="120,138 126,116 120,122 114,116" fill="#94A3B8" />
     <Circle cx="120" cy="116" r="3" fill="#FFFFFF" />
 
     {/* Magnifier Handle */}
-    <Path d="M142 138L162 158" stroke="#B45309" strokeWidth="4.5" strokeLinecap="round" />
-    <Path d="M142 138L162 158" stroke="#D97706" strokeWidth="2" strokeLinecap="round" />
+    <Path d="M142 138L162 158" stroke="#C99A00" strokeWidth="4.5" strokeLinecap="round" />
+    <Path d="M142 138L162 158" stroke="#FDD223" strokeWidth="2" strokeLinecap="round" />
 
     {/* Strong's Reference Seal 1834 */}
-    <Rect x="88" y="156" width="64" height="18" rx="4" fill="#FEF3C7" stroke="#D97706" strokeWidth="1" />
-    <Path d="M96 165H144" stroke="#B45309" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="3 2" />
+    <Rect x="88" y="156" width="64" height="18" rx="4" fill="#FEF9C3" stroke="#FDD223" strokeWidth="1" />
+    <Path d="M96 165H144" stroke="#C99A00" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="3 2" />
   </Svg>
 );
 
@@ -579,29 +579,29 @@ export const SacredPurposeArtSvg: React.FC<{ size?: number; style?: any }> = ({ 
   <Svg width={size} height={size} viewBox="0 0 240 240" fill="none" style={style}>
     {/* Soft Outer Circular Backdrop */}
     <Circle cx="120" cy="120" r="100" fill="#F8FAFC" />
-    <Circle cx="120" cy="120" r="88" stroke="#D97706" strokeWidth="1" strokeDasharray="6 6" strokeOpacity="0.35" />
-    <Circle cx="120" cy="120" r="74" fill="#FEF3C7" fillOpacity="0.35" />
+    <Circle cx="120" cy="120" r="88" stroke="#FDD223" strokeWidth="1" strokeDasharray="6 6" strokeOpacity="0.35" />
+    <Circle cx="120" cy="120" r="74" fill="#FEF9C3" fillOpacity="0.35" />
 
     {/* Ascending Path of Discipleship / Faith Growth */}
     <Path
       d="M76 196C86 160 98 144 120 134C142 144 154 160 164 196H76Z"
-      fill="#FEF3C7"
-      stroke="#D97706"
+      fill="#FEF9C3"
+      stroke="#FDD223"
       strokeWidth="1.5"
       strokeOpacity="0.5"
     />
-    <Path d="M120 196V142" stroke="#D97706" strokeWidth="1.5" strokeDasharray="4 4" />
+    <Path d="M120 196V142" stroke="#FDD223" strokeWidth="1.5" strokeDasharray="4 4" />
 
     {/* Stepping Stones of Faith */}
-    <Circle cx="120" cy="180" r="4" fill="#D97706" fillOpacity="0.6" />
-    <Circle cx="120" cy="160" r="3.5" fill="#D97706" fillOpacity="0.7" />
-    <Circle cx="120" cy="142" r="3" fill="#D97706" fillOpacity="0.9" />
+    <Circle cx="120" cy="180" r="4" fill="#FDD223" fillOpacity="0.6" />
+    <Circle cx="120" cy="160" r="3.5" fill="#FDD223" fillOpacity="0.7" />
+    <Circle cx="120" cy="142" r="3" fill="#FDD223" fillOpacity="0.9" />
 
     {/* Shield of Faith (Ephesians 6:16) */}
     <Path
       d="M120 54L156 68V112C156 138 140 156 120 164C100 156 84 138 84 112V68L120 54Z"
       fill="#FFFFFF"
-      stroke="#D97706"
+      stroke="#FDD223"
       strokeWidth="2"
       strokeLinejoin="round"
     />
@@ -609,33 +609,33 @@ export const SacredPurposeArtSvg: React.FC<{ size?: number; style?: any }> = ({ 
     <Path
       d="M120 62L148 74V110C148 132 134 148 120 154C106 148 92 132 92 110V74L120 62Z"
       fill="#F8FAFC"
-      stroke="#FEF3C7"
+      stroke="#FEF9C3"
       strokeWidth="1"
     />
 
     {/* Sacred Cross Motif within Shield */}
-    <Path d="M120 78V134M104 94H136" stroke="#D97706" strokeWidth="3" strokeLinecap="round" />
+    <Path d="M120 78V134M104 94H136" stroke="#FDD223" strokeWidth="3" strokeLinecap="round" />
 
     {/* Holy Flame / Glory of the Lord at the Summit */}
     <Path
       d="M120 30C116 38 110 44 110 50A10 10 0 0 0 130 50C130 44 124 38 120 30Z"
-      fill="#D97706"
+      fill="#FDD223"
     />
     <Path
       d="M120 36C118 41 114 45 114 49A6 6 0 0 0 126 49C126 45 122 41 120 36Z"
-      fill="#FEF3C7"
+      fill="#FEF9C3"
     />
 
     {/* Ascending Celestial Rays */}
-    <Path d="M84 46L94 54" stroke="#D97706" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.6" />
-    <Path d="M156 46L146 54" stroke="#D97706" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.6" />
-    <Path d="M68 84L80 86" stroke="#D97706" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.4" />
-    <Path d="M172 84L160 86" stroke="#D97706" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.4" />
+    <Path d="M84 46L94 54" stroke="#FDD223" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.6" />
+    <Path d="M156 46L146 54" stroke="#FDD223" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.6" />
+    <Path d="M68 84L80 86" stroke="#FDD223" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.4" />
+    <Path d="M172 84L160 86" stroke="#FDD223" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.4" />
 
     {/* Radiant Dots */}
-    <Circle cx="64" cy="116" r="3" fill="#D97706" fillOpacity="0.5" />
-    <Circle cx="176" cy="116" r="3" fill="#D97706" fillOpacity="0.5" />
-    <Circle cx="120" cy="22" r="3.5" fill="#D97706" />
+    <Circle cx="64" cy="116" r="3" fill="#FDD223" fillOpacity="0.5" />
+    <Circle cx="176" cy="116" r="3" fill="#FDD223" fillOpacity="0.5" />
+    <Circle cx="120" cy="22" r="3.5" fill="#FDD223" />
   </Svg>
 );
 

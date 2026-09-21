@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/Expo%20SDK-57.0-000000?style=for-the-badge&logo=expo&logoColor=white" alt="Expo SDK 57" />
   <img src="https://img.shields.io/badge/React%20Native-0.86-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React Native 0.86" />
   <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript 5.9" />
-  <img src="https://img.shields.io/badge/Holy%20Bible-66--Book%20Canon%20Reader-D97706?style=for-the-badge" alt="Full Holy Bible Reader" />
+  <img src="https://img.shields.io/badge/Holy%20Bible-66--Book%20Canon%20Reader-FDD223?style=for-the-badge" alt="Full Holy Bible Reader" />
   <img src="https://img.shields.io/badge/Bible%20API-Multi--Tier%20Offline%20Cache-0284C7?style=for-the-badge" alt="Bible API Offline Cache" />
   <img src="https://img.shields.io/badge/Community-Believer%20&%20Scholar%20Hub-10B981?style=for-the-badge" alt="Believer & Scholar Hub" />
   <img src="https://img.shields.io/badge/Verses%20Hub-Compact%20Lexical%20Cards-6366F1?style=for-the-badge" alt="Compact Verses Hub" />
@@ -14,7 +14,7 @@
   <img src="https://img.shields.io/badge/EAS%20Channels-Production%20%7C%20Preview-000000?style=for-the-badge&logo=expo&logoColor=white" alt="EAS Channels" />
   <img src="https://img.shields.io/badge/Outer%20Release-v1.0.2-2563EB?style=for-the-badge&logo=android&logoColor=white" alt="Outer Release v1.0.2" />
   <img src="https://img.shields.io/badge/Security-Kotlin%20FLAG__SECURE-DC2626?style=for-the-badge&logo=android&logoColor=white" alt="Kotlin FLAG_SECURE" />
-  <img src="https://img.shields.io/badge/Tab%20Architecture-Floating%20Pill%20280px-D97706?style=for-the-badge" alt="Floating Pill Tab Bar" />
+  <img src="https://img.shields.io/badge/Tab%20Architecture-Floating%20Pill%20280px-FDD223?style=for-the-badge" alt="Floating Pill Tab Bar" />
   <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
   <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License MIT" />
@@ -106,7 +106,7 @@ The in-app update experience is implemented in `src/components/UpdateModal.tsx` 
   - **"Update Now"**: Downloads the update and reloads the app immediately with fresh code and assets.
   - **"Remind Me Later"**: Snoozes the notification for 30 minutes.
 - **Foreground Resume Detection**: Uses `AppState.addEventListener('change', ...)` to dynamically check for fresh updates whenever the user returns to the app from the background.
-- **Aesthetic**: Pure white surface card (`#FFFFFF`), biblical amber gold action button (`#D97706`), clean typography, and zero status badges per Rule 16.
+- **Aesthetic**: Pure white surface card (`#FFFFFF`), biblical amber gold action button (`#FDD223`), clean typography, and zero status badges per Rule 16.
 
 ### 4. Automated GitHub Actions Workflow (`compile-and-ota.yml`)
 The workflow `.github/workflows/compile-and-ota.yml` coordinates automated deployments:
@@ -122,7 +122,7 @@ The application strictly implements the **60-30-10 Design Rule**, the **Mobile T
 ### 1. 60-30-10 Color Hierarchy (Rule 1 & Rule 20)
 - **60% Dominant Background**: Clean Slate Canvas (`#F8FAFC`) with Secondary Canvas (`#F1F5F9`)
 - **30% Panel / Surface**: Pure White (`#FFFFFF`) cards, headers, modal sheets, and floating pill tab bar with hairline borders (`rgba(15, 23, 42, 0.08)`) and soft elevation shadow (`shadowColor: '#0F172A'`)
-- **10% Accent**: Biblical Amber Gold (`#D97706`) with soft tint (`rgba(217, 119, 6, 0.12)`) and accent border (`rgba(217, 119, 6, 0.24)`)
+- **10% Accent**: Biblical Amber Gold (`#FDD223`) with soft tint (`rgba(217, 119, 6, 0.12)`) and accent border (`rgba(217, 119, 6, 0.24)`)
 - **Monochromatic Typography**: Primary Text (`#0F172A`), Secondary Slate (`#64748B`), and Muted Slate (`#94A3B8`)
 - *Strict Rule: No rainbow status tags, review badges, or ad-hoc coloring.*
 
@@ -251,7 +251,7 @@ Immediately after the application boots up, new and unauthenticated users are gu
 ### 1. Slide 1: Welcome to exégeomai
 - **Narrative**: *"We hope this sacred companion illuminates God's Word in your heart. Explore the timeless treasures of Scripture with rich historical, linguistic, and ancient cultural clarity."*
 - **Visual Spec**: Custom high-resolution vector illustration with transparent background, seamlessly blending into the 60% slate canvas (`#F8FAFC`).
-- **Action**: Persistent sliding tab locator at bottom-left + circular forward button with white Chevron SVG (`#FFFFFF`) on amber background (`#D97706`).
+- **Action**: Persistent sliding tab locator at bottom-left + circular forward button with white Chevron SVG (`#FFFFFF`) on amber background (`#FDD223`).
 
 ### 2. Slide 2: What Does exégeomai Mean?
 - **Ancient Root**: *ἐξηγέομαι (Strong's Greek 1834)*
@@ -262,7 +262,7 @@ Immediately after the application boots up, new and unauthenticated users are gu
 ### 3. Slide 3: Our Sacred Purpose & Interactive "Swipe to Get Started"
 - **Narrative**: *"This application was created to help you better understand the scriptures, deepen your knowledge in the glory of the Lord, and strengthen your everyday walk of faith through sound biblical exegesis."*
 - **Visual Spec**: Custom vector illustration with transparent background depicting discipleship, study, and the Word of God.
-- **Interactive "Swipe to Get Started" Slider**: Replaced the static full-width button with a sleek 210px `PanResponder` slider track (`#FFFFFF` surface, hairline border `rgba(15, 23, 42, 0.08)`). Users drag an amber circular thumb (`#D97706`) with white Chevron SVG across the track to launch into registration. Swiping past 60% executes the launch transition, while releasing early gently springs back. Tapping also navigates for accessibility.
+- **Interactive "Swipe to Get Started" Slider**: Replaced the static full-width button with a sleek 210px `PanResponder` slider track (`#FFFFFF` surface, hairline border `rgba(15, 23, 42, 0.08)`). Users drag an amber circular thumb (`#FDD223`) with white Chevron SVG across the track to launch into registration. Swiping past 60% executes the launch transition, while releasing early gently springs back. Tapping also navigates for accessibility.
 - **Persistent Tab Locator (Zero Center-Jumping)**: The active tab locator stays firmly anchored at the bottom-left on all three slides, completely eliminating abrupt position shifts.
 - **Real-Time Sliding Liquid Pill**: The active indicator pill interpolates `translateX` and `width` dynamically via `scrollX`, sliding smoothly between dot slots as the user drags.
 - **Image Merge & Pure Crossfade Canvas (Zero Pop)**: Vector illustrations are mounted in a shared center stage where opacities crossfade seamlessly based on `scrollX`. Unwanted scale pop animations were removed, ensuring an organic dissolving morph between slides rather than rigid block translations.
@@ -333,10 +333,10 @@ graph TD
    - **Native Text Input Box Format**: Styled as an unmistakable text input box (`#FFFFFF` surface, `1.5px` border, dynamic amber focus ring, centered numeric input, and `px` unit adornment), allowing the user to type their custom font size with dynamic 1–24 clamping.
    - **Real-Time Live Scripture Preview**: Renders John 3:16 dynamically matching the selected font size and typeface in real time.
 4. **Typography Style Selection**: 4 selectable typeface pills: Classical Serif, Modern Sans, System Default, and Monospace.
-5. **Uiverse-Inspired Animated Switch**: Custom React Native implementation of namecho's sliding pill toggle (`52x30px`, `#CBD5E1` to amber `#D97706`, with smooth thumb translation).
+5. **Uiverse-Inspired Animated Switch**: Custom React Native implementation of namecho's sliding pill toggle (`52x30px`, `#CBD5E1` to amber `#FDD223`, with smooth thumb translation).
 6. **Tactile Swipe to Sign Out (Calibrated to Swipe to Start - Zero Red)**:
    - Red color (`#EF4444`, `rgba(239, 68, 68, ...)`) completely removed from the sign-out slider.
-   - Track (`#FFFFFF`), soft amber progress fill (`rgba(217, 119, 6, 0.12)`), text (`colors.textSecondary`), and draggable thumb (`#D97706` with white Chevron SVG) match the Welcome screen's "Swipe to Start" slider identically.
+   - Track (`#FFFFFF`), soft amber progress fill (`rgba(217, 119, 6, 0.12)`), text (`colors.textSecondary`), and draggable thumb (`#FDD223` with white Chevron SVG) match the Welcome screen's "Swipe to Start" slider identically.
 7. **Removed Legacy Cards**: Cleanly stripped "Default Scripture Translation" chips, "Application" runtime info, and "Study Preferences" containers.
 
 ---

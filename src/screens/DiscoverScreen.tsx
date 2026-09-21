@@ -136,7 +136,7 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
             </View>
           </View>
           <View style={styles.continueActionBtn}>
-            <Text variant="caption" weight="700" color="#FFFFFF">
+            <Text variant="caption" weight="700" color="#0F172A">
               Open ›
             </Text>
           </View>
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: radius.full,
     borderWidth: 1,
-    borderColor: 'rgba(217, 119, 6, 0.2)',
+    borderColor: 'rgba(253, 210, 35, 0.2)',
   },
 
   // Continue Reading Card
