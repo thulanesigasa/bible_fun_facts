@@ -23,17 +23,9 @@ import { useUser } from '../context/UserContext';
 import {
   ProfileSvg,
   CameraSvg,
-  BookmarkSvg,
   FlameSvg,
   StrongsIconSvg,
-  BellSvg,
   ChevronRightSvg,
-  LogOutSvg,
-  CheckSvg,
-  BookOpenSvg,
-  ShieldCheckSvg,
-  FontSizeSvg,
-  TypeSvg,
 } from '../components/SvgIcons';
 
 // ============================================================================
@@ -466,36 +458,34 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
         {/* ALL SETTINGS DIRECTLY IN THE SCREEN BODY (ZERO ENCLOSING DIVS)    */}
         {/* ================================================================ */}
 
-        {/* 1. READING & TYPOGRAPHY SETTINGS */}
+        {/* 1. READING & TYPOGRAPHY SETTINGS (ZERO ICONS IN SETTINGS) */}
         <View style={styles.bodySection}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             READING & TYPOGRAPHY
           </Text>
 
-          {/* Font Size Row: Left-to-Right 1px-24px Scroller + Clickable Custom Input Number */}
+          {/* Font Size Row: Left-to-Right 1px-24px Scroller + Text Input Format */}
           <View style={styles.settingRowBlock}>
             <View style={styles.rowHeader}>
-              <View style={styles.rowIconCircle}>
-                <FontSizeSvg size={18} color={colors.accent} />
-              </View>
               <View style={styles.rowTitleBox}>
                 <Text variant="h3" style={styles.rowTitle}>
                   Reading Font Size
                 </Text>
                 <Text variant="caption" color={colors.textSecondary}>
-                  Scroll 1px–24px or tap number to type
+                  Scroll 1px–24px or enter number
                 </Text>
               </View>
 
-              {/* Clickable & Editable Numeric Badge with Direct Input UX */}
-              <TouchableOpacity
-                style={styles.fontSizeInputBadge}
-                onPress={() => fontSizeInputRef.current?.focus()}
-                activeOpacity={0.85}
+              {/* Text Input Format for Font Size */}
+              <View
+                style={[
+                  styles.fontSizeInputContainer,
+                  isEditingFontSize && styles.fontSizeInputContainerFocused,
+                ]}
               >
                 <TextInput
                   ref={fontSizeInputRef}
-                  style={styles.fontSizeInput}
+                  style={styles.fontSizeInputField}
                   value={fontSizeInputText}
                   onChangeText={handleFontSizeInputChange}
                   onFocus={() => setIsEditingFontSize(true)}
@@ -511,11 +501,14 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                   maxLength={2}
                   selectTextOnFocus
                   returnKeyType="done"
+                  selectionColor={colors.accent}
+                  placeholder="16"
+                  placeholderTextColor={colors.textTertiary}
                 />
-                <Text variant="caption" weight="700" color={colors.accent} style={styles.pxUnitLabel}>
+                <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.pxUnitLabel}>
                   px
                 </Text>
-              </TouchableOpacity>
+              </View>
             </View>
 
             {/* Smooth Left-to-Right Horizontal Scroller Track (1px to 24px) */}
@@ -581,12 +574,9 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
 
           <View style={styles.rowDivider} />
 
-          {/* Typography Style Row */}
+          {/* Typography Style Row (Zero Icons) */}
           <View style={styles.settingRowBlock}>
             <View style={styles.rowHeader}>
-              <View style={styles.rowIconCircle}>
-                <TypeSvg size={18} color={colors.accent} />
-              </View>
               <View style={styles.rowTitleBox}>
                 <Text variant="h3" style={styles.rowTitle}>
                   Typography Style
@@ -621,9 +611,6 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                     >
                       {opt.label}
                     </Text>
-                    {isSelected && (
-                      <CheckSvg size={13} color="#FFFFFF" strokeWidth={3} style={{ marginLeft: 4 }} />
-                    )}
                   </TouchableOpacity>
                 );
               })}
@@ -631,25 +618,20 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           </View>
         </View>
 
-        {/* 2. NOTIFICATIONS */}
+        {/* 2. NOTIFICATIONS (ZERO ICONS) */}
         <View style={styles.bodySection}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             NOTIFICATIONS
           </Text>
 
           <View style={styles.actionRow}>
-            <View style={styles.actionRowLeft}>
-              <View style={styles.rowIconCircle}>
-                <BellSvg size={18} color={colors.accent} />
-              </View>
-              <View style={styles.rowTitleBox}>
-                <Text variant="h3" style={styles.rowTitle}>
-                  Daily Devotional Reminder
-                </Text>
-                <Text variant="caption" color={colors.textSecondary}>
-                  Morning inspiration at 08:00 AM
-                </Text>
-              </View>
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Daily Devotional Reminder
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                Morning inspiration at 08:00 AM
+              </Text>
             </View>
             <UiverseSwitch
               value={notifications}
@@ -658,7 +640,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           </View>
         </View>
 
-        {/* 3. SAVED CONTENT */}
+        {/* 3. SAVED CONTENT (ZERO ICONS) */}
         <View style={styles.bodySection}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             SAVED CONTENT
@@ -669,24 +651,19 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
             onPress={() => navigation.navigate('Favorites')}
             activeOpacity={0.75}
           >
-            <View style={styles.actionRowLeft}>
-              <View style={styles.rowIconCircle}>
-                <BookmarkSvg size={18} color={colors.accent} fill={colors.accent} />
-              </View>
-              <View style={styles.rowTitleBox}>
-                <Text variant="h3" style={styles.rowTitle}>
-                  Saved Collection
-                </Text>
-                <Text variant="caption" color={colors.textSecondary}>
-                  {totalSaved} items persisted offline
-                </Text>
-              </View>
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Saved Collection
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                {totalSaved} items persisted offline
+              </Text>
             </View>
-            <ChevronRightSvg size={18} color="#94A3B8" />
+            <Text style={styles.rowDisclosureArrow}>›</Text>
           </TouchableOpacity>
         </View>
 
-        {/* 4. LEGAL & POLICIES */}
+        {/* 4. LEGAL & POLICIES (ZERO ICONS) */}
         <View style={styles.bodySection}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             LEGAL & POLICIES
@@ -697,20 +674,15 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
             onPress={() => navigation.navigate('PrivacyPolicy')}
             activeOpacity={0.75}
           >
-            <View style={styles.actionRowLeft}>
-              <View style={styles.rowIconCircle}>
-                <ShieldCheckSvg size={18} color={colors.accent} />
-              </View>
-              <View style={styles.rowTitleBox}>
-                <Text variant="h3" style={styles.rowTitle}>
-                  Privacy Policy
-                </Text>
-                <Text variant="caption" color={colors.textSecondary}>
-                  Zero ad-trackers & encrypted persistence
-                </Text>
-              </View>
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Privacy Policy
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                Zero ad-trackers & encrypted persistence
+              </Text>
             </View>
-            <ChevronRightSvg size={18} color="#94A3B8" />
+            <Text style={styles.rowDisclosureArrow}>›</Text>
           </TouchableOpacity>
 
           <View style={styles.rowDivider} />
@@ -720,39 +692,34 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
             onPress={() => navigation.navigate('TermsOfService')}
             activeOpacity={0.75}
           >
-            <View style={styles.actionRowLeft}>
-              <View style={styles.rowIconCircle}>
-                <BookOpenSvg size={18} color={colors.accent} />
-              </View>
-              <View style={styles.rowTitleBox}>
-                <Text variant="h3" style={styles.rowTitle}>
-                  Terms of Service
-                </Text>
-                <Text variant="caption" color={colors.textSecondary}>
-                  Theological integrity & terms of usage
-                </Text>
-              </View>
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Terms of Service
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                Theological integrity & terms of usage
+              </Text>
             </View>
-            <ChevronRightSvg size={18} color="#94A3B8" />
+            <Text style={styles.rowDisclosureArrow}>›</Text>
           </TouchableOpacity>
         </View>
 
-        {/* 5. ACCOUNT (SWIPE TO SIGN OUT DIRECTLY IN BODY) */}
+        {/* 5. ACCOUNT (SWIPE TO SIGN OUT - SAME COLOR AS SWIPE TO SIGN IN, NO RED) */}
         <View style={[styles.bodySection, { borderBottomWidth: 0 }]}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             ACCOUNT
           </Text>
 
           <View style={styles.swipeSignOutContainer}>
-            <View style={styles.swipeTrack}>
-              {/* Flowing Drag Trail Fill */}
+            <View style={[styles.swipeTrack, shadow.sm]}>
+              {/* Flowing Soft Amber Drag Trail Fill */}
               <Animated.View
                 style={[
                   styles.swipeProgressFill,
                   {
                     width: panX.interpolate({
                       inputRange: [0, maxDrag],
-                      outputRange: [thumbDiameter + 4, swipeTrackWidth],
+                      outputRange: [thumbDiameter + 8, swipeTrackWidth],
                       extrapolate: 'clamp',
                     }),
                   },
@@ -768,12 +735,12 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                   },
                 ]}
               >
-                <Text variant="caption" weight="700" color="#EF4444" style={styles.swipeSignOutText}>
-                  {'Swipe to Sign Out >>'}
+                <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.swipeSignOutText}>
+                  {'Swipe to Sign Out  ››'}
                 </Text>
               </Animated.View>
 
-              {/* Draggable Red Thumb Button */}
+              {/* Draggable Amber Thumb Button (Matching WelcomeScreen Swipe to Start) */}
               <Animated.View
                 style={[
                   styles.swipeThumb,
@@ -784,7 +751,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                 ]}
                 {...panResponder.panHandlers}
               >
-                <LogOutSvg size={18} color="#FFFFFF" strokeWidth={2.2} />
+                <ChevronRightSvg size={20} color="#FFFFFF" strokeWidth={2.5} />
               </Animated.View>
             </View>
           </View>
@@ -932,17 +899,12 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
 
-  // Settings Rows
+  // Settings Rows (Clean Minimalist Typography - Zero Icons)
   actionRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 10,
-  },
-  actionRowLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
+    paddingVertical: 12,
   },
   rowHeader: {
     flexDirection: 'row',
@@ -950,21 +912,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 4,
   },
-  rowIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(217, 119, 6, 0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.sm,
-  },
   rowTitleBox: {
     flex: 1,
   },
   rowTitle: {
     fontSize: 14,
     color: colors.textPrimary,
+  },
+  rowDisclosureArrow: {
+    fontSize: 22,
+    fontWeight: '300',
+    color: colors.textTertiary,
+    marginLeft: spacing.sm,
   },
   rowDivider: {
     height: 1,
@@ -975,28 +934,39 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
 
-  // Font Size Scroller & Clickable/Editable Numeric Badge
-  fontSizeInputBadge: {
+  // Font Size Scroller & Text Input Format Field
+  fontSizeInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    backgroundColor: 'rgba(217, 119, 6, 0.1)',
-    borderRadius: radius.sm,
-    borderWidth: 1,
-    borderColor: 'rgba(217, 119, 6, 0.3)',
+    justifyContent: 'center',
+    backgroundColor: colors.surface, // Pure white 30% surface
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: 'rgba(15, 23, 42, 0.16)', // Clear native input border
+    paddingHorizontal: 10,
+    height: 38,
+    minWidth: 64,
   },
-  fontSizeInput: {
-    fontSize: 14,
+  fontSizeInputContainerFocused: {
+    borderColor: colors.accent, // Amber focus ring
+    shadowColor: colors.accent,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  fontSizeInputField: {
+    fontSize: 15,
     fontWeight: '700',
-    color: colors.accent,
+    color: colors.textPrimary,
     padding: 0,
-    minWidth: 20,
+    minWidth: 22,
     textAlign: 'center',
+    marginRight: 2,
   },
   pxUnitLabel: {
     fontSize: 12,
-    marginLeft: 2,
+    color: colors.textSecondary,
   },
 
   sliderRow: {
@@ -1115,7 +1085,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
 
-  // Swipe to Sign Out
+  // Swipe to Sign Out (Identical styling to WelcomeScreen Swipe to Start, Zero Red)
   swipeSignOutContainer: {
     alignItems: 'center',
     marginTop: spacing.sm,
@@ -1123,11 +1093,11 @@ const styles = StyleSheet.create({
   },
   swipeTrack: {
     width: 280,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(239, 68, 68, 0.08)',
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: colors.surface, // 30% panel surface #FFFFFF
     borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.2)',
+    borderColor: 'rgba(15, 23, 42, 0.08)',
     justifyContent: 'center',
     position: 'relative',
     overflow: 'hidden',
@@ -1137,8 +1107,8 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: 'rgba(239, 68, 68, 0.15)',
-    borderRadius: 25,
+    backgroundColor: 'rgba(217, 119, 6, 0.12)', // Soft amber progress fill
+    borderRadius: 26,
   },
   swipeTextWrapper: {
     position: 'absolute',
@@ -1149,15 +1119,15 @@ const styles = StyleSheet.create({
   },
   swipeSignOutText: {
     fontSize: 12.5,
-    letterSpacing: 0.3,
+    letterSpacing: 0.5,
   },
   swipeThumb: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#EF4444',
+    backgroundColor: colors.accent, // Biblical amber gold (#D97706)
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 3,
+    marginLeft: 4,
   },
 });
