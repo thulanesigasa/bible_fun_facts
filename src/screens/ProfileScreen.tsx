@@ -4,6 +4,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  TextInput,
   Alert,
   Image,
   ActivityIndicator,
@@ -33,8 +34,6 @@ import {
   ShieldCheckSvg,
   FontSizeSvg,
   TypeSvg,
-  UsersSvg,
-  UserCheckSvg,
 } from '../components/SvgIcons';
 
 // ============================================================================
@@ -95,10 +94,8 @@ const UiverseSwitch: React.FC<UiverseSwitchProps> = ({ value, onValueChange }) =
 };
 
 // ============================================================================
-// FONT SIZES & TYPOGRAPHY PRESETS
+// TYPOGRAPHY PRESETS
 // ============================================================================
-const FONT_SIZE_STEPS = [12, 14, 16, 18, 20, 22, 24];
-
 interface FontTypeOption {
   key: 'serif' | 'sans' | 'system' | 'mono';
   label: string;
@@ -131,9 +128,18 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     userProfile?.notificationsEnabled ?? true
   );
 
-  // Reader Settings State
-  const currentFontSize = userProfile?.fontSize || 16;
+  // Reader Settings State: 1px to 24px
+  const currentFontSize = userProfile?.fontSize ?? 16;
   const currentFontType = userProfile?.fontType || 'serif';
+  const [fontSizeInputText, setFontSizeInputText] = useState(currentFontSize.toString());
+  const [isEditingFontSize, setIsEditingFontSize] = useState(false);
+  const fontSizeInputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    if (!isEditingFontSize) {
+      setFontSizeInputText(currentFontSize.toString());
+    }
+  }, [currentFontSize, isEditingFontSize]);
 
   const totalSaved =
     favoritesFacts.length + favoritesScriptures.length + completedWOTDs.length;
@@ -144,14 +150,69 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
   };
 
   const handleSelectFontSize = (size: number) => {
-    updateProfile({ fontSize: size });
+    const clamped = Math.max(1, Math.min(24, Math.round(size)));
+    updateProfile({ fontSize: clamped });
+    setFontSizeInputText(clamped.toString());
   };
 
-  const handleCycleFontSize = () => {
-    const cycle = [14, 16, 18, 20, 22];
-    const nextIdx = (cycle.indexOf(currentFontSize) + 1) % cycle.length;
-    handleSelectFontSize(cycle[nextIdx]);
+  const handleFontSizeInputChange = (text: string) => {
+    const digits = text.replace(/[^\d]/g, '');
+    setFontSizeInputText(digits);
+    if (digits.length > 0) {
+      const num = parseInt(digits, 10);
+      if (!isNaN(num)) {
+        const clamped = Math.max(1, Math.min(24, num));
+        updateProfile({ fontSize: clamped });
+      }
+    }
   };
+
+  const handleFontSizeInputCommit = () => {
+    const num = parseInt(fontSizeInputText, 10);
+    if (isNaN(num) || num < 1) {
+      handleSelectFontSize(1);
+    } else if (num > 24) {
+      handleSelectFontSize(24);
+    } else {
+      handleSelectFontSize(num);
+    }
+  };
+
+  // Continuous Left-to-Right Pan/Touch Scroller (1px to 24px)
+  const [scrollEnabled, setScrollEnabled] = useState(true);
+  const sliderWidthRef = useRef(240);
+  const [sliderWidth, setSliderWidth] = useState(240);
+  const startXRef = useRef(0);
+
+  const updateFontSizeFromX = (x: number) => {
+    const width = sliderWidthRef.current;
+    if (width <= 0) return;
+    const ratio = Math.max(0, Math.min(1, x / width));
+    const size = Math.round(1 + ratio * 23); // 1px to 24px
+    handleSelectFontSize(size);
+  };
+
+  const sliderPanResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: (evt) => {
+        setScrollEnabled(false);
+        startXRef.current = evt.nativeEvent.locationX;
+        updateFontSizeFromX(evt.nativeEvent.locationX);
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        const currentX = startXRef.current + gestureState.dx;
+        updateFontSizeFromX(currentX);
+      },
+      onPanResponderRelease: () => {
+        setScrollEnabled(true);
+      },
+      onPanResponderTerminate: () => {
+        setScrollEnabled(true);
+      },
+    })
+  ).current;
 
   const handleSelectFontType = (type: 'serif' | 'sans' | 'system' | 'mono') => {
     updateProfile({ fontType: type });
@@ -294,11 +355,12 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
       <ScrollView
         style={styles.scroll}
+        scrollEnabled={scrollEnabled}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
       >
         {/* ================================================================ */}
-        {/* PROFILE IDENTITY SECTION (PRESERVED TOP HEADER)                   */}
+        {/* PROFILE IDENTITY SECTION (PRESERVED HEADER - ONLY ENCLOSED CARD)   */}
         {/* ================================================================ */}
         <View style={styles.profileHeader}>
           <View style={styles.userRow}>
@@ -401,300 +463,329 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
         </View>
 
         {/* ================================================================ */}
-        {/* CONTINUOUS CLEAN BODY SURFACE (ZERO CARD/DIV CONTAINERS)          */}
+        {/* ALL SETTINGS DIRECTLY IN THE SCREEN BODY (ZERO ENCLOSING DIVS)    */}
         {/* ================================================================ */}
-        <View style={styles.cleanBodyContainer}>
-          {/* 1. READING & TYPOGRAPHY SETTINGS */}
-          <View style={styles.bodySection}>
-            <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
-              READING & TYPOGRAPHY
-            </Text>
 
-            {/* Font Size Row: Scroller + Numeric Selector Badge */}
-            <View style={styles.settingRowBlock}>
-              <View style={styles.rowHeader}>
-                <View style={styles.rowIconCircle}>
-                  <FontSizeSvg size={18} color={colors.accent} />
-                </View>
-                <View style={styles.rowTitleBox}>
-                  <Text variant="h3" style={styles.rowTitle}>
-                    Reading Font Size
-                  </Text>
-                  <Text variant="caption" color={colors.textSecondary}>
-                    Adjust Scripture & fact readability
-                  </Text>
-                </View>
-                {/* Numeric Selector Badge (Right Side) */}
-                <TouchableOpacity
-                  style={styles.fontSizeBadge}
-                  onPress={handleCycleFontSize}
-                  activeOpacity={0.75}
-                  accessibilityLabel={`Current font size ${currentFontSize}px, tap to cycle`}
-                >
-                  <Text variant="caption" weight="700" color={colors.accent}>
-                    {currentFontSize}px
-                  </Text>
-                </TouchableOpacity>
+        {/* 1. READING & TYPOGRAPHY SETTINGS */}
+        <View style={styles.bodySection}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+            READING & TYPOGRAPHY
+          </Text>
+
+          {/* Font Size Row: Left-to-Right 1px-24px Scroller + Clickable Custom Input Number */}
+          <View style={styles.settingRowBlock}>
+            <View style={styles.rowHeader}>
+              <View style={styles.rowIconCircle}>
+                <FontSizeSvg size={18} color={colors.accent} />
               </View>
-
-              {/* Horizontal Slider / Scroller from Left to Right */}
-              <View style={styles.sliderContainer}>
-                <Text variant="caption" weight="700" color={colors.textTertiary} style={styles.sliderMinLabel}>
-                  A
+              <View style={styles.rowTitleBox}>
+                <Text variant="h3" style={styles.rowTitle}>
+                  Reading Font Size
                 </Text>
-                <View style={styles.stepperTrack}>
-                  {FONT_SIZE_STEPS.map((stepSize) => {
-                    const isSelected = currentFontSize === stepSize;
-                    return (
-                      <TouchableOpacity
-                        key={stepSize}
-                        style={styles.stepTouchTarget}
-                        onPress={() => handleSelectFontSize(stepSize)}
-                        activeOpacity={0.7}
-                      >
-                        <View
-                          style={[
-                            styles.stepDot,
-                            isSelected && styles.stepDotActive,
-                          ]}
-                        />
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-                <Text variant="h3" weight="800" color={colors.textPrimary} style={styles.sliderMaxLabel}>
-                  A
+                <Text variant="caption" color={colors.textSecondary}>
+                  Scroll 1px–24px or tap number to type
                 </Text>
               </View>
 
-              {/* Real-time Scripture Preview Box */}
-              <View style={styles.previewBox}>
-                <Text
-                  style={[
-                    styles.previewText,
-                    {
-                      fontSize: currentFontSize,
-                      lineHeight: currentFontSize * 1.5,
-                      fontFamily: selectedFamily,
-                    },
-                  ]}
-                >
-                  “For God so loved the world, that He gave His only begotten Son, that whoever believes in Him should not perish but have everlasting life.”
-                </Text>
-                <Text variant="caption" color={colors.accent} weight="700" style={styles.previewCite}>
-                  John 3:16 • {currentFontSize}px {FONT_TYPE_OPTIONS.find(o => o.key === currentFontType)?.label}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.rowDivider} />
-
-            {/* Typography Style Row */}
-            <View style={styles.settingRowBlock}>
-              <View style={styles.rowHeader}>
-                <View style={styles.rowIconCircle}>
-                  <TypeSvg size={18} color={colors.accent} />
-                </View>
-                <View style={styles.rowTitleBox}>
-                  <Text variant="h3" style={styles.rowTitle}>
-                    Typography Style
-                  </Text>
-                  <Text variant="caption" color={colors.textSecondary}>
-                    Choose primary reader typeface
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.fontTypePillsRow}>
-                {FONT_TYPE_OPTIONS.map((opt) => {
-                  const isSelected = currentFontType === opt.key;
-                  return (
-                    <TouchableOpacity
-                      key={opt.key}
-                      style={[
-                        styles.fontTypePill,
-                        isSelected && styles.fontTypePillActive,
-                      ]}
-                      onPress={() => handleSelectFontType(opt.key)}
-                      activeOpacity={0.8}
-                    >
-                      <Text
-                        variant="caption"
-                        weight={isSelected ? '700' : '500'}
-                        style={[
-                          styles.fontTypePillText,
-                          isSelected && styles.fontTypePillTextActive,
-                          opt.fontFamily ? { fontFamily: opt.fontFamily } : undefined,
-                        ]}
-                      >
-                        {opt.label}
-                      </Text>
-                      {isSelected && (
-                        <CheckSvg size={13} color="#FFFFFF" strokeWidth={3} style={{ marginLeft: 4 }} />
-                      )}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </View>
-          </View>
-
-          {/* 2. NOTIFICATIONS & CADENCE */}
-          <View style={styles.bodySection}>
-            <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
-              NOTIFICATIONS
-            </Text>
-
-            <View style={styles.actionRow}>
-              <View style={styles.actionRowLeft}>
-                <View style={styles.rowIconCircle}>
-                  <BellSvg size={18} color={colors.accent} />
-                </View>
-                <View style={styles.rowTitleBox}>
-                  <Text variant="h3" style={styles.rowTitle}>
-                    Daily Devotional Reminder
-                  </Text>
-                  <Text variant="caption" color={colors.textSecondary}>
-                    Morning inspiration at 08:00 AM
-                  </Text>
-                </View>
-              </View>
-              <UiverseSwitch
-                value={notifications}
-                onValueChange={handleToggleNotifications}
-              />
-            </View>
-          </View>
-
-          {/* 3. SAVED CONTENT */}
-          <View style={styles.bodySection}>
-            <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
-              SAVED CONTENT
-            </Text>
-
-            <TouchableOpacity
-              style={styles.actionRow}
-              onPress={() => navigation.navigate('Favorites')}
-              activeOpacity={0.75}
-            >
-              <View style={styles.actionRowLeft}>
-                <View style={styles.rowIconCircle}>
-                  <BookmarkSvg size={18} color={colors.accent} fill={colors.accent} />
-                </View>
-                <View style={styles.rowTitleBox}>
-                  <Text variant="h3" style={styles.rowTitle}>
-                    Saved Collection
-                  </Text>
-                  <Text variant="caption" color={colors.textSecondary}>
-                    {totalSaved} items persisted offline
-                  </Text>
-                </View>
-              </View>
-              <ChevronRightSvg size={18} color="#94A3B8" />
-            </TouchableOpacity>
-          </View>
-
-          {/* 4. LEGAL & POLICIES */}
-          <View style={styles.bodySection}>
-            <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
-              LEGAL & POLICIES
-            </Text>
-
-            <TouchableOpacity
-              style={styles.actionRow}
-              onPress={() => navigation.navigate('PrivacyPolicy')}
-              activeOpacity={0.75}
-            >
-              <View style={styles.actionRowLeft}>
-                <View style={styles.rowIconCircle}>
-                  <ShieldCheckSvg size={18} color={colors.accent} />
-                </View>
-                <View style={styles.rowTitleBox}>
-                  <Text variant="h3" style={styles.rowTitle}>
-                    Privacy Policy
-                  </Text>
-                  <Text variant="caption" color={colors.textSecondary}>
-                    Zero ad-trackers & encrypted persistence
-                  </Text>
-                </View>
-              </View>
-              <ChevronRightSvg size={18} color="#94A3B8" />
-            </TouchableOpacity>
-
-            <View style={styles.rowDivider} />
-
-            <TouchableOpacity
-              style={styles.actionRow}
-              onPress={() => navigation.navigate('TermsOfService')}
-              activeOpacity={0.75}
-            >
-              <View style={styles.actionRowLeft}>
-                <View style={styles.rowIconCircle}>
-                  <BookOpenSvg size={18} color={colors.accent} />
-                </View>
-                <View style={styles.rowTitleBox}>
-                  <Text variant="h3" style={styles.rowTitle}>
-                    Terms of Service
-                  </Text>
-                  <Text variant="caption" color={colors.textSecondary}>
-                    Theological integrity & terms of usage
-                  </Text>
-                </View>
-              </View>
-              <ChevronRightSvg size={18} color="#94A3B8" />
-            </TouchableOpacity>
-          </View>
-
-          {/* 5. ACCOUNT (SWIPE TO SIGN OUT) */}
-          <View style={styles.bodySection}>
-            <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
-              ACCOUNT
-            </Text>
-
-            <View style={styles.swipeSignOutContainer}>
-              <View style={styles.swipeTrack}>
-                {/* Flowing Drag Trail Fill */}
-                <Animated.View
-                  style={[
-                    styles.swipeProgressFill,
-                    {
-                      width: panX.interpolate({
-                        inputRange: [0, maxDrag],
-                        outputRange: [thumbDiameter + 4, swipeTrackWidth],
-                        extrapolate: 'clamp',
-                      }),
-                    },
-                  ]}
+              {/* Clickable & Editable Numeric Badge with Direct Input UX */}
+              <TouchableOpacity
+                style={styles.fontSizeInputBadge}
+                onPress={() => fontSizeInputRef.current?.focus()}
+                activeOpacity={0.85}
+              >
+                <TextInput
+                  ref={fontSizeInputRef}
+                  style={styles.fontSizeInput}
+                  value={fontSizeInputText}
+                  onChangeText={handleFontSizeInputChange}
+                  onFocus={() => setIsEditingFontSize(true)}
+                  onBlur={() => {
+                    setIsEditingFontSize(false);
+                    handleFontSizeInputCommit();
+                  }}
+                  onSubmitEditing={() => {
+                    setIsEditingFontSize(false);
+                    handleFontSizeInputCommit();
+                  }}
+                  keyboardType="number-pad"
+                  maxLength={2}
+                  selectTextOnFocus
+                  returnKeyType="done"
                 />
+                <Text variant="caption" weight="700" color={colors.accent} style={styles.pxUnitLabel}>
+                  px
+                </Text>
+              </TouchableOpacity>
+            </View>
 
-                {/* Centered Track Label */}
-                <Animated.View
-                  style={[
-                    styles.swipeTextWrapper,
-                    {
-                      opacity: signOutTextOpacity,
-                    },
-                  ]}
-                >
-                  <Text variant="caption" weight="700" color="#EF4444" style={styles.swipeSignOutText}>
-                    {'Swipe to Sign Out >>'}
-                  </Text>
-                </Animated.View>
-
-                {/* Draggable Red Thumb Button */}
-                <Animated.View
-                  style={[
-                    styles.swipeThumb,
-                    shadow.sm,
-                    {
-                      transform: [{ translateX: panX }],
-                    },
-                  ]}
-                  {...panResponder.panHandlers}
-                >
-                  <LogOutSvg size={18} color="#FFFFFF" strokeWidth={2.2} />
-                </Animated.View>
+            {/* Smooth Left-to-Right Horizontal Scroller Track (1px to 24px) */}
+            <View style={styles.sliderRow}>
+              <Text variant="caption" weight="700" color={colors.textTertiary} style={styles.sliderBoundLabel}>
+                1px
+              </Text>
+              <View
+                style={styles.sliderTrack}
+                onLayout={(e) => {
+                  const w = e.nativeEvent.layout.width;
+                  sliderWidthRef.current = w;
+                  setSliderWidth(w);
+                }}
+                {...sliderPanResponder.panHandlers}
+              >
+                {/* Visual Track Rail, Fill, and Thumb with pointerEvents="none" */}
+                <View pointerEvents="none" style={styles.sliderInnerTrack}>
+                  <View style={styles.sliderRail} />
+                  <View
+                    style={[
+                      styles.sliderFill,
+                      {
+                        width: `${Math.max(0, Math.min(100, ((currentFontSize - 1) / 23) * 100))}%`,
+                      },
+                    ]}
+                  />
+                  <View
+                    style={[
+                      styles.sliderThumb,
+                      shadow.sm,
+                      {
+                        left: `${Math.max(0, Math.min(100, ((currentFontSize - 1) / 23) * 100))}%`,
+                      },
+                    ]}
+                  />
+                </View>
               </View>
+              <Text variant="caption" weight="800" color={colors.textPrimary} style={styles.sliderBoundLabel}>
+                24px
+              </Text>
+            </View>
+
+            {/* Real-time Scripture Preview Box */}
+            <View style={styles.previewBox}>
+              <Text
+                style={[
+                  styles.previewText,
+                  {
+                    fontSize: currentFontSize,
+                    lineHeight: Math.max(14, currentFontSize * 1.5),
+                    fontFamily: selectedFamily,
+                  },
+                ]}
+              >
+                “For God so loved the world, that He gave His only begotten Son, that whoever believes in Him should not perish but have everlasting life.”
+              </Text>
+              <Text variant="caption" color={colors.accent} weight="700" style={styles.previewCite}>
+                John 3:16 • {currentFontSize}px {FONT_TYPE_OPTIONS.find(o => o.key === currentFontType)?.label}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.rowDivider} />
+
+          {/* Typography Style Row */}
+          <View style={styles.settingRowBlock}>
+            <View style={styles.rowHeader}>
+              <View style={styles.rowIconCircle}>
+                <TypeSvg size={18} color={colors.accent} />
+              </View>
+              <View style={styles.rowTitleBox}>
+                <Text variant="h3" style={styles.rowTitle}>
+                  Typography Style
+                </Text>
+                <Text variant="caption" color={colors.textSecondary}>
+                  Choose primary reader typeface
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.fontTypePillsRow}>
+              {FONT_TYPE_OPTIONS.map((opt) => {
+                const isSelected = currentFontType === opt.key;
+                return (
+                  <TouchableOpacity
+                    key={opt.key}
+                    style={[
+                      styles.fontTypePill,
+                      isSelected && styles.fontTypePillActive,
+                    ]}
+                    onPress={() => handleSelectFontType(opt.key)}
+                    activeOpacity={0.8}
+                  >
+                    <Text
+                      variant="caption"
+                      weight={isSelected ? '700' : '500'}
+                      style={[
+                        styles.fontTypePillText,
+                        isSelected && styles.fontTypePillTextActive,
+                        opt.fontFamily ? { fontFamily: opt.fontFamily } : undefined,
+                      ]}
+                    >
+                      {opt.label}
+                    </Text>
+                    {isSelected && (
+                      <CheckSvg size={13} color="#FFFFFF" strokeWidth={3} style={{ marginLeft: 4 }} />
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+        </View>
+
+        {/* 2. NOTIFICATIONS */}
+        <View style={styles.bodySection}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+            NOTIFICATIONS
+          </Text>
+
+          <View style={styles.actionRow}>
+            <View style={styles.actionRowLeft}>
+              <View style={styles.rowIconCircle}>
+                <BellSvg size={18} color={colors.accent} />
+              </View>
+              <View style={styles.rowTitleBox}>
+                <Text variant="h3" style={styles.rowTitle}>
+                  Daily Devotional Reminder
+                </Text>
+                <Text variant="caption" color={colors.textSecondary}>
+                  Morning inspiration at 08:00 AM
+                </Text>
+              </View>
+            </View>
+            <UiverseSwitch
+              value={notifications}
+              onValueChange={handleToggleNotifications}
+            />
+          </View>
+        </View>
+
+        {/* 3. SAVED CONTENT */}
+        <View style={styles.bodySection}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+            SAVED CONTENT
+          </Text>
+
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={() => navigation.navigate('Favorites')}
+            activeOpacity={0.75}
+          >
+            <View style={styles.actionRowLeft}>
+              <View style={styles.rowIconCircle}>
+                <BookmarkSvg size={18} color={colors.accent} fill={colors.accent} />
+              </View>
+              <View style={styles.rowTitleBox}>
+                <Text variant="h3" style={styles.rowTitle}>
+                  Saved Collection
+                </Text>
+                <Text variant="caption" color={colors.textSecondary}>
+                  {totalSaved} items persisted offline
+                </Text>
+              </View>
+            </View>
+            <ChevronRightSvg size={18} color="#94A3B8" />
+          </TouchableOpacity>
+        </View>
+
+        {/* 4. LEGAL & POLICIES */}
+        <View style={styles.bodySection}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+            LEGAL & POLICIES
+          </Text>
+
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={() => navigation.navigate('PrivacyPolicy')}
+            activeOpacity={0.75}
+          >
+            <View style={styles.actionRowLeft}>
+              <View style={styles.rowIconCircle}>
+                <ShieldCheckSvg size={18} color={colors.accent} />
+              </View>
+              <View style={styles.rowTitleBox}>
+                <Text variant="h3" style={styles.rowTitle}>
+                  Privacy Policy
+                </Text>
+                <Text variant="caption" color={colors.textSecondary}>
+                  Zero ad-trackers & encrypted persistence
+                </Text>
+              </View>
+            </View>
+            <ChevronRightSvg size={18} color="#94A3B8" />
+          </TouchableOpacity>
+
+          <View style={styles.rowDivider} />
+
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={() => navigation.navigate('TermsOfService')}
+            activeOpacity={0.75}
+          >
+            <View style={styles.actionRowLeft}>
+              <View style={styles.rowIconCircle}>
+                <BookOpenSvg size={18} color={colors.accent} />
+              </View>
+              <View style={styles.rowTitleBox}>
+                <Text variant="h3" style={styles.rowTitle}>
+                  Terms of Service
+                </Text>
+                <Text variant="caption" color={colors.textSecondary}>
+                  Theological integrity & terms of usage
+                </Text>
+              </View>
+            </View>
+            <ChevronRightSvg size={18} color="#94A3B8" />
+          </TouchableOpacity>
+        </View>
+
+        {/* 5. ACCOUNT (SWIPE TO SIGN OUT DIRECTLY IN BODY) */}
+        <View style={[styles.bodySection, { borderBottomWidth: 0 }]}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+            ACCOUNT
+          </Text>
+
+          <View style={styles.swipeSignOutContainer}>
+            <View style={styles.swipeTrack}>
+              {/* Flowing Drag Trail Fill */}
+              <Animated.View
+                style={[
+                  styles.swipeProgressFill,
+                  {
+                    width: panX.interpolate({
+                      inputRange: [0, maxDrag],
+                      outputRange: [thumbDiameter + 4, swipeTrackWidth],
+                      extrapolate: 'clamp',
+                    }),
+                  },
+                ]}
+              />
+
+              {/* Centered Track Label */}
+              <Animated.View
+                style={[
+                  styles.swipeTextWrapper,
+                  {
+                    opacity: signOutTextOpacity,
+                  },
+                ]}
+              >
+                <Text variant="caption" weight="700" color="#EF4444" style={styles.swipeSignOutText}>
+                  {'Swipe to Sign Out >>'}
+                </Text>
+              </Animated.View>
+
+              {/* Draggable Red Thumb Button */}
+              <Animated.View
+                style={[
+                  styles.swipeThumb,
+                  shadow.sm,
+                  {
+                    transform: [{ translateX: panX }],
+                  },
+                ]}
+                {...panResponder.panHandlers}
+              >
+                <LogOutSvg size={18} color="#FFFFFF" strokeWidth={2.2} />
+              </Animated.View>
             </View>
           </View>
         </View>
@@ -717,14 +808,14 @@ const styles = StyleSheet.create({
     paddingBottom: 96,             // Clearance for 50px pill bottom tab bar
   },
 
-  // Profile Identity Header (Preserved)
+  // Profile Identity Header (Only enclosed top section, per user spec)
   profileHeader: {
     backgroundColor: colors.surface, // 30% Panel #FFFFFF
     borderRadius: radius.lg,
     padding: spacing.md,
     borderWidth: 1,
     borderColor: colors.border,
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
   userRow: {
     flexDirection: 'row',
@@ -829,23 +920,16 @@ const styles = StyleSheet.create({
     backgroundColor: colors.border,
   },
 
-  // Clean Continuous Body (Zero Card/Div Containers)
-  cleanBodyContainer: {
-    backgroundColor: colors.surface, // Clean 30% white panel
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: 'hidden',
-  },
+  // Direct Body Sections (Zero enclosing divs/cards)
   bodySection: {
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.08)',
   },
   sectionHeader: {
     fontSize: 10.5,
     letterSpacing: 0.8,
-    marginBottom: 4,
+    marginBottom: 6,
   },
 
   // Settings Rows
@@ -885,63 +969,88 @@ const styles = StyleSheet.create({
   rowDivider: {
     height: 1,
     backgroundColor: 'rgba(15, 23, 42, 0.06)',
-    marginVertical: 4,
+    marginVertical: 6,
   },
   settingRowBlock: {
     paddingVertical: 4,
   },
 
-  // Font Size Scroller & Numeric Badge
-  fontSizeBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+  // Font Size Scroller & Clickable/Editable Numeric Badge
+  fontSizeInputBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     backgroundColor: 'rgba(217, 119, 6, 0.1)',
-    borderRadius: radius.full,
+    borderRadius: radius.sm,
     borderWidth: 1,
-    borderColor: 'rgba(217, 119, 6, 0.25)',
+    borderColor: 'rgba(217, 119, 6, 0.3)',
   },
-  sliderContainer: {
+  fontSizeInput: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.accent,
+    padding: 0,
+    minWidth: 20,
+    textAlign: 'center',
+  },
+  pxUnitLabel: {
+    fontSize: 12,
+    marginLeft: 2,
+  },
+
+  sliderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: spacing.sm,
-    paddingHorizontal: 4,
+    paddingHorizontal: 2,
   },
-  sliderMinLabel: {
-    fontSize: 12,
-    marginRight: spacing.sm,
+  sliderBoundLabel: {
+    fontSize: 11,
+    color: colors.textSecondary,
+    width: 32,
+    textAlign: 'center',
   },
-  sliderMaxLabel: {
-    fontSize: 18,
-    marginLeft: spacing.sm,
-  },
-  stepperTrack: {
+  sliderTrack: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    height: 32,
-    paddingHorizontal: 8,
-    backgroundColor: colors.surfaceSecondary,
-    borderRadius: radius.full,
+    height: 36,
+    justifyContent: 'center',
+    position: 'relative',
+    marginHorizontal: 4,
   },
-  stepTouchTarget: {
-    padding: 6,
-    alignItems: 'center',
+  sliderInnerTrack: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
     justifyContent: 'center',
   },
-  stepDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#CBD5E1',
+  sliderRail: {
+    height: 6,
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-  stepDotActive: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
+  sliderFill: {
+    position: 'absolute',
+    left: 0,
+    height: 6,
+    top: 15,
+    backgroundColor: colors.accent,
+    borderRadius: 3,
+  },
+  sliderThumb: {
+    position: 'absolute',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
     backgroundColor: colors.accent,
     borderWidth: 2,
     borderColor: colors.surface,
+    marginLeft: -11,
+    top: 7,
   },
 
   // Live Scripture Preview
@@ -1009,7 +1118,7 @@ const styles = StyleSheet.create({
   // Swipe to Sign Out
   swipeSignOutContainer: {
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: spacing.sm,
     marginBottom: spacing.sm,
   },
   swipeTrack: {
