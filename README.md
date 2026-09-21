@@ -369,6 +369,24 @@ In strict adherence to Rule 16 and clean typography principles:
 
 ---
 
+## Unified Single-Header Navigation & Clean Legal Screen Architecture
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Navigation-Single--Header%20Architecture-FDD223?style=for-the-badge" alt="Single Header Navigation" />
+  <img src="https://img.shields.io/badge/Legal%20Screens-Zero%20Icons%20%7C%20Zero%20SVGs-0F172A?style=for-the-badge" alt="Zero Icons In Legal Screens" />
+  <img src="https://img.shields.io/badge/Saved%20Collection-Single%20Stack%20Header-3B82F6?style=for-the-badge" alt="Single Saved Collection Header" />
+</p>
+
+To eliminate visual header stacking and duplicate headers across nested navigators:
+1. **Dynamic Tab App Header Visibility**: Configured `shouldShowTabHeader(route)` in `AppNavigator.tsx` leveraging `getFocusedRouteNameFromRoute`. When child/detail screens (`Favorites`, `TermsOfService`, `PrivacyPolicy`, `FactDetails`, `ScriptureDetails`, `WOTDDetails`) are active, the outer `Tab.Navigator` application header (`exégeomai` brand bar) is automatically hidden.
+2. **Unified Native Stack Header on Saved Collection (`FavoritesScreen.tsx`)**: Removed the duplicated inner `headerRow` (previously containing `FavoritesSvg` and "Saved Collection") from the screen canvas. The screen now renders exactly one header via React Navigation's stack header bar with native back navigation.
+3. **Clean Legal Screen Architecture (`TermsOfServiceScreen.tsx` & `PrivacyPolicyScreen.tsx`)**:
+   - Eliminated the custom duplicated `<View style={styles.headerBar}>` and replaced it with unified React Navigation native stack headers across both `AuthStack` and `ProfileStack`.
+   - Removed all icons and SVGs (`BookOpenSvg`, `ShieldCheckSvg`, header logo images, and back chevrons) from the legal screens, delivering a pristine, distraction-free typographic layout strictly focused on theological and legal exposition.
+   - Dynamic tab bar hiding (`display: 'none'`) during policy reading to prevent floating UI elements from obstructing legal content.
+
+---
+
 ## Project Directory Structure (Rule 12 & Rule 13)
 
 ```

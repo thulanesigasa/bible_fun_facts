@@ -6,7 +6,7 @@ import {
   useWindowDimensions,
   Image,
 } from 'react-native';
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
@@ -58,6 +58,29 @@ export type RootStackParamList = {
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
+
+function shouldShowTabHeader(route: any): boolean {
+  const routeName = getFocusedRouteNameFromRoute(route);
+  if (!routeName) return true;
+  const childScreens = [
+    'Favorites',
+    'TermsOfService',
+    'PrivacyPolicy',
+    'FactDetails',
+    'ScriptureDetails',
+    'WOTDDetails',
+  ];
+  return !childScreens.includes(routeName);
+}
+
+function getTabBarVisibility(route: any, hideTabBar: boolean): 'none' | 'flex' {
+  if (hideTabBar) return 'none';
+  const routeName = getFocusedRouteNameFromRoute(route);
+  if (routeName === 'TermsOfService' || routeName === 'PrivacyPolicy') {
+    return 'none';
+  }
+  return 'flex';
+}
 
 function DiscoverStack() {
   return (
@@ -129,7 +152,7 @@ function ProfileStack() {
             fontSize: 18,
             fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
           },
-          headerTintColor: colors.accent,
+          headerTintColor: '#0F172A',
         }}
       />
       <Stack.Screen
@@ -163,7 +186,18 @@ function ProfileStack() {
         name="TermsOfService"
         component={TermsOfServiceScreen}
         options={{
-          headerShown: false,
+          headerShown: true,
+          title: 'Terms of Service',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
           contentStyle: { backgroundColor: colors.background },
         }}
       />
@@ -171,7 +205,18 @@ function ProfileStack() {
         name="PrivacyPolicy"
         component={PrivacyPolicyScreen}
         options={{
-          headerShown: false,
+          headerShown: true,
+          title: 'Privacy Policy',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
           contentStyle: { backgroundColor: colors.background },
         }}
       />
@@ -202,16 +247,51 @@ export default function AppNavigator() {
         <AuthStack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
           <AuthStack.Screen name="Welcome" component={WelcomeScreen} />
           <AuthStack.Screen name="Auth" component={AuthScreen} />
-          <AuthStack.Screen name="TermsOfService" component={TermsOfServiceScreen} />
-          <AuthStack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
+          <AuthStack.Screen
+            name="TermsOfService"
+            component={TermsOfServiceScreen}
+            options={{
+              headerShown: true,
+              title: 'Terms of Service',
+              headerStyle: {
+                backgroundColor: '#FFFFFF',
+              },
+              headerTitleStyle: {
+                fontWeight: 'bold',
+                color: '#0F172A',
+                fontSize: 18,
+                fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+              },
+              headerTintColor: '#0F172A',
+            }}
+          />
+          <AuthStack.Screen
+            name="PrivacyPolicy"
+            component={PrivacyPolicyScreen}
+            options={{
+              headerShown: true,
+              title: 'Privacy Policy',
+              headerStyle: {
+                backgroundColor: '#FFFFFF',
+              },
+              headerTitleStyle: {
+                fontWeight: 'bold',
+                color: '#0F172A',
+                fontSize: 18,
+                fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+              },
+              headerTintColor: '#0F172A',
+            }}
+          />
         </AuthStack.Navigator>
       ) : (
         <Tab.Navigator
-          screenOptions={{
+          screenOptions={({ route }) => ({
+            headerShown: shouldShowTabHeader(route),
             tabBarActiveTintColor: accent,
             tabBarInactiveTintColor: '#94A3B8',
             tabBarStyle: {
-              display: hideTabBar ? 'none' : 'flex',
+              display: getTabBarVisibility(route, hideTabBar),
               position: 'absolute',
               bottom: Platform.OS === 'ios' ? 28 : 24,
               marginHorizontal: horizontalPadding,
@@ -287,7 +367,7 @@ export default function AppNavigator() {
                 )}
               </View>
             ),
-          }}
+          })}
         >
           <Tab.Screen
             name="Discover"

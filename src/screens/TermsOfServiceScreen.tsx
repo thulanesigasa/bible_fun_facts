@@ -3,60 +3,22 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
-  Platform,
-  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
-import { spacing, radius, shadow } from '../theme';
+import { spacing, radius } from '../theme';
 import { Text } from '../components/Typography';
-import { ChevronLeftSvg, ShieldCheckSvg, BookOpenSvg } from '../components/SvgIcons';
 
-export default function TermsOfServiceScreen({ navigation }: { navigation: any }) {
+export default function TermsOfServiceScreen() {
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom', 'left', 'right']}>
-      {/* Header Bar */}
-      <View style={styles.headerBar}>
-        <TouchableOpacity
-          style={styles.backBtn}
-          onPress={() => navigation.goBack()}
-          activeOpacity={0.7}
-          accessibilityLabel="Go back"
-        >
-          <ChevronLeftSvg size={20} color={colors.textPrimary} strokeWidth={2.5} />
-          <Text variant="caption" weight="700" color={colors.textPrimary} style={styles.backText}>
-            Back
-          </Text>
-        </TouchableOpacity>
-
-        <View style={styles.headerTitleContainer}>
-          <Image
-            source={require('../../assets/logo-transparent.png')}
-            style={styles.headerLogo}
-            resizeMode="contain"
-          />
-          <Text variant="h3" weight="800" color={colors.textPrimary} style={styles.headerTitle}>
-            Terms of Service
-          </Text>
-        </View>
-
-        <View style={styles.headerPlaceholder} />
-      </View>
-
+    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       {/* Main Scroll Content */}
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Document Intro Badge */}
+        {/* Document Intro */}
         <View style={styles.introHeader}>
-          <View style={styles.iconCircle}>
-            <BookOpenSvg size={24} color={colors.accent} strokeWidth={2} />
-          </View>
-          <Text variant="h1" weight="800" color={colors.textPrimary} style={styles.docTitle}>
-            Terms & Conditions of Use
-          </Text>
           <Text variant="caption" color={colors.textSecondary} style={styles.lastUpdated}>
             Effective Date: September 20, 2026 • Version 1.0.1
           </Text>
@@ -302,43 +264,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background, // 60% dominant background (#F8FAFC)
   },
-  headerBar: {
-    height: 56,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.md, // 16px
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(15, 23, 42, 0.08)',
-  },
-  backBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingRight: 12,
-  },
-  backText: {
-    marginLeft: 4,
-    fontSize: 14,
-  },
-  headerTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  headerLogo: {
-    width: 24,
-    height: 24,
-    borderRadius: 5,
-    marginRight: 8,
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
-  },
-  headerPlaceholder: {
-    width: 48,
-  },
   scrollContent: {
     paddingHorizontal: spacing.lg, // 24px
     paddingTop: spacing.lg, // 24px
@@ -350,22 +275,6 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.lg,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
-  },
-  iconCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  docTitle: {
-    fontSize: 24,
-    textAlign: 'center',
-    marginBottom: 4,
   },
   lastUpdated: {
     fontSize: 12,
