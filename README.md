@@ -448,17 +448,20 @@ bible_fun_facts/
 - **Real-Time Follow / Unfollow**: Amber follow button toggles into a clean slate "Following" pill, persisted across app sessions via `UserContext`.
 - **Slide-Up Scholar Profile Modal**: Full screen inspection presenting scholar credentials, verified badges, follower and following counts, study streaks, verses explored, theological specialty tags, full bio, and their favorite scripture reflection.
 
-### 3. Compact, Non-Overwhelming Verses Hub (`ScripturesScreen.tsx`)
-- **50% Card Height Reduction**: Streamlined layout removing excessive vertical whitespace and replacing multi-line text blocks with concise 2-line snippets to eliminate scroll fatigue.
-- **Unified Search Category Fusion**: Incorporates historical search categories (`People`, `Prophecy`, `Customs`, `History`, `Language`) directly into the verses hub alongside canon testament filters.
-- **Strong's Lexical Concordance Badges**: Inline pills showing the original Greek or Hebrew word transliteration and Strong's number.
-- **Quick Verse Actions**: Direct one-tap favoriting and sharing without leaving the list stream.
+### 3. Search-Driven, Non-Scrolling Verses Finder (`ScripturesScreen.tsx`)
+- **Zero Scroll Fatigue Architecture**: Eliminated endless scrolling by transforming the screen into a focused, search-driven scripture finder.
+- **1-Tap Quick Search Chips**: Instant search tags (`John 3:16`, `Psalm 23`, `Romans 8`, `Genesis 1`, `Galatians 5`, `Ephesians 6`, `Grace`, `Peace`) that populate and show specific verses immediately.
+- **Genre Filter Tabs**: High-level segmentation across `All`, `Gospel`, `Wisdom`, `Prophecy`, and `Epistle`.
+- **Focused Result Display (Top 3)**: Limits view to 3 focused, compact cards at a time with an explicit "Load Next 3 Verses" button to prevent overwhelming scroll lists.
+- **Inline Strong's Lexical Badges**: Displays the original Greek or Hebrew word transliteration, definition, and Strong's number with direct one-tap favoriting and sharing.
 
-### 4. Rich Multi-Card Exegetical Feed Stream (`DiscoverScreen.tsx`)
-- **Daily Exegetical Spotlight**: Hero featured study with Strong's lexical root breakdown, pronunciation, transliteration, and theological commentary.
-- **"Continue Reading" Bible Quick-Card**: Reads `lastReadBible` state from `UserContext` and presents an immediate jump link to resume scripture study.
-- **Interleaved Biblical Feed**: Multi-card stream combining archaeological discoveries, Hebrew and Greek word root analyses, ancient Near Eastern cultural customs, and reflections from community scholars.
-- **Pull-To-Refresh**: Live stream shuffling allowing users to discover fresh insights with every gesture.
+### 4. Compact, Zero-Post Daily Discovery Dashboard (`DiscoverScreen.tsx`)
+- **Zero-Post Private Architecture**: Removed all social feed elements and mock user posting cards. The app is dedicated to individual biblical exegesis without social post clutter.
+- **Single-Screen Focused View**: Fits cleanly on mobile screens without requiring continuous vertical scrolling:
+  - **Resume Scripture Quick-Card**: 1-tap jump to the user's last read Bible book and chapter.
+  - **Original Language Root Card**: Daily Strong's Concordance exegesis highlighting Greek and Hebrew terms, transliterations, Strong's numbers, and lexical definitions.
+  - **Archaeology & Customs Discovery**: Displays one high-impact historical/cultural insight with an in-place **"Next Discovery ›"** button to cycle discoveries without scrolling.
+  - **Compact Header & Streak Ribbon**: Streak tracking and pull-to-refresh integration.
 
 ### 1. Direct-Body Canvas Architecture (Elimination of Nested "Divs")
 - **Clean Screen Surface**: Removed all outer card wrappers (`stepIndicatorCard`, `stepContentCard`, `formCard`).

@@ -12,33 +12,26 @@ import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
 import { Card } from '../components/Card';
-import { facts, Fact, scriptures, Scripture } from '../data/mockDatabase';
-import { MOCK_COMMUNITY_USERS, CommunityUser } from '../data/mockUsers';
+import { facts, Fact } from '../data/mockDatabase';
 import { useUser } from '../context/UserContext';
 import {
   DiscoverSvg,
   FlameSvg,
   FavoritesSvg,
   LandmarkSvg,
-  UsersSvg,
-  QuoteSvg,
   StrongsIconSvg,
   ChevronRightSvg,
   BookOpenSvg,
   ShareSvg,
+  RefreshSvg,
 } from '../components/SvgIcons';
 
 interface DiscoverScreenProps {
   navigation: any;
 }
 
-type FeedFilter = 'All' | 'Archaeology' | 'Language' | 'Customs' | 'Scholars';
-
-const FEED_FILTERS: FeedFilter[] = ['All', 'Archaeology', 'Language', 'Customs', 'Scholars'];
-
 export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
-  const [activeFilter, setActiveFilter] = useState<FeedFilter>('All');
-  const [feedSeed, setFeedSeed] = useState(0);
+  const [factIndex, setFactIndex] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
 
   const {
@@ -49,84 +42,45 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
     toggleFavoriteFact,
     isFactFavorited,
     lastReadBible,
-    followedUserIds,
   } = useUser();
+
+  // Curated list of historical and archaeological discoveries
+  const discoveryFacts = useMemo(() => {
+    return facts.filter((f) => f.category === 'History' || f.category === 'Customs' || f.category === 'Prophecy');
+  }, []);
+
+  // Today's Exegetical Root Word (language category)
+  const languageFact: Fact = useMemo(() => {
+    const langList = facts.filter((f) => f.category === 'Language');
+    return langList[factIndex % langList.length] || facts[0];
+  }, [factIndex]);
+
+  // Current Featured Discovery (cycle without scrolling)
+  const currentFact: Fact = discoveryFacts[factIndex % discoveryFacts.length] || facts[0];
+
+  const handleNextDiscovery = useCallback(() => {
+    setFactIndex((prev) => prev + 1);
+    incrementFactsViewed();
+  }, [incrementFactsViewed]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
-      setFeedSeed((prev) => prev + 1);
-      incrementFactsViewed();
+      handleNextDiscovery();
       setRefreshing(false);
-    }, 400);
-  }, [incrementFactsViewed]);
+    }, 300);
+  }, [handleNextDiscovery]);
 
-  // Featured Spotlight Fact (Shuffles with seed)
-  const spotlightFact: Fact = useMemo(() => {
-    const languageFacts = facts.filter((f) => f.category === 'Language');
-    const index = (feedSeed + 2) % languageFacts.length;
-    return languageFacts[index] || facts[0];
-  }, [feedSeed]);
-
-  // Curated Feed Stream
-  const feedStream = useMemo(() => {
-    // 1. Facts
-    const factItems = facts.slice((feedSeed * 4) % 40, ((feedSeed * 4) % 40) + 12).map((fact) => ({
-      type: 'fact' as const,
-      id: `feed_fact_${fact.id}`,
-      data: fact,
-      category: fact.category,
-    }));
-
-    // 2. Scholar Insights
-    const scholarItems = MOCK_COMMUNITY_USERS.map((user) => ({
-      type: 'scholar' as const,
-      id: `feed_scholar_${user.id}`,
-      data: user,
-      category: 'Scholars',
-    }));
-
-    // Interleave
-    const combined: Array<{
-      type: 'fact' | 'scholar';
-      id: string;
-      data: Fact | CommunityUser;
-      category: string;
-    }> = [];
-
-    const maxLen = Math.max(factItems.length, scholarItems.length);
-    for (let i = 0; i < maxLen; i++) {
-      if (factItems[i]) combined.push(factItems[i]);
-      if (i % 2 === 0 && scholarItems[i / 2]) combined.push(scholarItems[i / 2]);
-    }
-
-    return combined.filter((item) => {
-      if (activeFilter === 'All') return true;
-      if (activeFilter === 'Archaeology') return item.type === 'fact' && (item.category === 'History' || item.category === 'Prophecy');
-      if (activeFilter === 'Language') return item.type === 'fact' && item.category === 'Language';
-      if (activeFilter === 'Customs') return item.type === 'fact' && item.category === 'Customs';
-      if (activeFilter === 'Scholars') return item.type === 'scholar';
-      return true;
-    });
-  }, [feedSeed, activeFilter]);
-
-  const onShareFact = async (fact: Fact) => {
+  const onShareCurrentFact = async (fact: Fact) => {
     try {
-      const message = `"${fact.fact_title}"\n${fact.verse_text} (${fact.scripture_ref})\n\nHistorical Context:\n${fact.historical_context}\n\nCultural Practice:\n${fact.cultural_practice}`;
+      const message = `"${fact.fact_title}" (${fact.scripture_ref})\n\n"${fact.verse_text}"\n\nContext:\n${fact.historical_context}`;
       await Share.share({ message });
     } catch (error) {
       console.error(error);
     }
   };
 
-  const onShareScholar = async (user: CommunityUser) => {
-    try {
-      const message = `Scripture Reflection by ${user.name} (@${user.username}):\n"${user.favoriteVerse.text}" - ${user.favoriteVerse.reference}\n\nNote: ${user.favoriteVerse.note}`;
-      await Share.share({ message });
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const isFavorited = isFactFavorited(currentFact.id);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
@@ -143,332 +97,156 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
           />
         }
       >
-        {/* Screen Top Header Greeting */}
-        <View style={styles.header}>
-          <View style={styles.headerIconRow}>
-            <DiscoverSvg size={24} color={colors.accent} fill={colors.accentSoft} />
+        {/* Header Greeting & Compact Streak Pill */}
+        <View style={styles.headerRow}>
+          <View style={styles.headerTextWrap}>
             <Text variant="h2" style={styles.headerTitle}>
-              {userProfile?.name ? `Shalom, ${userProfile.name}` : 'Exegetical Feed'}
+              {userProfile?.name ? `Shalom, ${userProfile.name}` : 'Daily Discovery'}
+            </Text>
+            <Text variant="caption" color={colors.textSecondary} style={styles.headerSub}>
+              Essential biblical insights & archaeological context
             </Text>
           </View>
-          <Text variant="body" color={colors.textSecondary} style={styles.headerSub}>
-            Daily archaeological insights, lexical roots & scholar reflections
-          </Text>
-        </View>
 
-        {/* Milestone & Streak Ribbon */}
-        <View style={[styles.statsRibbon, shadow.sm]}>
-          <View style={styles.statItem}>
-            <View style={styles.streakIconCircle}>
-              <FlameSvg size={16} color={colors.accent} fill={colors.accent} />
-            </View>
-            <View>
-              <Text variant="caption" color={colors.textTertiary}>Streak</Text>
-              <Text variant="h3" style={{ color: colors.textPrimary }}>
-                {streak} day{streak !== 1 ? 's' : ''}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.statDivider} />
-
-          <View style={styles.statItem}>
-            <View style={styles.streakIconCircle}>
-              <DiscoverSvg size={16} color={colors.accent} />
-            </View>
-            <View>
-              <Text variant="caption" color={colors.textTertiary}>Discovered</Text>
-              <Text variant="h3" style={{ color: colors.textPrimary }}>
-                {factsViewedCount} items
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.statDivider} />
-
-          <View style={styles.statItem}>
-            <View style={styles.streakIconCircle}>
-              <UsersSvg size={16} color={colors.accent} />
-            </View>
-            <View>
-              <Text variant="caption" color={colors.textTertiary}>Following</Text>
-              <Text variant="h3" style={{ color: colors.textPrimary }}>
-                {followedUserIds.length} scholars
-              </Text>
-            </View>
+          <View style={styles.streakPill}>
+            <FlameSvg size={14} color={colors.accent} fill={colors.accent} />
+            <Text variant="caption" weight="700" color={colors.accent}>
+              {streak}d streak
+            </Text>
           </View>
         </View>
 
-        {/* FEATURED 1: Continue Reading Bible Card */}
+        {/* 1. Quick Jump: Continue Scripture Card */}
         <TouchableOpacity
           activeOpacity={0.88}
           onPress={() => navigation.navigate('WOTD')}
-          style={[styles.continueReadingCard, shadow.sm]}
+          style={[styles.continueCard, shadow.sm]}
         >
           <View style={styles.continueLeft}>
-            <View style={styles.continueIconCircle}>
-              <BookOpenSvg size={20} color={colors.accent} />
+            <View style={styles.continueIconWrap}>
+              <BookOpenSvg size={18} color={colors.accent} />
             </View>
             <View style={styles.continueTextWrap}>
-              <Text variant="caption" color={colors.accent} weight="700" style={styles.continueMiniBadge}>
-                CONTINUE STUDY
+              <Text variant="caption" color={colors.accent} weight="700" style={styles.continueTag}>
+                RESUME READING
               </Text>
-              <Text variant="h3" style={styles.continueBookTitle}>
+              <Text variant="h3" style={styles.continueTitle}>
                 {lastReadBible.book} Chapter {lastReadBible.chapter}
-              </Text>
-              <Text variant="caption" color={colors.textSecondary}>
-                Translation: {lastReadBible.translation.toUpperCase()} • Tap to open reader
               </Text>
             </View>
           </View>
-          <ChevronRightSvg size={18} color={colors.accent} />
+          <View style={styles.continueActionBtn}>
+            <Text variant="caption" weight="700" color="#FFFFFF">
+              Open ›
+            </Text>
+          </View>
         </TouchableOpacity>
 
-        {/* FEATURED 2: Hero Exegetical Spotlight Card */}
-        <Card style={styles.spotlightCard}>
-          <View style={styles.spotlightBadgeRow}>
-            <View style={styles.spotlightPill}>
-              <StrongsIconSvg size={13} color={colors.accent} />
-              <Text variant="caption" weight="700" color={colors.accent} style={{ letterSpacing: 0.8 }}>
-                EXEGETICAL SPOTLIGHT
+        {/* 2. Today's Original Root Word (Strong's Exegesis) */}
+        <Card style={styles.rootCard}>
+          <View style={styles.cardSectionHeader}>
+            <View style={styles.sectionBadge}>
+              <StrongsIconSvg size={12} color={colors.accent} />
+              <Text variant="caption" weight="700" color={colors.accent} style={styles.badgeText}>
+                ORIGINAL LANGUAGE ROOT
               </Text>
             </View>
             <Text variant="caption" color={colors.textTertiary}>
-              {spotlightFact.scripture_ref}
+              {languageFact.scripture_ref}
             </Text>
           </View>
 
-          <Text variant="h2" style={styles.spotlightTitle}>
-            {spotlightFact.fact_title}
-          </Text>
-
-          {/* Lexicon box */}
-          <View style={styles.lexiconBox}>
-            <View style={styles.lexiconHeader}>
-              <Text variant="h3" color={colors.accent}>
-                {spotlightFact.strongs_word}
+          <View style={styles.rootWordRow}>
+            <View style={styles.rootWordLeft}>
+              <Text variant="h2" color={colors.accent} style={styles.rootWord}>
+                {languageFact.strongs_word}
               </Text>
-              <Text variant="caption" weight="700" color={colors.textSecondary}>
-                Strong's {spotlightFact.strongs_number}
+              <Text variant="caption" color={colors.textSecondary}>
+                Strong's {languageFact.strongs_number} • <Text variant="caption" weight="600" color={colors.textPrimary}>{languageFact.strongs_transliteration}</Text>
               </Text>
             </View>
-            <Text variant="caption" color={colors.textTertiary} style={styles.lexiconTranslit}>
-              Transliteration: <Text variant="caption" weight="600" color={colors.textPrimary}>{spotlightFact.strongs_transliteration}</Text>
-            </Text>
-            <Text variant="body" color={colors.textPrimary} style={styles.lexiconDef}>
-              "{spotlightFact.strongs_definition}"
+            <View style={styles.rootCategoryTag}>
+              <Text variant="caption" color={colors.textSecondary} style={{ fontSize: 11 }}>
+                {languageFact.category}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.rootDefBox}>
+            <Text variant="body" color={colors.textPrimary} style={styles.rootDefText}>
+              "{languageFact.strongs_definition}"
             </Text>
           </View>
 
-          <Text variant="body" color={colors.textSecondary} style={styles.spotlightContext} numberOfLines={3}>
-            {spotlightFact.historical_context}
+          <Text variant="caption" color={colors.textSecondary} numberOfLines={2} style={styles.rootContextSnippet}>
+            {languageFact.historical_context}
+          </Text>
+        </Card>
+
+        {/* 3. Archaeological & Historical Discovery Card (With In-Place Shuffle) */}
+        <Card style={styles.discoveryCard}>
+          <View style={styles.cardSectionHeader}>
+            <View style={styles.sectionBadge}>
+              <LandmarkSvg size={12} color={colors.accent} />
+              <Text variant="caption" weight="700" color={colors.accent} style={styles.badgeText}>
+                ARCHAEOLOGY & CUSTOMS
+              </Text>
+            </View>
+            <Text variant="caption" color={colors.textTertiary}>
+              {currentFact.scripture_ref}
+            </Text>
+          </View>
+
+          <Text variant="h3" style={styles.discoveryTitle}>
+            {currentFact.fact_title}
           </Text>
 
-          <View style={styles.spotlightFooter}>
+          <View style={styles.discoveryVerseBox}>
+            <Text variant="body" style={styles.discoveryVerseText} numberOfLines={2}>
+              "{currentFact.verse_text}"
+            </Text>
+          </View>
+
+          <Text variant="body" color={colors.textSecondary} numberOfLines={3} style={styles.discoveryContext}>
+            {currentFact.historical_context}
+          </Text>
+
+          {/* Interactive Card Action Bar: Next Discovery + Save + Share */}
+          <View style={styles.cardActionsBar}>
             <TouchableOpacity
-              style={styles.spotlightReadBtn}
-              onPress={() => navigation.navigate('FactDetails', { fact: spotlightFact })}
+              style={styles.nextDiscoveryBtn}
+              onPress={handleNextDiscovery}
               activeOpacity={0.8}
             >
-              <Text variant="caption" weight="700" color="#FFFFFF">
-                Full Exegesis & Context ›
+              <RefreshSvg size={14} color={colors.accent} />
+              <Text variant="caption" weight="700" color={colors.accent}>
+                Next Discovery ›
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.spotlightShareBtn}
-              onPress={() => onShareFact(spotlightFact)}
-              activeOpacity={0.8}
-            >
-              <ShareSvg size={16} color={colors.accent} />
-            </TouchableOpacity>
+            <View style={styles.actionIconsRight}>
+              <TouchableOpacity
+                style={styles.iconBtn}
+                onPress={() => toggleFavoriteFact(currentFact)}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <FavoritesSvg
+                  size={18}
+                  color={colors.accent}
+                  fill={isFavorited ? colors.accent : 'none'}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.iconBtn}
+                onPress={() => onShareCurrentFact(currentFact)}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <ShareSvg size={18} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
           </View>
         </Card>
-
-        {/* Category Feed Filter Chips */}
-        <View style={styles.filterSection}>
-          <Text variant="label" color={colors.textTertiary} style={styles.feedHeading}>
-            DISCOVER STREAM
-          </Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.filterPillsContainer}
-          >
-            {FEED_FILTERS.map((f) => {
-              const isActive = activeFilter === f;
-              return (
-                <TouchableOpacity
-                  key={f}
-                  style={[styles.filterPill, isActive && styles.filterPillActive]}
-                  onPress={() => setActiveFilter(f)}
-                  activeOpacity={0.8}
-                >
-                  <Text
-                    variant="caption"
-                    weight={isActive ? '700' : '500'}
-                    style={[styles.filterPillText, isActive && styles.filterPillTextActive]}
-                  >
-                    {f}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </View>
-
-        {/* Feed Stream Cards */}
-        <View style={styles.feedList}>
-          {feedStream.map((item) => {
-            if (item.type === 'fact') {
-              const fact = item.data as Fact;
-              const isFavorited = isFactFavorited(fact.id);
-
-              return (
-                <View key={item.id} style={[styles.feedFactCard, shadow.sm]}>
-                  {/* Top Bar */}
-                  <View style={styles.cardHeaderRow}>
-                    <View style={styles.categoryBadge}>
-                      {fact.category === 'Language' ? (
-                        <StrongsIconSvg size={12} color={colors.accent} />
-                      ) : (
-                        <LandmarkSvg size={12} color={colors.accent} />
-                      )}
-                      <Text variant="caption" weight="700" color={colors.accent} style={styles.categoryBadgeText}>
-                        {fact.category.toUpperCase()}
-                      </Text>
-                    </View>
-                    <Text variant="caption" color={colors.textTertiary}>
-                      {fact.scripture_ref}
-                    </Text>
-                  </View>
-
-                  {/* Fact Title */}
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    onPress={() => navigation.navigate('FactDetails', { fact })}
-                  >
-                    <Text variant="h3" style={styles.factCardTitle}>
-                      {fact.fact_title}
-                    </Text>
-                  </TouchableOpacity>
-
-                  {/* Quote */}
-                  <View style={styles.verseQuoteBox}>
-                    <Text variant="body" style={styles.verseQuoteText} numberOfLines={2}>
-                      "{fact.verse_text}"
-                    </Text>
-                  </View>
-
-                  {/* Context preview */}
-                  <Text variant="body" color={colors.textSecondary} numberOfLines={3} style={styles.factContextText}>
-                    {fact.historical_context}
-                  </Text>
-
-                  {/* Card Action Row */}
-                  <View style={styles.cardBottomRow}>
-                    <TouchableOpacity
-                      style={styles.readMoreLink}
-                      onPress={() => navigation.navigate('FactDetails', { fact })}
-                      activeOpacity={0.7}
-                    >
-                      <Text variant="caption" weight="700" color={colors.accent}>
-                        Explore Discovery
-                      </Text>
-                      <ChevronRightSvg size={12} color={colors.accent} />
-                    </TouchableOpacity>
-
-                    <View style={styles.cardActionIcons}>
-                      <TouchableOpacity
-                        style={styles.iconBtn}
-                        onPress={() => toggleFavoriteFact(fact)}
-                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                      >
-                        <FavoritesSvg
-                          size={16}
-                          color={colors.accent}
-                          fill={isFavorited ? colors.accent : 'none'}
-                        />
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        style={styles.iconBtn}
-                        onPress={() => onShareFact(fact)}
-                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                      >
-                        <ShareSvg size={16} color={colors.textSecondary} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
-              );
-            } else {
-              // Community Scholar Card
-              const scholar = item.data as CommunityUser;
-
-              return (
-                <View key={item.id} style={[styles.feedScholarCard, shadow.sm]}>
-                  {/* Top Bar */}
-                  <View style={styles.scholarHeaderRow}>
-                    <View style={styles.scholarAvatarCircle}>
-                      <Text variant="caption" weight="700" color={colors.accent}>
-                        {scholar.name.replace(/^(Dr\.|Prof\.|Pastor)\s+/i, '').slice(0, 2).toUpperCase()}
-                      </Text>
-                    </View>
-                    <View style={styles.scholarInfoWrap}>
-                      <Text variant="h3" style={styles.scholarName} numberOfLines={1}>
-                        {scholar.name}
-                      </Text>
-                      <Text variant="caption" color={colors.textTertiary}>
-                        @{scholar.username} • {scholar.role}
-                      </Text>
-                    </View>
-                    <View style={styles.scholarBadge}>
-                      <UsersSvg size={12} color={colors.accent} />
-                    </View>
-                  </View>
-
-                  {/* Scholar Reflection Quote */}
-                  <View style={styles.scholarQuoteCard}>
-                    <View style={styles.scholarQuoteHeader}>
-                      <QuoteSvg size={14} color={colors.accent} />
-                      <Text variant="caption" weight="700" color={colors.accent}>
-                        {scholar.favoriteVerse.reference}
-                      </Text>
-                    </View>
-                    <Text variant="body" style={styles.scholarVerseText}>
-                      "{scholar.favoriteVerse.text}"
-                    </Text>
-                    <Text variant="caption" color={colors.textSecondary} style={styles.scholarNoteText}>
-                      {scholar.favoriteVerse.note}
-                    </Text>
-                  </View>
-
-                  {/* Scholar Card Footer */}
-                  <View style={styles.scholarFooterRow}>
-                    <TouchableOpacity
-                      style={styles.viewScholarBtn}
-                      onPress={() => navigation.navigate('Search')}
-                      activeOpacity={0.7}
-                    >
-                      <Text variant="caption" weight="600" color={colors.accent}>
-                        View Profile in Search ›
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={styles.iconBtn}
-                      onPress={() => onShareScholar(scholar)}
-                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                    >
-                      <ShareSvg size={16} color={colors.textSecondary} />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              );
-            }
-          })}
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -485,63 +263,45 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
-    paddingBottom: 110,
+    paddingBottom: 96,
   },
-  header: {
-    marginBottom: spacing.md,
-  },
-  headerIconRow: {
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+  },
+  headerTextWrap: {
+    flex: 1,
+    marginRight: 10,
   },
   headerTitle: {
     color: colors.textPrimary,
   },
   headerSub: {
-    fontSize: 13,
     marginTop: 2,
   },
-  statsRibbon: {
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: radius.md,
-    paddingVertical: 10,
-    paddingHorizontal: spacing.sm,
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
-  },
-  statItem: {
+  streakPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-  },
-  streakIconCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: radius.full,
+    gap: 5,
     backgroundColor: colors.accentSoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  statDivider: {
-    width: 1,
-    height: 24,
-    backgroundColor: 'rgba(15, 23, 42, 0.06)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(217, 119, 6, 0.2)',
   },
 
   // Continue Reading Card
-  continueReadingCard: {
+  continueCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#FFFFFF',
     borderRadius: radius.md,
     paddingHorizontal: spacing.md,
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderLeftWidth: 4,
     borderLeftColor: colors.accent,
     borderWidth: 1,
@@ -554,10 +314,10 @@ const styles = StyleSheet.create({
     gap: 10,
     flex: 1,
   },
-  continueIconCircle: {
-    width: 38,
-    height: 38,
-    borderRadius: radius.md,
+  continueIconWrap: {
+    width: 34,
+    height: 34,
+    borderRadius: radius.sm,
     backgroundColor: colors.accentSoft,
     alignItems: 'center',
     justifyContent: 'center',
@@ -565,263 +325,138 @@ const styles = StyleSheet.create({
   continueTextWrap: {
     flex: 1,
   },
-  continueMiniBadge: {
+  continueTag: {
     letterSpacing: 0.8,
+    fontSize: 10,
   },
-  continueBookTitle: {
+  continueTitle: {
     fontSize: 15,
     marginTop: 1,
   },
+  continueActionBtn: {
+    backgroundColor: colors.accent,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: radius.full,
+  },
 
-  // Hero Spotlight Card
-  spotlightCard: {
+  // Root Word Card
+  rootCard: {
     backgroundColor: '#FFFFFF',
     padding: spacing.md,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(217, 119, 6, 0.25)',
+    borderColor: 'rgba(15, 23, 42, 0.06)',
   },
-  spotlightBadgeRow: {
+  cardSectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 4,
+    marginBottom: 6,
   },
-  spotlightPill: {
+  sectionBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
     backgroundColor: colors.accentSoft,
     paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: radius.sm,
+  },
+  badgeText: {
+    fontSize: 10,
+    letterSpacing: 0.6,
+  },
+  rootWordRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginVertical: 4,
+  },
+  rootWordLeft: {
+    gap: 1,
+  },
+  rootWord: {
+    fontSize: 20,
+    fontWeight: '800',
+  },
+  rootCategoryTag: {
+    backgroundColor: 'rgba(15, 23, 42, 0.04)',
+    paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: radius.sm,
   },
-  spotlightTitle: {
-    color: colors.textPrimary,
-    fontSize: 18,
-    marginTop: 4,
-    marginBottom: spacing.sm,
-  },
-  lexiconBox: {
-    backgroundColor: 'rgba(15, 23, 42, 0.03)',
-    borderRadius: radius.sm,
-    padding: spacing.sm,
-    marginBottom: spacing.sm,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.accent,
-  },
-  lexiconHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  lexiconTranslit: {
-    marginTop: 2,
-  },
-  lexiconDef: {
-    fontStyle: 'italic',
-    marginTop: 4,
-    fontSize: 13,
-  },
-  spotlightContext: {
-    fontSize: 13,
-    lineHeight: 19,
-    marginBottom: spacing.md,
-  },
-  spotlightFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: 4,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(15, 23, 42, 0.05)',
-  },
-  spotlightReadBtn: {
-    backgroundColor: colors.accent,
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderRadius: radius.full,
-  },
-  spotlightShareBtn: {
-    padding: 7,
-    borderRadius: radius.full,
-    backgroundColor: colors.accentSoft,
-  },
-
-  // Filters
-  filterSection: {
-    marginBottom: spacing.sm,
-  },
-  feedHeading: {
-    letterSpacing: 1.2,
-    marginBottom: 4,
-  },
-  filterPillsContainer: {
-    gap: 6,
-    paddingVertical: 4,
-  },
-  filterPill: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: radius.full,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
-  },
-  filterPillActive: {
-    backgroundColor: colors.accent,
-    borderColor: colors.accent,
-  },
-  filterPillText: {
-    color: colors.textSecondary,
-    fontSize: 12,
-  },
-  filterPillTextActive: {
-    color: '#FFFFFF',
-  },
-
-  // Feed Cards
-  feedList: {
-    gap: 12,
-  },
-  feedFactCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
-  },
-  cardHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 6,
-  },
-  categoryBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: radius.sm,
-  },
-  categoryBadgeText: {
-    fontSize: 10,
-  },
-  factCardTitle: {
-    color: colors.textPrimary,
-    fontSize: 16,
-    marginBottom: 6,
-  },
-  verseQuoteBox: {
+  rootDefBox: {
     backgroundColor: 'rgba(15, 23, 42, 0.02)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
     borderRadius: radius.sm,
-    marginBottom: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginVertical: 6,
     borderLeftWidth: 2,
     borderLeftColor: colors.accent,
   },
-  verseQuoteText: {
-    fontStyle: 'italic',
-    fontSize: 12,
-    color: colors.textPrimary,
-  },
-  factContextText: {
+  rootDefText: {
     fontSize: 13,
-    lineHeight: 18,
-    marginBottom: 8,
+    fontStyle: 'italic',
   },
-  cardBottomRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: 6,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(15, 23, 42, 0.04)',
-  },
-  readMoreLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  cardActionIcons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  iconBtn: {
-    padding: 2,
+  rootContextSnippet: {
+    lineHeight: 16,
+    marginTop: 2,
   },
 
-  // Scholar Card
-  feedScholarCard: {
+  // Discovery Card
+  discoveryCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: radius.lg,
     padding: spacing.md,
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.06)',
   },
-  scholarHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 8,
-  },
-  scholarAvatarCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.full,
-    backgroundColor: colors.accentSoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scholarInfoWrap: {
-    flex: 1,
-  },
-  scholarName: {
-    fontSize: 14,
+  discoveryTitle: {
+    fontSize: 16,
     color: colors.textPrimary,
+    marginTop: 4,
+    marginBottom: 6,
   },
-  scholarBadge: {
-    width: 28,
-    height: 28,
-    borderRadius: radius.full,
-    backgroundColor: 'rgba(15, 23, 42, 0.04)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scholarQuoteCard: {
+  discoveryVerseBox: {
     backgroundColor: colors.accentSoft,
-    borderRadius: radius.md,
-    padding: spacing.sm,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: radius.sm,
     marginBottom: 8,
   },
-  scholarQuoteHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 2,
-  },
-  scholarVerseText: {
+  discoveryVerseText: {
     fontStyle: 'italic',
     fontSize: 12,
     color: colors.textPrimary,
-    lineHeight: 17,
   },
-  scholarNoteText: {
-    fontSize: 11,
-    marginTop: 4,
-    lineHeight: 15,
+  discoveryContext: {
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: spacing.md,
   },
-  scholarFooterRow: {
+  cardActionsBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 4,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(15, 23, 42, 0.05)',
   },
-  viewScholarBtn: {
-    paddingVertical: 2,
+  nextDiscoveryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: colors.accentSoft,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: radius.full,
+  },
+  actionIconsRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  iconBtn: {
+    padding: 2,
   },
 });
