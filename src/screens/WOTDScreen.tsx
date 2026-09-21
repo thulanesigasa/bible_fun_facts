@@ -442,47 +442,42 @@ export default function WOTDScreen() {
                 </TouchableOpacity>
               </View>
             ) : (
-              /* ── Inline Scripture Flow (YouVersion style) ── */
-              <View style={styles.versesFlow}>
+              /* ── YouVersion inline paragraph flow ── */
+              <Text
+                style={[
+                  styles.scriptureParagraph,
+                  {
+                    fontSize: fontSize,
+                    fontFamily: getFontFamily(fontType),
+                    lineHeight: fontSize * 1.75,
+                    color: theme.text,
+                  },
+                ]}
+              >
                 {chapterData?.verses.map((v: BibleVerse) => {
                   const isSelected = selectedVerses.includes(v.verse);
                   const hlColor = bibleHighlights[verseKey(v.verse)];
+                  const isFav = isScriptureFavorited(`bible_${selectedBook.id}_${selectedChapter}_${v.verse}`);
                   return (
-                    <TouchableOpacity
+                    <Text
                       key={v.verse}
-                      activeOpacity={0.7}
                       onPress={() => toggleVerseSelection(v.verse)}
                       style={[
-                        styles.verseBlock,
-                        isSelected && styles.verseBlockSelected,
+                        isSelected && { backgroundColor: '#FDD22333' },
                         hlColor ? { backgroundColor: hlColor + '55' } : null,
                       ]}
                     >
-                      {/* Superscript verse number */}
-                      <Text style={[styles.verseSuper, { color: colors.accent }]}>{v.verse}</Text>
-                      <Text
-                        style={[
-                          styles.verseBodyInline,
-                          {
-                            fontSize: fontSize,
-                            fontFamily: getFontFamily(fontType),
-                            lineHeight: fontSize * 1.65,
-                            color: theme.text,
-                          },
-                        ]}
-                      >
-                        {v.text.trim()}
-                        {isScriptureFavorited(`bible_${selectedBook.id}_${selectedChapter}_${v.verse}`) && (
-                          <Text style={{ color: colors.accent }}> ♥</Text>
-                        )}
+                      {/* Inline [N] verse number */}
+                      <Text style={[styles.verseNumInline, { color: colors.accent }]}>
+                        [{v.verse}]
                       </Text>
-                      {hlColor && (
-                        <View style={[styles.hlUnderline, { backgroundColor: hlColor }]} />
-                      )}
-                    </TouchableOpacity>
+                      {v.text.trim()}
+                      {isFav ? <Text style={{ color: colors.accent }}>♥</Text> : null}
+                      {'  '}
+                    </Text>
                   );
                 })}
-              </View>
+              </Text>
             )}
 
             {/* ── Chapter Stepper ── */}
@@ -926,42 +921,13 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 
-  // Verse flow
-  versesFlow: {
-    gap: 2,
+  // Verse inline paragraph
+  scriptureParagraph: {
+    // base text style — overridden inline with fontSize/fontFamily/color
   },
-  verseBlock: {
-    paddingVertical: 6,
-    paddingHorizontal: 8,
-    borderRadius: 6,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'flex-start',
-    position: 'relative',
-  },
-  verseBlockSelected: {
-    backgroundColor: '#FDD22330',
-  },
-  verseSuper: {
-    fontSize: 10,
+  verseNumInline: {
     fontWeight: '700',
-    lineHeight: 20,
-    marginRight: 5,
-    marginTop: 2,
-    minWidth: 20,
-  },
-  verseBodyInline: {
-    flex: 1,
-    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
-  },
-  hlUnderline: {
-    position: 'absolute',
-    bottom: 0,
-    left: 8,
-    right: 8,
-    height: 2,
-    borderRadius: 1,
-    opacity: 0.6,
+    fontSize: 11,
   },
 
   // ── Loader / Error ──────────────────────────────────────────────────────────
