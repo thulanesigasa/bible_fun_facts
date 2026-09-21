@@ -1,37 +1,117 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Switch,
   Alert,
   Image,
   ActivityIndicator,
+  Animated,
+  PanResponder,
+  Platform,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
-import { Card } from '../components/Card';
 import { useUser } from '../context/UserContext';
 import {
   ProfileSvg,
   CameraSvg,
   BookmarkSvg,
-  SettingsSvg,
   FlameSvg,
   StrongsIconSvg,
   BellSvg,
-  GlobeSvg,
   ChevronRightSvg,
   LogOutSvg,
   CheckSvg,
   BookOpenSvg,
   ShieldCheckSvg,
+  FontSizeSvg,
+  TypeSvg,
+  UsersSvg,
+  UserCheckSvg,
 } from '../components/SvgIcons';
+
+// ============================================================================
+// UIVERSE-INSPIRED ANIMATED SLIDING PILL SWITCH (BY NAMECHO)
+// ============================================================================
+interface UiverseSwitchProps {
+  value: boolean;
+  onValueChange: (val: boolean) => void;
+}
+
+const UiverseSwitch: React.FC<UiverseSwitchProps> = ({ value, onValueChange }) => {
+  const animatedValue = useRef(new Animated.Value(value ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.timing(animatedValue, {
+      toValue: value ? 1 : 0,
+      duration: 250,
+      useNativeDriver: false,
+    }).start();
+  }, [value, animatedValue]);
+
+  const toggle = () => {
+    onValueChange(!value);
+  };
+
+  // Button width: 52px, Height: 30px, Toggle diameter: 24px, Offset: 3px
+  const translateX = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [3, 25],
+  });
+
+  const backgroundColor = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['#CBD5E1', colors.accent],
+  });
+
+  return (
+    <TouchableOpacity
+      activeOpacity={0.85}
+      onPress={toggle}
+      style={styles.switchWrapper}
+      accessibilityRole="switch"
+      accessibilityState={{ checked: value }}
+    >
+      <Animated.View style={[styles.uiverseTrack, { backgroundColor }]}>
+        <Animated.View
+          style={[
+            styles.uiverseThumb,
+            shadow.sm,
+            {
+              transform: [{ translateX }],
+            },
+          ]}
+        />
+      </Animated.View>
+    </TouchableOpacity>
+  );
+};
+
+// ============================================================================
+// FONT SIZES & TYPOGRAPHY PRESETS
+// ============================================================================
+const FONT_SIZE_STEPS = [12, 14, 16, 18, 20, 22, 24];
+
+interface FontTypeOption {
+  key: 'serif' | 'sans' | 'system' | 'mono';
+  label: string;
+  subtitle: string;
+  fontFamily?: string;
+}
+
+const FONT_TYPE_OPTIONS: FontTypeOption[] = [
+  { key: 'serif', label: 'Classical Serif', subtitle: 'Biblical Exegesis', fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif' },
+  { key: 'sans', label: 'Modern Sans', subtitle: 'Clean & Neutral', fontFamily: Platform.OS === 'ios' ? 'Helvetica Neue' : 'sans-serif' },
+  { key: 'system', label: 'System Default', subtitle: 'Native UI Type', fontFamily: undefined },
+  { key: 'mono', label: 'Monospace', subtitle: 'Concordance & Lexicon', fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'monospace' },
+];
 
 export default function ProfileScreen({ navigation }: { navigation: any }) {
   const {
@@ -51,8 +131,9 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     userProfile?.notificationsEnabled ?? true
   );
 
-  const translations = ['ESV', 'KJV', 'NASB', 'NIV'];
-  const currentTranslation = userProfile?.preferredTranslation || 'ESV';
+  // Reader Settings State
+  const currentFontSize = userProfile?.fontSize || 16;
+  const currentFontType = userProfile?.fontType || 'serif';
 
   const totalSaved =
     favoritesFacts.length + favoritesScriptures.length + completedWOTDs.length;
@@ -62,25 +143,21 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     updateProfile({ notificationsEnabled: val });
   };
 
-  const handleSelectTranslation = (trans: string) => {
-    updateProfile({ preferredTranslation: trans });
+  const handleSelectFontSize = (size: number) => {
+    updateProfile({ fontSize: size });
   };
 
-  const handleSignOut = () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out of your exégeomai account?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Sign Out',
-          style: 'destructive',
-          onPress: () => logout(),
-        },
-      ]
-    );
+  const handleCycleFontSize = () => {
+    const cycle = [14, 16, 18, 20, 22];
+    const nextIdx = (cycle.indexOf(currentFontSize) + 1) % cycle.length;
+    handleSelectFontSize(cycle[nextIdx]);
   };
 
+  const handleSelectFontType = (type: 'serif' | 'sans' | 'system' | 'mono') => {
+    updateProfile({ fontType: type });
+  };
+
+  // Avatar Photo Picker
   const handlePickAvatar = async () => {
     try {
       const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -103,7 +180,6 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
         setIsUploading(true);
         const originalUri = result.assets[0].uri;
 
-        // Compress and optimize image to lightweight format (AVIF/WebP) to minimize storage consumption
         const manipResult = await ImageManipulator.manipulateAsync(
           originalUri,
           [{ resize: { width: 360, height: 360 } }],
@@ -114,7 +190,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
         if (uploadRes.success) {
           Alert.alert(
             'Profile Photo Updated',
-            'Your profile image has been compressed to a lightweight AVIF format and saved.'
+            'Your profile image has been compressed and updated.'
           );
         } else {
           Alert.alert('Upload Notice', uploadRes.error || 'Failed to update avatar image.');
@@ -127,9 +203,92 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     }
   };
 
+  // ============================================================================
+  // SWIPE TO SIGN OUT GESTURE CONTROLLER
+  // ============================================================================
+  const swipeTrackWidth = 280;
+  const thumbDiameter = 44;
+  const maxDrag = swipeTrackWidth - thumbDiameter - 8; // 228px runway
+  const panX = useRef(new Animated.Value(0)).current;
+  const isTriggered = useRef(false);
+
+  const resetSwipe = useCallback(() => {
+    isTriggered.current = false;
+    Animated.spring(panX, {
+      toValue: 0,
+      tension: 50,
+      friction: 8,
+      useNativeDriver: true,
+    }).start();
+  }, [panX]);
+
+  useFocusEffect(
+    useCallback(() => {
+      resetSwipe();
+    }, [resetSwipe])
+  );
+
+  const triggerSignOut = () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out of your exégeomai account?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+          onPress: resetSwipe,
+        },
+        {
+          text: 'Sign Out',
+          style: 'destructive',
+          onPress: () => logout(),
+        },
+      ]
+    );
+  };
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, gestureState) => Math.abs(gestureState.dx) > 5,
+      onPanResponderMove: (_, gestureState) => {
+        if (isTriggered.current) return;
+        const clamped = Math.max(0, Math.min(maxDrag, gestureState.dx));
+        panX.setValue(clamped);
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        if (isTriggered.current) return;
+        if (gestureState.dx >= maxDrag * 0.65) {
+          isTriggered.current = true;
+          Animated.timing(panX, {
+            toValue: maxDrag,
+            duration: 150,
+            useNativeDriver: true,
+          }).start(() => {
+            triggerSignOut();
+          });
+        } else {
+          resetSwipe();
+        }
+      },
+    })
+  ).current;
+
+  // Sign out text opacity fades out as thumb is dragged
+  const signOutTextOpacity = panX.interpolate({
+    inputRange: [0, maxDrag * 0.5],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
   const displayName = userProfile?.name || 'Believer';
   const displayEmail = userProfile?.email || 'user@exegeomai.org';
   const displayJoined = userProfile?.joinedDate || 'September 2026';
+  const followersCount = userProfile?.followersCount ?? 248;
+  const followingCount = userProfile?.followingCount ?? 182;
+
+  // Selected Font Family helper
+  const selectedFamily = FONT_TYPE_OPTIONS.find(o => o.key === currentFontType)?.fontFamily;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
@@ -138,8 +297,10 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
       >
-        {/* User Identity Card with AVIF Profile Picture & Camera Upload */}
-        <Card style={styles.userCard}>
+        {/* ================================================================ */}
+        {/* PROFILE IDENTITY SECTION (PRESERVED TOP HEADER)                   */}
+        {/* ================================================================ */}
+        <View style={styles.profileHeader}>
           <View style={styles.userRow}>
             <View style={styles.avatarWrapper}>
               <TouchableOpacity
@@ -151,7 +312,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                 {userProfile?.avatarUrl ? (
                   <Image source={{ uri: userProfile.avatarUrl }} style={styles.avatarImage} />
                 ) : (
-                  <ProfileSvg size={32} color={colors.accent} strokeWidth={2} />
+                  <ProfileSvg size={34} color={colors.accent} strokeWidth={2} />
                 )}
                 {isUploading && (
                   <View style={styles.avatarLoadingOverlay}>
@@ -186,100 +347,211 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
               </Text>
             </View>
           </View>
-        </Card>
 
-        {/* Study Journey & Exegesis Preferences */}
-        {(userProfile?.studyFocus || userProfile?.dailyGoal) && (
-          <Card style={styles.focusCard}>
-            <View style={styles.focusHeaderRow}>
-              <Text variant="h3" style={styles.focusTitle}>Personalized Exegesis</Text>
+          {/* Social Stats & Study Metrics Bar */}
+          <View style={styles.socialStatsBar}>
+            <View style={styles.statColumn}>
+              <Text variant="h3" style={styles.statValue}>
+                {followersCount}
+              </Text>
+              <Text variant="caption" color={colors.textSecondary} style={styles.statLabel}>
+                Followers
+              </Text>
             </View>
-            <View style={styles.focusDetails}>
-              {userProfile.studyFocus && (
-                <View style={styles.focusItem}>
-                  <Text variant="caption" color={colors.textSecondary}>EXEGESIS FOCUS</Text>
-                  <Text variant="body" weight="700" color={colors.textPrimary}>{userProfile.studyFocus}</Text>
-                </View>
-              )}
-              {userProfile.dailyGoal && (
-                <View style={[styles.focusItem, { marginTop: spacing.sm }]}>
-                  <Text variant="caption" color={colors.textSecondary}>DAILY CADENCE</Text>
-                  <Text variant="body" weight="700" color={colors.textPrimary}>{userProfile.dailyGoal}</Text>
-                </View>
-              )}
-            </View>
-          </Card>
-        )}
 
-        {/* Study Journey Metrics */}
-        <View style={styles.metricsRow}>
-          <Card style={[styles.metricCard, { marginRight: spacing.sm }]}>
-            <View style={styles.metricIconBox}>
-              <FlameSvg size={20} color={colors.accent} fill={colors.accent} />
-            </View>
-            <Text variant="h2" style={styles.metricValue}>
-              {streak} Days
-            </Text>
-            <Text variant="caption" color={colors.textSecondary}>
-              Study Streak
-            </Text>
-          </Card>
+            <View style={styles.statDivider} />
 
-          <Card style={[styles.metricCard, { marginLeft: spacing.sm }]}>
-            <View style={styles.metricIconBox}>
-              <StrongsIconSvg size={20} color={colors.accent} strokeWidth={2} />
+            <View style={styles.statColumn}>
+              <Text variant="h3" style={styles.statValue}>
+                {followingCount}
+              </Text>
+              <Text variant="caption" color={colors.textSecondary} style={styles.statLabel}>
+                Following
+              </Text>
             </View>
-            <Text variant="h2" style={styles.metricValue}>
-              {factsViewedCount}
-            </Text>
-            <Text variant="caption" color={colors.textSecondary}>
-              Facts Unfolded
-            </Text>
-          </Card>
-        </View>
 
-        {/* Saved Collection Section */}
-        <View style={styles.section}>
-          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
-            SAVED CONTENT
-          </Text>
-          <TouchableOpacity
-            style={[styles.actionCard, shadow.sm]}
-            onPress={() => navigation.navigate('Favorites')}
-            activeOpacity={0.8}
-          >
-            <View style={styles.actionCardLeft}>
-              <View style={styles.iconCircle}>
-                <BookmarkSvg size={20} color={colors.accent} fill={colors.accent} />
-              </View>
-              <View>
-                <Text variant="h3" style={{ color: colors.textPrimary }}>
-                  Saved Collection
-                </Text>
-                <Text variant="caption" color={colors.textSecondary}>
-                  {totalSaved} items persisted offline
+            <View style={styles.statDivider} />
+
+            <View style={styles.statColumn}>
+              <View style={styles.statIconRow}>
+                <FlameSvg size={14} color={colors.accent} fill={colors.accent} />
+                <Text variant="h3" style={[styles.statValue, { marginLeft: 4 }]}>
+                  {streak}
                 </Text>
               </View>
+              <Text variant="caption" color={colors.textSecondary} style={styles.statLabel}>
+                Streak
+              </Text>
             </View>
-            <ChevronRightSvg size={20} color="#94A3B8" />
-          </TouchableOpacity>
+
+            <View style={styles.statDivider} />
+
+            <View style={styles.statColumn}>
+              <View style={styles.statIconRow}>
+                <StrongsIconSvg size={14} color={colors.accent} strokeWidth={2} />
+                <Text variant="h3" style={[styles.statValue, { marginLeft: 4 }]}>
+                  {factsViewedCount}
+                </Text>
+              </View>
+              <Text variant="caption" color={colors.textSecondary} style={styles.statLabel}>
+                Unfolded
+              </Text>
+            </View>
+          </View>
         </View>
 
-        {/* Study Preferences Section */}
-        <View style={styles.section}>
-          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
-            STUDY PREFERENCES
-          </Text>
+        {/* ================================================================ */}
+        {/* CONTINUOUS CLEAN BODY SURFACE (ZERO CARD/DIV CONTAINERS)          */}
+        {/* ================================================================ */}
+        <View style={styles.cleanBodyContainer}>
+          {/* 1. READING & TYPOGRAPHY SETTINGS */}
+          <View style={styles.bodySection}>
+            <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+              READING & TYPOGRAPHY
+            </Text>
 
-          {/* Notifications Toggle */}
-          <Card style={styles.settingCard}>
-            <View style={styles.settingRow}>
-              <View style={styles.settingLabelBox}>
-                <View style={styles.iconCircle}>
-                  <BellSvg size={20} color={colors.accent} />
+            {/* Font Size Row: Scroller + Numeric Selector Badge */}
+            <View style={styles.settingRowBlock}>
+              <View style={styles.rowHeader}>
+                <View style={styles.rowIconCircle}>
+                  <FontSizeSvg size={18} color={colors.accent} />
                 </View>
-                <View>
-                  <Text variant="h3" style={{ color: colors.textPrimary }}>
+                <View style={styles.rowTitleBox}>
+                  <Text variant="h3" style={styles.rowTitle}>
+                    Reading Font Size
+                  </Text>
+                  <Text variant="caption" color={colors.textSecondary}>
+                    Adjust Scripture & fact readability
+                  </Text>
+                </View>
+                {/* Numeric Selector Badge (Right Side) */}
+                <TouchableOpacity
+                  style={styles.fontSizeBadge}
+                  onPress={handleCycleFontSize}
+                  activeOpacity={0.75}
+                  accessibilityLabel={`Current font size ${currentFontSize}px, tap to cycle`}
+                >
+                  <Text variant="caption" weight="700" color={colors.accent}>
+                    {currentFontSize}px
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Horizontal Slider / Scroller from Left to Right */}
+              <View style={styles.sliderContainer}>
+                <Text variant="caption" weight="700" color={colors.textTertiary} style={styles.sliderMinLabel}>
+                  A
+                </Text>
+                <View style={styles.stepperTrack}>
+                  {FONT_SIZE_STEPS.map((stepSize) => {
+                    const isSelected = currentFontSize === stepSize;
+                    return (
+                      <TouchableOpacity
+                        key={stepSize}
+                        style={styles.stepTouchTarget}
+                        onPress={() => handleSelectFontSize(stepSize)}
+                        activeOpacity={0.7}
+                      >
+                        <View
+                          style={[
+                            styles.stepDot,
+                            isSelected && styles.stepDotActive,
+                          ]}
+                        />
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                <Text variant="h3" weight="800" color={colors.textPrimary} style={styles.sliderMaxLabel}>
+                  A
+                </Text>
+              </View>
+
+              {/* Real-time Scripture Preview Box */}
+              <View style={styles.previewBox}>
+                <Text
+                  style={[
+                    styles.previewText,
+                    {
+                      fontSize: currentFontSize,
+                      lineHeight: currentFontSize * 1.5,
+                      fontFamily: selectedFamily,
+                    },
+                  ]}
+                >
+                  “For God so loved the world, that He gave His only begotten Son, that whoever believes in Him should not perish but have everlasting life.”
+                </Text>
+                <Text variant="caption" color={colors.accent} weight="700" style={styles.previewCite}>
+                  John 3:16 • {currentFontSize}px {FONT_TYPE_OPTIONS.find(o => o.key === currentFontType)?.label}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.rowDivider} />
+
+            {/* Typography Style Row */}
+            <View style={styles.settingRowBlock}>
+              <View style={styles.rowHeader}>
+                <View style={styles.rowIconCircle}>
+                  <TypeSvg size={18} color={colors.accent} />
+                </View>
+                <View style={styles.rowTitleBox}>
+                  <Text variant="h3" style={styles.rowTitle}>
+                    Typography Style
+                  </Text>
+                  <Text variant="caption" color={colors.textSecondary}>
+                    Choose primary reader typeface
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.fontTypePillsRow}>
+                {FONT_TYPE_OPTIONS.map((opt) => {
+                  const isSelected = currentFontType === opt.key;
+                  return (
+                    <TouchableOpacity
+                      key={opt.key}
+                      style={[
+                        styles.fontTypePill,
+                        isSelected && styles.fontTypePillActive,
+                      ]}
+                      onPress={() => handleSelectFontType(opt.key)}
+                      activeOpacity={0.8}
+                    >
+                      <Text
+                        variant="caption"
+                        weight={isSelected ? '700' : '500'}
+                        style={[
+                          styles.fontTypePillText,
+                          isSelected && styles.fontTypePillTextActive,
+                          opt.fontFamily ? { fontFamily: opt.fontFamily } : undefined,
+                        ]}
+                      >
+                        {opt.label}
+                      </Text>
+                      {isSelected && (
+                        <CheckSvg size={13} color="#FFFFFF" strokeWidth={3} style={{ marginLeft: 4 }} />
+                      )}
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+          </View>
+
+          {/* 2. NOTIFICATIONS & CADENCE */}
+          <View style={styles.bodySection}>
+            <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+              NOTIFICATIONS
+            </Text>
+
+            <View style={styles.actionRow}>
+              <View style={styles.actionRowLeft}>
+                <View style={styles.rowIconCircle}>
+                  <BellSvg size={18} color={colors.accent} />
+                </View>
+                <View style={styles.rowTitleBox}>
+                  <Text variant="h3" style={styles.rowTitle}>
                     Daily Devotional Reminder
                   </Text>
                   <Text variant="caption" color={colors.textSecondary}>
@@ -287,157 +559,144 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                   </Text>
                 </View>
               </View>
-              <Switch
+              <UiverseSwitch
                 value={notifications}
                 onValueChange={handleToggleNotifications}
-                trackColor={{ false: '#CBD5E1', true: colors.accent }}
-                thumbColor="#FFFFFF"
               />
             </View>
-          </Card>
+          </View>
 
-          {/* Translation Selection */}
-          <Card style={[styles.settingCard, { marginTop: spacing.md }]}>
-            <View style={styles.translationHeader}>
-              <View style={styles.iconCircle}>
-                <GlobeSvg size={20} color={colors.accent} />
-              </View>
-              <View>
-                <Text variant="h3" style={{ color: colors.textPrimary }}>
-                  Default Scripture Translation
-                </Text>
-                <Text variant="caption" color={colors.textSecondary}>
-                  Select your primary study version
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.translationChips}>
-              {translations.map(t => {
-                const isSelected = currentTranslation === t;
-                return (
-                  <TouchableOpacity
-                    key={t}
-                    style={[
-                      styles.translationChip,
-                      isSelected && styles.translationChipActive,
-                    ]}
-                    onPress={() => handleSelectTranslation(t)}
-                    activeOpacity={0.8}
-                  >
-                    <Text
-                      variant="caption"
-                      weight={isSelected ? '700' : '500'}
-                      style={[
-                        styles.translationChipText,
-                        isSelected && styles.translationChipTextActive,
-                      ]}
-                    >
-                      {t}
-                    </Text>
-                    {isSelected && (
-                      <CheckSvg size={14} color="#FFFFFF" strokeWidth={3} style={{ marginLeft: 4 }} />
-                    )}
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </Card>
-        </View>
-
-        {/* Legal & Privacy Section */}
-        <View style={styles.section}>
-          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
-            LEGAL & PRIVACY
-          </Text>
-          <TouchableOpacity
-            style={[styles.actionCard, shadow.sm, { marginBottom: spacing.sm }]}
-            onPress={() => navigation.navigate('TermsOfService')}
-            activeOpacity={0.8}
-          >
-            <View style={styles.actionCardLeft}>
-              <View style={styles.iconCircle}>
-                <BookOpenSvg size={20} color={colors.accent} />
-              </View>
-              <View>
-                <Text variant="h3" style={{ color: colors.textPrimary }}>
-                  Terms of Service
-                </Text>
-                <Text variant="caption" color={colors.textSecondary}>
-                  Theological integrity & terms of usage
-                </Text>
-              </View>
-            </View>
-            <ChevronRightSvg size={20} color="#94A3B8" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.actionCard, shadow.sm]}
-            onPress={() => navigation.navigate('PrivacyPolicy')}
-            activeOpacity={0.8}
-          >
-            <View style={styles.actionCardLeft}>
-              <View style={styles.iconCircle}>
-                <ShieldCheckSvg size={20} color={colors.accent} />
-              </View>
-              <View>
-                <Text variant="h3" style={{ color: colors.textPrimary }}>
-                  Privacy Policy
-                </Text>
-                <Text variant="caption" color={colors.textSecondary}>
-                  Zero ad-trackers & encrypted persistence
-                </Text>
-              </View>
-            </View>
-            <ChevronRightSvg size={20} color="#94A3B8" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Application Information */}
-        <View style={styles.section}>
-          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
-            APPLICATION
-          </Text>
-          <Card style={styles.aboutCard}>
-            <View style={styles.aboutRow}>
-              <Text variant="body" color={colors.textSecondary}>
-                Outer Release
-              </Text>
-              <Text variant="h3" style={{ color: colors.textPrimary }}>
-                v1.0.2
-              </Text>
-            </View>
-            <View style={[styles.aboutRow, { marginTop: spacing.sm }]}>
-              <Text variant="body" color={colors.textSecondary}>
-                OTA Runtime
-              </Text>
-              <Text variant="caption" color={colors.accent} style={{ fontWeight: '700' }}>
-                v1.0.1 (Active Continuous Updates)
-              </Text>
-            </View>
-            <View style={[styles.aboutRow, { marginTop: spacing.sm }]}>
-              <Text variant="body" color={colors.textSecondary}>
-                Architecture
-              </Text>
-              <Text variant="caption" color={colors.textTertiary}>
-                React Native & Expo OTA (Rule 21)
-              </Text>
-            </View>
-          </Card>
-        </View>
-
-        {/* Sign Out Action */}
-        <View style={styles.section}>
-          <TouchableOpacity
-            style={[styles.signOutBtn, shadow.sm]}
-            onPress={handleSignOut}
-            activeOpacity={0.8}
-          >
-            <LogOutSvg size={20} color="#EF4444" strokeWidth={2} />
-            <Text variant="h3" style={styles.signOutText}>
-              Sign Out
+          {/* 3. SAVED CONTENT */}
+          <View style={styles.bodySection}>
+            <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+              SAVED CONTENT
             </Text>
-          </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.actionRow}
+              onPress={() => navigation.navigate('Favorites')}
+              activeOpacity={0.75}
+            >
+              <View style={styles.actionRowLeft}>
+                <View style={styles.rowIconCircle}>
+                  <BookmarkSvg size={18} color={colors.accent} fill={colors.accent} />
+                </View>
+                <View style={styles.rowTitleBox}>
+                  <Text variant="h3" style={styles.rowTitle}>
+                    Saved Collection
+                  </Text>
+                  <Text variant="caption" color={colors.textSecondary}>
+                    {totalSaved} items persisted offline
+                  </Text>
+                </View>
+              </View>
+              <ChevronRightSvg size={18} color="#94A3B8" />
+            </TouchableOpacity>
+          </View>
+
+          {/* 4. LEGAL & POLICIES */}
+          <View style={styles.bodySection}>
+            <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+              LEGAL & POLICIES
+            </Text>
+
+            <TouchableOpacity
+              style={styles.actionRow}
+              onPress={() => navigation.navigate('PrivacyPolicy')}
+              activeOpacity={0.75}
+            >
+              <View style={styles.actionRowLeft}>
+                <View style={styles.rowIconCircle}>
+                  <ShieldCheckSvg size={18} color={colors.accent} />
+                </View>
+                <View style={styles.rowTitleBox}>
+                  <Text variant="h3" style={styles.rowTitle}>
+                    Privacy Policy
+                  </Text>
+                  <Text variant="caption" color={colors.textSecondary}>
+                    Zero ad-trackers & encrypted persistence
+                  </Text>
+                </View>
+              </View>
+              <ChevronRightSvg size={18} color="#94A3B8" />
+            </TouchableOpacity>
+
+            <View style={styles.rowDivider} />
+
+            <TouchableOpacity
+              style={styles.actionRow}
+              onPress={() => navigation.navigate('TermsOfService')}
+              activeOpacity={0.75}
+            >
+              <View style={styles.actionRowLeft}>
+                <View style={styles.rowIconCircle}>
+                  <BookOpenSvg size={18} color={colors.accent} />
+                </View>
+                <View style={styles.rowTitleBox}>
+                  <Text variant="h3" style={styles.rowTitle}>
+                    Terms of Service
+                  </Text>
+                  <Text variant="caption" color={colors.textSecondary}>
+                    Theological integrity & terms of usage
+                  </Text>
+                </View>
+              </View>
+              <ChevronRightSvg size={18} color="#94A3B8" />
+            </TouchableOpacity>
+          </View>
+
+          {/* 5. ACCOUNT (SWIPE TO SIGN OUT) */}
+          <View style={styles.bodySection}>
+            <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+              ACCOUNT
+            </Text>
+
+            <View style={styles.swipeSignOutContainer}>
+              <View style={styles.swipeTrack}>
+                {/* Flowing Drag Trail Fill */}
+                <Animated.View
+                  style={[
+                    styles.swipeProgressFill,
+                    {
+                      width: panX.interpolate({
+                        inputRange: [0, maxDrag],
+                        outputRange: [thumbDiameter + 4, swipeTrackWidth],
+                        extrapolate: 'clamp',
+                      }),
+                    },
+                  ]}
+                />
+
+                {/* Centered Track Label */}
+                <Animated.View
+                  style={[
+                    styles.swipeTextWrapper,
+                    {
+                      opacity: signOutTextOpacity,
+                    },
+                  ]}
+                >
+                  <Text variant="caption" weight="700" color="#EF4444" style={styles.swipeSignOutText}>
+                    {'Swipe to Sign Out >>'}
+                  </Text>
+                </Animated.View>
+
+                {/* Draggable Red Thumb Button */}
+                <Animated.View
+                  style={[
+                    styles.swipeThumb,
+                    shadow.sm,
+                    {
+                      transform: [{ translateX: panX }],
+                    },
+                  ]}
+                  {...panResponder.panHandlers}
+                >
+                  <LogOutSvg size={18} color="#FFFFFF" strokeWidth={2.2} />
+                </Animated.View>
+              </View>
+            </View>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -447,17 +706,24 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.background, // 60% Dominant Canvas #F8FAFC
   },
   scroll: {
     flex: 1,
   },
   contentContainer: {
     paddingHorizontal: spacing.md, // 16px
-    paddingTop: spacing.lg,        // 24px
-    paddingBottom: 96,             // Bottom content clearance for 50px pill tab bar
+    paddingTop: spacing.md,        // 16px
+    paddingBottom: 96,             // Clearance for 50px pill bottom tab bar
   },
-  userCard: {
+
+  // Profile Identity Header (Preserved)
+  profileHeader: {
+    backgroundColor: colors.surface, // 30% Panel #FFFFFF
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
     marginBottom: spacing.md,
   },
   userRow: {
@@ -466,14 +732,14 @@ const styles = StyleSheet.create({
   },
   avatarWrapper: {
     position: 'relative',
-    width: 68,
-    height: 68,
+    width: 64,
+    height: 64,
     marginRight: spacing.md,
   },
   avatarContainer: {
-    width: 68,
-    height: 68,
-    borderRadius: 34,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     backgroundColor: 'rgba(217, 119, 6, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -482,12 +748,16 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   avatarImage: {
-    width: 68,
-    height: 68,
-    borderRadius: 34,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
   },
   avatarLoadingOverlay: {
-    ...StyleSheet.absoluteFill,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: 'rgba(15, 23, 42, 0.5)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -496,9 +766,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -2,
     right: -2,
-    width: 26,
-    height: 26,
-    borderRadius: 13,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
@@ -516,145 +786,269 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   userEmail: {
-    fontSize: 14,
+    fontSize: 13,
     marginTop: 2,
   },
   userJoined: {
-    fontSize: 12,
-    marginTop: 4,
+    fontSize: 11,
+    marginTop: 3,
   },
-  focusCard: {
-    marginBottom: spacing.md,
-  },
-  focusHeaderRow: {
-    marginBottom: spacing.sm,
-  },
-  focusTitle: {
-    fontSize: 15,
-    color: colors.textPrimary,
-  },
-  focusDetails: {
+
+  // Integrated Social Stats Bar
+  socialStatsBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: colors.surfaceSecondary,
     borderRadius: radius.md,
-    padding: spacing.md,
+    marginTop: spacing.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: 4,
   },
-  focusItem: {},
-  metricsRow: {
-    flexDirection: 'row',
-    marginBottom: spacing.md,
-  },
-  metricCard: {
+  statColumn: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: spacing.md,
+    justifyContent: 'center',
   },
-  metricIconBox: {
+  statValue: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: colors.textPrimary,
+  },
+  statLabel: {
+    fontSize: 10,
+    marginTop: 1,
+  },
+  statIconRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  statDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: colors.border,
+  },
+
+  // Clean Continuous Body (Zero Card/Div Containers)
+  cleanBodyContainer: {
+    backgroundColor: colors.surface, // Clean 30% white panel
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    overflow: 'hidden',
+  },
+  bodySection: {
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
+  },
+  sectionHeader: {
+    fontSize: 10.5,
+    letterSpacing: 0.8,
+    marginBottom: 4,
+  },
+
+  // Settings Rows
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+  },
+  actionRowLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  rowHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 4,
+  },
+  rowIconCircle: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(217, 119, 6, 0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 4,
-  },
-  metricValue: {
-    color: colors.textPrimary,
-    marginBottom: 2,
-  },
-  section: {
-    marginTop: spacing.md,
-  },
-  sectionHeader: {
-    marginBottom: 4,
-    marginLeft: 4,
-  },
-  actionCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  actionCardLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  iconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
     backgroundColor: 'rgba(217, 119, 6, 0.08)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: spacing.md,
+    marginRight: spacing.sm,
   },
-  settingCard: {
-    padding: spacing.md,
+  rowTitleBox: {
+    flex: 1,
   },
-  settingRow: {
+  rowTitle: {
+    fontSize: 14,
+    color: colors.textPrimary,
+  },
+  rowDivider: {
+    height: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.06)',
+    marginVertical: 4,
+  },
+  settingRowBlock: {
+    paddingVertical: 4,
+  },
+
+  // Font Size Scroller & Numeric Badge
+  fontSizeBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(217, 119, 6, 0.1)',
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(217, 119, 6, 0.25)',
+  },
+  sliderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.sm,
+    paddingHorizontal: 4,
+  },
+  sliderMinLabel: {
+    fontSize: 12,
+    marginRight: spacing.sm,
+  },
+  sliderMaxLabel: {
+    fontSize: 18,
+    marginLeft: spacing.sm,
+  },
+  stepperTrack: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    height: 32,
+    paddingHorizontal: 8,
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: radius.full,
   },
-  settingLabelBox: {
-    flexDirection: 'row',
+  stepTouchTarget: {
+    padding: 6,
     alignItems: 'center',
-    flex: 1,
+    justifyContent: 'center',
   },
-  translationHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.md,
+  stepDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#CBD5E1',
   },
-  translationChips: {
+  stepDotActive: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: colors.accent,
+    borderWidth: 2,
+    borderColor: colors.surface,
+  },
+
+  // Live Scripture Preview
+  previewBox: {
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginTop: spacing.sm,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.accent,
+  },
+  previewText: {
+    color: colors.textPrimary,
+  },
+  previewCite: {
+    marginTop: 4,
+  },
+
+  // Typography Style Pills
+  fontTypePillsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.sm,
+    gap: 8,
+    marginTop: spacing.sm,
   },
-  translationChip: {
+  fontTypePill: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
     borderRadius: radius.full,
     backgroundColor: colors.surfaceSecondary,
     borderWidth: 1,
     borderColor: colors.border,
   },
-  translationChipActive: {
+  fontTypePillActive: {
     backgroundColor: colors.accent,
     borderColor: colors.accent,
   },
-  translationChipText: {
+  fontTypePillText: {
+    fontSize: 12,
     color: colors.textSecondary,
   },
-  translationChipTextActive: {
+  fontTypePillTextActive: {
     color: '#FFFFFF',
   },
-  aboutCard: {
-    padding: spacing.md,
+
+  // Uiverse-inspired Switch (by namecho)
+  switchWrapper: {
+    paddingVertical: 2,
   },
-  aboutRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  signOutBtn: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
+  uiverseTrack: {
+    width: 52,
+    height: 30,
+    borderRadius: 15,
     justifyContent: 'center',
+  },
+  uiverseThumb: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+  },
+
+  // Swipe to Sign Out
+  swipeSignOutContainer: {
+    alignItems: 'center',
+    marginTop: 4,
+    marginBottom: spacing.sm,
+  },
+  swipeTrack: {
+    width: 280,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(239, 68, 68, 0.08)',
     borderWidth: 1,
     borderColor: 'rgba(239, 68, 68, 0.2)',
-    marginTop: spacing.sm,
+    justifyContent: 'center',
+    position: 'relative',
+    overflow: 'hidden',
   },
-  signOutText: {
-    color: '#EF4444',
-    marginLeft: spacing.sm,
+  swipeProgressFill: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+    borderRadius: 25,
+  },
+  swipeTextWrapper: {
+    position: 'absolute',
+    left: 48,
+    right: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  swipeSignOutText: {
+    fontSize: 12.5,
+    letterSpacing: 0.3,
+  },
+  swipeThumb: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#EF4444',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 3,
   },
 });

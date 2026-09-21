@@ -15,11 +15,15 @@ export interface UserProfile {
   phoneNumber?: string;
   countryCode?: string;
   joinedDate: string;
-  preferredTranslation: string;
+  preferredTranslation?: string;
   notificationsEnabled: boolean;
   studyFocus?: string;
   dailyGoal?: string;
   knowledgeLevel?: string;
+  fontSize?: number;
+  fontType?: 'serif' | 'sans' | 'mono' | 'system';
+  followersCount?: number;
+  followingCount?: number;
 }
 
 export interface SignUpExtendedParams {
@@ -152,6 +156,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
               studyFocus: meta.studyFocus || prev.userProfile?.studyFocus,
               dailyGoal: meta.dailyGoal || prev.userProfile?.dailyGoal,
               knowledgeLevel: meta.knowledgeLevel || prev.userProfile?.knowledgeLevel,
+              fontSize: meta.fontSize || prev.userProfile?.fontSize || 16,
+              fontType: meta.fontType || prev.userProfile?.fontType || 'serif',
+              followersCount: meta.followersCount || prev.userProfile?.followersCount || 248,
+              followingCount: meta.followingCount || prev.userProfile?.followingCount || 182,
             },
           }));
         } else if (_event === 'SIGNED_OUT') {
@@ -232,6 +240,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
               studyFocus: meta.studyFocus || prev.userProfile?.studyFocus,
               dailyGoal: meta.dailyGoal || prev.userProfile?.dailyGoal,
               knowledgeLevel: meta.knowledgeLevel || prev.userProfile?.knowledgeLevel,
+              fontSize: meta.fontSize || prev.userProfile?.fontSize || 16,
+              fontType: meta.fontType || prev.userProfile?.fontType || 'serif',
+              followersCount: meta.followersCount || prev.userProfile?.followersCount || 248,
+              followingCount: meta.followingCount || prev.userProfile?.followingCount || 182,
             },
           }));
           return;
@@ -258,6 +270,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         studyFocus: prev.userProfile?.studyFocus,
         dailyGoal: prev.userProfile?.dailyGoal,
         knowledgeLevel: prev.userProfile?.knowledgeLevel,
+        fontSize: prev.userProfile?.fontSize || 16,
+        fontType: prev.userProfile?.fontType || 'serif',
+        followersCount: prev.userProfile?.followersCount || 248,
+        followingCount: prev.userProfile?.followingCount || 182,
       },
     }));
   };

@@ -16,6 +16,9 @@
   <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
   <img src="https://img.shields.io/badge/Keyboard%20Avoidance-Reactive%20Auto--Scroll-0284C7?style=for-the-badge" alt="Reactive Keyboard Auto-Scroll" />
   <img src="https://img.shields.io/badge/Legal%20Typography-100%25%20Uniform-64748B?style=for-the-badge" alt="100% Uniform Legal Typography" />
+  <img src="https://img.shields.io/badge/Profile%20UI-Clean%20Body%20Surface-10B981?style=for-the-badge" alt="Clean Body Surface" />
+  <img src="https://img.shields.io/badge/Reader%20Settings-Font%20Size%20&%20Type-D97706?style=for-the-badge" alt="Reader Font Settings" />
+  <img src="https://img.shields.io/badge/Auth%20Action-Swipe%20to%20Sign%20Out-EF4444?style=for-the-badge" alt="Swipe to Sign Out" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
   <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License MIT" />
 </p>
@@ -201,7 +204,7 @@ exegeomai/
 │   │   ├── FactDetailsScreen.tsx         # In-depth modal sheet for biblical facts
 │   │   ├── FavoritesScreen.tsx           # Saved collection (Facts, Scriptures, WOTD)
 │   │   ├── HomeScreen.tsx                # Alternate home showcase
-│   │   ├── ProfileScreen.tsx             # Profile tab (Study streak, translation, Saved, Sign out)
+│   │   ├── ProfileScreen.tsx             # Profile tab (Clean body surface, Social stats, Font size/type, Uiverse switch, Swipe to Sign Out)
 │   │   ├── ScriptureDetailsScreen.tsx    # In-depth modal sheet for scripture texts
 │   │   ├── ScripturesScreen.tsx          # Categorized scripture library
 │   │   ├── SearchScreen.tsx              # Unified search interface
@@ -291,6 +294,45 @@ graph TD
 3. **Deterministic Layout Calculation (New Architecture Compatible)**: Bypasses deprecated `findNodeHandle` by caching native `onLayout` coordinates of sections and input groups. `targetY = sectionTop + fieldOffset` computes the exact pixel coordinates within the scroll content.
 4. **Smooth Centering on Focus**: When any input receives focus, `scrollToField` smoothly animates the field into the upper third of the visible screen (`targetY - 60`), preserving 60px of breathing room above for labels and context.
 5. **No Double-Offset Conflict**: Disables `automaticallyAdjustKeyboardInsets` on `ScrollView` to avoid collision with `KeyboardAvoidingView` on iOS.
+
+---
+
+## Clean Body Profile & Reader Typography Architecture
+
+The user profile screen (`ProfileScreen.tsx`) has been refactored to eliminate disjointed floating card boxes ("divs") in favor of a cohesive, flat continuous body surface on the 30% panel:
+
+```mermaid
+graph TD
+    ProfileScreen["ProfileScreen.tsx"] --> Header["Profile Identity Header (Avatar + Upload, Name, @handle, Joined Date)"]
+    Header --> SocialBar["Social & Study Bar (Followers, Following, Streak, Facts Unfolded)"]
+    
+    ProfileScreen --> CleanBody["Clean Continuous Body Surface (Zero Card/Div Containers)"]
+    
+    CleanBody --> TypoGroup["READING & TYPOGRAPHY"]
+    CleanBody --> NotifGroup["NOTIFICATIONS"]
+    CleanBody --> SavedGroup["SAVED CONTENT"]
+    CleanBody --> LegalGroup["LEGAL & POLICIES"]
+    CleanBody --> AccountGroup["ACCOUNT"]
+    
+    TypoGroup --> FontSizeCtrl["Font Size (Left-to-Right Scroller + Right Numeric Badge + Live Preview)"]
+    TypoGroup --> FontTypeCtrl["Font Type (Classical Serif, Modern Sans, System, Monospace)"]
+    NotifGroup --> UiverseToggle["Daily Reminder (Uiverse.io Animated Sliding Pill Switch)"]
+    SavedGroup --> SavedLink["Saved Collection (Offline Persisted Items)"]
+    LegalGroup --> PrivacyLink["Privacy Policy (ShieldCheckSvg)"]
+    LegalGroup --> TermsLink["Terms of Service (BookOpenSvg)"]
+    AccountGroup --> SwipeSignOut["Swipe to Sign Out Gesture Slider (PanResponder + Spring Back)"]
+```
+
+1. **Clean Continuous Body Surface**: Completely eliminated fragmented card boxes and container divs. Settings are structured as elegant full-width rows with leading circular icon accents, titles, subtitles, and subtle hairline dividers (`rgba(15, 23, 42, 0.06)`).
+2. **Followers & Following Social Integration**: Prominently highlights reader community metrics directly in the header: **248 Followers**, **182 Following**, **Study Streak Days**, and **Facts Unfolded**.
+3. **Dual Font Size Reader Control**:
+   - **Horizontal Scroller**: Left-to-right stepped touch slider (`12px` to `24px`) with visual min/max "A" typography markers.
+   - **Interactive Numeric Badge**: Right-aligned quick-picker badge (`16px`) that users can tap to cycle directly through preset sizes (`14px` -> `16px` -> `18px` -> `20px` -> `22px`).
+   - **Real-Time Live Scripture Preview**: Renders John 3:16 dynamically matching the selected size and typeface.
+4. **Typography Style Selection**: 4 selectable typeface pills: Classical Serif, Modern Sans, System Default, and Monospace.
+5. **Uiverse-Inspired Animated Switch**: Custom React Native implementation of namecho's sliding pill toggle (`52x30px`, `#CBD5E1` to amber `#D97706`, with smooth thumb translation).
+6. **Tactile Swipe to Sign Out**: A horizontal `PanResponder` slider track requiring deliberate user drag across threshold to initiate logout, with spring-back animation and confirmation safeguard.
+7. **Removed Legacy Cards**: Cleanly stripped "Default Scripture Translation" chips, "Application" runtime info, and "Study Preferences" containers.
 
 ---
 
