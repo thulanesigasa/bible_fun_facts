@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   View,
   ScrollView,
@@ -9,7 +9,9 @@ import {
   Modal,
   TextInput,
   Platform,
-  Alert,
+  Animated,
+  Clipboard,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
@@ -31,48 +33,72 @@ import {
   CalendarSvg,
   BookOpenSvg,
   ChevronDownSvg,
+  ChevronLeftSvg,
   CopySvg,
   FavoritesSvg,
   XCloseSvg,
   SearchSvg,
+  AaTextSvg,
+  BookmarkSvg,
 } from '../components/SvgIcons';
 
+// ─── Types ───────────────────────────────────────────────────────────────────
 type LensKey = 'original_intent' | 'theological_truth' | 'modern_walk' | 'prayer_focus';
 type ActiveTab = 'bible' | 'exegesis';
 type BibleTranslation = 'web' | 'kjv' | 'bbe';
+type ReaderTheme = 'light' | 'sepia' | 'dark';
+type NavStep = 'books' | 'chapters' | 'verses';
+
+// ─── YouVersion Highlight Colors ─────────────────────────────────────────────
+const HIGHLIGHT_COLORS = [
+  { id: 'gold',  hex: '#FDD223', label: 'Gold' },
+  { id: 'sage',  hex: '#86EFAC', label: 'Sage' },
+  { id: 'sky',   hex: '#93C5FD', label: 'Sky' },
+  { id: 'lilac', hex: '#D8B4FE', label: 'Lilac' },
+  { id: 'peach', hex: '#FDBA74', label: 'Peach' },
+];
+
+// ─── Reader Themes ────────────────────────────────────────────────────────────
+const THEMES: Record<ReaderTheme, { bg: string; surface: string; text: string; textSecondary: string; label: string }> = {
+  light: { bg: '#F8FAFC', surface: '#FFFFFF', text: '#0F172A', textSecondary: '#64748B', label: 'Light' },
+  sepia: { bg: '#FDF6E2', surface: '#F5EDD0', text: '#2C2416', textSecondary: '#8B7355', label: 'Sepia' },
+  dark:  { bg: '#0F172A', surface: '#1E293B', text: '#F8FAFC', textSecondary: '#94A3B8', label: 'Dark' },
+};
+
+const TRANSLATIONS: BibleTranslation[] = ['web', 'kjv', 'bbe'];
+const TRANSLATION_LABELS: Record<BibleTranslation, string> = {
+  web: 'WEB',
+  kjv: 'KJV',
+  bbe: 'BBE',
+};
+
+// ─── Helper: font family ─────────────────────────────────────────────────────
+const getFontFamily = (fontType?: 'serif' | 'sans' | 'mono' | 'system') => {
+  switch (fontType) {
+    case 'serif': return Platform.OS === 'ios' ? 'Georgia' : 'serif';
+    case 'sans':  return Platform.OS === 'ios' ? 'Helvetica Neue' : 'sans-serif';
+    case 'mono':  return Platform.OS === 'ios' ? 'Courier New' : 'monospace';
+    default:      return Platform.OS === 'ios' ? 'Georgia' : 'serif';
+  }
+};
 
 const getLensIcon = (key: LensKey, color: string) => {
   const size = 18;
   switch (key) {
-    case 'original_intent':
-      return <OriginalIntentSvg size={size} color={color} />;
-    case 'theological_truth':
-      return <TheologicalTruthSvg size={size} color={color} />;
-    case 'modern_walk':
-      return <ModernWalkSvg size={size} color={color} />;
-    case 'prayer_focus':
-      return <PrayerFocusSvg size={size} color={color} />;
+    case 'original_intent':   return <OriginalIntentSvg size={size} color={color} />;
+    case 'theological_truth': return <TheologicalTruthSvg size={size} color={color} />;
+    case 'modern_walk':       return <ModernWalkSvg size={size} color={color} />;
+    case 'prayer_focus':      return <PrayerFocusSvg size={size} color={color} />;
   }
 };
 
-const getFontFamily = (fontType?: 'serif' | 'sans' | 'mono' | 'system') => {
-  switch (fontType) {
-    case 'serif':
-      return Platform.OS === 'ios' ? 'Georgia' : 'serif';
-    case 'sans':
-      return Platform.OS === 'ios' ? 'Helvetica Neue' : 'sans-serif';
-    case 'mono':
-      return Platform.OS === 'ios' ? 'Courier New' : 'monospace';
-    default:
-      return undefined;
-  }
-};
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
+// ─── Main Component ───────────────────────────────────────────────────────────
 export default function WOTDScreen() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('bible');
   const [activeLens, setActiveLens] = useState<LensKey>('original_intent');
-  
-  // User context
+
   const {
     markWOTDComplete,
     isWOTDCompleted,
@@ -81,12 +107,16 @@ export default function WOTDScreen() {
     setLastReadBible,
     toggleFavoriteScripture,
     isScriptureFavorited,
+    bibleHighlights,
+    readerTheme,
+    setVerseHighlight,
+    setReaderTheme,
   } = useUser();
 
-  // Bible Reader State
-  const initialBook = useMemo(() => {
-    return BIBLE_BOOKS.find((b) => b.name.toLowerCase() === lastReadBible.book.toLowerCase()) || BIBLE_BOOKS[42]; // Default: John
-  }, [lastReadBible.book]);
+  // ── Bible Reader State ────────────────────────────────────────────────────
+  const initialBook = useMemo(() =>
+    BIBLE_BOOKS.find(b => b.name.toLowerCase() === lastReadBible.book.toLowerCase()) || BIBLE_BOOKS[42],
+  [lastReadBible.book]);
 
   const [selectedBook, setSelectedBook] = useState<BibleBook>(initialBook);
   const [selectedChapter, setSelectedChapter] = useState<number>(lastReadBible.chapter || 1);
@@ -97,295 +127,357 @@ export default function WOTDScreen() {
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Modal selector state
-  const [isSelectorOpen, setIsSelectorOpen] = useState(false);
-  const [selectorTestament, setSelectorTestament] = useState<'OT' | 'NT'>('NT');
+  // ── Multi-verse selection ─────────────────────────────────────────────────
+  const [selectedVerses, setSelectedVerses] = useState<number[]>([]);
+
+  // ── Navigator Modal ───────────────────────────────────────────────────────
+  const [isNavOpen, setIsNavOpen] = useState(false);
+  const [navStep, setNavStep] = useState<NavStep>('books');
+  const [navTestament, setNavTestament] = useState<'OT' | 'NT'>('NT');
+  const [navBook, setNavBook] = useState<BibleBook | null>(null);
+  const [navChapter, setNavChapter] = useState<number | null>(null);
   const [bookSearchText, setBookSearchText] = useState('');
-  const [browsingBookForChapters, setBrowsingBookForChapters] = useState<BibleBook | null>(null);
 
-  // Verse action modal
-  const [selectedVerse, setSelectedVerse] = useState<BibleVerse | null>(null);
+  // ── Aa Settings Sheet ─────────────────────────────────────────────────────
+  const [isAaOpen, setIsAaOpen] = useState(false);
+  const localFontSize = useRef(userProfile?.fontSize || 17);
+  const [fontSize, setFontSize] = useState<number>(localFontSize.current);
+  const [fontType, setFontType] = useState<'serif' | 'sans' | 'mono'>(
+    (userProfile?.fontType as 'serif' | 'sans' | 'mono') || 'serif'
+  );
 
-  // Fetch chapter logic
-  const loadCurrentChapter = useCallback(async (bookName: string, chapterNum: number, trans: BibleTranslation) => {
-    setLoading(true);
-    setErrorMsg(null);
-    try {
-      const data = await fetchChapter(bookName, chapterNum, trans);
-      setChapterData(data);
-      setLastReadBible(bookName, chapterNum, trans);
-    } catch (err: any) {
-      setErrorMsg('Unable to load chapter. Please verify your connection or choose another translation.');
-    } finally {
-      setLoading(false);
-    }
-  }, [setLastReadBible]);
+  // ── Action bar animation ─────────────────────────────────────────────────
+  const actionBarAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(actionBarAnim, {
+      toValue: selectedVerses.length > 0 ? 1 : 0,
+      duration: 220,
+      useNativeDriver: true,
+    }).start();
+  }, [selectedVerses.length, actionBarAnim]);
+
+  const theme = THEMES[readerTheme];
+
+  // ── Chapter Fetch ─────────────────────────────────────────────────────────
+  const loadCurrentChapter = useCallback(
+    async (bookName: string, chapterNum: number, trans: BibleTranslation) => {
+      setLoading(true);
+      setErrorMsg(null);
+      setSelectedVerses([]);
+      try {
+        const data = await fetchChapter(bookName, chapterNum, trans);
+        setChapterData(data);
+        setLastReadBible(bookName, chapterNum, trans);
+      } catch {
+        setErrorMsg('Unable to load chapter. Please check your connection.');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [setLastReadBible]
+  );
 
   useEffect(() => {
     loadCurrentChapter(selectedBook.name, selectedChapter, translation);
   }, [selectedBook.name, selectedChapter, translation, loadCurrentChapter]);
 
-  // Navigate to previous / next chapter
+  // ── Chapter Navigation ────────────────────────────────────────────────────
   const handlePrevChapter = () => {
     if (selectedChapter > 1) {
-      setSelectedChapter((prev) => prev - 1);
+      setSelectedChapter(c => c - 1);
     } else {
-      const currentIndex = BIBLE_BOOKS.findIndex((b) => b.id === selectedBook.id);
-      if (currentIndex > 0) {
-        const prevBook = BIBLE_BOOKS[currentIndex - 1];
-        setSelectedBook(prevBook);
-        setSelectedChapter(prevBook.chaptersCount);
+      const idx = BIBLE_BOOKS.findIndex(b => b.id === selectedBook.id);
+      if (idx > 0) {
+        const prev = BIBLE_BOOKS[idx - 1];
+        setSelectedBook(prev);
+        setSelectedChapter(prev.chaptersCount);
       }
     }
   };
 
   const handleNextChapter = () => {
     if (selectedChapter < selectedBook.chaptersCount) {
-      setSelectedChapter((prev) => prev + 1);
+      setSelectedChapter(c => c + 1);
     } else {
-      const currentIndex = BIBLE_BOOKS.findIndex((b) => b.id === selectedBook.id);
-      if (currentIndex < BIBLE_BOOKS.length - 1) {
-        const nextBook = BIBLE_BOOKS[currentIndex + 1];
-        setSelectedBook(nextBook);
+      const idx = BIBLE_BOOKS.findIndex(b => b.id === selectedBook.id);
+      if (idx < BIBLE_BOOKS.length - 1) {
+        const next = BIBLE_BOOKS[idx + 1];
+        setSelectedBook(next);
         setSelectedChapter(1);
       }
     }
   };
 
-  const toggleTranslation = () => {
-    const nextTrans: BibleTranslation = translation === 'web' ? 'kjv' : 'web';
-    setTranslation(nextTrans);
+  // ── Verse Selection Toggle ────────────────────────────────────────────────
+  const toggleVerseSelection = (verseNum: number) => {
+    setSelectedVerses(prev => {
+      if (prev.includes(verseNum)) {
+        return prev.filter(v => v !== verseNum).sort((a, b) => a - b);
+      }
+      return [...prev, verseNum].sort((a, b) => a - b);
+    });
   };
 
-  // Exegesis share
-  const onShareExegesis = async () => {
+  const getSelectionRef = () => {
+    if (selectedVerses.length === 0) return '';
+    const min = selectedVerses[0];
+    const max = selectedVerses[selectedVerses.length - 1];
+    const trans = TRANSLATION_LABELS[translation];
+    return min === max
+      ? `${selectedBook.name} ${selectedChapter}:${min} (${trans})`
+      : `${selectedBook.name} ${selectedChapter}:${min}-${max} (${trans})`;
+  };
+
+  const getSelectedText = () => {
+    if (!chapterData) return '';
+    return chapterData.verses
+      .filter(v => selectedVerses.includes(v.verse))
+      .map(v => `${v.verse}. ${v.text.trim()}`)
+      .join(' ');
+  };
+
+  // ── Verse Key ─────────────────────────────────────────────────────────────
+  const verseKey = (verseNum: number) =>
+    `${selectedBook.id}_${selectedChapter}_${verseNum}`;
+
+  // ── Action: Copy ─────────────────────────────────────────────────────────
+  const onCopy = () => {
+    const ref = getSelectionRef();
+    const text = getSelectedText();
+    Clipboard.setString(`"${text}" — ${ref}`);
+    setSelectedVerses([]);
+  };
+
+  // ── Action: Share ─────────────────────────────────────────────────────────
+  const onShare = async () => {
+    const ref = getSelectionRef();
+    const text = getSelectedText();
     try {
-      const message = `${wotd.verse}\n- ${wotd.reference}\n\nOriginal Intent:\n${wotd.original_intent}\n\nTheological Truth:\n${wotd.theological_truth}\n\nModern Walk:\n${wotd.modern_walk}\n\nPrayer Focus:\n${wotd.prayer_focus}`;
-      await Share.share({ message });
-    } catch (error) {
-      console.error(error);
-    }
+      await Share.share({ message: `"${text}"\n— ${ref}` });
+    } catch {}
+    setSelectedVerses([]);
   };
 
-  // Verse actions
-  const onShareVerse = async (verse: BibleVerse) => {
-    try {
-      const ref = `${selectedBook.name} ${selectedChapter}:${verse.verse} (${translation.toUpperCase()})`;
-      const message = `"${verse.text.trim()}"\n- ${ref}`;
-      await Share.share({ message });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const onCopyVerse = (verse: BibleVerse) => {
-    const ref = `${selectedBook.name} ${selectedChapter}:${verse.verse} (${translation.toUpperCase()})`;
-    const textToCopy = `"${verse.text.trim()}" - ${ref}`;
-    Alert.alert('Verse Copied', textToCopy);
-  };
-
-  const onToggleFavoriteVerse = (verse: BibleVerse) => {
-    const ref = `${selectedBook.name} ${selectedChapter}:${verse.verse}`;
+  // ── Action: Bookmark ─────────────────────────────────────────────────────
+  const onBookmark = () => {
+    const ref = getSelectionRef();
+    const text = getSelectedText();
     const scriptureObj: Scripture = {
-      id: `bible_${selectedBook.id}_${selectedChapter}_${verse.verse}`,
+      id: `bible_${selectedBook.id}_${selectedChapter}_${selectedVerses.join('_')}`,
       reference: ref,
-      text: verse.text.trim(),
+      text: text,
       testament: selectedBook.testament,
       book: selectedBook.name,
       chapter: selectedChapter,
-      verse_range: `${verse.verse}`,
+      verse_range: selectedVerses.join('-'),
       genre: selectedBook.category,
       historical_context: `Scripture passage from ${selectedBook.name} chapter ${selectedChapter}.`,
-      cultural_practice: 'Sacred biblical canon preservation.',
+      cultural_practice: 'Sacred biblical canon.',
       strongs_word: selectedBook.name,
       strongs_transliteration: selectedBook.name,
       strongs_definition: 'Sacred Scripture Canon',
       strongs_number: 'N/A',
     };
     toggleFavoriteScripture(scriptureObj);
+    setSelectedVerses([]);
   };
 
-  const isCurrentVerseFavorited = (verse: BibleVerse) => {
-    return isScriptureFavorited(`bible_${selectedBook.id}_${selectedChapter}_${verse.verse}`);
+  // ── Action: Highlight ─────────────────────────────────────────────────────
+  const onHighlight = (hexColor: string) => {
+    selectedVerses.forEach(vNum => setVerseHighlight(verseKey(vNum), hexColor));
+    setSelectedVerses([]);
   };
 
-  // Book filtering for selector modal
-  const filteredBooks = useMemo(() => {
-    return BIBLE_BOOKS.filter((b) => {
-      const matchesTestament =
-        selectorTestament === 'OT' ? b.testament === 'Old Testament' : b.testament === 'New Testament';
-      const matchesSearch =
-        bookSearchText === '' ||
-        b.name.toLowerCase().includes(bookSearchText.toLowerCase()) ||
-        b.category.toLowerCase().includes(bookSearchText.toLowerCase());
-      return matchesTestament && matchesSearch;
-    });
-  }, [selectorTestament, bookSearchText]);
+  const onEraseHighlight = () => {
+    selectedVerses.forEach(vNum => setVerseHighlight(verseKey(vNum), undefined));
+    setSelectedVerses([]);
+  };
 
-  const customFontSize = userProfile?.fontSize || 16;
-  const customFontFamily = getFontFamily(userProfile?.fontType);
+  // ── Navigator Helpers ─────────────────────────────────────────────────────
+  const filteredBooks = useMemo(() =>
+    BIBLE_BOOKS.filter(b => {
+      const matchT = navTestament === 'OT' ? b.testament === 'Old Testament' : b.testament === 'New Testament';
+      const matchS = bookSearchText === '' || b.name.toLowerCase().includes(bookSearchText.toLowerCase());
+      return matchT && matchS;
+    }),
+  [navTestament, bookSearchText]);
 
-  const completed = isWOTDCompleted(wotd.id);
+  const openNav = () => {
+    setNavStep('books');
+    setNavBook(selectedBook);
+    setNavChapter(null);
+    setBookSearchText('');
+    setIsNavOpen(true);
+  };
 
-  const getLensContent = () => {
-    switch (activeLens) {
-      case 'original_intent':
-        return wotd.original_intent;
-      case 'theological_truth':
-        return wotd.theological_truth;
-      case 'modern_walk':
-        return wotd.modern_walk;
-      case 'prayer_focus':
-        return wotd.prayer_focus;
+  const onNavBookTap = (book: BibleBook) => {
+    setNavBook(book);
+    setNavStep('chapters');
+  };
+
+  const onNavChapterTap = (ch: number) => {
+    setNavChapter(ch);
+    setNavStep('verses');
+  };
+
+  const onNavVerseTap = (v: number) => {
+    if (navBook && navChapter) {
+      setSelectedBook(navBook);
+      setSelectedChapter(navChapter);
+      setIsNavOpen(false);
+      // Scroll to verse — for simplicity we just open the chapter
     }
   };
 
+  const onNavChapterConfirm = (ch: number) => {
+    if (navBook) {
+      setSelectedBook(navBook);
+      setSelectedChapter(ch);
+      setIsNavOpen(false);
+    }
+  };
+
+  // ── Translation Cycle ─────────────────────────────────────────────────────
+  const cycleTranslation = () => {
+    const idx = TRANSLATIONS.indexOf(translation);
+    setTranslation(TRANSLATIONS[(idx + 1) % TRANSLATIONS.length]);
+  };
+
+  // ── Exegesis ─────────────────────────────────────────────────────────────
+  const getLensContent = () => {
+    switch (activeLens) {
+      case 'original_intent':   return wotd.original_intent;
+      case 'theological_truth': return wotd.theological_truth;
+      case 'modern_walk':       return wotd.modern_walk;
+      case 'prayer_focus':      return wotd.prayer_focus;
+    }
+  };
+
+  const onShareExegesis = async () => {
+    try {
+      const msg = `${wotd.verse}\n— ${wotd.reference}\n\nOriginal Intent:\n${wotd.original_intent}\n\nTheological Truth:\n${wotd.theological_truth}`;
+      await Share.share({ message: msg });
+    } catch {}
+  };
+
+  const completed = isWOTDCompleted(wotd.id);
+
+  // ── Action bar translation ────────────────────────────────────────────────
+  const actionBarTranslateY = actionBarAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [120, 0],
+  });
+
+  // ─── Render ───────────────────────────────────────────────────────────────
   return (
-    <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
-      {/* Top Segmented Navigation: Holy Bible vs Daily Exegesis */}
-      <View style={styles.topSegmentContainer}>
-        <View style={styles.segmentedControl}>
-          <TouchableOpacity
-            style={[styles.segmentBtn, activeTab === 'bible' && styles.segmentBtnActive]}
-            onPress={() => setActiveTab('bible')}
-            activeOpacity={0.8}
-          >
-            <BookOpenSvg size={16} color={activeTab === 'bible' ? colors.accent : colors.textSecondary} />
-            <Text
-              variant="caption"
-              weight={activeTab === 'bible' ? '700' : '600'}
-              style={[styles.segmentText, activeTab === 'bible' && styles.segmentTextActive]}
-            >
-              Holy Bible
-            </Text>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.bg }]} edges={['left', 'right']}>
+      {/* ── YouVersion Top App Bar (pill row) ── */}
+      <View style={[styles.topBar, { backgroundColor: theme.surface, borderBottomColor: readerTheme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)' }]}>
+        {/* Left: Book & Chapter pill */}
+        <TouchableOpacity style={[styles.pill, styles.pillPrimary]} onPress={openNav} activeOpacity={0.75}>
+          <BookOpenSvg size={14} color={colors.accent} />
+          <Text style={styles.pillTextBold}>{selectedBook.name} {selectedChapter}</Text>
+          <ChevronDownSvg size={13} color={colors.accent} />
+        </TouchableOpacity>
+
+        <View style={styles.pillRow}>
+          {/* Translation pill */}
+          <TouchableOpacity style={styles.pill} onPress={cycleTranslation} activeOpacity={0.75}>
+            <Text style={styles.pillText}>{TRANSLATION_LABELS[translation]}</Text>
+            <ChevronDownSvg size={13} color={colors.textSecondary || '#64748B'} />
           </TouchableOpacity>
 
+          {/* Aa settings pill */}
+          <TouchableOpacity style={styles.pill} onPress={() => setIsAaOpen(true)} activeOpacity={0.75}>
+            <AaTextSvg size={16} color={theme.text} />
+          </TouchableOpacity>
+
+          {/* Bible / Exegesis toggle */}
           <TouchableOpacity
-            style={[styles.segmentBtn, activeTab === 'exegesis' && styles.segmentBtnActive]}
-            onPress={() => setActiveTab('exegesis')}
-            activeOpacity={0.8}
+            style={[styles.pill, activeTab === 'exegesis' && styles.pillAccent]}
+            onPress={() => setActiveTab(prev => prev === 'bible' ? 'exegesis' : 'bible')}
+            activeOpacity={0.75}
           >
-            <WotdSvg size={16} color={activeTab === 'exegesis' ? colors.accent : colors.textSecondary} />
-            <Text
-              variant="caption"
-              weight={activeTab === 'exegesis' ? '700' : '600'}
-              style={[styles.segmentText, activeTab === 'exegesis' && styles.segmentTextActive]}
-            >
-              Daily Exegesis
-            </Text>
+            <WotdSvg size={14} color={activeTab === 'exegesis' ? '#FFFFFF' : colors.accent} />
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* VIEW 1: FULL HOLY BIBLE READER */}
+      {/* ════════════════════════════════════════════════════ */}
+      {/* VIEW 1: FULL BIBLE READER                           */}
+      {/* ════════════════════════════════════════════════════ */}
       {activeTab === 'bible' ? (
-        <View style={styles.bibleContainer}>
-          {/* Reader Subheader Bar */}
-          <View style={[styles.readerHeaderBar, shadow.sm]}>
-            <TouchableOpacity
-              style={styles.bookSelectorButton}
-              onPress={() => {
-                setBrowsingBookForChapters(selectedBook);
-                setIsSelectorOpen(true);
-              }}
-              activeOpacity={0.7}
-            >
-              <View style={styles.bookSelectorIcon}>
-                <BookOpenSvg size={18} color={colors.accent} />
-              </View>
-              <View style={styles.bookSelectorTextWrap}>
-                <Text variant="h3" style={styles.bookSelectorTitle}>
-                  {selectedBook.name} {selectedChapter}
-                </Text>
-                <Text variant="caption" color={colors.textSecondary}>
-                  {selectedBook.testament} • {selectedBook.category}
-                </Text>
-              </View>
-              <ChevronDownSvg size={18} color={colors.accent} />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.translationBadge}
-              onPress={toggleTranslation}
-              activeOpacity={0.7}
-            >
-              <Text variant="caption" weight="700" style={styles.translationText}>
-                {translation.toUpperCase()}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Chapter Content Stream */}
+        <View style={styles.flex1}>
           <ScrollView
-            style={styles.bibleScrollView}
-            contentContainerStyle={styles.bibleScrollContent}
+            style={styles.flex1}
+            contentContainerStyle={[styles.scriptureCanvas, { paddingBottom: selectedVerses.length > 0 ? 200 : 130 }]}
             showsVerticalScrollIndicator={false}
           >
-            {/* Header info */}
-            <View style={styles.chapterHeader}>
-              <Text variant="h1" style={styles.chapterMainTitle}>
-                {selectedBook.name}
-              </Text>
-              <Text variant="h3" color={colors.accent} style={styles.chapterNumberLabel}>
-                Chapter {selectedChapter}
-              </Text>
-              <Text variant="caption" color={colors.textTertiary} style={styles.chapterTranslationMeta}>
-                {translation === 'web' ? 'World English Bible (Public Domain)' : 'King James Version (KJV)'}
+            {/* Chapter Heading */}
+            <View style={styles.chapterHeading}>
+              <Text style={[styles.chapterHeadingBook, { color: theme.text }]}>{selectedBook.name.toUpperCase()}</Text>
+              <Text style={[styles.chapterHeadingNumber, { color: colors.accent }]}>Chapter {selectedChapter}</Text>
+              <Text style={[styles.chapterMeta, { color: theme.textSecondary }]}>
+                {translation === 'web' ? 'World English Bible' : translation === 'kjv' ? 'King James Version' : 'Bible in Basic English'}
               </Text>
             </View>
 
+            {/* Scripture Content */}
             {loading ? (
-              <View style={styles.loaderContainer}>
+              <View style={styles.loaderBox}>
                 <ActivityIndicator size="large" color={colors.accent} />
-                <Text variant="body" color={colors.textSecondary} style={{ marginTop: spacing.md }}>
+                <Text style={[styles.loaderText, { color: theme.textSecondary }]}>
                   Loading {selectedBook.name} {selectedChapter}...
                 </Text>
               </View>
             ) : errorMsg ? (
-              <View style={styles.errorContainer}>
-                <Text variant="body" color={colors.textSecondary} style={styles.errorText}>
-                  {errorMsg}
-                </Text>
+              <View style={styles.errorBox}>
+                <Text style={[styles.errorText, { color: theme.textSecondary }]}>{errorMsg}</Text>
                 <TouchableOpacity
-                  style={styles.retryBtn}
+                  style={[styles.retryBtn, { backgroundColor: colors.accent }]}
                   onPress={() => loadCurrentChapter(selectedBook.name, selectedChapter, translation)}
                 >
-                  <Text variant="caption" weight="700" color="#FFFFFF">Retry</Text>
+                  <Text style={styles.retryBtnText}>Retry</Text>
                 </TouchableOpacity>
               </View>
             ) : (
-              <View style={styles.versesWrapper}>
+              /* ── Inline Scripture Flow (YouVersion style) ── */
+              <View style={styles.versesFlow}>
                 {chapterData?.verses.map((v: BibleVerse) => {
-                  const isFavorited = isCurrentVerseFavorited(v);
+                  const isSelected = selectedVerses.includes(v.verse);
+                  const hlColor = bibleHighlights[verseKey(v.verse)];
                   return (
                     <TouchableOpacity
                       key={v.verse}
                       activeOpacity={0.7}
-                      onPress={() => setSelectedVerse(v)}
+                      onPress={() => toggleVerseSelection(v.verse)}
                       style={[
-                        styles.verseRow,
-                        selectedVerse?.verse === v.verse && styles.verseRowHighlight,
+                        styles.verseBlock,
+                        isSelected && styles.verseBlockSelected,
+                        hlColor ? { backgroundColor: hlColor + '55' } : null,
                       ]}
                     >
-                      <Text variant="label" style={styles.verseNumberBadge}>
-                        {v.verse}
-                      </Text>
+                      {/* Superscript verse number */}
+                      <Text style={[styles.verseSuper, { color: colors.accent }]}>{v.verse}</Text>
                       <Text
                         style={[
-                          styles.verseBodyText,
+                          styles.verseBodyInline,
                           {
-                            fontSize: customFontSize,
-                            fontFamily: customFontFamily,
-                            lineHeight: Math.max(customFontSize * 1.55, 20),
+                            fontSize: fontSize,
+                            fontFamily: getFontFamily(fontType),
+                            lineHeight: fontSize * 1.65,
+                            color: theme.text,
                           },
                         ]}
                       >
                         {v.text.trim()}
+                        {isScriptureFavorited(`bible_${selectedBook.id}_${selectedChapter}_${v.verse}`) && (
+                          <Text style={{ color: colors.accent }}> ♥</Text>
+                        )}
                       </Text>
-                      {isFavorited && (
-                        <View style={styles.verseFavIndicator}>
-                          <FavoritesSvg size={12} color={colors.accent} fill={colors.accent} />
-                        </View>
+                      {hlColor && (
+                        <View style={[styles.hlUnderline, { backgroundColor: hlColor }]} />
                       )}
                     </TouchableOpacity>
                   );
@@ -393,393 +485,361 @@ export default function WOTDScreen() {
               </View>
             )}
 
-            {/* Chapter Navigation Footer */}
-            <View style={styles.chapterNavFooter}>
-              <TouchableOpacity
-                style={[
-                  styles.navBtn,
-                  selectedBook.id === 'GEN' && selectedChapter === 1 && styles.navBtnDisabled,
-                ]}
-                onPress={handlePrevChapter}
-                disabled={selectedBook.id === 'GEN' && selectedChapter === 1}
-                activeOpacity={0.8}
-              >
-                <Text
-                  variant="body"
-                  weight="600"
-                  color={selectedBook.id === 'GEN' && selectedChapter === 1 ? colors.textTertiary : colors.accent}
+            {/* ── Chapter Stepper ── */}
+            {!loading && !errorMsg && (
+              <View style={[styles.chapterStepper, { borderTopColor: readerTheme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)' }]}>
+                <TouchableOpacity
+                  style={styles.stepBtn}
+                  onPress={handlePrevChapter}
+                  disabled={selectedBook.id === 'GEN' && selectedChapter === 1}
+                  activeOpacity={0.7}
                 >
-                  ‹ Prev Chapter
-                </Text>
-              </TouchableOpacity>
+                  <ChevronLeftSvg size={20} color={selectedBook.id === 'GEN' && selectedChapter === 1 ? '#CBD5E1' : colors.accent} />
+                  <Text style={[styles.stepBtnText, { color: selectedBook.id === 'GEN' && selectedChapter === 1 ? '#CBD5E1' : colors.accent }]}>
+                    {selectedChapter > 1
+                      ? `${selectedBook.name} ${selectedChapter - 1}`
+                      : 'First Chapter'}
+                  </Text>
+                </TouchableOpacity>
 
-              <View style={styles.navProgress}>
-                <Text variant="caption" color={colors.textSecondary}>
-                  {selectedChapter} of {selectedBook.chaptersCount}
-                </Text>
-              </View>
-
-              <TouchableOpacity
-                style={[
-                  styles.navBtn,
-                  selectedBook.id === 'REV' && selectedChapter === selectedBook.chaptersCount && styles.navBtnDisabled,
-                ]}
-                onPress={handleNextChapter}
-                disabled={selectedBook.id === 'REV' && selectedChapter === selectedBook.chaptersCount}
-                activeOpacity={0.8}
-              >
-                <Text
-                  variant="body"
-                  weight="600"
-                  color={
-                    selectedBook.id === 'REV' && selectedChapter === selectedBook.chaptersCount
-                      ? colors.textTertiary
-                      : colors.accent
-                  }
-                >
-                  Next Chapter ›
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
-
-          {/* Book / Chapter Selector Modal */}
-          <Modal
-            visible={isSelectorOpen}
-            animationType="slide"
-            transparent={false}
-            onRequestClose={() => setIsSelectorOpen(false)}
-          >
-            <SafeAreaView style={styles.modalSafeArea}>
-              <View style={styles.modalHeader}>
-                <View style={styles.modalHeaderLeft}>
-                  <BookOpenSvg size={22} color={colors.accent} />
-                  <Text variant="h2" style={styles.modalTitle}>
-                    {browsingBookForChapters ? browsingBookForChapters.name : 'Select Scripture'}
+                <View style={[styles.stepCenter, { backgroundColor: readerTheme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.04)' }]}>
+                  <Text style={[styles.stepCenterText, { color: theme.textSecondary }]}>
+                    {selectedChapter} / {selectedBook.chaptersCount}
                   </Text>
                 </View>
+
                 <TouchableOpacity
-                  style={styles.modalCloseBtn}
-                  onPress={() => {
-                    setBrowsingBookForChapters(null);
-                    setIsSelectorOpen(false);
-                  }}
+                  style={styles.stepBtn}
+                  onPress={handleNextChapter}
+                  disabled={selectedBook.id === 'REV' && selectedChapter === selectedBook.chaptersCount}
+                  activeOpacity={0.7}
                 >
-                  <XCloseSvg size={22} color={colors.textSecondary} />
+                  <Text style={[styles.stepBtnText, { color: selectedBook.id === 'REV' && selectedChapter === selectedBook.chaptersCount ? '#CBD5E1' : colors.accent }]}>
+                    {selectedChapter < selectedBook.chaptersCount
+                      ? `${selectedBook.name} ${selectedChapter + 1}`
+                      : 'Last Chapter'}
+                  </Text>
+                  <ChevronDownSvg size={20} color={selectedBook.id === 'REV' && selectedChapter === selectedBook.chaptersCount ? '#CBD5E1' : colors.accent} style={{ transform: [{ rotate: '-90deg' }] }} />
                 </TouchableOpacity>
               </View>
+            )}
+          </ScrollView>
 
-              {browsingBookForChapters ? (
-                /* Chapter grid selection for chosen book */
-                <View style={styles.chapterSelectionContainer}>
-                  <View style={styles.chapterSelectionTopRow}>
+          {/* ── Floating YouVersion Action Bar ── */}
+          <Animated.View
+            style={[
+              styles.floatingActionBar,
+              {
+                transform: [{ translateY: actionBarTranslateY }],
+                opacity: actionBarAnim,
+                backgroundColor: theme.surface,
+              },
+            ]}
+            pointerEvents={selectedVerses.length > 0 ? 'auto' : 'none'}
+          >
+            {/* Reference header */}
+            <View style={styles.fabHeader}>
+              <Text style={[styles.fabRef, { color: colors.accent }]} numberOfLines={1}>
+                {getSelectionRef()}
+              </Text>
+              <TouchableOpacity onPress={() => setSelectedVerses([])} style={styles.fabClose}>
+                <XCloseSvg size={18} color={theme.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Highlight color row */}
+            <View style={styles.fabColorRow}>
+              {HIGHLIGHT_COLORS.map(hc => (
+                <TouchableOpacity
+                  key={hc.id}
+                  style={[styles.fabColorDot, { backgroundColor: hc.hex }]}
+                  onPress={() => onHighlight(hc.hex)}
+                  activeOpacity={0.8}
+                />
+              ))}
+              <TouchableOpacity style={[styles.fabColorDot, styles.fabEraseDot]} onPress={onEraseHighlight} activeOpacity={0.8}>
+                <XCloseSvg size={14} color="#64748B" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Action buttons */}
+            <View style={styles.fabActions}>
+              <TouchableOpacity style={styles.fabActionBtn} onPress={onCopy}>
+                <CopySvg size={18} color={colors.accent} />
+                <Text style={[styles.fabActionLabel, { color: theme.textSecondary }]}>Copy</Text>
+              </TouchableOpacity>
+              <View style={[styles.fabDivider, { backgroundColor: readerTheme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }]} />
+              <TouchableOpacity style={styles.fabActionBtn} onPress={onBookmark}>
+                <BookmarkSvg size={18} color={colors.accent} />
+                <Text style={[styles.fabActionLabel, { color: theme.textSecondary }]}>Bookmark</Text>
+              </TouchableOpacity>
+              <View style={[styles.fabDivider, { backgroundColor: readerTheme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }]} />
+              <TouchableOpacity style={styles.fabActionBtn} onPress={onShare}>
+                <ShareSvg size={18} color={colors.accent} />
+                <Text style={[styles.fabActionLabel, { color: theme.textSecondary }]}>Share</Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+
+          {/* ── 3-Step Canonical Navigator Modal ── */}
+          <Modal visible={isNavOpen} animationType="slide" transparent={false} onRequestClose={() => setIsNavOpen(false)}>
+            <SafeAreaView style={[styles.navModal, { backgroundColor: theme.bg }]}>
+              {/* Nav modal header */}
+              <View style={[styles.navModalHeader, { backgroundColor: theme.surface, borderBottomColor: readerTheme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)' }]}>
+                <TouchableOpacity onPress={() => setIsNavOpen(false)} style={styles.navModalClose}>
+                  <XCloseSvg size={22} color={theme.textSecondary} />
+                </TouchableOpacity>
+                {/* 3 step tabs */}
+                <View style={styles.navStepRow}>
+                  {(['books', 'chapters', 'verses'] as NavStep[]).map(step => (
                     <TouchableOpacity
-                      onPress={() => setBrowsingBookForChapters(null)}
-                      style={styles.backToBooksBtn}
+                      key={step}
+                      style={[styles.navStepTab, navStep === step && styles.navStepTabActive]}
+                      onPress={() => {
+                        if (step === 'chapters' && navBook) setNavStep('chapters');
+                        else if (step === 'books') setNavStep('books');
+                        else if (step === 'verses' && navBook && navChapter) setNavStep('verses');
+                      }}
                     >
-                      <Text variant="caption" weight="700" color={colors.accent}>
-                        ‹ All Books
+                      <Text style={[styles.navStepLabel, { color: navStep === step ? colors.accent : theme.textSecondary }]}>
+                        {step.toUpperCase()}
                       </Text>
                     </TouchableOpacity>
-                    <Text variant="body" color={colors.textSecondary}>
-                      {browsingBookForChapters.chaptersCount} Chapters
-                    </Text>
-                  </View>
-
-                  <ScrollView contentContainerStyle={styles.chapterGrid} showsVerticalScrollIndicator={false}>
-                    {Array.from({ length: browsingBookForChapters.chaptersCount }, (_, i) => i + 1).map((ch) => {
-                      const isCurrent =
-                        selectedBook.id === browsingBookForChapters.id && selectedChapter === ch;
-                      return (
-                        <TouchableOpacity
-                          key={ch}
-                          style={[styles.chapterTile, isCurrent && styles.chapterTileActive]}
-                          onPress={() => {
-                            setSelectedBook(browsingBookForChapters);
-                            setSelectedChapter(ch);
-                            setBrowsingBookForChapters(null);
-                            setIsSelectorOpen(false);
-                          }}
-                          activeOpacity={0.7}
-                        >
-                          <Text
-                            variant="body"
-                            weight={isCurrent ? '700' : '500'}
-                            style={[styles.chapterTileText, isCurrent && styles.chapterTileTextActive]}
-                          >
-                            {ch}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </ScrollView>
+                  ))}
                 </View>
-              ) : (
-                /* Books list view with Old/New Testament tabs */
-                <View style={styles.booksSelectionContainer}>
-                  {/* Search bar */}
-                  <View style={[styles.bookSearchBox, shadow.sm]}>
+              </View>
+
+              {/* BOOKS step */}
+              {navStep === 'books' && (
+                <View style={styles.flex1}>
+                  <View style={[styles.navSearchBox, { backgroundColor: theme.surface, borderColor: readerTheme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)' }]}>
                     <SearchSvg size={16} color={colors.accent} />
                     <TextInput
-                      style={styles.bookSearchInput}
-                      placeholder="Search book or category..."
-                      placeholderTextColor={colors.textTertiary}
+                      style={[styles.navSearchInput, { color: theme.text }]}
+                      placeholder="Search book..."
+                      placeholderTextColor={theme.textSecondary}
                       value={bookSearchText}
                       onChangeText={setBookSearchText}
-                      clearButtonMode="while-editing"
                     />
                   </View>
-
-                  {/* Testament segmented tabs */}
-                  <View style={styles.testamentTabRow}>
-                    <TouchableOpacity
-                      style={[styles.testamentTab, selectorTestament === 'OT' && styles.testamentTabActive]}
-                      onPress={() => setSelectorTestament('OT')}
-                    >
-                      <Text
-                        variant="caption"
-                        weight={selectorTestament === 'OT' ? '700' : '500'}
-                        style={[styles.testamentTabText, selectorTestament === 'OT' && styles.testamentTabTextActive]}
+                  <View style={styles.navTestamentRow}>
+                    {(['OT', 'NT'] as const).map(t => (
+                      <TouchableOpacity
+                        key={t}
+                        style={[styles.navTestTab, navTestament === t && { backgroundColor: colors.accent }]}
+                        onPress={() => setNavTestament(t)}
                       >
-                        Old Testament (39)
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[styles.testamentTab, selectorTestament === 'NT' && styles.testamentTabActive]}
-                      onPress={() => setSelectorTestament('NT')}
-                    >
-                      <Text
-                        variant="caption"
-                        weight={selectorTestament === 'NT' ? '700' : '500'}
-                        style={[styles.testamentTabText, selectorTestament === 'NT' && styles.testamentTabTextActive]}
-                      >
-                        New Testament (27)
-                      </Text>
-                    </TouchableOpacity>
+                        <Text style={{ color: navTestament === t ? '#FFFFFF' : theme.textSecondary, fontSize: 12, fontWeight: '700' }}>
+                          {t === 'OT' ? 'Old Testament' : 'New Testament'}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
                   </View>
-
-                  <ScrollView
-                    contentContainerStyle={styles.booksListContainer}
-                    showsVerticalScrollIndicator={false}
-                  >
-                    {filteredBooks.map((book) => {
-                      const isSelected = selectedBook.id === book.id;
+                  <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.navBookList}>
+                    {filteredBooks.map(book => {
+                      const isCur = selectedBook.id === book.id;
                       return (
                         <TouchableOpacity
                           key={book.id}
-                          style={[styles.bookRowItem, isSelected && styles.bookRowItemActive]}
-                          onPress={() => setBrowsingBookForChapters(book)}
+                          style={[styles.navBookRow, isCur && { backgroundColor: '#FDD22320' }]}
+                          onPress={() => onNavBookTap(book)}
                           activeOpacity={0.7}
                         >
-                          <View style={styles.bookRowMain}>
-                            <Text
-                              variant="body"
-                              weight={isSelected ? '700' : '600'}
-                              style={[styles.bookRowName, isSelected && styles.bookRowNameActive]}
-                            >
-                              {book.name}
-                            </Text>
-                            <Text variant="caption" color={colors.textTertiary}>
-                              {book.category}
-                            </Text>
+                          <View>
+                            <Text style={[styles.navBookName, { color: isCur ? colors.accent : theme.text }]}>{book.name}</Text>
+                            <Text style={[styles.navBookMeta, { color: theme.textSecondary }]}>{book.category}</Text>
                           </View>
-                          <View style={styles.bookRowRight}>
-                            <Text variant="caption" color={colors.textSecondary} style={{ marginRight: 6 }}>
-                              {book.chaptersCount} ch
-                            </Text>
-                            <ChevronDownSvg size={14} color={colors.accent} style={{ transform: [{ rotate: '-9deg' }] }} />
-                          </View>
+                          <Text style={[styles.navBookCh, { color: theme.textSecondary }]}>{book.chaptersCount} ch</Text>
                         </TouchableOpacity>
                       );
                     })}
                   </ScrollView>
                 </View>
               )}
+
+              {/* CHAPTERS step */}
+              {navStep === 'chapters' && navBook && (
+                <View style={styles.flex1}>
+                  <TouchableOpacity style={styles.navBackRow} onPress={() => setNavStep('books')}>
+                    <ChevronLeftSvg size={18} color={colors.accent} />
+                    <Text style={{ color: colors.accent, fontWeight: '700', fontSize: 14 }}>All Books</Text>
+                  </TouchableOpacity>
+                  <Text style={[styles.navBookTitle, { color: theme.text }]}>{navBook.name}</Text>
+                  <ScrollView contentContainerStyle={styles.navChapterGrid} showsVerticalScrollIndicator={false}>
+                    {Array.from({ length: navBook.chaptersCount }, (_, i) => i + 1).map(ch => {
+                      const isActive = selectedBook.id === navBook.id && selectedChapter === ch;
+                      return (
+                        <TouchableOpacity
+                          key={ch}
+                          style={[styles.navChTile, isActive && { backgroundColor: colors.accent }]}
+                          onPress={() => onNavChapterConfirm(ch)}
+                          activeOpacity={0.7}
+                        >
+                          <Text style={[styles.navChTileText, { color: isActive ? '#FFFFFF' : theme.text }]}>{ch}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+              )}
+
+              {/* VERSES step */}
+              {navStep === 'verses' && navBook && navChapter && (
+                <View style={styles.flex1}>
+                  <TouchableOpacity style={styles.navBackRow} onPress={() => setNavStep('chapters')}>
+                    <ChevronLeftSvg size={18} color={colors.accent} />
+                    <Text style={{ color: colors.accent, fontWeight: '700', fontSize: 14 }}>Chapters</Text>
+                  </TouchableOpacity>
+                  <Text style={[styles.navBookTitle, { color: theme.text }]}>{navBook.name} {navChapter}</Text>
+                  <ScrollView contentContainerStyle={styles.navChapterGrid} showsVerticalScrollIndicator={false}>
+                    {Array.from({ length: 50 }, (_, i) => i + 1).map(v => (
+                      <TouchableOpacity
+                        key={v}
+                        style={styles.navChTile}
+                        onPress={() => onNavVerseTap(v)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={[styles.navChTileText, { color: theme.text }]}>{v}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
             </SafeAreaView>
           </Modal>
 
-          {/* Verse Tap Action Bottom Sheet Modal */}
-          <Modal
-            visible={!!selectedVerse}
-            animationType="fade"
-            transparent={true}
-            onRequestClose={() => setSelectedVerse(null)}
-          >
-            <TouchableOpacity
-              style={styles.modalOverlay}
-              activeOpacity={1}
-              onPress={() => setSelectedVerse(null)}
-            >
-              <View style={[styles.verseActionCard, shadow.md]}>
-                <View style={styles.verseActionHeader}>
-                  <View>
-                    <Text variant="h3" color={colors.accent}>
-                      {selectedBook.name} {selectedChapter}:{selectedVerse?.verse}
-                    </Text>
-                    <Text variant="caption" color={colors.textTertiary}>
-                      {translation.toUpperCase()} Translation
-                    </Text>
-                  </View>
-                  <TouchableOpacity onPress={() => setSelectedVerse(null)} style={styles.closeVerseActionBtn}>
-                    <XCloseSvg size={18} color={colors.textSecondary} />
+          {/* ── Aa Reader Settings Sheet ── */}
+          <Modal visible={isAaOpen} animationType="slide" transparent={true} onRequestClose={() => setIsAaOpen(false)}>
+            <TouchableOpacity style={styles.aaOverlay} activeOpacity={1} onPress={() => setIsAaOpen(false)}>
+              <View style={[styles.aaSheet, { backgroundColor: theme.surface }]} onStartShouldSetResponder={() => true}>
+                <View style={[styles.aaSheetHandle, { backgroundColor: readerTheme === 'dark' ? '#334155' : '#E2E8F0' }]} />
+
+                <Text style={[styles.aaSectionLabel, { color: theme.textSecondary }]}>FONT SIZE</Text>
+                <View style={styles.aaFontSizeRow}>
+                  <TouchableOpacity
+                    style={[styles.aaFontBtn, { borderColor: colors.accent }]}
+                    onPress={() => setFontSize(s => Math.max(12, s - 1))}
+                  >
+                    <Text style={[styles.aaFontBtnText, { color: colors.accent }]}>A−</Text>
+                  </TouchableOpacity>
+                  <Text style={[styles.aaFontSizeVal, { color: theme.text }]}>{fontSize}px</Text>
+                  <TouchableOpacity
+                    style={[styles.aaFontBtn, { borderColor: colors.accent }]}
+                    onPress={() => setFontSize(s => Math.min(28, s + 1))}
+                  >
+                    <Text style={[styles.aaFontBtnText, { color: colors.accent }]}>A+</Text>
                   </TouchableOpacity>
                 </View>
 
-                <Text
-                  variant="body"
-                  color={colors.textPrimary}
-                  style={styles.verseActionSnippet}
-                  numberOfLines={4}
-                >
-                  "{selectedVerse?.text.trim()}"
-                </Text>
+                <Text style={[styles.aaSectionLabel, { color: theme.textSecondary }]}>TYPEFACE</Text>
+                <View style={styles.aaTypefaceRow}>
+                  {([['serif', 'Serif'], ['sans', 'Sans'], ['mono', 'Mono']] as ['serif'|'sans'|'mono', string][]).map(([key, label]) => (
+                    <TouchableOpacity
+                      key={key}
+                      style={[styles.aaTypePill, fontType === key && { backgroundColor: colors.accent }]}
+                      onPress={() => setFontType(key)}
+                    >
+                      <Text style={{ fontFamily: getFontFamily(key), color: fontType === key ? '#FFFFFF' : theme.textSecondary, fontSize: 14 }}>
+                        {label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
 
-                <View style={styles.verseActionButtonsRow}>
-                  {/* Copy */}
-                  <TouchableOpacity
-                    style={styles.verseActionBtn}
-                    onPress={() => {
-                      if (selectedVerse) onCopyVerse(selectedVerse);
-                    }}
-                  >
-                    <CopySvg size={18} color={colors.accent} />
-                    <Text variant="caption" weight="600" color={colors.textPrimary}>
-                      Copy
-                    </Text>
-                  </TouchableOpacity>
-
-                  {/* Favorite */}
-                  <TouchableOpacity
-                    style={styles.verseActionBtn}
-                    onPress={() => {
-                      if (selectedVerse) onToggleFavoriteVerse(selectedVerse);
-                    }}
-                  >
-                    <FavoritesSvg
-                      size={18}
-                      color={colors.accent}
-                      fill={selectedVerse && isCurrentVerseFavorited(selectedVerse) ? colors.accent : 'none'}
-                    />
-                    <Text variant="caption" weight="600" color={colors.textPrimary}>
-                      {selectedVerse && isCurrentVerseFavorited(selectedVerse) ? 'Saved' : 'Favorite'}
-                    </Text>
-                  </TouchableOpacity>
-
-                  {/* Share */}
-                  <TouchableOpacity
-                    style={styles.verseActionBtn}
-                    onPress={() => {
-                      if (selectedVerse) {
-                        onShareVerse(selectedVerse);
-                        setSelectedVerse(null);
-                      }
-                    }}
-                  >
-                    <ShareSvg size={18} color={colors.accent} />
-                    <Text variant="caption" weight="600" color={colors.textPrimary}>
-                      Share
-                    </Text>
-                  </TouchableOpacity>
+                <Text style={[styles.aaSectionLabel, { color: theme.textSecondary }]}>READING THEME</Text>
+                <View style={styles.aaThemeRow}>
+                  {(Object.keys(THEMES) as ReaderTheme[]).map(t => (
+                    <TouchableOpacity
+                      key={t}
+                      style={[styles.aaThemeTile, { backgroundColor: THEMES[t].bg, borderColor: readerTheme === t ? colors.accent : 'transparent', borderWidth: 2 }]}
+                      onPress={() => setReaderTheme(t)}
+                    >
+                      <Text style={[styles.aaThemeLabel, { color: THEMES[t].text }]}>{THEMES[t].label}</Text>
+                      <Text style={{ fontSize: 10, color: THEMES[t].textSecondary }}>Aa</Text>
+                    </TouchableOpacity>
+                  ))}
                 </View>
               </View>
             </TouchableOpacity>
           </Modal>
         </View>
+
       ) : (
-        /* VIEW 2: DAILY EXEGESIS */
+        /* ════════════════════════════════════════════════════ */
+        /* VIEW 2: DAILY EXEGESIS                              */
+        /* ════════════════════════════════════════════════════ */
         <ScrollView
-          style={styles.scroll}
+          style={styles.flex1}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.contentContainer}
+          contentContainerStyle={styles.exegesisContainer}
         >
           {/* Header */}
-          <View style={styles.header}>
-            <View style={styles.headerTitleRow}>
-              <WotdSvg size={24} color={colors.accent} fill={colors.accentSoft} />
-              <Text variant="h2" style={styles.titleText}>Daily Word & Exegesis</Text>
+          <View style={styles.exegesisHeader}>
+            <View style={styles.exegesisHeaderRow}>
+              <WotdSvg size={22} color={colors.accent} fill={colors.accentSoft} />
+              <Text style={[styles.exegesisTitle, { color: theme.text }]}>Daily Word & Exegesis</Text>
             </View>
-            <Text variant="body" color={colors.textSecondary} style={styles.subtitle}>
-              Deepen your understanding across 4 distinct analytical perspectives
+            <Text style={[styles.exegesisSubtitle, { color: theme.textSecondary }]}>
+              4 analytical perspectives on today's scripture
             </Text>
           </View>
 
-          {/* Verse Highlight Card */}
-          <Card style={styles.verseCard}>
-            <View style={styles.metaRow}>
+          {/* Verse Card */}
+          <View style={[styles.verseCard, { backgroundColor: theme.surface }]}>
+            <View style={styles.verseMeta}>
               <CalendarSvg size={14} color={colors.accent} />
-              <Text variant="label" color={colors.accent} style={styles.metaLabel}>DAILY SCRIPTURE</Text>
+              <Text style={styles.verseMetaLabel}>DAILY SCRIPTURE</Text>
             </View>
+            <Text style={[styles.verseCardText, { color: theme.text }]}>
+              "{wotd.verse}"
+            </Text>
+            <Text style={[styles.verseCardRef, { color: colors.accent }]}>{wotd.reference}</Text>
+          </View>
 
-            <View style={styles.quoteWrapper}>
-              <Text variant="h2" style={styles.verseText}>
-                "{wotd.verse}"
+          {/* Lens Tabs */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.lensTabs}>
+            {LENS_TABS.map(tab => {
+              const isActive = activeLens === tab.key;
+              return (
+                <TouchableOpacity
+                  key={tab.key}
+                  style={[styles.lensTab, isActive && { borderColor: colors.accent, backgroundColor: colors.accentSoft }]}
+                  onPress={() => setActiveLens(tab.key as LensKey)}
+                  activeOpacity={0.8}
+                >
+                  {getLensIcon(tab.key as LensKey, isActive ? colors.accent : (theme.textSecondary))}
+                  <Text style={[styles.lensTabText, { color: isActive ? colors.accent : theme.textSecondary }]}>
+                    {tab.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+
+          {/* Lens Content Card */}
+          <View style={[styles.lensCard, { backgroundColor: theme.surface }]}>
+            <View style={styles.lensCardHeader}>
+              {getLensIcon(activeLens, colors.accent)}
+              <Text style={[styles.lensCardTitle, { color: colors.accent }]}>
+                {activeLens.replace(/_/g, ' ').toUpperCase()}
               </Text>
             </View>
-
-            <Text variant="h3" style={styles.verseRef}>{wotd.reference}</Text>
-          </Card>
-
-          {/* Lens Selection Tabs */}
-          <View style={styles.lensTabsContainer}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.lensScroll}>
-              {LENS_TABS.map((tab) => {
-                const isActive = activeLens === tab.key;
-                return (
-                  <TouchableOpacity
-                    key={tab.key}
-                    style={[styles.lensTab, isActive && styles.lensTabActive]}
-                    onPress={() => setActiveLens(tab.key as LensKey)}
-                    activeOpacity={0.8}
-                  >
-                    {getLensIcon(tab.key as LensKey, isActive ? colors.accent : colors.textSecondary)}
-                    <Text
-                      variant="caption"
-                      weight={isActive ? '700' : '500'}
-                      style={[styles.lensTabText, isActive && styles.lensTabTextActive]}
-                    >
-                      {tab.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
+            <Text style={[styles.lensCardBody, { color: theme.text }]}>{getLensContent()}</Text>
           </View>
 
-          {/* Active Lens Insight Card */}
-          <Card style={styles.lensCard}>
-            <View style={styles.lensCardHeader}>
-              <View style={styles.lensHeaderTitleRow}>
-                {getLensIcon(activeLens, colors.accent)}
-                <Text variant="label" color={colors.accent} style={styles.lensHeaderTitle}>
-                  {activeLens.replace('_', ' ').toUpperCase()}
-                </Text>
-              </View>
-            </View>
-
-            <Text variant="body" style={styles.lensContentText}>
-              {getLensContent()}
-            </Text>
-          </Card>
-
           {/* Action Footer */}
-          <View style={styles.actionFooter}>
+          <View style={styles.exegesisFooter}>
             <TouchableOpacity
-              style={[styles.actionBtn, completed && styles.completedBtn]}
+              style={[styles.markBtn, completed && { backgroundColor: colors.accent }]}
               onPress={() => markWOTDComplete(wotd)}
-              activeOpacity={0.8}
+              activeOpacity={0.85}
             >
               <CheckSvg size={18} color={completed ? '#FFFFFF' : colors.accent} />
-              <Text
-                variant="body"
-                weight="600"
-                style={[styles.actionBtnText, completed && styles.completedBtnText]}
-              >
+              <Text style={[styles.markBtnText, { color: completed ? '#FFFFFF' : colors.accent }]}>
                 {completed ? 'Reflected Today' : 'Mark as Studied'}
               </Text>
             </TouchableOpacity>
-
-            <TouchableOpacity style={styles.shareBtn} onPress={onShareExegesis} activeOpacity={0.8}>
+            <TouchableOpacity style={[styles.shareExBtn, { backgroundColor: theme.surface }]} onPress={onShareExegesis} activeOpacity={0.8}>
               <ShareSvg size={18} color={colors.accent} />
             </TouchableOpacity>
           </View>
@@ -789,506 +849,559 @@ export default function WOTDScreen() {
   );
 }
 
+// ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  // Top segment
-  topSegmentContainer: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.sm,
-    backgroundColor: colors.background,
-  },
-  segmentedControl: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(15, 23, 42, 0.05)',
-    borderRadius: radius.full,
-    padding: 3,
-  },
-  segmentBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-    borderRadius: radius.full,
-    gap: 6,
-  },
-  segmentBtnActive: {
-    backgroundColor: '#FFFFFF',
-    ...shadow.sm,
-  },
-  segmentText: {
-    color: colors.textSecondary,
-    fontSize: 13,
-  },
-  segmentTextActive: {
-    color: colors.accent,
-  },
+  safeArea: { flex: 1 },
+  flex1: { flex: 1 },
 
-  // Full Bible Styles
-  bibleContainer: {
-    flex: 1,
-  },
-  readerHeaderBar: {
+  // ── Top App Bar ─────────────────────────────────────────────────────────────
+  topBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: 16,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
   },
-  bookSelectorButton: {
+  pill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    flex: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 20,
+    backgroundColor: 'rgba(15,23,42,0.05)',
+    gap: 5,
   },
-  bookSelectorIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: colors.accentSoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bookSelectorTextWrap: {
-    flex: 1,
-  },
-  bookSelectorTitle: {
-    color: colors.textPrimary,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  translationBadge: {
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: radius.sm,
+  pillPrimary: {
+    backgroundColor: '#FDD22318',
     borderWidth: 1,
-    borderColor: 'rgba(253, 210, 35, 0.2)',
+    borderColor: '#FDD22340',
   },
-  translationText: {
+  pillAccent: {
+    backgroundColor: colors.accent,
+  },
+  pillRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  pillText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#64748B',
+  },
+  pillTextBold: {
+    fontSize: 14,
+    fontWeight: '700',
     color: colors.accent,
-    fontSize: 12,
   },
-  bibleScrollView: {
-    flex: 1,
+
+  // ── Scripture Canvas ────────────────────────────────────────────────────────
+  scriptureCanvas: {
+    paddingHorizontal: 22,
+    paddingTop: 20,
   },
-  bibleScrollContent: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
-    paddingBottom: 110,
-  },
-  chapterHeader: {
+
+  // Chapter heading
+  chapterHeading: {
     alignItems: 'center',
-    marginBottom: spacing.lg,
-    paddingBottom: spacing.md,
+    marginBottom: 20,
+    paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(15, 23, 42, 0.05)',
+    borderBottomColor: 'rgba(15,23,42,0.06)',
   },
-  chapterMainTitle: {
-    color: colors.textPrimary,
+  chapterHeadingBook: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 3,
+  },
+  chapterHeadingNumber: {
     fontSize: 26,
     fontWeight: '800',
-  },
-  chapterNumberLabel: {
-    marginTop: 2,
-    fontSize: 18,
-  },
-  chapterTranslationMeta: {
     marginTop: 4,
+    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
+  },
+  chapterMeta: {
     fontSize: 11,
+    marginTop: 4,
+    letterSpacing: 0.5,
   },
-  loaderContainer: {
+
+  // Verse flow
+  versesFlow: {
+    gap: 2,
+  },
+  verseBlock: {
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'flex-start',
+    position: 'relative',
+  },
+  verseBlockSelected: {
+    backgroundColor: '#FDD22330',
+  },
+  verseSuper: {
+    fontSize: 10,
+    fontWeight: '700',
+    lineHeight: 20,
+    marginRight: 5,
+    marginTop: 2,
+    minWidth: 20,
+  },
+  verseBodyInline: {
+    flex: 1,
+    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
+  },
+  hlUnderline: {
+    position: 'absolute',
+    bottom: 0,
+    left: 8,
+    right: 8,
+    height: 2,
+    borderRadius: 1,
+    opacity: 0.6,
+  },
+
+  // ── Loader / Error ──────────────────────────────────────────────────────────
+  loaderBox: {
     alignItems: 'center',
-    justifyContent: 'center',
     paddingVertical: 60,
+    gap: 12,
   },
-  errorContainer: {
+  loaderText: {
+    fontSize: 14,
+  },
+  errorBox: {
     alignItems: 'center',
-    justifyContent: 'center',
     paddingVertical: 40,
+    gap: 16,
   },
   errorText: {
     textAlign: 'center',
-    marginBottom: spacing.md,
+    fontSize: 14,
   },
   retryBtn: {
-    backgroundColor: colors.accent,
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderRadius: radius.full,
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 20,
   },
-  versesWrapper: {
-    gap: 8,
-  },
-  verseRow: {
-    flexDirection: 'row',
-    paddingVertical: 6,
-    paddingHorizontal: 8,
-    borderRadius: radius.sm,
-    alignItems: 'flex-start',
-  },
-  verseRowHighlight: {
-    backgroundColor: colors.accentSoft,
-  },
-  verseNumberBadge: {
-    width: 28,
-    paddingTop: 2,
-    color: colors.accent,
+  retryBtnText: {
+    color: '#FFFFFF',
     fontWeight: '700',
-    fontSize: 12,
-  },
-  verseBodyText: {
-    flex: 1,
-    color: colors.textPrimary,
-  },
-  verseFavIndicator: {
-    marginLeft: 6,
-    paddingTop: 4,
-  },
-  chapterNavFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: spacing.xl,
-    paddingTop: spacing.lg,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(15, 23, 42, 0.06)',
-  },
-  navBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  navBtnDisabled: {
-    opacity: 0.3,
-  },
-  navProgress: {
-    backgroundColor: 'rgba(15, 23, 42, 0.04)',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: radius.full,
+    fontSize: 14,
   },
 
-  // Modal Selector Styles
-  modalSafeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  modalHeader: {
+  // ── Chapter Stepper ─────────────────────────────────────────────────────────
+  chapterStepper: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
+    marginTop: 28,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    marginBottom: 16,
   },
-  modalHeaderLeft: {
+  stepBtn: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
+    flex: 1,
+  },
+  stepBtnText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  stepCenter: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginHorizontal: 8,
+  },
+  stepCenterText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+
+  // ── Floating Action Bar ─────────────────────────────────────────────────────
+  floatingActionBar: {
+    position: 'absolute',
+    bottom: 90,
+    left: 16,
+    right: 16,
+    borderRadius: 16,
+    ...shadow.md,
+    padding: 16,
+  },
+  fabHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  fabRef: {
+    fontSize: 13,
+    fontWeight: '700',
+    flex: 1,
+    marginRight: 8,
+  },
+  fabClose: {
+    padding: 4,
+  },
+  fabColorRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 14,
+  },
+  fabColorDot: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    ...shadow.sm,
+  },
+  fabEraseDot: {
+    backgroundColor: '#F1F5F9',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fabActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(15,23,42,0.06)',
+    paddingTop: 12,
+  },
+  fabActionBtn: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 4,
+  },
+  fabActionLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  fabDivider: {
+    width: 1,
+    height: 32,
+    marginHorizontal: 4,
+  },
+
+  // ── Navigator Modal ─────────────────────────────────────────────────────────
+  navModal: {
+    flex: 1,
+  },
+  navModalHeader: {
+    borderBottomWidth: 1,
+    paddingTop: 12,
+    paddingHorizontal: 16,
+  },
+  navModalClose: {
+    alignSelf: 'flex-end',
+    padding: 4,
+    marginBottom: 8,
+  },
+  navStepRow: {
+    flexDirection: 'row',
+  },
+  navStepTab: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  navStepTabActive: {
+    borderBottomColor: colors.accent,
+  },
+  navStepLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  navSearchBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    margin: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1,
     gap: 8,
   },
-  modalTitle: {
-    color: colors.textPrimary,
-  },
-  modalCloseBtn: {
-    padding: 6,
-  },
-  chapterSelectionContainer: {
+  navSearchInput: {
     flex: 1,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
+    fontSize: 14,
+    padding: 0,
   },
-  chapterSelectionTopRow: {
+  navTestamentRow: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    gap: 8,
+    marginBottom: 8,
+  },
+  navTestTab: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: 'center',
+    borderRadius: 8,
+    backgroundColor: 'rgba(15,23,42,0.04)',
+  },
+  navBookList: {
+    paddingHorizontal: 16,
+    paddingBottom: 40,
+  },
+  navBookRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: spacing.md,
+    paddingVertical: 13,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15,23,42,0.04)',
+    paddingHorizontal: 8,
+    borderRadius: 6,
   },
-  backToBooksBtn: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    backgroundColor: colors.accentSoft,
-    borderRadius: radius.sm,
+  navBookName: {
+    fontSize: 15,
+    fontWeight: '600',
   },
-  chapterGrid: {
+  navBookMeta: {
+    fontSize: 11,
+    marginTop: 2,
+  },
+  navBookCh: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  navBackRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 4,
+  },
+  navBookTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    paddingHorizontal: 16,
+    marginBottom: 16,
+    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
+  },
+  navChapterGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    paddingHorizontal: 16,
     gap: 10,
     paddingBottom: 40,
   },
-  chapterTile: {
+  navChTile: {
     width: 52,
     height: 52,
-    backgroundColor: '#FFFFFF',
-    borderRadius: radius.md,
+    borderRadius: 12,
+    backgroundColor: 'rgba(15,23,42,0.04)',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    ...shadow.sm,
   },
-  chapterTileActive: {
-    backgroundColor: colors.accent,
-    borderColor: colors.accent,
+  navChTileText: {
+    fontSize: 15,
+    fontWeight: '700',
   },
-  chapterTileText: {
-    color: colors.textPrimary,
-  },
-  chapterTileTextActive: {
-    color: '#FFFFFF',
-  },
-  booksSelectionContainer: {
+
+  // ── Aa Settings Sheet ────────────────────────────────────────────────────────
+  aaOverlay: {
     flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(15,23,42,0.4)',
   },
-  bookSearchBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    marginHorizontal: spacing.lg,
-    marginTop: spacing.md,
-    marginBottom: spacing.sm,
-    paddingHorizontal: spacing.md,
-    paddingVertical: 8,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
-    gap: 8,
-  },
-  bookSearchInput: {
-    flex: 1,
-    fontSize: 14,
-    color: colors.textPrimary,
-    padding: 0,
-  },
-  testamentTabRow: {
-    flexDirection: 'row',
-    paddingHorizontal: spacing.lg,
-    gap: 8,
-    marginBottom: spacing.sm,
-  },
-  testamentTab: {
-    flex: 1,
-    paddingVertical: 8,
-    alignItems: 'center',
-    backgroundColor: 'rgba(15, 23, 42, 0.04)',
-    borderRadius: radius.sm,
-  },
-  testamentTabActive: {
-    backgroundColor: colors.accent,
-  },
-  testamentTabText: {
-    color: colors.textSecondary,
-    fontSize: 12,
-  },
-  testamentTabTextActive: {
-    color: '#FFFFFF',
-  },
-  booksListContainer: {
-    paddingHorizontal: spacing.lg,
+  aaSheet: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
     paddingBottom: 40,
   },
-  bookRowItem: {
+  aaSheetHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  aaSectionLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1.5,
+    marginBottom: 12,
+    marginTop: 8,
+  },
+  aaFontSizeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(15, 23, 42, 0.04)',
+    gap: 16,
+    marginBottom: 8,
   },
-  bookRowItemActive: {
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 8,
-    borderRadius: radius.sm,
-  },
-  bookRowMain: {
-    gap: 2,
-  },
-  bookRowName: {
-    color: colors.textPrimary,
-  },
-  bookRowNameActive: {
-    color: colors.accent,
-  },
-  bookRowRight: {
-    flexDirection: 'row',
+  aaFontBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    borderWidth: 1.5,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  aaFontBtnText: {
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  aaFontSizeVal: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  aaTypefaceRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 8,
+  },
+  aaTypePill: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: 10,
+    backgroundColor: 'rgba(15,23,42,0.05)',
+  },
+  aaThemeRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 8,
+  },
+  aaThemeTile: {
+    flex: 1,
+    paddingVertical: 14,
+    alignItems: 'center',
+    borderRadius: 12,
+    gap: 4,
+  },
+  aaThemeLabel: {
+    fontSize: 13,
+    fontWeight: '700',
   },
 
-  // Verse Action Modal
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.4)',
-    justifyContent: 'flex-end',
-    padding: spacing.lg,
+  // ── Daily Exegesis ──────────────────────────────────────────────────────────
+  exegesisContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 120,
   },
-  verseActionCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    marginBottom: 40,
+  exegesisHeader: {
+    marginBottom: 16,
   },
-  verseActionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing.md,
-  },
-  closeVerseActionBtn: {
-    padding: 4,
-  },
-  verseActionSnippet: {
-    fontStyle: 'italic',
-    marginBottom: spacing.lg,
-    lineHeight: 22,
-  },
-  verseActionButtonsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(15, 23, 42, 0.06)',
-    paddingTop: spacing.md,
-  },
-  verseActionBtn: {
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 12,
-  },
-
-  // Daily Exegesis View Styles
-  scroll: {
-    flex: 1,
-  },
-  contentContainer: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: 110,
-  },
-  header: {
-    marginBottom: spacing.lg,
-  },
-  headerTitleRow: {
+  exegesisHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    marginBottom: 4,
   },
-  titleText: {
-    color: colors.textPrimary,
+  exegesisTitle: {
+    fontSize: 20,
+    fontWeight: '800',
   },
-  subtitle: {
-    marginTop: 4,
+  exegesisSubtitle: {
+    fontSize: 13,
   },
   verseCard: {
-    marginBottom: spacing.lg,
-    padding: spacing.lg,
-    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    padding: 20,
+    marginBottom: 16,
+    ...shadow.sm,
   },
-  metaRow: {
+  verseMeta: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginBottom: spacing.sm,
+    marginBottom: 10,
   },
-  metaLabel: {
+  verseMetaLabel: {
+    color: colors.accent,
+    fontSize: 10,
+    fontWeight: '700',
     letterSpacing: 1.5,
   },
-  quoteWrapper: {
-    marginVertical: spacing.sm,
-  },
-  verseText: {
+  verseCardText: {
+    fontSize: 17,
     fontStyle: 'italic',
     lineHeight: 28,
-    color: colors.textPrimary,
+    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
+    marginBottom: 10,
   },
-  verseRef: {
-    color: colors.accent,
-    marginTop: spacing.sm,
+  verseCardRef: {
+    fontSize: 14,
+    fontWeight: '700',
   },
-  lensTabsContainer: {
-    marginBottom: spacing.md,
-  },
-  lensScroll: {
+  lensTabs: {
     gap: 8,
+    marginBottom: 16,
   },
   lensTab: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: radius.full,
+    borderRadius: 20,
     backgroundColor: '#FFFFFF',
-    gap: 8,
+    gap: 7,
     borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
-  },
-  lensTabActive: {
-    borderColor: colors.accent,
-    backgroundColor: colors.accentSoft,
+    borderColor: 'rgba(15,23,42,0.06)',
   },
   lensTabText: {
-    color: colors.textSecondary,
-  },
-  lensTabTextActive: {
-    color: colors.accent,
+    fontSize: 13,
+    fontWeight: '600',
   },
   lensCard: {
-    padding: spacing.lg,
-    backgroundColor: '#FFFFFF',
-    marginBottom: spacing.xl,
+    borderRadius: 14,
+    padding: 20,
+    marginBottom: 20,
+    ...shadow.sm,
   },
   lensCardHeader: {
-    marginBottom: spacing.md,
-  },
-  lensHeaderTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
+    marginBottom: 12,
   },
-  lensHeaderTitle: {
+  lensCardTitle: {
+    fontSize: 11,
+    fontWeight: '700',
     letterSpacing: 1,
   },
-  lensContentText: {
-    lineHeight: 24,
-    color: colors.textPrimary,
+  lensCardBody: {
+    fontSize: 15,
+    lineHeight: 25,
   },
-  actionFooter: {
+  exegesisFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
   },
-  actionBtn: {
+  markBtn: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 14,
-    borderRadius: radius.full,
+    borderRadius: 20,
     backgroundColor: colors.accentSoft,
     borderWidth: 1,
     borderColor: colors.accent,
     gap: 8,
   },
-  completedBtn: {
-    backgroundColor: colors.accent,
+  markBtnText: {
+    fontSize: 15,
+    fontWeight: '700',
   },
-  actionBtnText: {
-    color: colors.accent,
-  },
-  completedBtnText: {
-    color: '#FFFFFF',
-  },
-  shareBtn: {
+  shareExBtn: {
     padding: 14,
-    borderRadius: radius.full,
-    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
+    borderColor: 'rgba(15,23,42,0.08)',
   },
 });
