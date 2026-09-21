@@ -100,6 +100,11 @@ const getLensIcon = (key: LensKey, color: string) => {
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
+// Chapter/Verse grid: exactly 5 columns with 16px padding on each side and 10px gaps
+const NAV_COLS = 5;
+const NAV_TILE_SIZE = Math.floor((SCREEN_WIDTH - 32 - (NAV_COLS - 1) * 10) / NAV_COLS);
+
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function WOTDScreen() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('bible');
@@ -1275,8 +1280,8 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   navChTile: {
-    width: 52,
-    height: 52,
+    width: NAV_TILE_SIZE,
+    height: NAV_TILE_SIZE,
     borderRadius: 12,
     backgroundColor: 'rgba(15,23,42,0.04)',
     alignItems: 'center',
