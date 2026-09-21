@@ -25,7 +25,7 @@ export interface LastReadPosition {
 export async function fetchChapter(
   book: string,
   chapter: number,
-  translation: 'web' | 'kjv' | 'bbe' = 'web'
+  translation: 'web' | 'kjv' | 'bbe' | 'asv' | 'darby' | 'dra' | 'ylt' | 'oeb-cw' | 'webbe' | 'oeb-us' = 'web'
 ): Promise<BibleChapterData> {
   const normalizedBook = book.trim();
   const cacheKey = `${translation}_${normalizedBook.replace(/\s+/g, '_')}_${chapter}`;

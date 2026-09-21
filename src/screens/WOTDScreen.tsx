@@ -45,7 +45,9 @@ import {
 // ─── Types ───────────────────────────────────────────────────────────────────
 type LensKey = 'original_intent' | 'theological_truth' | 'modern_walk' | 'prayer_focus';
 type ActiveTab = 'bible' | 'exegesis';
-type BibleTranslation = 'web' | 'kjv' | 'bbe';
+type BibleTranslation =
+  | 'web' | 'kjv' | 'asv' | 'bbe' | 'darby'
+  | 'dra' | 'ylt' | 'oeb-cw' | 'webbe' | 'oeb-us';
 type ReaderTheme = 'light' | 'sepia' | 'dark';
 type NavStep = 'books' | 'chapters' | 'verses';
 
@@ -65,16 +67,32 @@ const THEMES: Record<ReaderTheme, { bg: string; surface: string; text: string; t
   dark:  { bg: '#0F172A', surface: '#1E293B', text: '#F8FAFC', textSecondary: '#94A3B8', label: 'Dark' },
 };
 
-const TRANSLATIONS: BibleTranslation[] = ['web', 'kjv', 'bbe'];
+const TRANSLATIONS: BibleTranslation[] = [
+  'web', 'kjv', 'asv', 'bbe', 'darby', 'dra', 'ylt', 'oeb-cw', 'webbe', 'oeb-us',
+];
 const TRANSLATION_LABELS: Record<BibleTranslation, string> = {
-  web: 'WEB',
-  kjv: 'KJV',
-  bbe: 'BBE',
+  web:      'WEB',
+  kjv:      'KJV',
+  asv:      'ASV',
+  bbe:      'BBE',
+  darby:    'DARBY',
+  dra:      'DRA',
+  ylt:      'YLT',
+  'oeb-cw': 'OEB-CW',
+  webbe:    'WEBBE',
+  'oeb-us': 'OEB-US',
 };
-const TRANSLATION_META: Record<BibleTranslation, { name: string; desc: string }> = {
-  web: { name: 'World English Bible', desc: 'Modern English, public domain' },
-  kjv: { name: 'King James Version', desc: 'Classic 1611 translation, public domain' },
-  bbe: { name: 'Bible in Basic English', desc: 'Simple vocabulary, public domain' },
+const TRANSLATION_META: Record<BibleTranslation, { name: string; desc: string; tag: string }> = {
+  web:      { name: 'World English Bible',                   desc: 'Modern English - Full Bible - Public domain',    tag: 'MODERN'    },
+  kjv:      { name: 'King James Version',                    desc: 'Classic 1611 - Full Bible - Public domain',      tag: 'CLASSIC'   },
+  asv:      { name: 'American Standard Version',             desc: 'Literal 1901 - Full Bible - Public domain',      tag: 'SCHOLARLY' },
+  bbe:      { name: 'Bible in Basic English',                desc: 'Simple vocab - Full Bible - Public domain',      tag: 'SIMPLE'    },
+  darby:    { name: 'Darby Bible',                           desc: 'Precise 1890 - Full Bible - Public domain',      tag: 'SCHOLARLY' },
+  dra:      { name: 'Douay-Rheims 1899',                     desc: 'Catholic - Full Bible - Public domain',          tag: 'CLASSIC'   },
+  ylt:      { name: "Young's Literal Translation",          desc: 'Very literal - NT only - Public domain',        tag: 'SCHOLARLY' },
+  'oeb-cw': { name: 'Open English Bible (Commonwealth)',     desc: 'Modern UK English - Full Bible - Open license', tag: 'MODERN'    },
+  webbe:    { name: 'World English Bible (British Ed.)',     desc: 'British spelling - Full Bible - Public domain',  tag: 'MODERN'    },
+  'oeb-us': { name: 'Open English Bible (US Edition)',       desc: 'Modern US English - Full Bible - Open license', tag: 'MODERN'    },
 };
 
 
@@ -800,41 +818,57 @@ export default function WOTDScreen() {
               onPress={() => setIsTranslationPickerOpen(false)}
             >
               <View
-                style={[styles.aaSheet, { backgroundColor: theme.surface }]}
+                style={[styles.translationSheet, { backgroundColor: theme.surface }]}
                 onStartShouldSetResponder={() => true}
               >
                 <View style={[styles.aaSheetHandle, { backgroundColor: readerTheme === 'dark' ? '#334155' : '#E2E8F0' }]} />
                 <Text style={[styles.aaSectionLabel, { color: theme.textSecondary }]}>SELECT TRANSLATION</Text>
+                <Text style={[styles.translationSubLabel, { color: theme.textSecondary }]}>
+                  10 public domain versions from bible-api.com
+                </Text>
 
-                {(Object.keys(TRANSLATION_META) as BibleTranslation[]).map(key => (
-                  <TouchableOpacity
-                    key={key}
-                    style={[
-                      styles.translationRow,
-                      translation === key && { backgroundColor: colors.accentSoft, borderColor: colors.accent, borderWidth: 1 },
-                    ]}
-                    onPress={() => {
-                      setTranslation(key);
-                      setIsTranslationPickerOpen(false);
-                    }}
-                    activeOpacity={0.75}
-                  >
-                    <View style={styles.translationRowLeft}>
-                      <Text style={[styles.translationKey, { color: translation === key ? colors.accent : theme.text }]}>
-                        {TRANSLATION_LABELS[key]}
-                      </Text>
-                      <Text style={[styles.translationDesc, { color: theme.textSecondary }]}>
-                        {TRANSLATION_META[key].name}
-                      </Text>
-                      <Text style={[styles.translationMeta, { color: theme.textSecondary }]}>
-                        {TRANSLATION_META[key].desc}
-                      </Text>
-                    </View>
-                    {translation === key && (
-                      <View style={[styles.translationCheck, { backgroundColor: colors.accent }]} />
-                    )}
-                  </TouchableOpacity>
-                ))}
+                <ScrollView showsVerticalScrollIndicator={false} style={styles.translationScrollList}>
+                  {TRANSLATIONS.map(key => {
+                    const isActive = translation === key;
+                    const meta = TRANSLATION_META[key];
+                    return (
+                      <TouchableOpacity
+                        key={key}
+                        style={[
+                          styles.translationRow,
+                          isActive && { backgroundColor: colors.accentSoft, borderColor: colors.accent, borderWidth: 1 },
+                        ]}
+                        onPress={() => {
+                          setTranslation(key);
+                          setIsTranslationPickerOpen(false);
+                        }}
+                        activeOpacity={0.75}
+                      >
+                        <View style={styles.translationRowLeft}>
+                          <View style={styles.translationNameRow}>
+                            <Text style={[styles.translationKey, { color: isActive ? colors.accent : theme.text }]}>
+                              {TRANSLATION_LABELS[key]}
+                            </Text>
+                            <View style={[styles.translationTag, { backgroundColor: isActive ? colors.accent : 'rgba(15,23,42,0.07)' }]}>
+                              <Text style={[styles.translationTagText, { color: isActive ? '#0F172A' : theme.textSecondary }]}>
+                                {meta.tag}
+                              </Text>
+                            </View>
+                          </View>
+                          <Text style={[styles.translationDesc, { color: isActive ? theme.text : theme.textSecondary }]}>
+                            {meta.name}
+                          </Text>
+                          <Text style={[styles.translationMeta, { color: theme.textSecondary }]}>
+                            {meta.desc}
+                          </Text>
+                        </View>
+                        {isActive && (
+                          <View style={[styles.translationCheck, { backgroundColor: colors.accent }]} />
+                        )}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
               </View>
             </TouchableOpacity>
           </Modal>
@@ -1403,6 +1437,39 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
     marginLeft: 12,
+  },
+  translationSheet: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingBottom: 32,
+    paddingTop: 12,
+    maxHeight: '85%',
+  },
+  translationScrollList: {
+    maxHeight: 480,
+  },
+  translationSubLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+    marginBottom: 16,
+    marginTop: -4,
+  },
+  translationNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 2,
+  },
+  translationTag: {
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  translationTagText: {
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
 
   // ── Daily Exegesis ──────────────────────────────────────────────────────────
