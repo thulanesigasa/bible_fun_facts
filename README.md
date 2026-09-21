@@ -448,19 +448,21 @@ bible_fun_facts/
 - **Real-Time Follow / Unfollow**: Amber follow button toggles into a clean slate "Following" pill, persisted across app sessions via `UserContext`.
 - **Slide-Up Scholar Profile Modal**: Full screen inspection presenting scholar credentials, verified badges, follower and following counts, study streaks, verses explored, theological specialty tags, full bio, and their favorite scripture reflection.
 
-### 3. Search-Driven, Non-Scrolling Verses Finder (`ScripturesScreen.tsx`)
+### 3. Search-Driven Verses Finder (`ScripturesScreen.tsx`)
 - **Zero Scroll Fatigue Architecture**: Eliminated endless scrolling by transforming the screen into a focused, search-driven scripture finder.
 - **1-Tap Quick Search Chips**: Instant search tags (`John 3:16`, `Psalm 23`, `Romans 8`, `Genesis 1`, `Galatians 5`, `Ephesians 6`, `Grace`, `Peace`) that populate and show specific verses immediately.
 - **Genre Filter Tabs**: High-level segmentation across `All`, `Gospel`, `Wisdom`, `Prophecy`, and `Epistle`.
-- **Focused Result Display (Top 3)**: Limits view to 3 focused, compact cards at a time with an explicit "Load Next 3 Verses" button to prevent overwhelming scroll lists.
-- **Inline Strong's Lexical Badges**: Displays the original Greek or Hebrew word transliteration, definition, and Strong's number with direct one-tap favoriting and sharing.
+- **Focused Result Display (Top 3)**: Limits view to 3 focused cards at a time with an explicit "Load Next 3 Verses" button to prevent overwhelming scroll lists.
+- **Full Untruncated Scripture Verses**: Completely removed line truncation limits (`numberOfLines`) so every scripture passage and Strong's lexical definition is displayed in its complete, uncut depth.
+- **Zero Status Badges (Rule 16 Compliance)**: Replaced status pill badges with clean, elegant typographic headings and semantic text hierarchies.
 
-### 4. Compact, Zero-Post Daily Discovery Dashboard (`DiscoverScreen.tsx`)
+### 4. Compact Daily Discovery Dashboard (`DiscoverScreen.tsx`)
 - **Zero-Post Private Architecture**: Removed all social feed elements and mock user posting cards. The app is dedicated to individual biblical exegesis without social post clutter.
-- **Single-Screen Focused View**: Fits cleanly on mobile screens without requiring continuous vertical scrolling:
-  - **Resume Scripture Quick-Card**: 1-tap jump to the user's last read Bible book and chapter.
-  - **Original Language Root Card**: Daily Strong's Concordance exegesis highlighting Greek and Hebrew terms, transliterations, Strong's numbers, and lexical definitions.
-  - **Archaeology & Customs Discovery**: Displays one high-impact historical/cultural insight with an in-place **"Next Discovery ›"** button to cycle discoveries without scrolling.
+- **Single-Screen Focused View with Full Context**:
+  - **Resume Scripture Quick-Card**: 1-tap jump to the user's last read Bible book and chapter with clean subtitle header.
+  - **Original Language Root Card**: Daily Strong's Concordance exegesis highlighting Greek and Hebrew terms, transliterations, Strong's numbers, and complete, untruncated lexical definitions and historical context.
+  - **Archaeology & Customs Discovery**: Displays high-impact historical and cultural insights in full text with an in-place **"Next Discovery ›"** button to cycle discoveries without scrolling.
+  - **Zero Section Badges**: Removed container badge tags (`ORIGINAL LANGUAGE ROOT`, `ARCHAEOLOGY & CUSTOMS`, `RESUME READING`) in strict compliance with Rule 16, replaced by clean iconography and typography.
   - **Compact Header & Streak Ribbon**: Streak tracking and pull-to-refresh integration.
 
 ### 1. Direct-Body Canvas Architecture (Elimination of Nested "Divs")

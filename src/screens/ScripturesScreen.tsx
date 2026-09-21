@@ -213,11 +213,9 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
                       <Text variant="h3" color={colors.accent} style={styles.cardReference}>
                         {scripture.reference}
                       </Text>
-                      <View style={styles.genrePill}>
-                        <Text variant="caption" color={colors.textSecondary} style={styles.genrePillText}>
-                          {scripture.genre}
-                        </Text>
-                      </View>
+                      <Text variant="caption" color={colors.textTertiary}>
+                        • {scripture.genre}
+                      </Text>
                     </View>
 
                     <View style={styles.cardActionsRow}>
@@ -243,24 +241,23 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
                     </View>
                   </View>
 
-                  {/* 2-line quote */}
+                  {/* Full scripture text (no truncation) */}
                   <Text
                     variant="body"
                     color={colors.textPrimary}
-                    numberOfLines={2}
                     style={styles.verseExcerpt}
                   >
                     "{scripture.text}"
                   </Text>
 
-                  {/* Strong's Root info */}
+                  {/* Strong's Root info (full definition) */}
                   <View style={styles.cardFooterRow}>
                     <View style={styles.strongsPill}>
                       <StrongsIconSvg size={12} color={colors.accent} />
                       <Text variant="caption" color={colors.accent} weight="600" style={styles.strongsWordText}>
                         {scripture.strongs_transliteration} ({scripture.strongs_number})
                       </Text>
-                      <Text variant="caption" color={colors.textTertiary} numberOfLines={1} style={styles.strongsDefText}>
+                      <Text variant="caption" color={colors.textTertiary} style={styles.strongsDefText}>
                         • {scripture.strongs_definition}
                       </Text>
                     </View>
@@ -426,15 +423,6 @@ const styles = StyleSheet.create({
   },
   cardReference: {
     fontSize: 14,
-  },
-  genrePill: {
-    backgroundColor: 'rgba(15, 23, 42, 0.04)',
-    paddingHorizontal: 6,
-    paddingVertical: 1,
-    borderRadius: 4,
-  },
-  genrePillText: {
-    fontSize: 10,
   },
   cardActionsRow: {
     flexDirection: 'row',
