@@ -12,7 +12,7 @@ import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
 import { Card } from '../components/Card';
-import { scriptures, Scripture, Testament, Category } from '../data/mockDatabase';
+import { scriptures, Scripture, Genre } from '../data/mockDatabase';
 import { useUser } from '../context/UserContext';
 import {
   SearchSvg,
@@ -21,15 +21,26 @@ import {
   ShareSvg,
   ChevronRightSvg,
   StrongsIconSvg,
+  XCloseSvg,
 } from '../components/SvgIcons';
 
-const TOPIC_CATEGORIES: (Category | 'All')[] = ['All', 'People', 'Prophecy', 'Customs', 'History', 'Language'];
-const TESTAMENTS: ('All' | Testament)[] = ['All', 'Old Testament', 'New Testament'];
+const QUICK_SEARCH_CHIPS = [
+  'John 3:16',
+  'Psalm 23',
+  'Romans 8',
+  'Genesis 1',
+  'Galatians 5',
+  'Ephesians 6',
+  'Grace',
+  'Peace',
+];
+
+const GENRE_FILTERS: (Genre | 'All')[] = ['All', 'Gospel', 'Wisdom', 'Prophecy', 'Epistle'];
 
 export default function ScripturesScreen({ navigation }: { navigation: any }) {
   const [searchText, setSearchText] = useState('');
-  const [activeCategory, setActiveCategory] = useState<Category | 'All'>('All');
-  const [activeTestament, setActiveTestament] = useState<'All' | Testament>('All');
+  const [activeGenre, setActiveGenre] = useState<Genre | 'All'>('All');
+  const [displayCount, setDisplayCount] = useState(3);
 
   const { isScriptureFavorited, toggleFavoriteScripture } = useUser();
 
@@ -46,50 +57,37 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
         s.strongs_number.toLowerCase().includes(q) ||
         (s.tags && s.tags.some((t) => t.toLowerCase().includes(q)));
 
-      const matchTestament = activeTestament === 'All' || s.testament === activeTestament;
+      const matchGenre = activeGenre === 'All' || s.genre === activeGenre;
 
-      let matchCategory = true;
-      if (activeCategory !== 'All') {
-        switch (activeCategory) {
-          case 'Prophecy':
-            matchCategory =
-              s.genre === 'Prophecy' ||
-              s.genre === 'Apocalyptic' ||
-              (s.tags ? s.tags.some((t) => t.toLowerCase().includes('prophecy') || t.toLowerCase().includes('messiah')) : false);
-            break;
-          case 'History':
-            matchCategory =
-              s.genre === 'History' ||
-              s.genre === 'Law' ||
-              s.historical_context.length > 0;
-            break;
-          case 'Language':
-            matchCategory = !!s.strongs_word || !!s.strongs_number;
-            break;
-          case 'Customs':
-            matchCategory =
-              (s.cultural_practice && s.cultural_practice.length > 0) ||
-              (s.tags ? s.tags.some((t) => ['altar', 'vow', 'feast', 'law'].includes(t.toLowerCase())) : false);
-            break;
-          case 'People':
-            matchCategory =
-              s.genre === 'Gospel' ||
-              (s.tags ? s.tags.some((t) => ['jesus', 'abraham', 'david', 'paul', 'peter', 'mary'].includes(t.toLowerCase())) : false);
-            break;
-        }
-      }
-
-      return matchSearch && matchTestament && matchCategory;
+      return matchSearch && matchGenre;
     });
-  }, [searchText, activeTestament, activeCategory]);
+  }, [searchText, activeGenre]);
+
+  const displayedList = useMemo(() => {
+    // If searching actively, show up to 4 exact matches to keep view focused
+    if (searchText.trim() !== '') {
+      return filteredScriptures.slice(0, 4);
+    }
+    return filteredScriptures.slice(0, displayCount);
+  }, [filteredScriptures, searchText, displayCount]);
 
   const onShareScripture = async (scripture: Scripture) => {
     try {
-      const message = `"${scripture.text}"\n- ${scripture.reference} (${scripture.testament})\n\nRoot: ${scripture.strongs_transliteration} (${scripture.strongs_number}) - "${scripture.strongs_definition}"`;
+      const message = `"${scripture.text}"\n- ${scripture.reference}\n\nRoot: ${scripture.strongs_transliteration} (${scripture.strongs_number}) - "${scripture.strongs_definition}"`;
       await Share.share({ message });
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleSelectChip = (chip: string) => {
+    setSearchText(chip);
+    setDisplayCount(3);
+  };
+
+  const handleClearSearch = () => {
+    setSearchText('');
+    setDisplayCount(3);
   };
 
   return (
@@ -99,94 +97,107 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
       >
-        {/* Header Row */}
+        {/* Header */}
         <View style={styles.headerRow}>
           <View style={styles.headerIconWrap}>
-            <ScripturesSvg size={22} color={colors.accent} fill={colors.accentSoft} />
+            <ScripturesSvg size={20} color={colors.accent} fill={colors.accentSoft} />
           </View>
           <View style={styles.headerTextWrap}>
-            <Text variant="h2" style={styles.title}>Scripture Library</Text>
-            <Text variant="body" color={colors.textSecondary} style={styles.subtitle}>
-              Key verses paired with Strong's lexical roots
+            <Text variant="h2" style={styles.title}>Scripture Finder</Text>
+            <Text variant="caption" color={colors.textSecondary} style={styles.subtitle}>
+              Search verses, topics, or original lexical roots
             </Text>
           </View>
         </View>
 
-        {/* Compact Search Bar */}
+        {/* Focused Search Bar */}
         <View style={[styles.searchContainer, shadow.sm]}>
           <SearchSvg size={16} color={colors.accent} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search reference, text, Greek, Hebrew roots..."
+            placeholder="Type a book, verse (e.g. John 3), or root..."
             placeholderTextColor={colors.textTertiary}
             value={searchText}
-            onChangeText={setSearchText}
-            clearButtonMode="while-editing"
+            onChangeText={(text) => {
+              setSearchText(text);
+              setDisplayCount(3);
+            }}
+            clearButtonMode="never"
           />
+          {searchText.length > 0 && (
+            <TouchableOpacity onPress={handleClearSearch} style={styles.clearSearchBtn}>
+              <XCloseSvg size={14} color={colors.textSecondary} />
+            </TouchableOpacity>
+          )}
         </View>
 
-        {/* Combined Category Pills (from previous search section) */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filterPillsScroll}
-          style={styles.categoryScroll}
-        >
-          {TOPIC_CATEGORIES.map((cat) => {
-            const isActive = activeCategory === cat;
+        {/* 1-Tap Quick Search Chips */}
+        <View style={styles.chipsSection}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.chipsScroll}
+          >
+            {QUICK_SEARCH_CHIPS.map((chip) => {
+              const isSelected = searchText.toLowerCase() === chip.toLowerCase();
+              return (
+                <TouchableOpacity
+                  key={chip}
+                  style={[styles.quickChip, isSelected && styles.quickChipActive]}
+                  onPress={() => handleSelectChip(chip)}
+                  activeOpacity={0.8}
+                >
+                  <Text
+                    variant="caption"
+                    weight={isSelected ? '700' : '500'}
+                    style={[styles.quickChipText, isSelected && styles.quickChipTextActive]}
+                  >
+                    {chip}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+
+        {/* Genre Filter Tabs */}
+        <View style={styles.genreRow}>
+          {GENRE_FILTERS.map((genre) => {
+            const isActive = activeGenre === genre;
             return (
               <TouchableOpacity
-                key={cat}
-                style={[styles.categoryPill, isActive && styles.categoryPillActive]}
-                onPress={() => setActiveCategory(cat)}
+                key={genre}
+                style={[styles.genreTab, isActive && styles.genreTabActive]}
+                onPress={() => {
+                  setActiveGenre(genre);
+                  setDisplayCount(3);
+                }}
                 activeOpacity={0.8}
               >
                 <Text
                   variant="caption"
                   weight={isActive ? '700' : '500'}
-                  style={[styles.categoryPillText, isActive && styles.categoryPillTextActive]}
+                  style={[styles.genreTabText, isActive && styles.genreTabTextActive]}
                 >
-                  {cat}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-
-        {/* Testament Sub-Filter Segment */}
-        <View style={styles.testamentSegmentRow}>
-          {TESTAMENTS.map((t) => {
-            const isActive = activeTestament === t;
-            const label = t === 'All' ? 'All Canons' : t === 'Old Testament' ? 'Old Testament' : 'New Testament';
-            return (
-              <TouchableOpacity
-                key={t}
-                style={[styles.testamentSegment, isActive && styles.testamentSegmentActive]}
-                onPress={() => setActiveTestament(t)}
-                activeOpacity={0.8}
-              >
-                <Text
-                  variant="caption"
-                  weight={isActive ? '700' : '500'}
-                  style={[styles.testamentSegmentText, isActive && styles.testamentSegmentTextActive]}
-                >
-                  {label}
+                  {genre}
                 </Text>
               </TouchableOpacity>
             );
           })}
         </View>
 
-        {/* Results Counter */}
+        {/* Search Results Summary */}
         <View style={styles.countRow}>
-          <Text variant="caption" color={colors.textTertiary}>
-            {filteredScriptures.length} verse{filteredScriptures.length !== 1 ? 's' : ''} available
+          <Text variant="caption" color={colors.textSecondary}>
+            {filteredScriptures.length === 0
+              ? 'No matching scriptures found'
+              : `Showing ${displayedList.length} of ${filteredScriptures.length} result${filteredScriptures.length !== 1 ? 's' : ''}`}
           </Text>
         </View>
 
-        {/* Compact Scripture Cards List */}
+        {/* Compact, Focused Verse Cards */}
         <View style={styles.scripturesList}>
-          {filteredScriptures.map((scripture) => {
+          {displayedList.map((scripture) => {
             const isFavorited = isScriptureFavorited(scripture.id);
 
             return (
@@ -196,9 +207,9 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
                 onPress={() => navigation.navigate('ScriptureDetails', { scripture })}
               >
                 <View style={[styles.compactCard, shadow.sm]}>
-                  {/* Card Header Row: Reference + Genre Badge + Favorite */}
+                  {/* Top line: Reference + Genre + Actions */}
                   <View style={styles.cardHeaderRow}>
-                    <View style={styles.referenceBadgeWrap}>
+                    <View style={styles.referenceWrap}>
                       <Text variant="h3" color={colors.accent} style={styles.cardReference}>
                         {scripture.reference}
                       </Text>
@@ -212,7 +223,7 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
                     <View style={styles.cardActionsRow}>
                       <TouchableOpacity
                         onPress={() => toggleFavoriteScripture(scripture)}
-                        style={styles.iconActionBtn}
+                        style={styles.iconBtn}
                         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       >
                         <FavoritesSvg
@@ -224,7 +235,7 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
 
                       <TouchableOpacity
                         onPress={() => onShareScripture(scripture)}
-                        style={styles.iconActionBtn}
+                        style={styles.iconBtn}
                         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       >
                         <ShareSvg size={16} color={colors.textSecondary} />
@@ -232,7 +243,7 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
                     </View>
                   </View>
 
-                  {/* 2-Line Verse Snippet (No vertical bloat) */}
+                  {/* 2-line quote */}
                   <Text
                     variant="body"
                     color={colors.textPrimary}
@@ -242,7 +253,7 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
                     "{scripture.text}"
                   </Text>
 
-                  {/* Bottom Metadata: Strong's Concordance Word */}
+                  {/* Strong's Root info */}
                   <View style={styles.cardFooterRow}>
                     <View style={styles.strongsPill}>
                       <StrongsIconSvg size={12} color={colors.accent} />
@@ -261,6 +272,19 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
             );
           })}
         </View>
+
+        {/* Load More / Next Page Button (Avoids scroll fatigue) */}
+        {filteredScriptures.length > displayedList.length && (
+          <TouchableOpacity
+            style={styles.showMoreBtn}
+            onPress={() => setDisplayCount((prev) => prev + 3)}
+            activeOpacity={0.8}
+          >
+            <Text variant="caption" weight="700" color={colors.accent}>
+              Load Next {Math.min(3, filteredScriptures.length - displayedList.length)} Verses ›
+            </Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -277,17 +301,17 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
-    paddingBottom: 110,
+    paddingBottom: 96,
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: spacing.md,
-    gap: 12,
+    gap: 10,
   },
   headerIconWrap: {
-    width: 44,
-    height: 44,
+    width: 38,
+    height: 38,
     borderRadius: radius.md,
     backgroundColor: colors.accentSoft,
     alignItems: 'center',
@@ -300,8 +324,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   subtitle: {
-    fontSize: 13,
-    marginTop: 2,
+    marginTop: 1,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -321,63 +344,65 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     padding: 0,
   },
-  categoryScroll: {
-    marginBottom: 4,
+  clearSearchBtn: {
+    padding: 2,
   },
-  filterPillsScroll: {
+  chipsSection: {
+    marginBottom: spacing.sm,
+  },
+  chipsScroll: {
     gap: 6,
-    paddingVertical: 4,
+    paddingVertical: 2,
   },
-  categoryPill: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+  quickChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     borderRadius: radius.full,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.08)',
   },
-  categoryPillActive: {
-    backgroundColor: colors.accent,
+  quickChipActive: {
+    backgroundColor: colors.accentSoft,
     borderColor: colors.accent,
   },
-  categoryPillText: {
+  quickChipText: {
     color: colors.textSecondary,
-    fontSize: 12,
+    fontSize: 11,
   },
-  categoryPillTextActive: {
-    color: '#FFFFFF',
+  quickChipTextActive: {
+    color: colors.accent,
   },
-  testamentSegmentRow: {
+  genreRow: {
     flexDirection: 'row',
     backgroundColor: 'rgba(15, 23, 42, 0.04)',
     borderRadius: radius.sm,
     padding: 2,
-    marginTop: 4,
-    marginBottom: 4,
+    marginBottom: 6,
     gap: 4,
   },
-  testamentSegment: {
+  genreTab: {
     flex: 1,
     paddingVertical: 6,
     alignItems: 'center',
     borderRadius: radius.sm - 2,
   },
-  testamentSegmentActive: {
+  genreTabActive: {
     backgroundColor: '#FFFFFF',
     ...shadow.sm,
   },
-  testamentSegmentText: {
+  genreTabText: {
     color: colors.textSecondary,
     fontSize: 11,
   },
-  testamentSegmentTextActive: {
+  genreTabTextActive: {
     color: colors.accent,
   },
   countRow: {
     marginVertical: 4,
   },
   scripturesList: {
-    gap: 10,
+    gap: 8,
   },
   compactCard: {
     backgroundColor: '#FFFFFF',
@@ -391,21 +416,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    marginBottom: 4,
   },
-  referenceBadgeWrap: {
+  referenceWrap: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     flex: 1,
   },
   cardReference: {
-    fontSize: 15,
+    fontSize: 14,
   },
   genrePill: {
     backgroundColor: 'rgba(15, 23, 42, 0.04)',
     paddingHorizontal: 6,
-    paddingVertical: 2,
+    paddingVertical: 1,
     borderRadius: 4,
   },
   genrePillText: {
@@ -416,7 +441,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
   },
-  iconActionBtn: {
+  iconBtn: {
     padding: 2,
   },
   verseExcerpt: {
@@ -447,5 +472,13 @@ const styles = StyleSheet.create({
   strongsDefText: {
     fontSize: 11,
     flex: 1,
+  },
+  showMoreBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    backgroundColor: colors.accentSoft,
+    borderRadius: radius.md,
+    marginTop: 8,
   },
 });
