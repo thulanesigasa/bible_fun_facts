@@ -41,6 +41,8 @@ import {
   AaTextSvg,
   BookmarkSvg,
 } from '../components/SvgIcons';
+import { isRedLetter } from '../data/redLetterVerses';
+import { UiverseSwitch } from '../components/UiverseSwitch';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type LensKey = 'original_intent' | 'theological_truth' | 'modern_walk' | 'prayer_focus';
@@ -132,6 +134,7 @@ export default function WOTDScreen() {
     markWOTDComplete,
     isWOTDCompleted,
     userProfile,
+    updateProfile,
     lastReadBible,
     setLastReadBible,
     toggleFavoriteScripture,
@@ -485,6 +488,9 @@ export default function WOTDScreen() {
                   const isSelected = selectedVerses.includes(v.verse);
                   const hlColor = bibleHighlights[verseKey(v.verse)];
                   const isFav = isScriptureFavorited(`bible_${selectedBook.id}_${selectedChapter}_${v.verse}`);
+                  const isJesusWords = isRedLetter(selectedBook.id, selectedChapter, v.verse);
+                  const showRed = isJesusWords && (userProfile?.redLetterEnabled ?? true);
+                  const redTextColor = readerTheme === 'dark' ? '#F87171' : '#DC2626';
                   return (
                     <TouchableOpacity
                       key={v.verse}
@@ -503,7 +509,7 @@ export default function WOTDScreen() {
                             fontSize: fontSize,
                             fontFamily: getFontFamily(fontType),
                             lineHeight: fontSize * 1.75,
-                            color: theme.text,
+                            color: showRed ? redTextColor : theme.text,
                             textAlign: 'justify',
                           },
                           isFav && {
@@ -804,6 +810,21 @@ export default function WOTDScreen() {
                       <Text style={{ fontSize: 10, color: THEMES[t].textSecondary }}>Aa</Text>
                     </TouchableOpacity>
                   ))}
+                </View>
+
+                <Text style={[styles.aaSectionLabel, { color: theme.textSecondary }]}>WORDS OF JESUS</Text>
+                <View style={styles.aaToggleRow}>
+                  <View style={{ flex: 1, marginRight: 12 }}>
+                    <Text style={[styles.aaToggleTitle, { color: theme.text }]}>Red Letter Bible</Text>
+                    <Text style={[styles.aaToggleSub, { color: theme.textSecondary }]}>
+                      Highlight the spoken words of Jesus Christ in red
+                    </Text>
+                  </View>
+                  <UiverseSwitch
+                    value={userProfile?.redLetterEnabled ?? true}
+                    onValueChange={(val) => updateProfile({ redLetterEnabled: val })}
+                    accessibilityLabel="Toggle words of Jesus in red"
+                  />
                 </View>
               </View>
             </TouchableOpacity>
@@ -1407,6 +1428,21 @@ const styles = StyleSheet.create({
   aaThemeLabel: {
     fontSize: 13,
     fontWeight: '700',
+  },
+  aaToggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+    marginBottom: 6,
+  },
+  aaToggleTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  aaToggleSub: {
+    fontSize: 11.5,
+    marginTop: 2,
   },
 
   // ── Translation Picker ───────────────────────────────────────────────────────

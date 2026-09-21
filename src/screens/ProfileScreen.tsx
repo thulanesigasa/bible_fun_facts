@@ -28,63 +28,7 @@ import {
   ChevronRightSvg,
   BookmarkSvg,
 } from '../components/SvgIcons';
-
-// ============================================================================
-// UIVERSE-INSPIRED ANIMATED SLIDING PILL SWITCH (BY NAMECHO)
-// ============================================================================
-interface UiverseSwitchProps {
-  value: boolean;
-  onValueChange: (val: boolean) => void;
-}
-
-const UiverseSwitch: React.FC<UiverseSwitchProps> = ({ value, onValueChange }) => {
-  const animatedValue = useRef(new Animated.Value(value ? 1 : 0)).current;
-
-  useEffect(() => {
-    Animated.timing(animatedValue, {
-      toValue: value ? 1 : 0,
-      duration: 250,
-      useNativeDriver: false,
-    }).start();
-  }, [value, animatedValue]);
-
-  const toggle = () => {
-    onValueChange(!value);
-  };
-
-  // Button width: 52px, Height: 30px, Toggle diameter: 24px, Offset: 3px
-  const translateX = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [3, 25],
-  });
-
-  const backgroundColor = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['#CBD5E1', colors.accent],
-  });
-
-  return (
-    <TouchableOpacity
-      activeOpacity={0.85}
-      onPress={toggle}
-      style={styles.switchWrapper}
-      accessibilityRole="switch"
-      accessibilityState={{ checked: value }}
-    >
-      <Animated.View style={[styles.uiverseTrack, { backgroundColor }]}>
-        <Animated.View
-          style={[
-            styles.uiverseThumb,
-            shadow.sm,
-            {
-              transform: [{ translateX }],
-            },
-          ]}
-        />
-      </Animated.View>
-    </TouchableOpacity>
-  );
-};
+import { UiverseSwitch } from '../components/UiverseSwitch';
 
 // ============================================================================
 // TYPOGRAPHY PRESETS
@@ -122,6 +66,20 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
   const [notifications, setNotifications] = useState<boolean>(
     userProfile?.notificationsEnabled ?? true
   );
+  const [redLetter, setRedLetter] = useState<boolean>(
+    userProfile?.redLetterEnabled ?? true
+  );
+
+  useEffect(() => {
+    if (userProfile?.redLetterEnabled !== undefined) {
+      setRedLetter(userProfile.redLetterEnabled);
+    }
+  }, [userProfile?.redLetterEnabled]);
+
+  const handleToggleRedLetter = (val: boolean) => {
+    setRedLetter(val);
+    updateProfile({ redLetterEnabled: val });
+  };
 
   // Reader Settings State: 1px to 24px
   const currentFontSize = userProfile?.fontSize ?? 16;
@@ -564,6 +522,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                     fontSize: currentFontSize,
                     lineHeight: Math.max(14, currentFontSize * 1.5),
                     fontFamily: selectedFamily,
+                    color: redLetter ? '#DC2626' : colors.textPrimary,
                   },
                 ]}
               >
@@ -618,6 +577,25 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                 );
               })}
             </View>
+          </View>
+
+          <View style={styles.rowDivider} />
+
+          {/* Words of Jesus in Red (Zero Icons) */}
+          <View style={styles.actionRow}>
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Words of Jesus in Red
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                Highlight the spoken words of Christ in red
+              </Text>
+            </View>
+            <UiverseSwitch
+              value={redLetter}
+              onValueChange={handleToggleRedLetter}
+              accessibilityLabel="Words of Jesus in Red switch"
+            />
           </View>
         </View>
 
@@ -1168,23 +1146,6 @@ const styles = StyleSheet.create({
   },
   fontTypePillTextActive: {
     color: '#FFFFFF',
-  },
-
-  // Uiverse-inspired Switch (by namecho)
-  switchWrapper: {
-    paddingVertical: 2,
-  },
-  uiverseTrack: {
-    width: 52,
-    height: 30,
-    borderRadius: 15,
-    justifyContent: 'center',
-  },
-  uiverseThumb: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#FFFFFF',
   },
 
   // Swipe to Sign Out (Identical styling to WelcomeScreen Swipe to Start, Zero Red)
