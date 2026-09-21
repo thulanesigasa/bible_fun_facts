@@ -193,12 +193,16 @@ exegeomai/
 │   │   ├── SearchBar.tsx                 # Search input with clear button and chips
 │   │   ├── SvgIcons.tsx                  # Pure vector SVG library (zero emojis)
 │   │   ├── Typography.tsx                # Monochromatic typography hierarchy
+│   │   ├── UiverseSwitch.tsx             # Animated sliding toggle pill switch (60-30-10 calibrated)
 │   │   ├── UpdateModal.tsx               # OTA update modal (50x50 logo in 68x68 container, Remind Me Later snooze)
 │   │   └── WOTDCard.tsx                  # Word of the Day devotional card
 │   ├── context/
 │   │   └── UserContext.tsx               # State management with useApp, useUser & Supabase Auth hooks
 │   ├── data/
-│   │   └── mockDatabase.ts               # Curated scriptures, facts, and Strong's database
+│   │   ├── bibleCanon.ts                 # Complete 66-book canon metadata and prebundled offline chapters
+│   │   ├── mockDatabase.ts               # Curated scriptures, facts, and Strong's database
+│   │   ├── mockUsers.ts                  # 8 theological scholars, pastors, and exegetes with follower tracking
+│   │   └── redLetterVerses.ts            # Canonical dataset of Jesus Christ's spoken words across NT books
 │   ├── navigation/
 │   │   └── AppNavigator.tsx              # Rule 20 floating pill tab navigation & stack navigators
 │   ├── screens/                          # Application views
@@ -406,6 +410,7 @@ bible_fun_facts/
 │   │   ├── ScriptureCard.tsx        # Scripture reading card with inline typography
 │   │   ├── SvgIcons.tsx             # Curated SVG icon collection (zero emojis)
 │   │   ├── Typography.tsx           # Scaled typographic components
+│   │   ├── UiverseSwitch.tsx        # Animated sliding toggle pill switch (60-30-10 tokens)
 │   │   ├── UpdateModal.tsx          # Dual-action OTA update prompt with 30m snooze
 │   │   └── WOTDCard.tsx             # Word of the Day analytical lens viewer
 │   ├── context/
@@ -413,7 +418,8 @@ bible_fun_facts/
 │   ├── data/
 │   │   ├── bibleCanon.ts            # Complete 66-book canon metadata and prebundled offline chapters
 │   │   ├── mockDatabase.ts          # Offline database: 120 facts, 24 scriptures, WOTD
-│   │   └── mockUsers.ts             # 8 theological scholars, pastors, and exegetes with follower tracking
+│   │   ├── mockUsers.ts             # 8 theological scholars, pastors, and exegetes with follower tracking
+│   │   └── redLetterVerses.ts       # Words of Jesus Christ dataset across Matthew through Revelation
 │   ├── hooks/
 │   │   └── useSecurePasswordCapture.ts # Hardware FLAG_SECURE blackout protection & app switcher privacy
 │   ├── navigation/
@@ -457,6 +463,12 @@ bible_fun_facts/
   - Tier 3: Network fetch via public domain REST API (`https://bible-api.com/`).
   - Tier 4: Zero-latency offline prebundled fallback chapters (Genesis 1, Psalms 23, John 3).
 - **Dynamic Profile Typography Integration**: Scripture reader directly respects the user's custom font size (`1px–24px`) and font family (`serif`, `sans`, `mono`, `system`) configured in Profile settings.
+- **Red Letter Bible (Words of Jesus in Red)**:
+  - Identifies and highlights the spoken words of Jesus Christ in classic crimson red (`#DC2626` in Light/Sepia, `#F87171` in Dark mode).
+  - Powered by `redLetterVerses.ts` spanning ~2,800 verse references across Matthew, Mark, Luke, John, Acts, 1 Corinthians, 2 Corinthians, and Revelation with O(1) set lookup.
+  - User-configurable toggle in both the Profile Settings screen (Reading Preferences) and the reader's quick "Aa" settings modal.
+  - Live reactive scripture preview card in Profile settings (John 3:16) that dynamically responds to the toggle.
+  - Seamlessly integrates with dotted-underline bookmarked verses and YouVersion multi-color highlights.
 - **Interactive Verse Sheet**: Tapping any verse displays an action sheet allowing users to copy the verse with full reference, save to favorites, or share via native OS dialogs.
 - **Dual-Mode Segmented Control**: Seamless switching between the Full Holy Bible reader and the 4-lens analytical Daily Exegesis devotional.
 

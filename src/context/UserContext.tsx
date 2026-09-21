@@ -22,6 +22,7 @@ export interface UserProfile {
   knowledgeLevel?: string;
   fontSize?: number;
   fontType?: 'serif' | 'sans' | 'mono' | 'system';
+  redLetterEnabled?: boolean;
   followersCount?: number;
   followingCount?: number;
 }
@@ -121,6 +122,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const cleanProfile = parsed.userProfile
             ? {
                 ...parsed.userProfile,
+                redLetterEnabled: parsed.userProfile.redLetterEnabled ?? true,
                 followersCount:
                   parsed.userProfile.followersCount === 248 ? 0 : (parsed.userProfile.followersCount || 0),
                 followingCount:
@@ -169,6 +171,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
               studyFocus: meta.studyFocus || prev.userProfile?.studyFocus,
               dailyGoal: meta.dailyGoal || prev.userProfile?.dailyGoal,
               knowledgeLevel: meta.knowledgeLevel || prev.userProfile?.knowledgeLevel,
+              redLetterEnabled: meta.redLetterEnabled ?? prev.userProfile?.redLetterEnabled ?? true,
             },
           }));
         }
@@ -198,6 +201,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
               knowledgeLevel: meta.knowledgeLevel || prev.userProfile?.knowledgeLevel,
               fontSize: meta.fontSize || prev.userProfile?.fontSize || 16,
               fontType: meta.fontType || prev.userProfile?.fontType || 'serif',
+              redLetterEnabled: meta.redLetterEnabled ?? prev.userProfile?.redLetterEnabled ?? true,
               followersCount: 0,
               followingCount: prev.followedUserIds?.length || 0,
             },
@@ -282,6 +286,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
               knowledgeLevel: meta.knowledgeLevel || prev.userProfile?.knowledgeLevel,
               fontSize: meta.fontSize || prev.userProfile?.fontSize || 16,
               fontType: meta.fontType || prev.userProfile?.fontType || 'serif',
+              redLetterEnabled: meta.redLetterEnabled ?? prev.userProfile?.redLetterEnabled ?? true,
               followersCount: 0,
               followingCount: prev.followedUserIds?.length || 0,
             },
@@ -312,6 +317,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         knowledgeLevel: prev.userProfile?.knowledgeLevel,
         fontSize: prev.userProfile?.fontSize || 16,
         fontType: prev.userProfile?.fontType || 'serif',
+        redLetterEnabled: prev.userProfile?.redLetterEnabled ?? true,
         followersCount: 0,
         followingCount: prev.followedUserIds?.length || 0,
       },
@@ -472,6 +478,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
               joinedDate: new Date(data.user!.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
               preferredTranslation,
               notificationsEnabled: true,
+              redLetterEnabled: true,
               studyFocus,
               dailyGoal,
               knowledgeLevel,
@@ -500,6 +507,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         joinedDate: 'September 2026',
         preferredTranslation,
         notificationsEnabled: true,
+        redLetterEnabled: true,
         studyFocus,
         dailyGoal,
         knowledgeLevel,
