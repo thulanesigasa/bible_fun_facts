@@ -40,6 +40,12 @@ export interface SignUpExtendedParams {
   knowledgeLevel?: string;
 }
 
+export interface LastReadBiblePosition {
+  book: string;
+  chapter: number;
+  translation: string;
+}
+
 interface UserState {
   userProfile: UserProfile | null;
   favoritesFacts: Fact[];
@@ -48,6 +54,8 @@ interface UserState {
   streak: number;
   factsViewedCount: number;
   lastLoginDate: string | null;
+  followedUserIds: string[];
+  lastReadBible: LastReadBiblePosition;
 }
 
 interface AppContextType extends UserState {
@@ -69,6 +77,9 @@ interface AppContextType extends UserState {
   isFactFavorited: (id: string) => boolean;
   isScriptureFavorited: (id: string) => boolean;
   isWOTDCompleted: (id: string) => boolean;
+  toggleFollowUser: (userId: string) => void;
+  isUserFollowed: (userId: string) => boolean;
+  setLastReadBible: (book: string, chapter: number, translation: string) => void;
 }
 
 const UserContext = createContext<AppContextType | undefined>(undefined);
@@ -86,6 +97,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     streak: 0,
     factsViewedCount: 0,
     lastLoginDate: null,
+    followedUserIds: ['user_1'],
+    lastReadBible: { book: 'John', chapter: 3, translation: 'web' },
   });
 
   // Load data on mount
@@ -532,6 +545,36 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isScriptureFavorited = (id: string) => state.favoritesScriptures.some(s => s.id === id);
   const isWOTDCompleted = (id: string) => state.completedWOTDs.some(w => w.id === id);
 
+  const toggleFollowUser = (userId: string) => {
+    setState(prev => {
+      const isFollowed = prev.followedUserIds.includes(userId);
+      const newFollowed = isFollowed
+        ? prev.followedUserIds.filter(id => id !== userId)
+        : [...prev.followedUserIds, userId];
+
+      const currentFollowing = prev.userProfile?.followingCount ?? 182;
+      const updatedFollowing = isFollowed ? Math.max(0, currentFollowing - 1) : currentFollowing + 1;
+
+      return {
+        ...prev,
+        followedUserIds: newFollowed,
+        userProfile: prev.userProfile ? {
+          ...prev.userProfile,
+          followingCount: updatedFollowing,
+        } : null,
+      };
+    });
+  };
+
+  const isUserFollowed = (userId: string) => state.followedUserIds.includes(userId);
+
+  const setLastReadBible = (book: string, chapter: number, translation: string) => {
+    setState(prev => ({
+      ...prev,
+      lastReadBible: { book, chapter, translation },
+    }));
+  };
+
   return (
     <UserContext.Provider value={{
       ...state,
@@ -553,6 +596,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isFactFavorited,
       isScriptureFavorited,
       isWOTDCompleted,
+      toggleFollowUser,
+      isUserFollowed,
+      setLastReadBible,
     }}>
       {children}
     </UserContext.Provider>
