@@ -56,6 +56,8 @@ interface UserState {
   lastLoginDate: string | null;
   followedUserIds: string[];
   lastReadBible: LastReadBiblePosition;
+  bibleHighlights: Record<string, string>;
+  readerTheme: 'light' | 'sepia' | 'dark';
 }
 
 interface AppContextType extends UserState {
@@ -80,6 +82,8 @@ interface AppContextType extends UserState {
   toggleFollowUser: (userId: string) => void;
   isUserFollowed: (userId: string) => boolean;
   setLastReadBible: (book: string, chapter: number, translation: string) => void;
+  setVerseHighlight: (verseKey: string, color?: string) => void;
+  setReaderTheme: (theme: 'light' | 'sepia' | 'dark') => void;
 }
 
 const UserContext = createContext<AppContextType | undefined>(undefined);
@@ -99,6 +103,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     lastLoginDate: null,
     followedUserIds: [],
     lastReadBible: { book: 'John', chapter: 3, translation: 'web' },
+    bibleHighlights: {},
+    readerTheme: 'light',
   });
 
   // Load data on mount
@@ -593,6 +599,22 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }));
   };
 
+  const setVerseHighlight = (verseKey: string, color?: string) => {
+    setState(prev => {
+      const updated = { ...prev.bibleHighlights };
+      if (color) {
+        updated[verseKey] = color;
+      } else {
+        delete updated[verseKey];
+      }
+      return { ...prev, bibleHighlights: updated };
+    });
+  };
+
+  const setReaderTheme = (theme: 'light' | 'sepia' | 'dark') => {
+    setState(prev => ({ ...prev, readerTheme: theme }));
+  };
+
   return (
     <UserContext.Provider value={{
       ...state,
@@ -617,7 +639,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toggleFollowUser,
       isUserFollowed,
       setLastReadBible,
+      setVerseHighlight,
+      setReaderTheme,
     }}>
+
       {children}
     </UserContext.Provider>
   );

@@ -691,5 +691,30 @@ export const XCloseSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B'
   </Svg>
 );
 
+// Aa reader settings icon
+export const AaTextSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#0F172A', style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M2 18L7.5 6L13 18" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M4.5 13.5H10.5" stroke={color} strokeWidth={2} strokeLinecap="round" />
+    <Path d="M15 9C15 9 16.5 7 19 7C21.5 7 22 9 22 10C22 13 18 13 17 14C16 15 16 15.5 16 16.5H22" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+// Highlighter marker icon
+export const HighlighterSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M12 3L21 12L14 19L5 10L12 3Z" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M5 10L3 21L14 19" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M14 5L19 10" stroke={color} strokeWidth={2} strokeLinecap="round" />
+  </Svg>
+);
+
+// Moon icon for dark theme
+export const MoonSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#0F172A', style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
 
 
