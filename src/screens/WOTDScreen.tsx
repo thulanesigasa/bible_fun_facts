@@ -71,6 +71,12 @@ const TRANSLATION_LABELS: Record<BibleTranslation, string> = {
   kjv: 'KJV',
   bbe: 'BBE',
 };
+const TRANSLATION_META: Record<BibleTranslation, { name: string; desc: string }> = {
+  web: { name: 'World English Bible', desc: 'Modern English, public domain' },
+  kjv: { name: 'King James Version', desc: 'Classic 1611 translation, public domain' },
+  bbe: { name: 'Bible in Basic English', desc: 'Simple vocabulary, public domain' },
+};
+
 
 // ─── Helper: font family ─────────────────────────────────────────────────────
 const getFontFamily = (fontType?: 'serif' | 'sans' | 'mono' | 'system') => {
@@ -137,6 +143,9 @@ export default function WOTDScreen() {
   const [navBook, setNavBook] = useState<BibleBook | null>(null);
   const [navChapter, setNavChapter] = useState<number | null>(null);
   const [bookSearchText, setBookSearchText] = useState('');
+
+  // ── Translation picker ───────────────────────────────────────────
+  const [isTranslationPickerOpen, setIsTranslationPickerOpen] = useState(false);
 
   // ── Aa Settings Sheet ─────────────────────────────────────────────────────
   const [isAaOpen, setIsAaOpen] = useState(false);
@@ -337,7 +346,11 @@ export default function WOTDScreen() {
       setSelectedBook(navBook);
       setSelectedChapter(navChapter);
       setIsNavOpen(false);
-      // Scroll to verse — for simplicity we just open the chapter
+      // Scroll to the tapped verse after a short render delay
+      setTimeout(() => {
+        const targetKey = `${navBook.id}-${navChapter}-${v}`;
+        verseRefs.current[targetKey]?.scrollIntoView?.();
+      }, 300);
     }
   };
 
@@ -347,12 +360,6 @@ export default function WOTDScreen() {
       setSelectedChapter(ch);
       setIsNavOpen(false);
     }
-  };
-
-  // ── Translation Cycle ─────────────────────────────────────────────────────
-  const cycleTranslation = () => {
-    const idx = TRANSLATIONS.indexOf(translation);
-    setTranslation(TRANSLATIONS[(idx + 1) % TRANSLATIONS.length]);
   };
 
   // ── Exegesis ─────────────────────────────────────────────────────────────
@@ -393,8 +400,8 @@ export default function WOTDScreen() {
         </TouchableOpacity>
 
         <View style={styles.pillRow}>
-          {/* Translation pill */}
-          <TouchableOpacity style={styles.pill} onPress={cycleTranslation} activeOpacity={0.75}>
+          {/* Translation pill — opens picker modal */}
+          <TouchableOpacity style={styles.pill} onPress={() => setIsTranslationPickerOpen(true)} activeOpacity={0.75}>
             <Text style={styles.pillText}>{TRANSLATION_LABELS[translation]}</Text>
             <ChevronDownSvg size={13} color={colors.textSecondary || '#64748B'} />
           </TouchableOpacity>
@@ -479,6 +486,7 @@ export default function WOTDScreen() {
                             fontFamily: getFontFamily(fontType),
                             lineHeight: fontSize * 1.75,
                             color: theme.text,
+                            textAlign: 'justify',
                           },
                         ]}
                       >
@@ -778,6 +786,58 @@ export default function WOTDScreen() {
               </View>
             </TouchableOpacity>
           </Modal>
+
+          {/* ── Translation Picker Sheet ── */}
+          <Modal
+            visible={isTranslationPickerOpen}
+            animationType="slide"
+            transparent={true}
+            onRequestClose={() => setIsTranslationPickerOpen(false)}
+          >
+            <TouchableOpacity
+              style={styles.aaOverlay}
+              activeOpacity={1}
+              onPress={() => setIsTranslationPickerOpen(false)}
+            >
+              <View
+                style={[styles.aaSheet, { backgroundColor: theme.surface }]}
+                onStartShouldSetResponder={() => true}
+              >
+                <View style={[styles.aaSheetHandle, { backgroundColor: readerTheme === 'dark' ? '#334155' : '#E2E8F0' }]} />
+                <Text style={[styles.aaSectionLabel, { color: theme.textSecondary }]}>SELECT TRANSLATION</Text>
+
+                {(Object.keys(TRANSLATION_META) as BibleTranslation[]).map(key => (
+                  <TouchableOpacity
+                    key={key}
+                    style={[
+                      styles.translationRow,
+                      translation === key && { backgroundColor: colors.accentSoft, borderColor: colors.accent, borderWidth: 1 },
+                    ]}
+                    onPress={() => {
+                      setTranslation(key);
+                      setIsTranslationPickerOpen(false);
+                    }}
+                    activeOpacity={0.75}
+                  >
+                    <View style={styles.translationRowLeft}>
+                      <Text style={[styles.translationKey, { color: translation === key ? colors.accent : theme.text }]}>
+                        {TRANSLATION_LABELS[key]}
+                      </Text>
+                      <Text style={[styles.translationDesc, { color: theme.textSecondary }]}>
+                        {TRANSLATION_META[key].name}
+                      </Text>
+                      <Text style={[styles.translationMeta, { color: theme.textSecondary }]}>
+                        {TRANSLATION_META[key].desc}
+                      </Text>
+                    </View>
+                    {translation === key && (
+                      <View style={[styles.translationCheck, { backgroundColor: colors.accent }]} />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </TouchableOpacity>
+          </Modal>
         </View>
 
       ) : (
@@ -908,7 +968,7 @@ const styles = StyleSheet.create({
   pillTextBold: {
     fontSize: 14,
     fontWeight: '700',
-    color: colors.accent,
+    color: '#0F172A',
   },
 
   // ── Scripture Canvas ────────────────────────────────────────────────────────
@@ -1309,6 +1369,40 @@ const styles = StyleSheet.create({
   aaThemeLabel: {
     fontSize: 13,
     fontWeight: '700',
+  },
+
+  // ── Translation Picker ───────────────────────────────────────────────────────
+  translationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+    backgroundColor: 'rgba(15,23,42,0.04)',
+  },
+  translationRowLeft: {
+    flex: 1,
+    gap: 2,
+  },
+  translationKey: {
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  translationDesc: {
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  translationMeta: {
+    fontSize: 11,
+    fontWeight: '400',
+  },
+  translationCheck: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginLeft: 12,
   },
 
   // ── Daily Exegesis ──────────────────────────────────────────────────────────
