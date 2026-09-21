@@ -5,63 +5,92 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
 import { Card } from '../components/Card';
-import { scriptures, Scripture, Testament, Genre } from '../data/mockDatabase';
+import { scriptures, Scripture, Testament, Category } from '../data/mockDatabase';
+import { useUser } from '../context/UserContext';
 import {
   SearchSvg,
-  ChevronRightSvg,
   ScripturesSvg,
-  getGenreSvg,
+  FavoritesSvg,
+  ShareSvg,
+  ChevronRightSvg,
+  StrongsIconSvg,
 } from '../components/SvgIcons';
 
-const TESTAMENTS: Testament[] = ['Old Testament', 'New Testament'];
-const GENRES: Genre[] = ['Law', 'History', 'Wisdom', 'Prophecy', 'Gospel', 'Epistle', 'Apocalyptic'];
-
-interface FilterPillProps {
-  label: string;
-  active: boolean;
-  onPress: () => void;
-}
-
-const FilterPill: React.FC<FilterPillProps> = ({ label, active, onPress }) => (
-  <TouchableOpacity
-    style={[styles.pill, active && styles.pillActive]}
-    onPress={onPress}
-    activeOpacity={0.8}
-  >
-    <Text
-      variant="caption"
-      weight={active ? '700' : '500'}
-      style={[styles.pillText, active && styles.pillTextActive]}
-    >
-      {label}
-    </Text>
-  </TouchableOpacity>
-);
+const TOPIC_CATEGORIES: (Category | 'All')[] = ['All', 'People', 'Prophecy', 'Customs', 'History', 'Language'];
+const TESTAMENTS: ('All' | Testament)[] = ['All', 'Old Testament', 'New Testament'];
 
 export default function ScripturesScreen({ navigation }: { navigation: any }) {
   const [searchText, setSearchText] = useState('');
-  const [activeTestament, setActiveTestament] = useState<Testament | 'All'>('All');
-  const [activeGenre, setActiveGenre] = useState<Genre | 'All'>('All');
+  const [activeCategory, setActiveCategory] = useState<Category | 'All'>('All');
+  const [activeTestament, setActiveTestament] = useState<'All' | Testament>('All');
 
-  const filtered = useMemo(() => {
+  const { isScriptureFavorited, toggleFavoriteScripture } = useUser();
+
+  const filteredScriptures = useMemo(() => {
     return scriptures.filter((s) => {
-      const q = searchText.toLowerCase();
+      const q = searchText.toLowerCase().trim();
       const matchSearch =
         q === '' ||
         s.reference.toLowerCase().includes(q) ||
         s.text.toLowerCase().includes(q) ||
-        s.book.toLowerCase().includes(q);
+        s.book.toLowerCase().includes(q) ||
+        s.strongs_word.toLowerCase().includes(q) ||
+        s.strongs_transliteration.toLowerCase().includes(q) ||
+        s.strongs_number.toLowerCase().includes(q) ||
+        (s.tags && s.tags.some((t) => t.toLowerCase().includes(q)));
+
       const matchTestament = activeTestament === 'All' || s.testament === activeTestament;
-      const matchGenre = activeGenre === 'All' || s.genre === activeGenre;
-      return matchSearch && matchTestament && matchGenre;
+
+      let matchCategory = true;
+      if (activeCategory !== 'All') {
+        switch (activeCategory) {
+          case 'Prophecy':
+            matchCategory =
+              s.genre === 'Prophecy' ||
+              s.genre === 'Apocalyptic' ||
+              (s.tags ? s.tags.some((t) => t.toLowerCase().includes('prophecy') || t.toLowerCase().includes('messiah')) : false);
+            break;
+          case 'History':
+            matchCategory =
+              s.genre === 'History' ||
+              s.genre === 'Law' ||
+              s.historical_context.length > 0;
+            break;
+          case 'Language':
+            matchCategory = !!s.strongs_word || !!s.strongs_number;
+            break;
+          case 'Customs':
+            matchCategory =
+              (s.cultural_practice && s.cultural_practice.length > 0) ||
+              (s.tags ? s.tags.some((t) => ['altar', 'vow', 'feast', 'law'].includes(t.toLowerCase())) : false);
+            break;
+          case 'People':
+            matchCategory =
+              s.genre === 'Gospel' ||
+              (s.tags ? s.tags.some((t) => ['jesus', 'abraham', 'david', 'paul', 'peter', 'mary'].includes(t.toLowerCase())) : false);
+            break;
+        }
+      }
+
+      return matchSearch && matchTestament && matchCategory;
     });
-  }, [searchText, activeTestament, activeGenre]);
+  }, [searchText, activeTestament, activeCategory]);
+
+  const onShareScripture = async (scripture: Scripture) => {
+    try {
+      const message = `"${scripture.text}"\n- ${scripture.reference} (${scripture.testament})\n\nRoot: ${scripture.strongs_transliteration} (${scripture.strongs_number}) - "${scripture.strongs_definition}"`;
+      await Share.share({ message });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
@@ -70,96 +99,168 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
       >
+        {/* Header Row */}
         <View style={styles.headerRow}>
-          <ScripturesSvg size={24} color={colors.accent} fill={colors.accentSoft} />
-          <View>
-            <Text variant="h2" style={styles.title}>Find Scriptures</Text>
-            <Text variant="body" color={colors.textSecondary} style={{ fontSize: 14 }}>
-              Search and explore Bible verses with original root words
+          <View style={styles.headerIconWrap}>
+            <ScripturesSvg size={22} color={colors.accent} fill={colors.accentSoft} />
+          </View>
+          <View style={styles.headerTextWrap}>
+            <Text variant="h2" style={styles.title}>Scripture Library</Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.subtitle}>
+              Key verses paired with Strong's lexical roots
             </Text>
           </View>
         </View>
 
-        {/* Search Bar */}
+        {/* Compact Search Bar */}
         <View style={[styles.searchContainer, shadow.sm]}>
-          <SearchSvg size={18} color={colors.accent} />
+          <SearchSvg size={16} color={colors.accent} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search scriptures, books, themes..."
+            placeholder="Search reference, text, Greek, Hebrew roots..."
             placeholderTextColor={colors.textTertiary}
             value={searchText}
             onChangeText={setSearchText}
+            clearButtonMode="while-editing"
           />
         </View>
 
-        {/* Testament Filter */}
-        <Text variant="h3" style={styles.filterLabel}>Testament</Text>
+        {/* Combined Category Pills (from previous search section) */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={styles.filterRow}
-          contentContainerStyle={styles.filterRowContent}
+          contentContainerStyle={styles.filterPillsScroll}
+          style={styles.categoryScroll}
         >
-          <FilterPill label="All" active={activeTestament === 'All'} onPress={() => setActiveTestament('All')} />
-          {TESTAMENTS.map((t) => (
-            <FilterPill key={t} label={t} active={activeTestament === t} onPress={() => setActiveTestament(t)} />
-          ))}
+          {TOPIC_CATEGORIES.map((cat) => {
+            const isActive = activeCategory === cat;
+            return (
+              <TouchableOpacity
+                key={cat}
+                style={[styles.categoryPill, isActive && styles.categoryPillActive]}
+                onPress={() => setActiveCategory(cat)}
+                activeOpacity={0.8}
+              >
+                <Text
+                  variant="caption"
+                  weight={isActive ? '700' : '500'}
+                  style={[styles.categoryPillText, isActive && styles.categoryPillTextActive]}
+                >
+                  {cat}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
 
-        {/* Genre Filter */}
-        <Text variant="h3" style={styles.filterLabel}>Genre</Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.filterRow}
-          contentContainerStyle={styles.filterRowContent}
-        >
-          <FilterPill label="All" active={activeGenre === 'All'} onPress={() => setActiveGenre('All')} />
-          {GENRES.map((g) => (
-            <FilterPill key={g} label={g} active={activeGenre === g} onPress={() => setActiveGenre(g)} />
-          ))}
-        </ScrollView>
+        {/* Testament Sub-Filter Segment */}
+        <View style={styles.testamentSegmentRow}>
+          {TESTAMENTS.map((t) => {
+            const isActive = activeTestament === t;
+            const label = t === 'All' ? 'All Canons' : t === 'Old Testament' ? 'Old Testament' : 'New Testament';
+            return (
+              <TouchableOpacity
+                key={t}
+                style={[styles.testamentSegment, isActive && styles.testamentSegmentActive]}
+                onPress={() => setActiveTestament(t)}
+                activeOpacity={0.8}
+              >
+                <Text
+                  variant="caption"
+                  weight={isActive ? '700' : '500'}
+                  style={[styles.testamentSegmentText, isActive && styles.testamentSegmentTextActive]}
+                >
+                  {label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
 
-        {/* Results Count */}
+        {/* Results Counter */}
         <View style={styles.countRow}>
-          <Text variant="label" color={colors.textSecondary}>
-            {filtered.length} SCRIPTURE{filtered.length !== 1 ? 'S' : ''} FOUND
+          <Text variant="caption" color={colors.textTertiary}>
+            {filteredScriptures.length} verse{filteredScriptures.length !== 1 ? 's' : ''} available
           </Text>
         </View>
 
-        {/* Scripture List */}
-        {filtered.map((scripture) => (
-          <TouchableOpacity
-            key={scripture.id}
-            activeOpacity={0.88}
-            onPress={() => navigation.navigate('ScriptureDetails', { scripture })}
-          >
-            <Card style={styles.scriptureCard}>
-              <View style={styles.scriptureHeader}>
-                <View style={styles.genreIconRow}>
-                  {getGenreSvg(scripture.genre, 16, colors.accent)}
-                  <Text variant="caption" color={colors.accent} weight="700">
-                    {scripture.testament} • {scripture.genre}
+        {/* Compact Scripture Cards List */}
+        <View style={styles.scripturesList}>
+          {filteredScriptures.map((scripture) => {
+            const isFavorited = isScriptureFavorited(scripture.id);
+
+            return (
+              <TouchableOpacity
+                key={scripture.id}
+                activeOpacity={0.88}
+                onPress={() => navigation.navigate('ScriptureDetails', { scripture })}
+              >
+                <View style={[styles.compactCard, shadow.sm]}>
+                  {/* Card Header Row: Reference + Genre Badge + Favorite */}
+                  <View style={styles.cardHeaderRow}>
+                    <View style={styles.referenceBadgeWrap}>
+                      <Text variant="h3" color={colors.accent} style={styles.cardReference}>
+                        {scripture.reference}
+                      </Text>
+                      <View style={styles.genrePill}>
+                        <Text variant="caption" color={colors.textSecondary} style={styles.genrePillText}>
+                          {scripture.genre}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <View style={styles.cardActionsRow}>
+                      <TouchableOpacity
+                        onPress={() => toggleFavoriteScripture(scripture)}
+                        style={styles.iconActionBtn}
+                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                      >
+                        <FavoritesSvg
+                          size={16}
+                          color={colors.accent}
+                          fill={isFavorited ? colors.accent : 'none'}
+                        />
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        onPress={() => onShareScripture(scripture)}
+                        style={styles.iconActionBtn}
+                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                      >
+                        <ShareSvg size={16} color={colors.textSecondary} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
+                  {/* 2-Line Verse Snippet (No vertical bloat) */}
+                  <Text
+                    variant="body"
+                    color={colors.textPrimary}
+                    numberOfLines={2}
+                    style={styles.verseExcerpt}
+                  >
+                    "{scripture.text}"
                   </Text>
-                </View>
-                <ChevronRightSvg size={18} color={colors.accent} />
-              </View>
 
-              <Text variant="h2" style={styles.referenceText}>{scripture.reference}</Text>
-              <Text variant="body" color={colors.textSecondary} numberOfLines={3} style={styles.versePreview}>
-                "{scripture.text}"
-              </Text>
+                  {/* Bottom Metadata: Strong's Concordance Word */}
+                  <View style={styles.cardFooterRow}>
+                    <View style={styles.strongsPill}>
+                      <StrongsIconSvg size={12} color={colors.accent} />
+                      <Text variant="caption" color={colors.accent} weight="600" style={styles.strongsWordText}>
+                        {scripture.strongs_transliteration} ({scripture.strongs_number})
+                      </Text>
+                      <Text variant="caption" color={colors.textTertiary} numberOfLines={1} style={styles.strongsDefText}>
+                        • {scripture.strongs_definition}
+                      </Text>
+                    </View>
 
-              {scripture.tags && (
-                <View style={styles.tagsContainer}>
-                  {scripture.tags.slice(0, 3).map((tag) => (
-                    <Text key={tag} variant="caption" color={colors.textTertiary}>#{tag}</Text>
-                  ))}
+                    <ChevronRightSvg size={14} color={colors.textTertiary} />
+                  </View>
                 </View>
-              )}
-            </Card>
-          </TouchableOpacity>
-        ))}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -174,106 +275,177 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    padding: spacing.md, // 16px margins & gutters
-    paddingBottom: 96, // 96px bottom padding clears floating pill tab bar
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: 110,
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm, // 8px
-    marginTop: spacing.sm, // 8px
-    marginBottom: spacing.md, // 16px
+    marginBottom: spacing.md,
+    gap: 12,
+  },
+  headerIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.md,
+    backgroundColor: colors.accentSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTextWrap: {
+    flex: 1,
   },
   title: {
-    fontSize: 22,
     color: colors.textPrimary,
+  },
+  subtitle: {
+    fontSize: 13,
+    marginTop: 2,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surface,
-    paddingHorizontal: spacing.md, // 16px
-    paddingVertical: spacing.sm, // 8px
-    borderRadius: radius.md, // 16px
+    backgroundColor: '#FFFFFF',
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 9,
     borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: spacing.md, // 16px
-    gap: spacing.sm, // 8px
+    borderColor: 'rgba(15, 23, 42, 0.08)',
+    gap: 8,
+    marginBottom: spacing.sm,
   },
   searchInput: {
     flex: 1,
-    color: colors.textPrimary,
-    fontSize: 15,
-    paddingVertical: spacing.sm, // 8px
-  },
-  filterLabel: {
     fontSize: 14,
     color: colors.textPrimary,
-    marginBottom: spacing.sm, // 8px
+    padding: 0,
   },
-  filterRow: {
-    marginBottom: spacing.md, // 16px
+  categoryScroll: {
+    marginBottom: 4,
   },
-  filterRowContent: {
-    gap: spacing.sm, // 8px
+  filterPillsScroll: {
+    gap: 6,
+    paddingVertical: 4,
   },
-  pill: {
-    paddingHorizontal: spacing.md, // 16px
-    paddingVertical: spacing.sm, // 8px
+  categoryPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: radius.full,
-    backgroundColor: colors.surface,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
   },
-  pillActive: {
-    backgroundColor: colors.accentSoft,
-    borderColor: colors.accentBorder,
+  categoryPillActive: {
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
   },
-  pillText: {
+  categoryPillText: {
     color: colors.textSecondary,
     fontSize: 12,
   },
-  pillTextActive: {
+  categoryPillTextActive: {
+    color: '#FFFFFF',
+  },
+  testamentSegmentRow: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(15, 23, 42, 0.04)',
+    borderRadius: radius.sm,
+    padding: 2,
+    marginTop: 4,
+    marginBottom: 4,
+    gap: 4,
+  },
+  testamentSegment: {
+    flex: 1,
+    paddingVertical: 6,
+    alignItems: 'center',
+    borderRadius: radius.sm - 2,
+  },
+  testamentSegmentActive: {
+    backgroundColor: '#FFFFFF',
+    ...shadow.sm,
+  },
+  testamentSegmentText: {
+    color: colors.textSecondary,
+    fontSize: 11,
+  },
+  testamentSegmentTextActive: {
     color: colors.accent,
   },
   countRow: {
-    marginVertical: spacing.sm, // 8px
+    marginVertical: 4,
   },
-  scriptureCard: {
-    backgroundColor: colors.surface,
-    padding: spacing.lg, // 24px
-    borderRadius: radius.lg, // 24px
+  scripturesList: {
+    gap: 10,
+  },
+  compactCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 10,
     borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: spacing.md, // 16px
+    borderColor: 'rgba(15, 23, 42, 0.06)',
   },
-  scriptureHeader: {
+  cardHeaderRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.sm, // 8px
+    marginBottom: 6,
   },
-  genreIconRow: {
+  referenceBadgeWrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm, // 8px
+    gap: 8,
+    flex: 1,
   },
-
-  referenceText: {
-    fontSize: 19,
+  cardReference: {
+    fontSize: 15,
+  },
+  genrePill: {
+    backgroundColor: 'rgba(15, 23, 42, 0.04)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  genrePillText: {
+    fontSize: 10,
+  },
+  cardActionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  iconActionBtn: {
+    padding: 2,
+  },
+  verseExcerpt: {
+    fontSize: 13,
+    lineHeight: 18,
     color: colors.textPrimary,
-    marginBottom: spacing.sm, // 8px
-  },
-  versePreview: {
     fontStyle: 'italic',
-    lineHeight: 22,
-    fontSize: 14,
-    marginBottom: spacing.md, // 16px
+    marginBottom: 6,
   },
-  tagsContainer: {
+  cardFooterRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm, // 8px
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 4,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(15, 23, 42, 0.04)',
   },
-
+  strongsPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    flex: 1,
+    marginRight: 6,
+  },
+  strongsWordText: {
+    fontSize: 11,
+  },
+  strongsDefText: {
+    fontSize: 11,
+    flex: 1,
+  },
 });

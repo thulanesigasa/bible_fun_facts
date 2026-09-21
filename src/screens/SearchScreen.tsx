@@ -5,72 +5,68 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
 import { Card } from '../components/Card';
-import { facts, scriptures, Category } from '../data/mockDatabase';
+import { useUser } from '../context/UserContext';
+import { MOCK_COMMUNITY_USERS, CommunityUser } from '../data/mockUsers';
 import {
   SearchSvg,
+  UsersSvg,
+  CheckSvg,
+  XCloseSvg,
+  FlameSvg,
+  BookOpenSvg,
+  QuoteSvg,
   ChevronRightSvg,
 } from '../components/SvgIcons';
 
-const CATEGORIES: Category[] = ['People', 'Prophecy', 'Customs', 'History', 'Language'];
+type FilterCategory = 'All' | 'Scholars' | 'Pastors' | 'Exegesis' | 'Linguistics';
 
-interface FilterTabProps {
-  label: string;
-  active: boolean;
-  onPress: () => void;
-}
+const FILTER_CATEGORIES: FilterCategory[] = ['All', 'Scholars', 'Pastors', 'Exegesis', 'Linguistics'];
 
-const FilterTab: React.FC<FilterTabProps> = ({ label, active, onPress }) => (
-  <TouchableOpacity
-    style={[styles.filterTab, active && styles.filterTabActive]}
-    onPress={onPress}
-    activeOpacity={0.8}
-  >
-    <Text
-      variant="caption"
-      weight={active ? '700' : '500'}
-      style={[styles.filterTabText, active && styles.filterTabTextActive]}
-    >
-      {label}
-    </Text>
-  </TouchableOpacity>
-);
-
-export default function SearchScreen({ navigation }: { navigation: any }) {
+export default function SearchScreen({ navigation }: { navigation?: any }) {
   const [searchText, setSearchText] = useState('');
-  const [activeCategory, setActiveCategory] = useState<Category | 'All' | 'Scriptures'>('All');
+  const [activeCategory, setActiveCategory] = useState<FilterCategory>('All');
+  const [selectedUser, setSelectedUser] = useState<CommunityUser | null>(null);
 
-  const filteredFacts = useMemo(() => {
-    if (activeCategory === 'Scriptures') return [];
-    return facts.filter((f) => {
-      const q = searchText.toLowerCase();
-      const matchSearch =
+  const { isUserFollowed, toggleFollowUser } = useUser();
+
+  const filteredUsers = useMemo(() => {
+    return MOCK_COMMUNITY_USERS.filter((user) => {
+      const q = searchText.toLowerCase().trim();
+      const matchesSearch =
         q === '' ||
-        f.fact_title.toLowerCase().includes(q) ||
-        f.scripture_ref.toLowerCase().includes(q) ||
-        f.verse_text.toLowerCase().includes(q);
-      const matchCat = activeCategory === 'All' || f.category === activeCategory;
-      return matchSearch && matchCat;
+        user.name.toLowerCase().includes(q) ||
+        user.username.toLowerCase().includes(q) ||
+        user.role.toLowerCase().includes(q) ||
+        user.theologicalFocus.toLowerCase().includes(q) ||
+        user.bio.toLowerCase().includes(q) ||
+        user.tags.some((t) => t.toLowerCase().includes(q));
+
+      if (!matchesSearch) return false;
+
+      if (activeCategory === 'All') return true;
+      if (activeCategory === 'Scholars') return user.role.toLowerCase().includes('scholar') || user.role.toLowerCase().includes('lexicographer');
+      if (activeCategory === 'Pastors') return user.role.toLowerCase().includes('pastor') || user.role.toLowerCase().includes('minister');
+      if (activeCategory === 'Exegesis') return user.tags.some((t) => ['exegesis', 'hermeneutics', 'romans', 'genesis', 'revelation'].includes(t.toLowerCase()));
+      if (activeCategory === 'Linguistics') return user.theologicalFocus.toLowerCase().includes('greek') || user.theologicalFocus.toLowerCase().includes('hebrew');
+
+      return true;
     });
   }, [searchText, activeCategory]);
 
-  const filteredScriptures = useMemo(() => {
-    if (activeCategory !== 'All' && activeCategory !== 'Scriptures') return [];
-    return scriptures.filter((s) => {
-      const q = searchText.toLowerCase();
-      return (
-        q === '' ||
-        s.reference.toLowerCase().includes(q) ||
-        s.text.toLowerCase().includes(q) ||
-        s.book.toLowerCase().includes(q)
-      );
-    });
-  }, [searchText, activeCategory]);
+  const getInitials = (name: string) => {
+    const parts = name.replace(/^(Dr\.|Prof\.|Pastor)\s+/i, '').split(' ');
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    }
+    return (parts[0] ? parts[0].slice(0, 2) : 'US').toUpperCase();
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
@@ -79,14 +75,15 @@ export default function SearchScreen({ navigation }: { navigation: any }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
       >
+        {/* Header */}
         <View style={styles.headerRow}>
           <View style={styles.searchIconCircle}>
-            <SearchSvg size={18} color={colors.accent} />
+            <UsersSvg size={22} color={colors.accent} />
           </View>
-          <View>
-            <Text variant="h2" style={styles.title}>Search Library</Text>
-            <Text variant="body" color={colors.textSecondary} style={{ fontSize: 14 }}>
-              Explore across historical facts and scriptures
+          <View style={styles.headerTextWrap}>
+            <Text variant="h2" style={styles.title}>Believers & Scholars</Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.subtitle}>
+              Search, follow, and discover students of the Word
             </Text>
           </View>
         </View>
@@ -96,105 +93,312 @@ export default function SearchScreen({ navigation }: { navigation: any }) {
           <SearchSvg size={18} color={colors.accent} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search keywords, topics, or verses..."
+            placeholder="Search scholars, @handles, Greek, Hebrew..."
             placeholderTextColor={colors.textTertiary}
             value={searchText}
             onChangeText={setSearchText}
+            clearButtonMode="while-editing"
           />
         </View>
 
-        {/* Category Filter Pills */}
+        {/* Filter Categories */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterTabsScroll}
           style={styles.filterRow}
-          contentContainerStyle={styles.filterRowContent}
         >
-          <FilterTab
-            label="All"
-            active={activeCategory === 'All'}
-            onPress={() => setActiveCategory('All')}
-          />
-          <FilterTab
-            label="Scriptures"
-            active={activeCategory === 'Scriptures'}
-            onPress={() => setActiveCategory('Scriptures')}
-          />
-          {CATEGORIES.map((cat) => (
-            <FilterTab
-              key={cat}
-              label={cat}
-              active={activeCategory === cat}
-              onPress={() => setActiveCategory(cat)}
-            />
-          ))}
+          {FILTER_CATEGORIES.map((cat) => {
+            const isActive = activeCategory === cat;
+            return (
+              <TouchableOpacity
+                key={cat}
+                style={[styles.filterTab, isActive && styles.filterTabActive]}
+                onPress={() => setActiveCategory(cat)}
+                activeOpacity={0.8}
+              >
+                <Text
+                  variant="caption"
+                  weight={isActive ? '700' : '500'}
+                  style={[styles.filterTabText, isActive && styles.filterTabTextActive]}
+                >
+                  {cat}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
 
-        {/* Fact Results */}
-        {filteredFacts.length > 0 && (
-          <View style={styles.sectionBlock}>
-            <Text variant="label" color={colors.accent} style={styles.sectionTitle}>
-              FACTS ({filteredFacts.length})
-            </Text>
-            {filteredFacts.map((fact) => (
-              <TouchableOpacity
-                key={fact.id}
-                activeOpacity={0.88}
-                onPress={() => navigation.navigate('FactDetails', { fact })}
-              >
-                <Card style={styles.resultCard}>
-                  <View style={styles.cardTopRow}>
-                    <Text variant="caption" weight="700" color={colors.accent}>{fact.category.toUpperCase()}</Text>
-                    <ChevronRightSvg size={16} color={colors.textSecondary} />
-                  </View>
-                  <Text variant="h3" style={styles.cardTitle}>{fact.fact_title}</Text>
-                  <Text variant="caption" color={colors.accent} style={styles.cardRef}>
-                    {fact.scripture_ref}
-                  </Text>
-                  <Text variant="body" color={colors.textSecondary} numberOfLines={2} style={styles.cardSnippet}>
-                    {fact.historical_context}
-                  </Text>
-                </Card>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
+        {/* Results Counter */}
+        <View style={styles.resultsMetaRow}>
+          <Text variant="caption" color={colors.textSecondary}>
+            {filteredUsers.length} community believer{filteredUsers.length !== 1 ? 's' : ''} found
+          </Text>
+        </View>
 
-        {/* Scripture Results */}
-        {filteredScriptures.length > 0 && (
-          <View style={styles.sectionBlock}>
-            <Text variant="label" color={colors.accent} style={styles.sectionTitle}>
-              SCRIPTURES ({filteredScriptures.length})
-            </Text>
-            {filteredScriptures.map((scripture) => (
-              <TouchableOpacity
-                key={scripture.id}
-                activeOpacity={0.88}
-                onPress={() => navigation.navigate('ScriptureDetails', { scripture })}
-              >
-                <Card style={styles.resultCard}>
-                  <View style={styles.cardTopRow}>
-                    <Text variant="caption" weight="700" color={colors.accent}>{scripture.testament.toUpperCase()}</Text>
-                    <ChevronRightSvg size={16} color={colors.textSecondary} />
-                  </View>
-                  <Text variant="h3" style={styles.cardTitle}>{scripture.reference}</Text>
-                  <Text variant="body" color={colors.textSecondary} numberOfLines={2} style={styles.cardSnippet}>
-                    "{scripture.text}"
-                  </Text>
-                </Card>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
+        {/* Users List */}
+        <View style={styles.usersList}>
+          {filteredUsers.map((user) => {
+            const isFollowed = isUserFollowed(user.id);
+            const totalFollowers = user.followersCount + (isFollowed ? 1 : 0);
 
-        {filteredFacts.length === 0 && filteredScriptures.length === 0 && (
-          <View style={styles.emptyState}>
-            <Text variant="body" color={colors.textSecondary} align="center">
-              No matching facts or scriptures found for "{searchText}".
-            </Text>
-          </View>
-        )}
+            return (
+              <TouchableOpacity
+                key={user.id}
+                activeOpacity={0.9}
+                style={[styles.userCard, shadow.sm]}
+                onPress={() => setSelectedUser(user)}
+              >
+                <View style={styles.userCardTop}>
+                  {/* Avatar Initials */}
+                  <View style={styles.avatarCircle}>
+                    <Text variant="body" weight="700" color={colors.accent}>
+                      {getInitials(user.name)}
+                    </Text>
+                  </View>
+
+                  {/* User Info */}
+                  <View style={styles.userInfoWrap}>
+                    <View style={styles.userNameRow}>
+                      <Text variant="h3" style={styles.userName} numberOfLines={1}>
+                        {user.name}
+                      </Text>
+                      {user.isVerified && (
+                        <View style={styles.verifiedDot}>
+                          <CheckSvg size={10} color="#FFFFFF" strokeWidth={3} />
+                        </View>
+                      )}
+                    </View>
+                    <Text variant="caption" color={colors.textTertiary}>
+                      @{user.username} • {user.role}
+                    </Text>
+                  </View>
+
+                  {/* Follow Button */}
+                  <TouchableOpacity
+                    style={[
+                      styles.followBtn,
+                      isFollowed ? styles.followingBtn : styles.unfollowedBtn,
+                    ]}
+                    onPress={() => toggleFollowUser(user.id)}
+                    activeOpacity={0.8}
+                  >
+                    {isFollowed ? (
+                      <View style={styles.followingBtnContent}>
+                        <CheckSvg size={12} color={colors.textSecondary} strokeWidth={2.5} />
+                        <Text variant="caption" weight="600" color={colors.textSecondary}>
+                          Following
+                        </Text>
+                      </View>
+                    ) : (
+                      <Text variant="caption" weight="700" color="#FFFFFF">
+                        + Follow
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+
+                {/* Bio snippet */}
+                <Text
+                  variant="body"
+                  color={colors.textPrimary}
+                  numberOfLines={2}
+                  style={styles.bioSnippet}
+                >
+                  {user.bio}
+                </Text>
+
+                {/* Tags row */}
+                <View style={styles.tagsRow}>
+                  {user.tags.slice(0, 3).map((tag) => (
+                    <View key={tag} style={styles.tagBadge}>
+                      <Text variant="caption" color={colors.accent} style={styles.tagText}>
+                        #{tag}
+                      </Text>
+                    </View>
+                  ))}
+                  <View style={styles.statsSummary}>
+                    <Text variant="caption" color={colors.textTertiary}>
+                      {totalFollowers.toLocaleString()} followers • {user.streak}d streak
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </ScrollView>
+
+      {/* Slide-Up Profile Inspection Modal */}
+      <Modal
+        visible={!!selectedUser}
+        animationType="slide"
+        transparent={false}
+        onRequestClose={() => setSelectedUser(null)}
+      >
+        {selectedUser && (
+          <SafeAreaView style={styles.profileModalSafeArea}>
+            <View style={styles.profileModalHeader}>
+              <View style={styles.profileModalHeaderLeft}>
+                <Text variant="h3" style={{ color: colors.textPrimary }}>Scholar Profile</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setSelectedUser(null)}
+                style={styles.modalCloseBtn}
+              >
+                <XCloseSvg size={22} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              style={styles.profileModalScroll}
+              contentContainerStyle={styles.profileModalContent}
+              showsVerticalScrollIndicator={false}
+            >
+              {/* Profile Card Header */}
+              <View style={styles.profileHero}>
+                <View style={styles.profileLargeAvatar}>
+                  <Text variant="h1" color={colors.accent}>
+                    {getInitials(selectedUser.name)}
+                  </Text>
+                </View>
+                <View style={styles.profileNameWrap}>
+                  <View style={styles.modalNameRow}>
+                    <Text variant="h2" style={styles.profileModalName}>
+                      {selectedUser.name}
+                    </Text>
+                    {selectedUser.isVerified && (
+                      <View style={styles.verifiedDot}>
+                        <CheckSvg size={10} color="#FFFFFF" strokeWidth={3} />
+                      </View>
+                    )}
+                  </View>
+                  <Text variant="body" color={colors.accent} weight="600">
+                    @{selectedUser.username}
+                  </Text>
+                  <Text variant="caption" color={colors.textSecondary} style={{ marginTop: 2 }}>
+                    {selectedUser.role} • Joined {selectedUser.joinedDate}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Stats Bar */}
+              <View style={[styles.profileStatsRow, shadow.sm]}>
+                <View style={styles.profileStatCol}>
+                  <Text variant="h3" color={colors.textPrimary}>
+                    {(selectedUser.followersCount + (isUserFollowed(selectedUser.id) ? 1 : 0)).toLocaleString()}
+                  </Text>
+                  <Text variant="caption" color={colors.textSecondary}>Followers</Text>
+                </View>
+                <View style={styles.profileStatDivider} />
+                <View style={styles.profileStatCol}>
+                  <Text variant="h3" color={colors.textPrimary}>
+                    {selectedUser.followingCount}
+                  </Text>
+                  <Text variant="caption" color={colors.textSecondary}>Following</Text>
+                </View>
+                <View style={styles.profileStatDivider} />
+                <View style={styles.profileStatCol}>
+                  <Text variant="h3" color={colors.accent}>
+                    {selectedUser.streak}d
+                  </Text>
+                  <Text variant="caption" color={colors.textSecondary}>Streak</Text>
+                </View>
+                <View style={styles.profileStatDivider} />
+                <View style={styles.profileStatCol}>
+                  <Text variant="h3" color={colors.textPrimary}>
+                    {selectedUser.versesExplored}
+                  </Text>
+                  <Text variant="caption" color={colors.textSecondary}>Verses</Text>
+                </View>
+              </View>
+
+              {/* Follow Button in Modal */}
+              <TouchableOpacity
+                style={[
+                  styles.modalBigFollowBtn,
+                  isUserFollowed(selectedUser.id) ? styles.modalFollowingBtn : styles.modalFollowBtn,
+                ]}
+                onPress={() => toggleFollowUser(selectedUser.id)}
+                activeOpacity={0.8}
+              >
+                {isUserFollowed(selectedUser.id) ? (
+                  <View style={styles.followingBtnContent}>
+                    <CheckSvg size={16} color={colors.textSecondary} strokeWidth={2.5} />
+                    <Text variant="body" weight="600" color={colors.textSecondary}>
+                      Following Scholar
+                    </Text>
+                  </View>
+                ) : (
+                  <Text variant="body" weight="700" color="#FFFFFF">
+                    + Follow Scholar
+                  </Text>
+                )}
+              </TouchableOpacity>
+
+              {/* Theological Focus Section */}
+              <View style={styles.sectionBlock}>
+                <Text variant="label" color={colors.textTertiary} style={styles.sectionHeading}>
+                  THEOLOGICAL SPECIALTY & FOCUS
+                </Text>
+                <Card style={styles.focusCard}>
+                  <Text variant="body" weight="600" color={colors.accent}>
+                    {selectedUser.theologicalFocus}
+                  </Text>
+                </Card>
+              </View>
+
+              {/* Bio Section */}
+              <View style={styles.sectionBlock}>
+                <Text variant="label" color={colors.textTertiary} style={styles.sectionHeading}>
+                  ABOUT
+                </Text>
+                <Text variant="body" color={colors.textPrimary} style={styles.fullBioText}>
+                  {selectedUser.bio}
+                </Text>
+              </View>
+
+              {/* Topics / Tags */}
+              <View style={styles.sectionBlock}>
+                <Text variant="label" color={colors.textTertiary} style={styles.sectionHeading}>
+                  TOPICS & KEY THEMES
+                </Text>
+                <View style={styles.modalTagsRow}>
+                  {selectedUser.tags.map((tag) => (
+                    <View key={tag} style={styles.modalTagBadge}>
+                      <Text variant="caption" weight="600" color={colors.accent}>
+                        #{tag}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+
+              {/* Favorite Scripture Reflection */}
+              <View style={styles.sectionBlock}>
+                <Text variant="label" color={colors.textTertiary} style={styles.sectionHeading}>
+                  FAVORITE SCRIPTURE REFLECTION
+                </Text>
+                <Card style={styles.reflectionCard}>
+                  <View style={styles.reflectionHeader}>
+                    <QuoteSvg size={16} color={colors.accent} />
+                    <Text variant="h3" color={colors.accent}>
+                      {selectedUser.favoriteVerse.reference}
+                    </Text>
+                  </View>
+                  <Text variant="body" style={styles.reflectionVerseText}>
+                    "{selectedUser.favoriteVerse.text}"
+                  </Text>
+                  <View style={styles.reflectionDivider} />
+                  <Text variant="caption" color={colors.textSecondary} style={styles.reflectionNote}>
+                    {selectedUser.favoriteVerse.note}
+                  </Text>
+                </Card>
+              </View>
+            </ScrollView>
+          </SafeAreaView>
+        )}
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -208,108 +412,314 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    padding: spacing.md, // 16px margins & gutters
-    paddingBottom: 96, // 96px padding clears floating pill tab bar
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: 110,
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm, // 8px
-    marginTop: spacing.sm, // 8px
-    marginBottom: spacing.md, // 16px
+    marginBottom: spacing.md,
+    gap: 12,
   },
   searchIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.full,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    justifyContent: 'center',
+    width: 44,
+    height: 44,
+    borderRadius: radius.md,
+    backgroundColor: colors.accentSoft,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTextWrap: {
+    flex: 1,
   },
   title: {
-    fontSize: 22,
     color: colors.textPrimary,
+  },
+  subtitle: {
+    fontSize: 13,
+    marginTop: 2,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surface,
-    paddingHorizontal: spacing.md, // 16px
-    paddingVertical: spacing.sm, // 8px
-    borderRadius: radius.md, // 16px
+    backgroundColor: '#FFFFFF',
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 10,
     borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: spacing.md, // 16px
-    gap: spacing.sm, // 8px
+    borderColor: 'rgba(15, 23, 42, 0.08)',
+    gap: 10,
+    marginBottom: spacing.md,
   },
   searchInput: {
     flex: 1,
+    fontSize: 14,
     color: colors.textPrimary,
-    fontSize: 15,
-    paddingVertical: spacing.sm, // 8px
+    padding: 0,
   },
   filterRow: {
-    marginBottom: spacing.lg, // 24px
+    marginBottom: spacing.md,
   },
-  filterRowContent: {
-    gap: spacing.sm, // 8px
+  filterTabsScroll: {
+    gap: 8,
   },
   filterTab: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.sm,
-    marginRight: spacing.sm,
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: radius.full,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.06)',
   },
   filterTabActive: {
-    borderBottomColor: colors.accent,
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
   },
   filterTabText: {
     color: colors.textSecondary,
-    fontSize: 13,
+    fontSize: 12,
   },
   filterTabTextActive: {
-    color: colors.accent,
+    color: '#FFFFFF',
   },
-  sectionBlock: {
-    marginBottom: spacing.lg, // 24px
+  resultsMetaRow: {
+    marginBottom: spacing.sm,
   },
-  sectionTitle: {
-    letterSpacing: 0.5,
-    marginBottom: spacing.sm, // 8px
+  usersList: {
+    gap: 12,
   },
-  resultCard: {
-    backgroundColor: colors.surface,
-    padding: spacing.md, // 16px
-    borderRadius: radius.md, // 16px
+  userCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: radius.lg,
+    padding: spacing.md,
     borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: spacing.sm, // 8px
+    borderColor: 'rgba(15, 23, 42, 0.06)',
   },
-  cardTopRow: {
+  userCardTop: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.sm, // 8px
+    gap: 12,
+  },
+  avatarCircle: {
+    width: 46,
+    height: 46,
+    borderRadius: radius.full,
+    backgroundColor: colors.accentSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(217, 119, 6, 0.2)',
+  },
+  userInfoWrap: {
+    flex: 1,
+  },
+  userNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  userName: {
+    color: colors.textPrimary,
+    fontSize: 15,
+  },
+  verifiedDot: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: colors.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  followBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: radius.full,
+  },
+  unfollowedBtn: {
+    backgroundColor: colors.accent,
+  },
+  followingBtn: {
+    backgroundColor: 'rgba(15, 23, 42, 0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.1)',
+  },
+  followingBtnContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  bioSnippet: {
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: spacing.sm,
+  },
+  tagsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: spacing.sm,
+    paddingTop: 4,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(15, 23, 42, 0.04)',
+  },
+  tagBadge: {
+    backgroundColor: colors.accentSoft,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: radius.sm,
+    marginRight: 6,
+  },
+  tagText: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  statsSummary: {
+    flex: 1,
+    alignItems: 'flex-end',
   },
 
-  cardTitle: {
-    fontSize: 17,
+  // Modal Profile Styles
+  profileModalSafeArea: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  profileModalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
+  },
+  profileModalHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  modalCloseBtn: {
+    padding: 6,
+  },
+  profileModalScroll: {
+    flex: 1,
+  },
+  profileModalContent: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: 60,
+  },
+  profileHero: {
+    alignItems: 'center',
+    marginBottom: spacing.lg,
+  },
+  profileLargeAvatar: {
+    width: 80,
+    height: 80,
+    borderRadius: radius.full,
+    backgroundColor: colors.accentSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.accent,
+    marginBottom: spacing.md,
+  },
+  profileNameWrap: {
+    alignItems: 'center',
+  },
+  modalNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  profileModalName: {
     color: colors.textPrimary,
+  },
+  profileStatsRow: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    borderRadius: radius.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    marginBottom: spacing.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.06)',
+  },
+  profileStatCol: {
+    alignItems: 'center',
+  },
+  profileStatDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: 'rgba(15, 23, 42, 0.08)',
+  },
+  modalBigFollowBtn: {
+    paddingVertical: 12,
+    borderRadius: radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.xl,
+  },
+  modalFollowBtn: {
+    backgroundColor: colors.accent,
+  },
+  modalFollowingBtn: {
+    backgroundColor: 'rgba(15, 23, 42, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.12)',
+  },
+  sectionBlock: {
+    marginBottom: spacing.lg,
+  },
+  sectionHeading: {
+    letterSpacing: 1.2,
     marginBottom: 4,
   },
-  cardRef: {
-    marginBottom: spacing.sm, // 8px
-    fontSize: 13,
+  focusCard: {
+    backgroundColor: colors.accentSoft,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(217, 119, 6, 0.2)',
   },
-  cardSnippet: {
-    lineHeight: 20,
-    fontSize: 14,
+  fullBioText: {
+    lineHeight: 22,
+    color: colors.textPrimary,
   },
-  emptyState: {
-    paddingVertical: spacing.xxl, // 48px
+  modalTagsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  modalTagBadge: {
+    backgroundColor: colors.accentSoft,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: radius.full,
+  },
+  reflectionCard: {
+    backgroundColor: '#FFFFFF',
+    padding: spacing.md,
+  },
+  reflectionHeader: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+  },
+  reflectionVerseText: {
+    fontStyle: 'italic',
+    lineHeight: 22,
+    color: colors.textPrimary,
+    marginVertical: 4,
+  },
+  reflectionDivider: {
+    height: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.06)',
+    marginVertical: spacing.sm,
+  },
+  reflectionNote: {
+    lineHeight: 18,
   },
 });

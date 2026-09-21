@@ -4,28 +4,25 @@
   <img src="https://img.shields.io/badge/Expo%20SDK-57.0-000000?style=for-the-badge&logo=expo&logoColor=white" alt="Expo SDK 57" />
   <img src="https://img.shields.io/badge/React%20Native-0.86-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React Native 0.86" />
   <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript 5.9" />
+  <img src="https://img.shields.io/badge/Holy%20Bible-66--Book%20Canon%20Reader-D97706?style=for-the-badge" alt="Full Holy Bible Reader" />
+  <img src="https://img.shields.io/badge/Bible%20API-Multi--Tier%20Offline%20Cache-0284C7?style=for-the-badge" alt="Bible API Offline Cache" />
+  <img src="https://img.shields.io/badge/Community-Believer%20&%20Scholar%20Hub-10B981?style=for-the-badge" alt="Believer & Scholar Hub" />
+  <img src="https://img.shields.io/badge/Verses%20Hub-Compact%20Lexical%20Cards-6366F1?style=for-the-badge" alt="Compact Verses Hub" />
+  <img src="https://img.shields.io/badge/Feed%20Stream-Rich%20Multi--Card%20Exegesis-F59E0B?style=for-the-badge" alt="Multi-Card Feed Stream" />
   <img src="https://img.shields.io/badge/Supabase-Auth%20&%20Backend-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase Backend" />
   <img src="https://img.shields.io/badge/CI%2FCD-Rule%2021%20Compliant-10B981?style=for-the-badge&logo=githubactions&logoColor=white" alt="Rule 21 Compliant" />
   <img src="https://img.shields.io/badge/EAS%20Channels-Production%20%7C%20Preview-000000?style=for-the-badge&logo=expo&logoColor=white" alt="EAS Channels" />
   <img src="https://img.shields.io/badge/Outer%20Release-v1.0.2-2563EB?style=for-the-badge&logo=android&logoColor=white" alt="Outer Release v1.0.2" />
-  <img src="https://img.shields.io/badge/EAS%20OTA%20Updates-Active%20(v1.0.1)-000000?style=for-the-badge&logo=expo&logoColor=white" alt="EAS OTA Updates" />
   <img src="https://img.shields.io/badge/Security-Kotlin%20FLAG__SECURE-DC2626?style=for-the-badge&logo=android&logoColor=white" alt="Kotlin FLAG_SECURE" />
-  <img src="https://img.shields.io/badge/Legal-Terms%20&%20Privacy%20Screens-475569?style=for-the-badge" alt="Terms & Privacy Screens" />
-  <img src="https://img.shields.io/badge/GitHub%20Actions-Compilation%20&%20OTA-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions" />
   <img src="https://img.shields.io/badge/Tab%20Architecture-Floating%20Pill%20280px-D97706?style=for-the-badge" alt="Floating Pill Tab Bar" />
   <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
-  <img src="https://img.shields.io/badge/Keyboard%20Avoidance-Reactive%20Auto--Scroll-0284C7?style=for-the-badge" alt="Reactive Keyboard Auto-Scroll" />
-  <img src="https://img.shields.io/badge/Legal%20Typography-100%25%20Uniform-64748B?style=for-the-badge" alt="100% Uniform Legal Typography" />
-  <img src="https://img.shields.io/badge/Profile%20UI-Clean%20Body%20Surface-10B981?style=for-the-badge" alt="Clean Body Surface" />
-  <img src="https://img.shields.io/badge/Reader%20Settings-Font%20Size%20&%20Type-D97706?style=for-the-badge" alt="Reader Font Settings" />
-  <img src="https://img.shields.io/badge/Auth%20Action-Swipe%20to%20Sign%20Out-EF4444?style=for-the-badge" alt="Swipe to Sign Out" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
   <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License MIT" />
 </p>
 
 > **Strong's Greek 1834**: *ἐξηγέομαι* (*exēgeomai*) — from *ἐκ* (out) and *ἡγέομαι* (to lead): **"to lead out, unfold, declare, interpret, draw out the true meaning."** As recorded in John 1:18: *"No one has seen God at any time; the only begotten Son, who is in the bosom of the Father, He has explained / declared (exēgēsato) Him."*
 
-**exégeomai** is a modern, high-performance React Native & Expo mobile application exploring ancient historical context, cultural customs, original language deep dives (Strong's Concordance), and multi-lens daily devotionals from Sacred Scripture.
+**exégeomai** is a modern, high-performance React Native & Expo mobile application exploring ancient historical context, cultural customs, original language deep dives (Strong's Concordance), full 66-book scripture reading, believer community discovery, and multi-lens daily devotionals from Sacred Scripture.
 
 ---
 
@@ -42,26 +39,32 @@ graph TD
     Auth --> Privacy["PrivacyPolicyScreen (11 Data Protection Sections)"]
     Nav --> Tabs["Rule 20 Floating Pill Tab Bar (280px)"]
     
-    Tabs --> DiscoverStack["Discover Stack"]
-    Tabs --> WOTDScreen["Word of the Day (4 Lenses)"]
-    Tabs --> ScripturesStack["Scriptures Stack"]
-    Tabs --> SearchStack["Search Stack"]
-    Tabs --> ProfileStack["Profile Stack"]
+    Tabs --> DiscoverStack["Feed Tab (Multi-Card Exegetical Stream)"]
+    Tabs --> WOTDScreen["Word Tab (Full Holy Bible Reader + Daily Exegesis)"]
+    Tabs --> ScripturesStack["Verses Tab (Compact Scripture Library + Categories)"]
+    Tabs --> SearchStack["Search Tab (Believers & Scholars Community Hub)"]
+    Tabs --> ProfileStack["Profile Tab (Settings, Reader Font Size 1-24px, Stats)"]
     
-    DiscoverStack --> DiscoverMain["DiscoverScreen"]
+    DiscoverStack --> DiscoverMain["DiscoverScreen (Hero Spotlight + Continue Reading + Archaeology)"]
     DiscoverStack --> FactDetails["FactDetailsScreen (PageSheet)"]
     
-    ScripturesStack --> ScripturesMain["ScripturesScreen"]
+    WOTDScreen --> BibleReader["Full 66-Book Holy Bible (WEB / KJV)"]
+    WOTDScreen --> ExegesisLenses["4-Lens Daily Devotional (Original Intent, Theological Truth, Walk, Prayer)"]
+    
+    ScripturesStack --> ScripturesMain["ScripturesScreen (People, Prophecy, Customs, History, Language)"]
     ScripturesStack --> ScriptureDetails["ScriptureDetailsScreen (PageSheet)"]
     
-    SearchStack --> SearchMain["SearchScreen"]
-    ProfileStack --> ProfileMain["ProfileScreen (Settings, Translation, Streak)"]
+    SearchStack --> SearchMain["SearchScreen (User Discovery, Follow/Unfollow, Scholar Modal)"]
+    ProfileStack --> ProfileMain["ProfileScreen (Preferences, Reader Typography, Followers)"]
     ProfileStack --> FavoritesMain["FavoritesScreen (Saved Collection)"]
     ProfileStack --> Terms
     ProfileStack --> Privacy
     
-    subgraph DataUpdates["Data, State, Auth and Updates"]
-        AsyncStorage[("AsyncStorage")] <--> UserContext["UserContext (useApp / useUser)"]
+    subgraph DataUpdates["Data, State, Canon and Caching"]
+        BibleService["bibleService.ts (Public Domain API)"] <--> AsyncStorage[("AsyncStorage Cache (@bible_chapter_cache_)")]
+        BibleCanon["bibleCanon.ts (66 Books & Fallback)"] --> BibleReader
+        MockUsers["mockUsers.ts (8 Theological Scholars)"] --> SearchMain
+        AsyncStorage <--> UserContext["UserContext (useApp / useUser)"]
         Supabase[("Supabase Auth (ibwooiejzxhbzplnldcz)")] <--> UserContext
         MockDB[("mockDatabase.ts")] --> Components["UI Components"]
         ExpoUpdates[("expo-updates")] <--> UpdateService["updates.ts"]
@@ -390,26 +393,29 @@ bible_fun_facts/
 │   ├── context/
 │   │   └── UserContext.tsx          # Global authentication, preferences, streak state
 │   ├── data/
-│   │   └── mockDatabase.ts          # Offline database: 120 facts, 24 scriptures, WOTD
+│   │   ├── bibleCanon.ts            # Complete 66-book canon metadata and prebundled offline chapters
+│   │   ├── mockDatabase.ts          # Offline database: 120 facts, 24 scriptures, WOTD
+│   │   └── mockUsers.ts             # 8 theological scholars, pastors, and exegetes with follower tracking
 │   ├── hooks/
 │   │   └── useSecurePasswordCapture.ts # Hardware FLAG_SECURE blackout protection & app switcher privacy
 │   ├── navigation/
 │   │   └── AppNavigator.tsx         # Tab navigation, AuthStack, ProfileStack, Root routes
 │   ├── screens/
 │   │   ├── AuthScreen.tsx           # Flattened body canvas, keyboard next, FLAG_SECURE
-│   │   ├── DiscoverScreen.tsx       # Daily scripture, fact feeds, search jump
+│   │   ├── DiscoverScreen.tsx       # Rich multi-card feed stream (Spotlight + Bible Jump + Archaeology)
 │   │   ├── FactDetailsScreen.tsx    # Modal sheet fact inspection
 │   │   ├── FavoritesScreen.tsx      # Saved collections persisted offline
 │   │   ├── PrivacyPolicyScreen.tsx  # 11-section GDPR/CCPA privacy policy screen
-│   │   ├── ProfileScreen.tsx        # Profile management, study streak, legal navigation
+│   │   ├── ProfileScreen.tsx        # Profile management, reader font (1-24px), followers
 │   │   ├── ScriptureDetailsScreen.tsx # In-depth chapter & linguistic breakdown
-│   │   ├── ScripturesScreen.tsx     # Testament & genre catalog
-│   │   ├── SearchScreen.tsx         # Unified biblical search across facts & scriptures
+│   │   ├── ScripturesScreen.tsx     # Compact scripture hub with search categories (50% card reduction)
+│   │   ├── SearchScreen.tsx         # Believer & scholar discovery hub with follow state & profile modal
 │   │   ├── TermsOfServiceScreen.tsx # 13-section theological & service terms screen
 │   │   ├── WelcomeScreen.tsx        # 3-step onboarding introduction
 │   │   ├── WOTDDetailsScreen.tsx    # Full 4-lens exegesis & prayer focus
-│   │   └── WOTDScreen.tsx           # Daily Word of the Day dashboard
+│   │   └── WOTDScreen.tsx           # Full Holy Bible reader (66 books, WEB/KJV) + Daily Exegesis
 │   ├── services/
+│   │   ├── bibleService.ts          # Multi-tier memory, persistent AsyncStorage & public domain API client
 │   │   ├── supabase.ts              # Defensive Supabase client with fallback anon keys
 │   │   └── updates.ts               # Background OTA update listener & dispatcher
 │   └── theme/                       # 60-30-10 color tokens, 8px grid spacing, radius, shadow
@@ -421,9 +427,38 @@ bible_fun_facts/
 
 ---
 
-## Direct-Body Authentication, Keyboard Flow & Screen Privacy
+## 4-Tab Core Application Overhaul
 
-The authentication flow in `src/screens/AuthScreen.tsx` provides an airy, frictionless user experience:
+### 1. Full Holy Bible Integration & Dual-Mode Word Hub (`WOTDScreen.tsx`)
+- **Full 66-Book Sacred Scripture Canon**: Complete canon navigator spanning all 39 Old Testament books and 27 New Testament books.
+- **Interactive Book & Chapter Matrix**: Modal-based selector with instant search filtering, testament division (`Old Testament (39)` / `New Testament (27)`), and responsive chapter selection grids.
+- **Dual Translation Architecture**: One-tap toggle between **World English Bible (WEB)** and the **King James Version (KJV)**.
+- **Multi-Tier Caching System (`bibleService.ts`)**:
+  - Tier 1: Instant in-memory Map cache.
+  - Tier 2: Persistent local storage in `AsyncStorage` under `@bible_chapter_cache_{trans}_{book}_{chapter}`.
+  - Tier 3: Network fetch via public domain REST API (`https://bible-api.com/`).
+  - Tier 4: Zero-latency offline prebundled fallback chapters (Genesis 1, Psalms 23, John 3).
+- **Dynamic Profile Typography Integration**: Scripture reader directly respects the user's custom font size (`1px–24px`) and font family (`serif`, `sans`, `mono`, `system`) configured in Profile settings.
+- **Interactive Verse Sheet**: Tapping any verse displays an action sheet allowing users to copy the verse with full reference, save to favorites, or share via native OS dialogs.
+- **Dual-Mode Segmented Control**: Seamless switching between the Full Holy Bible reader and the 4-lens analytical Daily Exegesis devotional.
+
+### 2. Community Believer & Scholar Discovery Hub (`SearchScreen.tsx`)
+- **Scholar & Believer Search**: Search across community believers by full name, handle (`@stephen_exegesis`, `@dr_elena_greek`), theological specialty, or bio keywords.
+- **Specialty Category Filters**: Quick filter chips for `All`, `Scholars`, `Pastors`, `Exegesis`, and `Linguistics`.
+- **Real-Time Follow / Unfollow**: Amber follow button toggles into a clean slate "Following" pill, persisted across app sessions via `UserContext`.
+- **Slide-Up Scholar Profile Modal**: Full screen inspection presenting scholar credentials, verified badges, follower and following counts, study streaks, verses explored, theological specialty tags, full bio, and their favorite scripture reflection.
+
+### 3. Compact, Non-Overwhelming Verses Hub (`ScripturesScreen.tsx`)
+- **50% Card Height Reduction**: Streamlined layout removing excessive vertical whitespace and replacing multi-line text blocks with concise 2-line snippets to eliminate scroll fatigue.
+- **Unified Search Category Fusion**: Incorporates historical search categories (`People`, `Prophecy`, `Customs`, `History`, `Language`) directly into the verses hub alongside canon testament filters.
+- **Strong's Lexical Concordance Badges**: Inline pills showing the original Greek or Hebrew word transliteration and Strong's number.
+- **Quick Verse Actions**: Direct one-tap favoriting and sharing without leaving the list stream.
+
+### 4. Rich Multi-Card Exegetical Feed Stream (`DiscoverScreen.tsx`)
+- **Daily Exegetical Spotlight**: Hero featured study with Strong's lexical root breakdown, pronunciation, transliteration, and theological commentary.
+- **"Continue Reading" Bible Quick-Card**: Reads `lastReadBible` state from `UserContext` and presents an immediate jump link to resume scripture study.
+- **Interleaved Biblical Feed**: Multi-card stream combining archaeological discoveries, Hebrew and Greek word root analyses, ancient Near Eastern cultural customs, and reflections from community scholars.
+- **Pull-To-Refresh**: Live stream shuffling allowing users to discover fresh insights with every gesture.
 
 ### 1. Direct-Body Canvas Architecture (Elimination of Nested "Divs")
 - **Clean Screen Surface**: Removed all outer card wrappers (`stepIndicatorCard`, `stepContentCard`, `formCard`).
