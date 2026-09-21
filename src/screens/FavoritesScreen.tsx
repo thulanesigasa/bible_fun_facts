@@ -12,8 +12,8 @@ import { Text } from '../components/Typography';
 import { Card } from '../components/Card';
 import { useUser } from '../context/UserContext';
 import {
-  FavoritesSvg,
   CheckSvg,
+  FavoritesSvg,
 } from '../components/SvgIcons';
 
 type FavTab = 'Facts' | 'Scriptures' | 'WOTD';
@@ -32,15 +32,9 @@ export default function FavoritesScreen({ navigation }: { navigation: any }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
       >
-        <View style={styles.headerRow}>
-          <FavoritesSvg size={24} color={colors.accent} fill={colors.accent} />
-          <View>
-            <Text variant="h2" style={styles.title}>Saved Collection</Text>
-            <Text variant="body" color={colors.textSecondary} style={{ fontSize: 14 }}>
-              Persisted for offline reflection & deeper study
-            </Text>
-          </View>
-        </View>
+        <Text variant="body" color={colors.textSecondary} style={styles.subtitle}>
+          Persisted for offline reflection & deeper study
+        </Text>
 
         {/* 3-Way Tab Selector */}
         <View style={[styles.toggleContainer, shadow.sm]}>
@@ -152,16 +146,9 @@ const styles = StyleSheet.create({
     padding: spacing.md, // 16px margins & gutters
     paddingBottom: 96, // 96px padding clears floating pill tab bar
   },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm, // 8px
-    marginTop: spacing.sm, // 8px
-    marginBottom: spacing.md, // 16px
-  },
-  title: {
-    fontSize: 22,
-    color: colors.textPrimary,
+  subtitle: {
+    fontSize: 14,
+    marginBottom: spacing.md,
   },
   toggleContainer: {
     flexDirection: 'row',

@@ -46,3 +46,6 @@ yarn-error.*
 .agents/
 .agents
 
+# scratch directory
+scratch/
+
