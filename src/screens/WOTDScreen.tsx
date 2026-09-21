@@ -346,11 +346,6 @@ export default function WOTDScreen() {
       setSelectedBook(navBook);
       setSelectedChapter(navChapter);
       setIsNavOpen(false);
-      // Scroll to the tapped verse after a short render delay
-      setTimeout(() => {
-        const targetKey = `${navBook.id}-${navChapter}-${v}`;
-        verseRefs.current[targetKey]?.scrollIntoView?.();
-      }, 300);
     }
   };
 
