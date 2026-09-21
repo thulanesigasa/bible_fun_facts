@@ -308,30 +308,32 @@ graph TD
     
     ProfileScreen --> DirectBody["Direct Screen Body (Zero Enclosing Divs / Cards)"]
     
-    DirectBody --> TypoGroup["READING & TYPOGRAPHY"]
-    DirectBody --> NotifGroup["NOTIFICATIONS"]
-    DirectBody --> SavedGroup["SAVED CONTENT"]
-    DirectBody --> LegalGroup["LEGAL & POLICIES"]
-    DirectBody --> AccountGroup["ACCOUNT"]
+    DirectBody --> TypoGroup["READING & TYPOGRAPHY (Clean Typographic Rows - Zero Icons)"]
+    DirectBody --> NotifGroup["NOTIFICATIONS (Zero Icons)"]
+    DirectBody --> SavedGroup["SAVED CONTENT (Zero Icons)"]
+    DirectBody --> LegalGroup["LEGAL & POLICIES (Zero Icons)"]
+    DirectBody --> AccountGroup["ACCOUNT (Amber Swipe Slider - Zero Red)"]
     
-    TypoGroup --> FontSizeCtrl["Font Size (Continuous 1px-24px Scroller + Clickable/Editable Numeric Input + Live Preview)"]
+    TypoGroup --> FontSizeCtrl["Font Size (Continuous 1px-24px Scroller + Clean Text Input Box + Live Preview)"]
     TypoGroup --> FontTypeCtrl["Font Type (Classical Serif, Modern Sans, System, Monospace)"]
     NotifGroup --> UiverseToggle["Daily Reminder (Uiverse.io Animated Sliding Pill Switch)"]
-    SavedGroup --> SavedLink["Saved Collection (Offline Persisted Items)"]
-    LegalGroup --> PrivacyLink["Privacy Policy (ShieldCheckSvg)"]
-    LegalGroup --> TermsLink["Terms of Service (BookOpenSvg)"]
-    AccountGroup --> SwipeSignOut["Swipe to Sign Out Gesture Slider (PanResponder + Spring Back)"]
+    SavedGroup --> SavedLink["Saved Collection (Text Disclosure Indicator)"]
+    LegalGroup --> PrivacyLink["Privacy Policy (Text Disclosure Indicator)"]
+    LegalGroup --> TermsLink["Terms of Service (Text Disclosure Indicator)"]
+    AccountGroup --> SwipeSignOut["Swipe to Sign Out (Amber Theme Matching Swipe to Start, Zero Red)"]
 ```
 
 1. **Direct Screen Body (Zero Enclosing Divs)**: Completely eliminated outer card wrappers and grouping divs around settings. Settings are rendered directly within the screen body (`ScrollView`), organized into clean sections with airy spacing and subtle hairline dividers (`rgba(15, 23, 42, 0.08)`). Only the top identity header retains an enclosed card surface.
-2. **Followers & Following Social Integration**: Prominently highlights reader community metrics directly in the header: **248 Followers**, **182 Following**, **Study Streak Days**, and **Facts Unfolded**.
+2. **Minimalist Typography-First Settings (Zero Settings Icons)**: Removed all leading icon circles and SVGs from settings rows (`Reading & Typography`, `Notifications`, `Saved Content`, `Legal & Policies`), yielding a clean, distraction-free typography layout with high-contrast text and elegant text disclosure indicators (`›`).
 3. **Continuous 1px to 24px Font Size Reader Control**:
-   - **Continuous Horizontal Scroller**: Smooth left-to-right `PanResponder` touch/drag scroller allowing precise selection anywhere from `1px` to `24px` with dynamic thumb position and active rail fill.
-   - **Clickable & Directly Editable Numeric Input**: Tapping the numeric font badge (`[ 16 ] px`) focuses an interactive `TextInput` (`keyboardType="number-pad"`), allowing the user to type their own custom number directly, instantly updating the app reader and live preview.
+   - **Continuous Horizontal Scroller**: Smooth left-to-right `PanResponder` touch/drag scroller allowing precise selection anywhere from `1px` to `24px` with dynamic thumb position, active rail fill, and vertical scroll lock during gestures.
+   - **Native Text Input Box Format**: Styled as an unmistakable text input box (`#FFFFFF` surface, `1.5px` border, dynamic amber focus ring, centered numeric input, and `px` unit adornment), allowing the user to type their custom font size with dynamic 1–24 clamping.
    - **Real-Time Live Scripture Preview**: Renders John 3:16 dynamically matching the selected font size and typeface in real time.
 4. **Typography Style Selection**: 4 selectable typeface pills: Classical Serif, Modern Sans, System Default, and Monospace.
 5. **Uiverse-Inspired Animated Switch**: Custom React Native implementation of namecho's sliding pill toggle (`52x30px`, `#CBD5E1` to amber `#D97706`, with smooth thumb translation).
-6. **Tactile Swipe to Sign Out**: A horizontal `PanResponder` slider track requiring deliberate user drag across threshold to initiate logout, with spring-back animation and confirmation safeguard.
+6. **Tactile Swipe to Sign Out (Calibrated to Swipe to Start - Zero Red)**:
+   - Red color (`#EF4444`, `rgba(239, 68, 68, ...)`) completely removed from the sign-out slider.
+   - Track (`#FFFFFF`), soft amber progress fill (`rgba(217, 119, 6, 0.12)`), text (`colors.textSecondary`), and draggable thumb (`#D97706` with white Chevron SVG) match the Welcome screen's "Swipe to Start" slider identically.
 7. **Removed Legacy Cards**: Cleanly stripped "Default Scripture Translation" chips, "Application" runtime info, and "Study Preferences" containers.
 
 ---
