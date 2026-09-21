@@ -26,6 +26,7 @@ import {
   FlameSvg,
   StrongsIconSvg,
   ChevronRightSvg,
+  BookmarkSvg,
 } from '../components/SvgIcons';
 
 // ============================================================================
@@ -114,6 +115,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     favoritesScriptures,
     completedWOTDs,
     followedUserIds,
+    toggleFavoriteScripture,
   } = useUser();
 
   const [isUploading, setIsUploading] = useState(false);
@@ -664,6 +666,59 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           </TouchableOpacity>
         </View>
 
+        {/* 3b. BOOKMARKS */}
+        <View style={styles.bodySection}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+            BOOKMARKS
+          </Text>
+          <Text variant="caption" color={colors.textSecondary} style={styles.sectionSubHeader}>
+            {favoritesScriptures.length} verse{favoritesScriptures.length !== 1 ? 's' : ''} bookmarked
+          </Text>
+
+          {favoritesScriptures.length === 0 ? (
+            <View style={styles.bookmarkEmptyState}>
+              <BookmarkSvg size={32} color={colors.textTertiary} />
+              <Text variant="caption" color={colors.textSecondary} style={styles.bookmarkEmptyText}>
+                No bookmarks yet. Select verses in the Bible reader and tap Bookmark.
+              </Text>
+            </View>
+          ) : (
+            favoritesScriptures.map((s, idx) => (
+              <View
+                key={s.id}
+                style={[
+                  styles.bookmarkCard,
+                  idx < favoritesScriptures.length - 1 && styles.bookmarkCardDivider,
+                ]}
+              >
+                <View style={styles.bookmarkCardContent}>
+                  <Text variant="caption" weight="700" color={colors.accent} style={styles.bookmarkRef}>
+                    {s.reference}
+                  </Text>
+                  <Text
+                    variant="body"
+                    color={colors.textPrimary}
+                    numberOfLines={3}
+                    style={styles.bookmarkSnippet}
+                  >
+                    {s.text}
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.bookmarkRemoveBtn}
+                  onPress={() => toggleFavoriteScripture(s)}
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <Text variant="caption" weight="700" color={colors.textTertiary}>
+                    ✕
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ))
+          )}
+        </View>
+
         {/* 4. LEGAL & POLICIES (ZERO ICONS) */}
         <View style={styles.bodySection}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
@@ -898,6 +953,52 @@ const styles = StyleSheet.create({
     fontSize: 10.5,
     letterSpacing: 0.8,
     marginBottom: 6,
+  },
+  sectionSubHeader: {
+    fontSize: 11,
+    marginBottom: 12,
+    marginTop: -4,
+  },
+
+  // Bookmark section
+  bookmarkEmptyState: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 16,
+    opacity: 0.5,
+  },
+  bookmarkEmptyText: {
+    flex: 1,
+    lineHeight: 18,
+  },
+  bookmarkCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingVertical: 14,
+    gap: 12,
+  },
+  bookmarkCardDivider: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15,23,42,0.06)',
+  },
+  bookmarkCardContent: {
+    flex: 1,
+    gap: 4,
+  },
+  bookmarkRef: {
+    fontSize: 11,
+    letterSpacing: 0.3,
+    marginBottom: 2,
+  },
+  bookmarkSnippet: {
+    fontSize: 13,
+    lineHeight: 20,
+    fontStyle: 'italic',
+  },
+  bookmarkRemoveBtn: {
+    paddingHorizontal: 6,
+    paddingVertical: 4,
   },
 
   // Settings Rows (Clean Minimalist Typography - Zero Icons)

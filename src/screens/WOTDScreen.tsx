@@ -506,13 +506,17 @@ export default function WOTDScreen() {
                             color: theme.text,
                             textAlign: 'justify',
                           },
+                          isFav && {
+                            textDecorationLine: 'underline',
+                            textDecorationStyle: 'dotted',
+                            textDecorationColor: colors.accent,
+                          },
                         ]}
                       >
                         <Text style={[styles.verseNumInline, { color: colors.accent }]}>
                           [{v.verse}]
                         </Text>
                         {' '}{v.text.trim()}
-                        {isFav ? <Text style={{ color: colors.accent }}> ♥</Text> : null}
                       </Text>
                     </TouchableOpacity>
                   );
