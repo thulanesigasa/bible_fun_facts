@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   ScrollView,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
@@ -13,7 +14,8 @@ import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
 import { Card } from '../components/Card';
 import { useUser } from '../context/UserContext';
-import { MOCK_COMMUNITY_USERS, CommunityUser } from '../data/mockUsers';
+import { CommunityUser } from '../data/mockUsers';
+import { supabase } from '../services/supabase';
 import {
   SearchSvg,
   UsersSvg,
@@ -33,11 +35,62 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
   const [searchText, setSearchText] = useState('');
   const [activeCategory, setActiveCategory] = useState<FilterCategory>('All');
   const [selectedUser, setSelectedUser] = useState<CommunityUser | null>(null);
+  const [liveUsers, setLiveUsers] = useState<CommunityUser[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const { isUserFollowed, toggleFollowUser } = useUser();
+  const { userProfile, isUserFollowed, toggleFollowUser } = useUser();
+
+  const fetchLiveProfiles = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (data && !error) {
+        // Exclude current logged-in user
+        const otherProfiles = data.filter(
+          (p: any) =>
+            p.username !== userProfile?.username &&
+            (!userProfile?.email || p.email !== userProfile?.email)
+        );
+
+        const mapped: CommunityUser[] = otherProfiles.map((p: any) => ({
+          id: p.id,
+          name: p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim() || 'Fellow Disciple',
+          username: p.username || 'believer',
+          role: p.knowledge_level || 'Growing Disciple',
+          theologicalFocus: p.study_focus || "Original Languages & Strong's",
+          bio: `Study focus: ${p.study_focus || 'Biblical Exegesis'}. Translation: ${p.preferred_translation || 'ESV'}. Daily goal: ${p.daily_goal || '15 mins/day'}.`,
+          joinedDate: new Date(p.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+          followersCount: 0,
+          followingCount: 0,
+          streak: 1,
+          versesExplored: 0,
+          tags: [p.study_focus || 'Exegesis', p.preferred_translation || 'ESV', p.knowledge_level || 'Disciple'].filter(Boolean),
+          favoriteVerse: {
+            reference: 'John 3:16',
+            text: 'For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life.',
+            note: 'Foundational scripture of divine grace and eternal life.',
+          },
+        }));
+
+        setLiveUsers(mapped);
+      }
+    } catch (err) {
+      console.warn('Live profiles fetch notice:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLiveProfiles();
+  }, [userProfile?.username, userProfile?.email]);
 
   const filteredUsers = useMemo(() => {
-    return MOCK_COMMUNITY_USERS.filter((user) => {
+    return liveUsers.filter((user) => {
       const q = searchText.toLowerCase().trim();
       const matchesSearch =
         q === '' ||
@@ -58,7 +111,7 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
 
       return true;
     });
-  }, [searchText, activeCategory]);
+  }, [liveUsers, searchText, activeCategory]);
 
   const getInitials = (name: string) => {
     const parts = name.replace(/^(Dr\.|Prof\.|Pastor)\s+/i, '').split(' ');
@@ -130,103 +183,128 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
         </ScrollView>
 
         {/* Results Counter */}
-        <View style={styles.resultsMetaRow}>
-          <Text variant="caption" color={colors.textSecondary}>
-            {filteredUsers.length} community believer{filteredUsers.length !== 1 ? 's' : ''} found
-          </Text>
-        </View>
+        {!loading && filteredUsers.length > 0 && (
+          <View style={styles.resultsMetaRow}>
+            <Text variant="caption" color={colors.textSecondary}>
+              {filteredUsers.length} community believer{filteredUsers.length !== 1 ? 's' : ''} found
+            </Text>
+          </View>
+        )}
 
-        {/* Users List */}
-        <View style={styles.usersList}>
-          {filteredUsers.map((user) => {
-            const isFollowed = isUserFollowed(user.id);
-            const totalFollowers = user.followersCount + (isFollowed ? 1 : 0);
+        {loading ? (
+          <View style={styles.loaderContainer}>
+            <ActivityIndicator size="small" color={colors.accent} />
+            <Text variant="caption" color={colors.textSecondary} style={{ marginTop: spacing.sm }}>
+              Connecting to live believer network...
+            </Text>
+          </View>
+        ) : filteredUsers.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <View style={styles.emptyCircle}>
+              <UsersSvg size={36} color={colors.accent} />
+            </View>
+            <Text variant="h2" style={styles.emptyTitle}>
+              {searchText ? 'No Matching Believers' : "No Other Believers Yet"}
+            </Text>
+            <Text variant="body" color={colors.textSecondary} align="center" style={styles.emptySub}>
+              {searchText
+                ? 'Try searching with a different name, @handle, or study topic.'
+                : 'You are currently the only believer registered in the live database. When new disciples sign up, they will automatically appear here in real time.'}
+            </Text>
+          </View>
+        ) : (
+          /* Users List */
+          <View style={styles.usersList}>
+            {filteredUsers.map((user) => {
+              const isFollowed = isUserFollowed(user.id);
+              const totalFollowers = user.followersCount + (isFollowed ? 1 : 0);
 
-            return (
-              <TouchableOpacity
-                key={user.id}
-                activeOpacity={0.9}
-                style={[styles.userCard, shadow.sm]}
-                onPress={() => setSelectedUser(user)}
-              >
-                <View style={styles.userCardTop}>
-                  {/* Avatar Initials */}
-                  <View style={styles.avatarCircle}>
-                    <Text variant="body" weight="700" color={colors.accent}>
-                      {getInitials(user.name)}
-                    </Text>
-                  </View>
-
-                  {/* User Info */}
-                  <View style={styles.userInfoWrap}>
-                    <View style={styles.userNameRow}>
-                      <Text variant="h3" style={styles.userName} numberOfLines={1}>
-                        {user.name}
+              return (
+                <TouchableOpacity
+                  key={user.id}
+                  activeOpacity={0.9}
+                  style={[styles.userCard, shadow.sm]}
+                  onPress={() => setSelectedUser(user)}
+                >
+                  <View style={styles.userCardTop}>
+                    {/* Avatar Initials */}
+                    <View style={styles.avatarCircle}>
+                      <Text variant="body" weight="700" color={colors.accent}>
+                        {getInitials(user.name)}
                       </Text>
-                      {user.isVerified && (
-                        <View style={styles.verifiedDot}>
-                          <CheckSvg size={10} color="#FFFFFF" strokeWidth={3} />
-                        </View>
-                      )}
                     </View>
-                    <Text variant="caption" color={colors.textTertiary}>
-                      @{user.username} • {user.role}
-                    </Text>
+
+                    {/* User Info */}
+                    <View style={styles.userInfoWrap}>
+                      <View style={styles.userNameRow}>
+                        <Text variant="h3" style={styles.userName} numberOfLines={1}>
+                          {user.name}
+                        </Text>
+                        {user.isVerified && (
+                          <View style={styles.verifiedDot}>
+                            <CheckSvg size={10} color="#FFFFFF" strokeWidth={3} />
+                          </View>
+                        )}
+                      </View>
+                      <Text variant="caption" color={colors.textTertiary}>
+                        @{user.username} • {user.role}
+                      </Text>
+                    </View>
+
+                    {/* Follow Button */}
+                    <TouchableOpacity
+                      style={[
+                        styles.followBtn,
+                        isFollowed ? styles.followingBtn : styles.unfollowedBtn,
+                      ]}
+                      onPress={() => toggleFollowUser(user.id)}
+                      activeOpacity={0.8}
+                    >
+                      {isFollowed ? (
+                        <View style={styles.followingBtnContent}>
+                          <CheckSvg size={12} color={colors.textSecondary} strokeWidth={2.5} />
+                          <Text variant="caption" weight="600" color={colors.textSecondary}>
+                            Following
+                          </Text>
+                        </View>
+                      ) : (
+                        <Text variant="caption" weight="700" color="#0F172A">
+                          + Follow
+                        </Text>
+                      )}
+                    </TouchableOpacity>
                   </View>
 
-                  {/* Follow Button */}
-                  <TouchableOpacity
-                    style={[
-                      styles.followBtn,
-                      isFollowed ? styles.followingBtn : styles.unfollowedBtn,
-                    ]}
-                    onPress={() => toggleFollowUser(user.id)}
-                    activeOpacity={0.8}
+                  {/* Bio snippet */}
+                  <Text
+                    variant="body"
+                    color={colors.textPrimary}
+                    numberOfLines={2}
+                    style={styles.bioSnippet}
                   >
-                    {isFollowed ? (
-                      <View style={styles.followingBtnContent}>
-                        <CheckSvg size={12} color={colors.textSecondary} strokeWidth={2.5} />
-                        <Text variant="caption" weight="600" color={colors.textSecondary}>
-                          Following
+                    {user.bio}
+                  </Text>
+
+                  {/* Tags row */}
+                  <View style={styles.tagsRow}>
+                    {user.tags.slice(0, 3).map((tag) => (
+                      <View key={tag} style={styles.tagBadge}>
+                        <Text variant="caption" color={colors.accent} style={styles.tagText}>
+                          #{tag}
                         </Text>
                       </View>
-                    ) : (
-                      <Text variant="caption" weight="700" color="#0F172A">
-                        + Follow
-                      </Text>
-                    )}
-                  </TouchableOpacity>
-                </View>
-
-                {/* Bio snippet */}
-                <Text
-                  variant="body"
-                  color={colors.textPrimary}
-                  numberOfLines={2}
-                  style={styles.bioSnippet}
-                >
-                  {user.bio}
-                </Text>
-
-                {/* Tags row */}
-                <View style={styles.tagsRow}>
-                  {user.tags.slice(0, 3).map((tag) => (
-                    <View key={tag} style={styles.tagBadge}>
-                      <Text variant="caption" color={colors.accent} style={styles.tagText}>
-                        #{tag}
+                    ))}
+                    <View style={styles.statsSummary}>
+                      <Text variant="caption" color={colors.textTertiary}>
+                        {totalFollowers.toLocaleString()} followers • {user.streak}d streak
                       </Text>
                     </View>
-                  ))}
-                  <View style={styles.statsSummary}>
-                    <Text variant="caption" color={colors.textTertiary}>
-                      {totalFollowers.toLocaleString()} followers • {user.streak}d streak
-                    </Text>
                   </View>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
       </ScrollView>
 
       {/* Slide-Up Profile Inspection Modal */}
@@ -485,6 +563,38 @@ const styles = StyleSheet.create({
   },
   resultsMetaRow: {
     marginBottom: spacing.sm,
+  },
+  loaderContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.xxl,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.xxl,
+    paddingHorizontal: spacing.lg,
+  },
+  emptyCircle: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
+  },
+  emptyTitle: {
+    color: colors.textPrimary,
+    marginBottom: spacing.sm,
+    textAlign: 'center',
+  },
+  emptySub: {
+    textAlign: 'center',
+    lineHeight: 20,
+    fontSize: 13,
   },
   usersList: {
     gap: 12,

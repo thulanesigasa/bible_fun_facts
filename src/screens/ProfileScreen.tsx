@@ -113,6 +113,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     favoritesFacts,
     favoritesScriptures,
     completedWOTDs,
+    followedUserIds,
   } = useUser();
 
   const [isUploading, setIsUploading] = useState(false);
@@ -337,8 +338,8 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
   const displayName = userProfile?.name || 'Believer';
   const displayEmail = userProfile?.email || 'user@exegeomai.org';
   const displayJoined = userProfile?.joinedDate || 'September 2026';
-  const followersCount = userProfile?.followersCount ?? 248;
-  const followingCount = userProfile?.followingCount ?? 182;
+  const followersCount = userProfile?.followersCount ?? 0;
+  const followingCount = userProfile?.followingCount ?? (followedUserIds?.length || 0);
 
   // Selected Font Family helper
   const selectedFamily = FONT_TYPE_OPTIONS.find(o => o.key === currentFontType)?.fontFamily;

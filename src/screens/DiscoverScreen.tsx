@@ -12,8 +12,9 @@ import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
 import { Card } from '../components/Card';
-import { facts, Fact } from '../data/mockDatabase';
+import { facts as initialFacts, Fact } from '../data/mockDatabase';
 import { useUser } from '../context/UserContext';
+import { supabase } from '../services/supabase';
 import {
   DiscoverSvg,
   FlameSvg,
@@ -33,6 +34,7 @@ interface DiscoverScreenProps {
 export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
   const [factIndex, setFactIndex] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
+  const [liveFacts, setLiveFacts] = useState<Fact[]>(initialFacts);
 
   const {
     streak,
@@ -44,32 +46,49 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
     lastReadBible,
   } = useUser();
 
+  const fetchLiveFacts = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('facts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (data && !error && data.length > 0) {
+        setLiveFacts(data as Fact[]);
+      }
+    } catch (err) {
+      console.warn('Live facts fetch notice:', err);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    fetchLiveFacts();
+  }, [fetchLiveFacts]);
+
   // Curated list of historical and archaeological discoveries
   const discoveryFacts = useMemo(() => {
-    return facts.filter((f) => f.category === 'History' || f.category === 'Customs' || f.category === 'Prophecy');
-  }, []);
+    return liveFacts.filter((f) => f.category === 'History' || f.category === 'Customs' || f.category === 'Prophecy');
+  }, [liveFacts]);
 
   // Today's Exegetical Root Word (language category)
   const languageFact: Fact = useMemo(() => {
-    const langList = facts.filter((f) => f.category === 'Language');
-    return langList[factIndex % langList.length] || facts[0];
-  }, [factIndex]);
+    const langList = liveFacts.filter((f) => f.category === 'Language');
+    return langList[factIndex % langList.length] || liveFacts[0] || initialFacts[0];
+  }, [liveFacts, factIndex]);
 
   // Current Featured Discovery (cycle without scrolling)
-  const currentFact: Fact = discoveryFacts[factIndex % discoveryFacts.length] || facts[0];
+  const currentFact: Fact = discoveryFacts[factIndex % discoveryFacts.length] || liveFacts[0] || initialFacts[0];
 
   const handleNextDiscovery = useCallback(() => {
     setFactIndex((prev) => prev + 1);
     incrementFactsViewed();
   }, [incrementFactsViewed]);
 
-  const onRefresh = useCallback(() => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    setTimeout(() => {
-      handleNextDiscovery();
-      setRefreshing(false);
-    }, 300);
-  }, [handleNextDiscovery]);
+    await fetchLiveFacts();
+    handleNextDiscovery();
+    setRefreshing(false);
+  }, [fetchLiveFacts, handleNextDiscovery]);
 
   const onShareCurrentFact = async (fact: Fact) => {
     try {
