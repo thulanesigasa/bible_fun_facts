@@ -164,7 +164,7 @@ function SwipeToStartButton({
           }}
           style={styles.swipeThumbTouchable}
         >
-          <ChevronRightSvg size={20} color="#FFFFFF" strokeWidth={2.5} />
+          <ChevronRightSvg size={20} color="#0F172A" strokeWidth={2.5} />
         </TouchableOpacity>
       </Animated.View>
     </View>
@@ -368,7 +368,7 @@ export default function WelcomeScreen({ navigation }: { navigation: any }) {
               activeOpacity={0.85}
               accessibilityLabel="Next slide"
             >
-              <ChevronRightSvg size={22} color="#FFFFFF" strokeWidth={2.5} />
+              <ChevronRightSvg size={22} color="#0F172A" strokeWidth={2.5} />
             </TouchableOpacity>
           ) : (
             <SwipeToStartButton
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
     left: 0,
     height: 6,
     borderRadius: 3,
-    backgroundColor: colors.accent, // 10% amber gold (#D97706)
+    backgroundColor: colors.accent, // 10% brand logo yellow (#FDD223)
   },
   nextCircleBtn: {
     width: 52,
@@ -565,7 +565,7 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: 'rgba(217, 119, 6, 0.12)',
+    backgroundColor: 'rgba(253, 210, 35, 0.12)',
     borderRadius: 26,
   },
   swipeTrackText: {
@@ -579,7 +579,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.accent, // 10% amber gold
+    backgroundColor: colors.accent, // 10% brand logo yellow
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -380,7 +380,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                 activeOpacity={0.85}
                 disabled={isUploading}
               >
-                <CameraSvg size={14} color="#FFFFFF" />
+                <CameraSvg size={14} color="#0F172A" />
               </TouchableOpacity>
             </View>
 
@@ -798,7 +798,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: 'rgba(217, 119, 6, 0.1)',
+    backgroundColor: 'rgba(253, 210, 35, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -1107,7 +1107,7 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: 'rgba(217, 119, 6, 0.12)', // Soft amber progress fill
+    backgroundColor: 'rgba(253, 210, 35, 0.12)', // Soft amber progress fill
     borderRadius: 26,
   },
   swipeTextWrapper: {
@@ -1125,7 +1125,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.accent, // Biblical amber gold (#D97706)
+    backgroundColor: colors.accent, // Biblical brand logo yellow (#FDD223)
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 4,

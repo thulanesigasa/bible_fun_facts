@@ -657,7 +657,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                     <Text variant="h3" style={styles.primaryBtnText}>
                       Continue to Contact Details
                     </Text>
-                    <ChevronRightSvg size={18} color="#FFFFFF" />
+                    <ChevronRightSvg size={18} color="#0F172A" />
                   </TouchableOpacity>
 
                   <TouchableOpacity
@@ -824,9 +824,9 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
                       activeOpacity={0.85}
                     >
                       <Text variant="h3" style={styles.primaryBtnText}>
-                        Continue to Security
+                        Continue
                       </Text>
-                      <ChevronRightSvg size={18} color="#FFFFFF" />
+                      <ChevronRightSvg size={18} color="#0F172A" />
                     </TouchableOpacity>
                   </View>
 
@@ -1398,7 +1398,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   primaryBtnText: {
-    color: '#FFFFFF',
+    color: '#0F172A',
     fontSize: 15,
     fontWeight: '700',
   },
@@ -1484,6 +1484,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
   },
   countryItemActive: {
-    backgroundColor: 'rgba(217, 119, 6, 0.08)',
+    backgroundColor: 'rgba(253, 210, 35, 0.08)',
   },
 });

@@ -3,7 +3,7 @@
  * Rule 1, Rule 15, and Rule 20 Specification:
  * - 60% Dominant Background: Clean Slate (#F8FAFC)
  * - 30% Panel / Surface: Pure White (#FFFFFF) & Hairline Border (rgba(15, 23, 42, 0.08))
- * - 10% Accent: Biblical Amber Gold (#D97706) & Soft Amber Tint (rgba(217, 119, 6, 0.12))
+ * - 10% Accent: Brand Logo Yellow (#FDD223) & Soft Gold Tint (rgba(253, 210, 35, 0.16))
  */
 
 export const colors = {
@@ -18,11 +18,12 @@ export const colors = {
   border: 'rgba(15, 23, 42, 0.08)',
   borderMuted: 'rgba(15, 23, 42, 0.04)',
 
-  // 10% Accent
-  accent: '#D97706',
-  accentHover: '#B45309',
-  accentSoft: 'rgba(217, 119, 6, 0.12)',
-  accentBorder: 'rgba(217, 119, 6, 0.24)',
+  // 10% Accent - Exact Brand Logo Yellow
+  accent: '#FDD223',
+  accentDark: '#C99A00',
+  accentHover: '#E5BD14',
+  accentSoft: 'rgba(253, 210, 35, 0.16)',
+  accentBorder: 'rgba(253, 210, 35, 0.35)',
 
   // Neutral Typography (Monochromatic within surfaces)
   textPrimary: '#0F172A',
@@ -31,9 +32,10 @@ export const colors = {
 
   // Aliases for compatibility
   white: '#FFFFFF',
-  orange: '#D97706',
-  softOrange: 'rgba(217, 119, 6, 0.12)',
-  lightOrange: 'rgba(217, 119, 6, 0.24)',
+  yellow: '#FDD223',
+  orange: '#FDD223',
+  softOrange: 'rgba(253, 210, 35, 0.16)',
+  lightOrange: 'rgba(253, 210, 35, 0.35)',
   lightGray: '#F1F5F9',
   softGray: '#F8FAFC',
   darkSlate: '#0F172A',
