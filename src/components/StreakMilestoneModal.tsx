@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ViewShot from 'react-native-view-shot';
+import * as Sharing from 'expo-sharing';
 import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
 import { colors } from '../theme/colors';
 import { Text } from './Typography';
@@ -88,15 +89,16 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
 
   const handleShare = async () => {
     try {
-      // Try image share first via ViewShot
       if (shareCardRef.current) {
         const uri = await (shareCardRef.current as any).capture();
-        await Share.share({
-          url: uri,
-          message: `Day ${selectedMilestone.days} Streak — "${selectedMilestone.title}" | Powered by exégeomai`,
-          title: `${selectedMilestone.title} - Day ${selectedMilestone.days} Streak`,
-        });
-        return;
+        const canShare = await Sharing.isAvailableAsync();
+        if (canShare) {
+          await Sharing.shareAsync(uri, {
+            mimeType: 'image/png',
+            dialogTitle: `${selectedMilestone.title} - Day ${selectedMilestone.days} Streak`,
+          });
+          return;
+        }
       }
     } catch (_) {
       // Fallback to text share
@@ -196,36 +198,33 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
               options={{ format: 'png', quality: 1.0 }}
               style={styles.shareCard}
             >
-              {/* Card Background */}
-              <View style={[styles.shareCardBg, { backgroundColor: tierInfo.bgGradient.replace(/rgba?\(([^)]+)\)/, (_, p) => `rgba(${p.split(',').slice(0,3).join(',')}, 1)`) }]}>
-                <View style={styles.shareCardInner}>
-                  {/* Badge */}
-                  <StreakHexagonBadge
-                    days={displayDays}
-                    tier={displayTier}
-                    size={220}
-                  />
-                  {/* Title */}
-                  <Text variant="h2" style={[styles.milestoneTitle, { marginTop: 8 }]}>
-                    {selectedMilestone.title}
+              <View style={styles.shareCardInner}>
+                {/* Badge */}
+                <StreakHexagonBadge
+                  days={displayDays}
+                  tier={displayTier}
+                  size={220}
+                />
+                {/* Title */}
+                <Text variant="h2" style={[styles.milestoneTitle, { marginTop: 8 }]}>
+                  {selectedMilestone.title}
+                </Text>
+                {/* Verse */}
+                {selectedMilestone.verseQuote ? (
+                  <Text variant="caption" color="#475569" style={[styles.verseQuoteText, { marginTop: 6, textAlign: 'center' }]}>
+                    "{selectedMilestone.verseQuote}"
                   </Text>
-                  {/* Verse */}
-                  {selectedMilestone.verseQuote ? (
-                    <Text variant="caption" color="#475569" style={[styles.verseQuoteText, { marginTop: 6, textAlign: 'center' }]}>
-                      "{selectedMilestone.verseQuote}"
-                    </Text>
-                  ) : null}
-                  {/* Powered by footer */}
-                  <View style={styles.shareCardFooter}>
-                    <Image
-                      source={require('../../assets/logo-transparent.png')}
-                      style={styles.shareCardLogo}
-                      resizeMode="contain"
-                    />
-                    <Text variant="caption" weight="700" color="#0F172A" style={styles.shareCardAppName}>
-                      exégeomai
-                    </Text>
-                  </View>
+                ) : null}
+                {/* Powered by footer */}
+                <View style={styles.shareCardFooter}>
+                  <Image
+                    source={require('../../assets/logo-transparent.png')}
+                    style={styles.shareCardLogo}
+                    resizeMode="contain"
+                  />
+                  <Text variant="caption" weight="700" color="#0F172A" style={styles.shareCardAppName}>
+                    exégeomai
+                  </Text>
                 </View>
               </View>
             </ViewShot>
