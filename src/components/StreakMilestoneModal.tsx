@@ -11,6 +11,7 @@ import {
   Platform,
   BackHandler,
   ActivityIndicator,
+  NativeModules,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
@@ -73,8 +74,9 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
   const [isSharing, setIsSharing] = useState(false);
 
   // Smooth entrance scale & fade animation
-  const scaleAnim = useRef(new Animated.Value(0.95)).current;
-  const opacityAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const opacityAnim = useRef(new Animated.Value(1)).current;
+  const wasVisibleRef = useRef(false);
 
   useEffect(() => {
     if (visible) {
@@ -89,22 +91,31 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
         setSelectedMilestone(active);
       }
 
-      scaleAnim.setValue(0.95);
-      opacityAnim.setValue(0);
-      Animated.parallel([
-        Animated.spring(scaleAnim, {
-          toValue: 1,
-          friction: 8,
-          tension: 60,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacityAnim, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start();
+      // Only run entrance animation when transitioning from hidden to visible
+      if (!wasVisibleRef.current) {
+        wasVisibleRef.current = true;
+        scaleAnim.setValue(0.95);
+        opacityAnim.setValue(0);
+        Animated.parallel([
+          Animated.spring(scaleAnim, {
+            toValue: 1,
+            friction: 8,
+            tension: 60,
+            useNativeDriver: true,
+          }),
+          Animated.timing(opacityAnim, {
+            toValue: 1,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      } else {
+        // Modal is already visible; guarantee full opacity and scale are maintained
+        opacityAnim.setValue(1);
+        scaleAnim.setValue(1);
+      }
     } else {
+      wasVisibleRef.current = false;
       setHideTabBar?.(false);
     }
     return () => {
@@ -181,11 +192,14 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
       // 2. Allow 250ms for GPU rendering & layout to settle completely
       await new Promise((r) => setTimeout(r, 250));
 
-      // 3. Dynamically resolve native modules to prevent startup crashes under OTA
+      // 3. Preflight check: verify native modules exist in current binary
+      const hasNativeViewShot = !!(NativeModules as any)?.RNViewShot;
       let captureRefFn: any = null;
-      try {
-        captureRefFn = require('react-native-view-shot').captureRef;
-      } catch (_) {}
+      if (hasNativeViewShot) {
+        try {
+          captureRefFn = require('react-native-view-shot').captureRef;
+        } catch (_) {}
+      }
 
       let SharingModule: any = null;
       try {
@@ -197,9 +211,9 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
         FileSystemModule = require('expo-file-system');
       } catch (_) {}
 
-      // 4. Capture the in-tree shareCard directly via captureRef if available
+      // 4. Capture the in-tree shareCard directly via captureRef if native module is present
       let uri: string | null = null;
-      if (captureRefFn && shareCardRef.current) {
+      if (hasNativeViewShot && captureRefFn && shareCardRef.current) {
         try {
           uri = await captureRefFn(shareCardRef.current, {
             format: 'png',
@@ -265,6 +279,9 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
       }
     } finally {
       setIsSharing(false);
+      // Guarantee full opacity and scale are maintained upon return from share sheet
+      opacityAnim.setValue(1);
+      scaleAnim.setValue(1);
     }
   };
 
