@@ -12,6 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import ViewShot from 'react-native-view-shot';
 import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
 import { colors } from '../theme/colors';
 import { Text } from './Typography';
@@ -52,6 +53,7 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
       ? STREAK_MILESTONES.find((m) => m.days === initialMilestoneDays) || currentEarnedMilestone
       : currentEarnedMilestone
   );
+  const shareCardRef = useRef<ViewShot>(null);
 
   // Smooth entrance scale & fade animation
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
@@ -86,8 +88,22 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
 
   const handleShare = async () => {
     try {
+      // Try image share first via ViewShot
+      if (shareCardRef.current) {
+        const uri = await (shareCardRef.current as any).capture();
+        await Share.share({
+          url: uri,
+          message: `Day ${selectedMilestone.days} Streak — "${selectedMilestone.title}" | Powered by exégeomai`,
+          title: `${selectedMilestone.title} - Day ${selectedMilestone.days} Streak`,
+        });
+        return;
+      }
+    } catch (_) {
+      // Fallback to text share
+    }
+    try {
       const shareMessage = [
-        `✦ ${selectedMilestone.days}-Day Scripture Study Streak`,
+        `✦ Day ${selectedMilestone.days} Scripture Study Streak`,
         `"${selectedMilestone.title}"`,
         '',
         selectedMilestone.verseQuote
@@ -174,22 +190,45 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
           >
-            {/* Centered 3D Hexagonal Shield Badge (100% Vector & Fire-Free) */}
-            <Animated.View
-              style={[
-                styles.badgeWrapper,
-                {
-                  transform: [{ scale: scaleAnim }],
-                  opacity: opacityAnim,
-                },
-              ]}
+            {/* Shareable card — captured by ViewShot */}
+            <ViewShot
+              ref={shareCardRef}
+              options={{ format: 'png', quality: 1.0 }}
+              style={styles.shareCard}
             >
-              <StreakHexagonBadge
-                days={displayDays}
-                tier={displayTier}
-                size={220}
-              />
-            </Animated.View>
+              {/* Card Background */}
+              <View style={[styles.shareCardBg, { backgroundColor: tierInfo.bgGradient.replace(/rgba?\(([^)]+)\)/, (_, p) => `rgba(${p.split(',').slice(0,3).join(',')}, 1)`) }]}>
+                <View style={styles.shareCardInner}>
+                  {/* Badge */}
+                  <StreakHexagonBadge
+                    days={displayDays}
+                    tier={displayTier}
+                    size={220}
+                  />
+                  {/* Title */}
+                  <Text variant="h2" style={[styles.milestoneTitle, { marginTop: 8 }]}>
+                    {selectedMilestone.title}
+                  </Text>
+                  {/* Verse */}
+                  {selectedMilestone.verseQuote ? (
+                    <Text variant="caption" color="#475569" style={[styles.verseQuoteText, { marginTop: 6, textAlign: 'center' }]}>
+                      "{selectedMilestone.verseQuote}"
+                    </Text>
+                  ) : null}
+                  {/* Powered by footer */}
+                  <View style={styles.shareCardFooter}>
+                    <Image
+                      source={require('../../assets/logo-transparent.png')}
+                      style={styles.shareCardLogo}
+                      resizeMode="contain"
+                    />
+                    <Text variant="caption" weight="700" color="#0F172A" style={styles.shareCardAppName}>
+                      exégeomai
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </ViewShot>
 
             {/* Title & Epigram Subtitle */}
             <View style={styles.copyBlock}>
@@ -419,6 +458,37 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  shareCard: {
+    width: '100%',
+    marginTop: 12,
+    marginBottom: 8,
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  shareCardBg: {
+    width: '100%',
+    borderRadius: 20,
+    padding: 24,
+    alignItems: 'center',
+  },
+  shareCardInner: {
+    alignItems: 'center',
+    width: '100%',
+  },
+  shareCardFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+    gap: 6,
+  },
+  shareCardLogo: {
+    width: 20,
+    height: 20,
+  },
+  shareCardAppName: {
+    fontSize: 13,
+    letterSpacing: 0.3,
   },
   copyBlock: {
     alignItems: 'center',
