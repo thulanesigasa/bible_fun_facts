@@ -405,8 +405,10 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
 
             <TouchableOpacity
               style={styles.statColumn}
-              onPress={() => navigation.navigate('History')}
+              onPress={() => navigation.navigate('Unfolded')}
               activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel={`${factsViewedCount} Unfolded exegeses. Tap to view your unfolded insights.`}
             >
               <Text variant="h3" style={styles.statValue}>
                 {factsViewedCount}

@@ -571,6 +571,7 @@ bible_fun_facts/
 │   │   ├── ScripturesScreen.tsx     # Compact scripture hub with search categories (50% card reduction)
 │   │   ├── SearchScreen.tsx         # Believer & scholar discovery hub with follow state & profile modal
 │   │   ├── TermsOfServiceScreen.tsx # 13-section theological & service terms screen
+│   │   ├── UnfoldedScreen.tsx       # Continuous body catalog of unlocked daily calendar exegeses
 │   │   ├── WelcomeScreen.tsx        # 3-step onboarding introduction
 │   │   ├── WOTDDetailsScreen.tsx    # Full 4-lens exegesis & prayer focus
 │   │   └── WOTDScreen.tsx           # Full Holy Bible reader (66 books, WEB/KJV) + Daily Exegesis

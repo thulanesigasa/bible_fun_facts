@@ -24,6 +24,7 @@ import WriterDetailsScreen from '../screens/WriterDetailsScreen';
 import SearchScreen from '../screens/SearchScreen';
 import FavoritesScreen from '../screens/FavoritesScreen';
 import BookmarksScreen from '../screens/BookmarksScreen';
+import UnfoldedScreen from '../screens/UnfoldedScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import FactDetailsScreen from '../screens/FactDetailsScreen';
 import ScriptureDetailsScreen from '../screens/ScriptureDetailsScreen';
@@ -57,6 +58,7 @@ export type RootStackParamList = {
   ProfileMain: undefined;
   Favorites: undefined;
   Bookmarks: undefined;
+  Unfolded: undefined;
   TermsOfService: undefined;
   PrivacyPolicy: undefined;
 };
@@ -71,6 +73,7 @@ function shouldShowTabHeader(route: any): boolean {
   const childScreens = [
     'Favorites',
     'Bookmarks',
+    'Unfolded',
     'TermsOfService',
     'PrivacyPolicy',
     'FactDetails',
@@ -169,6 +172,24 @@ function ProfileStack() {
         options={{
           headerShown: true,
           title: 'Bookmarked Verses',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+        }}
+      />
+      <Stack.Screen
+        name="Unfolded"
+        component={UnfoldedScreen}
+        options={{
+          headerShown: true,
+          title: 'Unfolded',
           headerStyle: {
             backgroundColor: '#FFFFFF',
           },

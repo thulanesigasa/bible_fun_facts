@@ -93,16 +93,6 @@ export default function BookmarksScreen({ navigation }: BookmarksScreenProps) {
         renderItem={renderBookmarkRow}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
-        ListHeaderComponent={
-          <View style={styles.headerBlock}>
-            <Text variant="h2" style={styles.headerTitle}>
-              Bookmarked Verses
-            </Text>
-            <Text variant="caption" color={colors.textSecondary} style={styles.headerSub}>
-              {favoritesScriptures.length} {favoritesScriptures.length === 1 ? 'verse' : 'verses'} saved • Tap any verse to open in Bible reader
-            </Text>
-          </View>
-        }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <View style={styles.emptyIconWrap}>
@@ -137,20 +127,6 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 96,
-  },
-  headerBlock: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
-  },
-  headerTitle: {
-    color: colors.textPrimary,
-  },
-  headerSub: {
-    marginTop: 4,
-    fontSize: 12,
   },
 
   // Continuous body row styling (no card divs)
