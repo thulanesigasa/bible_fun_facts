@@ -23,6 +23,7 @@ import HistoryScreen from '../screens/HistoryScreen';
 import WriterDetailsScreen from '../screens/WriterDetailsScreen';
 import SearchScreen from '../screens/SearchScreen';
 import FavoritesScreen from '../screens/FavoritesScreen';
+import BookmarksScreen from '../screens/BookmarksScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import FactDetailsScreen from '../screens/FactDetailsScreen';
 import ScriptureDetailsScreen from '../screens/ScriptureDetailsScreen';
@@ -55,6 +56,7 @@ export type RootStackParamList = {
   WOTDDetails: { wotd: WOTDEntry };
   ProfileMain: undefined;
   Favorites: undefined;
+  Bookmarks: undefined;
   TermsOfService: undefined;
   PrivacyPolicy: undefined;
 };
@@ -68,6 +70,7 @@ function shouldShowTabHeader(route: any): boolean {
   if (!routeName) return true;
   const childScreens = [
     'Favorites',
+    'Bookmarks',
     'TermsOfService',
     'PrivacyPolicy',
     'FactDetails',
@@ -148,6 +151,24 @@ function ProfileStack() {
         options={{
           headerShown: true,
           title: 'Saved Collection',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+        }}
+      />
+      <Stack.Screen
+        name="Bookmarks"
+        component={BookmarksScreen}
+        options={{
+          headerShown: true,
+          title: 'Bookmarked Verses',
           headerStyle: {
             backgroundColor: '#FFFFFF',
           },
