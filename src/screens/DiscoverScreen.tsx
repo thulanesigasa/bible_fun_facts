@@ -107,7 +107,7 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
             accessibilityRole="button"
             accessibilityLabel={`Streak ${streak || 1}. Tap to open streak badge.`}
           >
-            <StreakHexagonBadge days={streak || 1} size={46} showText={false} />
+            <StreakHexagonBadge days={streak || 1} size={46} />
           </TouchableOpacity>
         </View>
 
