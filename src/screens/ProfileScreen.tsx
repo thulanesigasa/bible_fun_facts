@@ -459,7 +459,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           >
             <View style={styles.rowTitleBox}>
               <Text variant="h3" style={styles.rowTitle}>
-                Study Milestones & Badges
+                Study Achievements
               </Text>
               <Text variant="caption" color={colors.textSecondary}>
                 {`${totalProgress.totalUnlocked} of ${totalProgress.totalAvailable} milestones unlocked`}

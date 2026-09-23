@@ -5,11 +5,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   useWindowDimensions,
-  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
-import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
 import { useUser } from '../context/UserContext';
 import { CategoryBadge } from '../components/CategoryBadge';
@@ -17,14 +15,12 @@ import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
 import {
   AchievementCategory,
   AchievementMilestone,
-  getAchievementsForCategory,
   getCategoryProgress,
   getCategoryTitle,
   getCategorySubtitle,
   getCategoryUnit,
   getTotalAchievementsProgress,
 } from '../data/achievements';
-import { LockSvg, CheckSvg } from '../components/SvgIcons';
 
 const CATEGORIES: { key: AchievementCategory; label: string }[] = [
   { key: 'streak', label: 'Streaks' },
@@ -76,7 +72,7 @@ export default function AchievementsScreen() {
     [activeCategory, currentCategoryCount]
   );
 
-  // Responsive 3-per-row grid calculation
+  // Responsive 3-per-row grid calculation (horizontal padding 16px, gap 8px)
   const horizontalPadding = 16;
   const gridGap = 8;
   const cardWidth = (width - (horizontalPadding * 2) - (gridGap * 2)) / 3;
@@ -93,33 +89,36 @@ export default function AchievementsScreen() {
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        {/* Global Summary Banner */}
-        <View style={[styles.globalBanner, shadow.sm]}>
-          <View style={styles.globalBannerTop}>
+        {/* Global Summary Header (Direct Body Layout, Zero Floating Cards / Divs) */}
+        <View style={styles.headerSection}>
+          <View style={styles.headerTopRow}>
             <View>
-              <Text variant="caption" weight="800" color={colors.accent} style={styles.globalPreTitle}>
+              <Text variant="caption" weight="800" color={colors.accent} style={styles.preTitle}>
                 HONOR & DEVOTION
               </Text>
-              <Text variant="h2" style={styles.globalTitle}>
+              <Text variant="h2" style={styles.title}>
                 Study Achievements
               </Text>
             </View>
-            <View style={styles.globalBadgePill}>
+            <View style={styles.progressCounterPill}>
               <Text variant="caption" weight="800" color="#0F172A">
-                {`${totalProgress.totalUnlocked}/48 UNLOCKED`}
+                {`${totalProgress.totalUnlocked} of 48 UNLOCKED`}
               </Text>
             </View>
           </View>
-          <Text variant="caption" color={colors.textSecondary} style={styles.globalSubtitle}>
+          <Text variant="caption" color={colors.textSecondary} style={styles.subtitle}>
             Grow in sacred wisdom by meditating on scripture, preserving verses, and sharing biblical truth.
           </Text>
-          <View style={styles.globalProgressBarTrack}>
-            <View style={[styles.globalProgressBarFill, { width: `${totalProgress.percent}%` }]} />
+          <View style={styles.progressBarTrack}>
+            <View style={[styles.progressBarFill, { width: `${totalProgress.percent}%` }]} />
           </View>
         </View>
 
-        {/* Category Selector Tabs */}
-        <View style={styles.categoryPillsWrapper}>
+        {/* Category Selector Tabs (Direct Body, Zero Divs) */}
+        <View style={styles.categorySection}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.categorySectionLabel}>
+            SELECT CATEGORY
+          </Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -163,13 +162,13 @@ export default function AchievementsScreen() {
           </ScrollView>
         </View>
 
-        {/* Active Category Header Card */}
-        <View style={styles.categoryHeaderCard}>
-          <View style={styles.categoryHeaderInfo}>
-            <Text variant="h3" style={styles.categoryTitle}>
+        {/* Active Category Overview (Direct Body Layout, Zero Divs) */}
+        <View style={styles.activeCategorySection}>
+          <View style={styles.activeCategoryInfo}>
+            <Text variant="h3" style={styles.activeCategoryTitle}>
               {getCategoryTitle(activeCategory)}
             </Text>
-            <Text variant="caption" color={colors.textSecondary} style={styles.categorySubtitle}>
+            <Text variant="caption" color={colors.textSecondary} style={styles.activeCategorySubtitle}>
               {getCategorySubtitle(activeCategory)}
             </Text>
           </View>
@@ -178,7 +177,7 @@ export default function AchievementsScreen() {
             <Text variant="caption" weight="700" color={colors.textPrimary}>
               {`Your record: ${currentCategoryCount} ${getCategoryUnit(activeCategory, currentCategoryCount)}`}
             </Text>
-            <Text variant="caption" weight="700" color={colors.accent}>
+            <Text variant="caption" weight="700" color={colors.accentDark}>
               {`${categoryProgress.unlockedCount} of 12 Unlocked`}
             </Text>
           </View>
@@ -188,7 +187,7 @@ export default function AchievementsScreen() {
           </View>
         </View>
 
-        {/* 3-Per-Row Grid of 12 Achievements */}
+        {/* 3-Per-Row Grid of 12 Achievements (Flat Blocks, Zero Divs, Zero Icons) */}
         <View style={styles.gridContainer}>
           {categoryProgress.milestones.map((m) => {
             const isEarned = currentCategoryCount >= m.target;
@@ -196,10 +195,9 @@ export default function AchievementsScreen() {
               <TouchableOpacity
                 key={m.id}
                 style={[
-                  styles.achievementCard,
+                  styles.achievementCell,
                   { width: cardWidth },
-                  isEarned ? styles.achievementCardEarned : styles.achievementCardLocked,
-                  shadow.sm,
+                  isEarned ? styles.achievementCellEarned : styles.achievementCellLocked,
                 ]}
                 onPress={() => handleCardPress(m)}
                 activeOpacity={0.75}
@@ -238,24 +236,22 @@ export default function AchievementsScreen() {
                   weight="700"
                   color={isEarned ? '#0F172A' : '#94A3B8'}
                   numberOfLines={2}
-                  style={styles.cardTitle}
+                  style={styles.cellTitle}
                 >
                   {m.title}
                 </Text>
 
-                {/* Status Indicator (Checkmark if earned, Lock if locked) */}
+                {/* Status Indicator (Clean Typography - Zero Icons) */}
                 <View style={styles.statusIndicatorRow}>
                   {isEarned ? (
                     <View style={styles.statusEarnedTag}>
-                      <CheckSvg size={10} color="#0F172A" strokeWidth={3} />
                       <Text variant="caption" weight="800" color="#0F172A" style={styles.statusEarnedText}>
                         EARNED
                       </Text>
                     </View>
                   ) : (
                     <View style={styles.statusLockedTag}>
-                      <LockSvg size={10} color="#94A3B8" />
-                      <Text variant="caption" weight="600" color="#94A3B8" style={styles.statusLockedText}>
+                      <Text variant="caption" weight="700" color="#94A3B8" style={styles.statusLockedText}>
                         LOCKED
                       </Text>
                     </View>
@@ -285,69 +281,73 @@ export default function AchievementsScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background, // 60% Dominant Canvas #F8FAFC
+    backgroundColor: '#FFFFFF', // Continuous flat 30% panel body surface
   },
   container: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   contentContainer: {
     paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 40,
+    paddingTop: 8,
+    paddingBottom: 48,
   },
 
-  // Global Summary Banner
-  globalBanner: {
-    backgroundColor: '#FFFFFF', // 30% Panel
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    marginBottom: 16,
+  // Flat Direct Body Header Section (Zero Divs / Floating Cards)
+  headerSection: {
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.08)',
+    marginBottom: 14,
   },
-  globalBannerTop: {
+  headerTopRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 6,
   },
-  globalPreTitle: {
+  preTitle: {
     fontSize: 10,
     letterSpacing: 1.2,
     marginBottom: 2,
   },
-  globalTitle: {
+  title: {
     fontSize: 20,
     fontWeight: '800',
     color: '#0F172A',
   },
-  globalBadgePill: {
+  progressCounterPill: {
     backgroundColor: colors.accent,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
   },
-  globalSubtitle: {
+  subtitle: {
     fontSize: 12,
     lineHeight: 18,
     marginBottom: 12,
   },
-  globalProgressBarTrack: {
-    height: 6,
+  progressBarTrack: {
+    height: 4,
     width: '100%',
-    backgroundColor: '#E2E8F0',
-    borderRadius: 3,
+    backgroundColor: '#F1F5F9',
+    borderRadius: 2,
     overflow: 'hidden',
   },
-  globalProgressBarFill: {
+  progressBarFill: {
     height: '100%',
     backgroundColor: colors.accent,
-    borderRadius: 3,
+    borderRadius: 2,
   },
 
-  // Category Selector Tabs
-  categoryPillsWrapper: {
-    marginBottom: 12,
+  // Category Selector Section (Direct Body Layout)
+  categorySection: {
+    marginBottom: 14,
+  },
+  categorySectionLabel: {
+    fontSize: 10.5,
+    letterSpacing: 0.8,
+    marginBottom: 8,
   },
   categoryPillsScroll: {
     gap: 8,
@@ -356,8 +356,8 @@ const styles = StyleSheet.create({
   categoryTabPill: {
     paddingVertical: 8,
     paddingHorizontal: 14,
-    borderRadius: 14,
-    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    backgroundColor: '#F8FAFC',
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.08)',
   },
@@ -374,25 +374,23 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
 
-  // Category Header Card
-  categoryHeaderCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    marginBottom: 16,
+  // Active Category Overview (Direct Body Layout, Zero Floating Divs)
+  activeCategorySection: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.08)',
+    marginBottom: 14,
   },
-  categoryHeaderInfo: {
-    marginBottom: 10,
+  activeCategoryInfo: {
+    marginBottom: 8,
   },
-  categoryTitle: {
+  activeCategoryTitle: {
     fontSize: 16,
     fontWeight: '800',
     color: '#0F172A',
     marginBottom: 2,
   },
-  categorySubtitle: {
+  activeCategorySubtitle: {
     fontSize: 12,
     lineHeight: 16,
   },
@@ -403,45 +401,44 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   categoryProgressBarTrack: {
-    height: 5,
+    height: 4,
     width: '100%',
-    backgroundColor: '#E2E8F0',
-    borderRadius: 2.5,
+    backgroundColor: '#F1F5F9',
+    borderRadius: 2,
     overflow: 'hidden',
   },
   categoryProgressBarFill: {
     height: '100%',
     backgroundColor: colors.accent,
-    borderRadius: 2.5,
+    borderRadius: 2,
   },
 
-  // 3-Per-Row Grid Layout
+  // 3-Per-Row Grid (Direct Flat Cells, Zero Divs, Zero Shadows)
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
     justifyContent: 'flex-start',
   },
-  achievementCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
+  achievementCell: {
+    borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 6,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.08)',
     marginBottom: 2,
-    minHeight: 154,
+    minHeight: 150,
     justifyContent: 'space-between',
+    backgroundColor: '#F8FAFC',
   },
-  achievementCardEarned: {
+  achievementCellEarned: {
     borderColor: colors.accent,
-    borderWidth: 1.5,
     backgroundColor: '#FEFCE8',
   },
-  achievementCardLocked: {
+  achievementCellLocked: {
     backgroundColor: '#FFFFFF',
-    opacity: 0.88,
+    borderColor: 'rgba(15, 23, 42, 0.06)',
   },
   badgeContainer: {
     marginBottom: 6,
@@ -455,7 +452,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F5F9',
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 8,
+    borderRadius: 6,
     marginBottom: 4,
   },
   targetPillEarned: {
@@ -465,7 +462,7 @@ const styles = StyleSheet.create({
     fontSize: 9.5,
     textAlign: 'center',
   },
-  cardTitle: {
+  cellTitle: {
     fontSize: 10.5,
     textAlign: 'center',
     lineHeight: 13,
@@ -476,27 +473,23 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   statusEarnedTag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 3,
     backgroundColor: colors.accent,
-    paddingHorizontal: 6,
+    paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 6,
   },
   statusEarnedText: {
-    fontSize: 8,
+    fontSize: 8.5,
     letterSpacing: 0.5,
   },
   statusLockedTag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 3,
-    paddingHorizontal: 4,
+    paddingHorizontal: 6,
     paddingVertical: 2,
+    borderRadius: 6,
+    backgroundColor: '#F1F5F9',
   },
   statusLockedText: {
-    fontSize: 8,
+    fontSize: 8.5,
     letterSpacing: 0.5,
   },
 });

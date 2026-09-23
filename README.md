@@ -538,14 +538,14 @@ To eliminate visual header stacking and duplicate headers across nested navigato
 </p>
 
 ### 1. Dedicated Achievements Screen (`AchievementsScreen.tsx`)
-Rather than crowding the main Profile screen with cramped horizontal scroll carousels, achievements now reside in an expansive, dedicated full-stack screen:
-- **Global Overview Banner**: Live global progress display showing total milestones unlocked across the entire study life (`X of 48 UNLOCKED`) with a high-contrast progress bar.
-- **Category Switcher Tabs**: Clean, responsive tabs allowing seamless filtering across **Streaks**, **Bookmarks**, **Highlights**, and **Shares**.
-- **Responsive 3-Per-Row Grid Layout**: Dynamic column math `cardWidth = (width - 32 - 16) / 3` ensures cards fit flush in blocks of 3 across all Android screen sizes (360dp–412dp) with zero horizontal overflow.
-- **Card States & Tactile Feedback**:
-  - Earned milestones: Warm golden highlight borders (`#FEFCE8` surface, `#FDD223` border), high-contrast titles, and full-opacity metallic badges.
-  - Locked milestones: Clean translucent styling (`opacity: 0.45`), showing believers upcoming targets and scriptural promises to strive towards.
-  - Tapping any card opens `StreakMilestoneModal` to inspect the full theological title, target, biblical quote, book reference, and share via native high-fidelity image capture.
+Rather than crowding the main Profile screen with cramped horizontal scroll carousels, achievements reside in an expansive, dedicated full-stack screen built with a flat continuous body surface (zero floating card divs, zero extraneous iconography):
+- **Direct Body Overview Section**: Live global progress display showing total milestones unlocked across the entire study life (`X of 48 UNLOCKED`) with a high-contrast progress bar, integrated directly on the continuous 30% panel surface without enclosing card divs.
+- **Category Switcher Tabs**: Clean, responsive flat tabs allowing seamless filtering across **Streaks**, **Bookmarks**, **Highlights**, and **Shares**.
+- **Responsive 3-Per-Row Grid Layout**: Dynamic column math `cardWidth = (width - 32 - 16) / 3` ensures cells fit flush in blocks of 3 across all Android screen sizes (360dp–412dp) with zero horizontal overflow.
+- **Pure Typographic Status & Tactile Feedback (Zero Icons)**:
+  - Earned milestones: Warm golden highlight borders (`#FEFCE8` surface, `#FDD223` border), high-contrast titles, full-opacity metallic badges, and crisp typographic `EARNED` indicator (no SVG check icons).
+  - Locked milestones: Clean translucent styling (`opacity: 0.45`), showing believers upcoming targets and scriptural promises to strive towards with subtle typographic `LOCKED` indicator (no SVG lock icons).
+  - Tapping any cell opens `StreakMilestoneModal` to inspect the full theological title, target, biblical quote, book reference, and share via native high-fidelity image capture.
 - **Direct Body Profile Navigation**: Replaced enclosing cards, div wrappers, and icons with a direct body action row (`styles.actionRow`) in `ProfileScreen.tsx` matching `Saved Collection` and reader preferences with clean typography and subtle `›` disclosure arrow.
 
 ### 2. Four Sacred Study Categories & 48 Curated Milestones
