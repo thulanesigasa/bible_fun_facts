@@ -546,6 +546,10 @@ Rather than crowding the main Profile screen with cramped horizontal scroll caro
   - Earned milestones: Warm golden highlight borders (`#FEFCE8` surface, `#FDD223` border), high-contrast titles, full-opacity metallic badges, and crisp typographic `EARNED` indicator (no SVG check icons).
   - Locked milestones: Clean translucent styling (`opacity: 0.45`), showing believers upcoming targets and scriptural promises to strive towards with subtle typographic `LOCKED` indicator (no SVG lock icons).
   - Tapping any cell opens `StreakMilestoneModal` to inspect the full theological title, target, biblical quote, book reference, and share via native high-fidelity image capture.
+- **Native Module Startup Crash Isolation & Rasterization Stability**:
+  - Dynamically isolates `react-native-view-shot`, `expo-sharing`, and `expo-file-system` inside `handleShare`, removing top-level module imports to completely eliminate startup evaluation crashes under OTA updates.
+  - Enforces `collapsable={false}` on `CategoryBadge` View and Svg containers with 250ms draw settlement to guarantee full GPU rasterization without blank outputs.
+  - Guards `cardWidth` in `AchievementsScreen.tsx` with `Math.max(80, ...)` to prevent unmeasured initial mount layout crashes.
 - **Direct Body Profile Navigation**: Replaced enclosing cards, div wrappers, and icons with a direct body action row (`styles.actionRow`) in `ProfileScreen.tsx` matching `Saved Collection` and reader preferences with clean typography and subtle `›` disclosure arrow.
 
 ### 2. Four Sacred Study Categories & 48 Curated Milestones

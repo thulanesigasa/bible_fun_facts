@@ -13,9 +13,6 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { captureRef } from 'react-native-view-shot';
-import * as Sharing from 'expo-sharing';
-import * as FileSystem from 'expo-file-system';
 import { colors } from '../theme/colors';
 import { Text } from './Typography';
 import { StreakHexagonBadge } from './StreakHexagonBadge';
@@ -181,36 +178,63 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
       // 1. Scroll card into view if user had scrolled down to shelf
       scrollViewRef.current?.scrollTo({ y: 0, animated: false });
 
-      // 2. Allow 120ms for view rendering & layout to settle completely
-      await new Promise((r) => setTimeout(r, 120));
+      // 2. Allow 250ms for GPU rendering & layout to settle completely
+      await new Promise((r) => setTimeout(r, 250));
 
-      // 3. Capture the in-tree shareCard directly via captureRef
-      const uri = await captureRef(shareCardRef.current, {
-        format: 'png',
-        quality: 1.0,
-        result: 'tmpfile',
-      });
+      // 3. Dynamically resolve native modules to prevent startup crashes under OTA
+      let captureRefFn: any = null;
+      try {
+        captureRefFn = require('react-native-view-shot').captureRef;
+      } catch (_) {}
 
-      // 4. Verify file exists and has actual rendered byte-size
-      let isFileValid = false;
-      if (uri) {
+      let SharingModule: any = null;
+      try {
+        SharingModule = require('expo-sharing');
+      } catch (_) {}
+
+      let FileSystemModule: any = null;
+      try {
+        FileSystemModule = require('expo-file-system');
+      } catch (_) {}
+
+      // 4. Capture the in-tree shareCard directly via captureRef if available
+      let uri: string | null = null;
+      if (captureRefFn && shareCardRef.current) {
         try {
-          const info = await FileSystem.getInfoAsync(uri);
-          if (info.exists && (info.size ?? 0) > 300) {
-            isFileValid = true;
-          }
-        } catch (_) {
-          isFileValid = !!uri;
+          uri = await captureRefFn(shareCardRef.current, {
+            format: 'png',
+            quality: 1.0,
+            result: 'tmpfile',
+          });
+        } catch (captureErr) {
+          console.warn('captureRef notice:', captureErr);
+          uri = null;
         }
       }
 
-      // 5. Native image share via expo-sharing
-      if (uri && isFileValid) {
-        const canShare = await Sharing.isAvailableAsync().catch(() => false);
+      // 5. Verify file exists and has actual rendered byte-size (>1500 bytes for real content)
+      let isFileValid = false;
+      if (uri) {
+        if (FileSystemModule?.getInfoAsync) {
+          try {
+            const info = await FileSystemModule.getInfoAsync(uri);
+            if (info.exists && (info.size ?? 0) > 1500) {
+              isFileValid = true;
+            }
+          } catch (_) {
+            isFileValid = true;
+          }
+        } else {
+          isFileValid = true;
+        }
+      }
+
+      // 6. Native image share via expo-sharing if available and valid
+      if (uri && isFileValid && SharingModule?.isAvailableAsync && SharingModule?.shareAsync) {
+        const canShare = await SharingModule.isAvailableAsync().catch(() => false);
         if (canShare) {
-          await Sharing.shareAsync(uri, {
+          await SharingModule.shareAsync(uri, {
             mimeType: 'image/png',
-            UTI: 'public.png',
             dialogTitle: shareTitle,
           });
           incrementSharesCount();
@@ -218,7 +242,7 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
         }
       }
 
-      // 6. Text share fallback if native image sharing is unavailable
+      // 7. Guaranteed rich text share fallback if native image sharing is unavailable
       const res = await Share.share({
         message: shareMessage,
         title: shareTitle,
