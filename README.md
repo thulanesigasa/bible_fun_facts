@@ -562,12 +562,15 @@ In strict adherence to Rule 1 (60-30-10 with dominant yellow/amber brand accents
 - **Shares**: **8-Point Compass Star / Heraldic Seal** in Sunset Golden Ochre / Wheat Amber (`#D97706` / `#502004`).
 - **Pure Vector Scalability**: Supports both compact 48px grid rendering and high-resolution 220px export canvases with 3D extruded numerals and debossed category headers.
 
-### 4. High-Fidelity Image Share Engine (Zero Blank Screen)
-The share architecture in `StreakMilestoneModal.tsx` eliminates Android Dialog capture bugs:
-- **Hardware Acceleration**: `<Modal hardwareAccelerated={true}>` forces Android's window manager to allocate GPU-backed off-screen render caches.
-- **Unclipped Canvas Surface**: Removed `overflow: 'hidden'` from the captured card container, allowing child `react-native-svg` elements to rasterize without viewport clipping.
-- **Byte-Size Integrity Gate**: Uses `expo-file-system` to inspect captured image size (`info.size > 1000`). If a view capture is unrendered (< 1KB), it automatically invokes `captureScreen` hardware fallback.
-- **Profile Navigation Integration**: Replaced the former inline shelf in `ProfileScreen.tsx` with a sleek navigation action card featuring `AwardSvg`, live `${unlocked}/48` pill, and progress fill.
+### 4. High-Fidelity In-Tree Share Engine & Zero Black Screen Architecture
+The updated share architecture in `StreakMilestoneModal.tsx` completely eliminates Android Dialog lifecycle detachment and offscreen culling issues:
+- **In-Tree Hardware-Safe Overlay**: Replaced native React Native `<Modal>` (`android.app.Dialog`) with an animated in-tree overlay (`StyleSheet.absoluteFill`). Because no secondary Dialog window is created, Android preserves the Activity surface when returning from external Share Intents, eliminating the permanent black screen freeze.
+- **Pinned Bottom Action Bar**: Elevated the "Share Badge" and "Continue Reading" buttons from the bottom of the ScrollView into a fixed bottom action bar (`fixedBottomBar`). Believers can immediately share without scrolling down.
+- **Pre-Capture Auto-Scroll & Viewport Settlement**: Automatically executes `scrollViewRef.current?.scrollTo({ y: 0, animated: false })` followed by a 120ms draw buffer settlement before capture, preventing Android `ScrollView` from culling the badge card from memory when scrolled.
+- **Direct `captureRef` Rasterization**: Snapshots the in-tree `shareCardRef` directly into a temporary PNG file with 100% vector fidelity, bypassing problematic full-screen captures.
+- **Byte-Size Integrity Gate**: Uses `expo-file-system` to inspect captured image size (`info.size > 300`). Validated PNGs are passed to `expo-sharing` (`Sharing.shareAsync`), ensuring true image sharing without blank screen fallbacks.
+- **Android Hardware Back Handler**: Intercepts Android hardware back button presses (`BackHandler.addEventListener('hardwareBackPress')`) to cleanly dismiss the overlay without window leaks.
+- **Dynamic Tab Bar Visibility**: Automatically hides the bottom floating pill tab bar (`setHideTabBar(true)`) while the overlay is visible and on `AchievementsScreen`.
 
 ---
 

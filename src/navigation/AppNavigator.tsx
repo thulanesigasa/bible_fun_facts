@@ -90,7 +90,11 @@ function shouldShowTabHeader(route: any): boolean {
 function getTabBarVisibility(route: any, hideTabBar: boolean): 'none' | 'flex' {
   if (hideTabBar) return 'none';
   const routeName = getFocusedRouteNameFromRoute(route);
-  if (routeName === 'TermsOfService' || routeName === 'PrivacyPolicy') {
+  if (
+    routeName === 'TermsOfService' ||
+    routeName === 'PrivacyPolicy' ||
+    routeName === 'Achievements'
+  ) {
     return 'none';
   }
   return 'flex';
