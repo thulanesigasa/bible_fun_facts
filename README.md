@@ -746,6 +746,62 @@ The mobile client integrates with Supabase for user authentication, profile data
 
 ---
 
+## Permanent Multi-Tier Database Persistence & Daily Study Streak Engine
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Database-AsyncStorage%20SQLite%20%2B%20Supabase%20Postgres-3ECF8E?style=for-the-badge&logo=postgresql&logoColor=white" alt="Multi-Tier Database" />
+  <img src="https://img.shields.io/badge/Daily%20Streak-Strict%20Skip--Day%20Reset-DC2626?style=for-the-badge" alt="Strict Streak Reset" />
+  <img src="https://img.shields.io/badge/AppState-Foreground%20Resume%20Re--Evaluation-FDD223?style=for-the-badge" alt="AppState Resume" />
+  <img src="https://img.shields.io/badge/Cloud%20Sync-Realtime%20Postgres%20Channels-0284C7?style=for-the-badge" alt="Cloud Realtime Sync" />
+</p>
+
+### 1. Multi-Tier Permanent Data Persistence Architecture
+
+The application implements a robust, fault-tolerant multi-tier persistence pipeline combining local offline-first storage with remote cloud databases to guarantee permanent data preservation:
+
+| Storage Tier | Technology | Data Scope | Persistence Guarantee |
+| :--- | :--- | :--- | :--- |
+| **Tier 1: Local Device Database** | `@react-native-async-storage/async-storage` (`@exegeomai_user_data`) | Full user profile, streak count, last login date, unfolded exegeses, share count, bookmarked facts, saved scriptures, verse highlights (`bibleHighlights`), last read chapter (`lastReadBible`), reader theme, font size, and UI preferences. | **Permanent local persistence**. Persists across app termination, device reboots, battery loss, airplane mode, and offline study sessions. 100% functional without network. |
+| **Tier 2: Relational Cloud Database** | Supabase Managed PostgreSQL (`public.profiles` table) | Authenticated user record (`id` UUID), `name`, `username`, `avatar_url`, `streak`, `facts_viewed_count`, `last_login_date`, `created_at`, `updated_at`. | **Permanent relational cloud persistence** with PostgreSQL Row-Level Security (RLS) policies scoped strictly to `auth.uid() = user_id`. |
+| **Tier 3: Cryptographic User Metadata** | Supabase Auth Metadata (`auth.users.raw_user_meta_data`) | Profile credentials, study preferences (`preferredTranslation`, `studyFocus`, `dailyGoal`, `knowledgeLevel`), bookmarked facts (`favoritesFacts`), saved verses (`favoritesScriptures`), verse color highlights, and reading position. | **Cross-device cloud restoration**. Guaranteed permanent backup across logins, new device upgrades, and factory resets. |
+| **Tier 4: Cloud Media Storage** | Supabase Storage (`avatars` bucket) | Ultra-compressed AVIF profile picture binaries (`image/avif`) under path `user_id/avatar_timestamp.avif`. | **Permanent cloud asset persistence** with public CDN distribution and edge caching. |
+
+### 2. Strict Daily Study Streak Lifecycle & Skip-Day Reset Engine
+
+Daily scripture engagement is treated as a sacred spiritual discipline. The streak calculation engine enforces strict algorithmic and temporal rules:
+
+```mermaid
+graph TD
+    Trigger["Launch App OR Foreground Resume (AppState)"] --> ReadDates["Read current calendar date & lastLoginDate"]
+    ReadDates --> DiffCalc["Calculate calendar difference: diffDays"]
+    
+    DiffCalc -->|diffDays === 0| SameDay["Same Day: Streak unchanged, study reinforced"]
+    DiffCalc -->|diffDays === 1| NextDay["Consecutive Day: Streak increments by +1"]
+    DiffCalc -->|diffDays >= 2| MissedDay["SKIPPED A DAY: STREAK STRICTLY RESTARTS FROM SCRATCH (Day 1)"]
+    DiffCalc -->|First Time / Null| FirstLaunch["First Launch: Streak initialized to Day 1"]
+    
+    SameDay --> SaveState["No state change needed"]
+    NextDay --> SyncAll["Update lastLoginDate to Today -> Save AsyncStorage -> Sync Supabase"]
+    MissedDay --> SyncAll
+    FirstLaunch --> SyncAll
+```
+
+#### Deterministic Day Difference Evaluation (`diffDays`)
+Instead of fragile string comparisons or raw millisecond division that can falter across Daylight Saving Time boundaries, the engine normalizes dates to midnight UTC boundaries:
+- **`diffDays === 0` (Same Calendar Day)**: The user has already engaged today. The daily streak is intact and does not double-count on repeat app openings.
+- **`diffDays === 1` (Consecutive Calendar Day)**: The user engaged yesterday and is engaging today. The daily streak strictly increments by `+1`.
+- **`diffDays >= 2` (Skipped 1 or More Days)**: **THE USER HAS MISSED A CALENDAR DAY. THE STREAK STRICTLY AND UNCONDITIONALLY RESTARTS FROM SCRATCH (DAY 1)**.
+- **`!lastLoginDate` (First Launch)**: The streak initializes to Day 1.
+
+#### Multi-Lifecycle Trigger Points
+The streak evaluation runs across 4 distinct lifecycle events:
+1. **Cold Application Launch**: Evaluated during initial hydration from `AsyncStorage`.
+2. **Foreground App Resume (`AppState === 'active'`)**: Evaluated dynamically via `AppState.addEventListener('change', ...)` whenever the user brings the app from background to foreground or unlocks the screen, preventing stale streaks if the app remains in memory across midnight.
+3. **Remote Session Restoration**: Evaluated inside `restoreRemoteUserData()` when restoring Supabase authentication sessions, ensuring that old remote streaks from weeks prior cannot override a reset.
+4. **Realtime PostgreSQL Updates**: Evaluated when incoming changes arrive via `postgres_changes` channels on `public.profiles`.
+
+---
+
 ## Rule 21: Mobile CI/CD & Native Compilation Architecture
 
 This project strictly adheres to **Rule 21** of our global mobile standards:
