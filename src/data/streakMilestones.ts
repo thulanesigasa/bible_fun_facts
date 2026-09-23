@@ -6,9 +6,7 @@ export interface StreakMilestone {
   verseRef?: string;
   verseQuote?: string;
   themeColor: string;
-  flameColor: string;
   bgGradientStart: string;
-  badgeImage?: any;
   description: string;
 }
 
@@ -21,7 +19,6 @@ export const STREAK_MILESTONES: StreakMilestone[] = [
     verseRef: 'Philippians 1:6',
     verseQuote: 'He who began a good work in you will carry it on to completion.',
     themeColor: '#D97706',
-    flameColor: '#F59E0B',
     bgGradientStart: 'rgba(217, 119, 6, 0.35)',
     description: 'Began the sacred walk of daily exegesis.',
   },
@@ -33,9 +30,7 @@ export const STREAK_MILESTONES: StreakMilestone[] = [
     verseRef: 'Galatians 6:9',
     verseQuote: 'Let us not become weary in doing good, for at the proper time we will reap a harvest.',
     themeColor: '#D97706',
-    flameColor: '#F59E0B',
     bgGradientStart: 'rgba(217, 119, 6, 0.45)',
-    badgeImage: require('../../assets/badges/badge_streak_3.jpg'),
     description: '3 days of unbroken daily scripture study.',
   },
   {
@@ -46,7 +41,6 @@ export const STREAK_MILESTONES: StreakMilestone[] = [
     verseRef: 'Genesis 2:2',
     verseQuote: 'By the seventh day God had finished the work he had been doing.',
     themeColor: '#94A3B8',
-    flameColor: '#CBD5E1',
     bgGradientStart: 'rgba(148, 163, 184, 0.40)',
     description: '7 days walking in theological truth.',
   },
@@ -58,9 +52,7 @@ export const STREAK_MILESTONES: StreakMilestone[] = [
     verseRef: 'Revelation 2:10',
     verseQuote: 'Be faithful, even to the point of death, and I will give you life as your victor’s crown.',
     themeColor: '#94A3B8',
-    flameColor: '#CBD5E1',
     bgGradientStart: 'rgba(148, 163, 184, 0.45)',
-    badgeImage: require('../../assets/badges/badge_streak_10.jpg'),
     description: 'Double-digit devotion milestone.',
   },
   {
@@ -71,7 +63,6 @@ export const STREAK_MILESTONES: StreakMilestone[] = [
     verseRef: 'Psalm 119:105',
     verseQuote: 'Your word is a lamp for my feet, a light on my path.',
     themeColor: '#FDD223',
-    flameColor: '#FDD223',
     bgGradientStart: 'rgba(253, 210, 35, 0.45)',
     description: '30 days walking faithfully with the Lord.',
   },
@@ -83,7 +74,6 @@ export const STREAK_MILESTONES: StreakMilestone[] = [
     verseRef: '1 Corinthians 15:58',
     verseQuote: 'Stand firm. Let nothing move you. Always give yourselves fully to the work of the Lord.',
     themeColor: '#FDD223',
-    flameColor: '#FDD223',
     bgGradientStart: 'rgba(253, 210, 35, 0.50)',
     description: 'Half a hundred unbroken days of study.',
   },
@@ -95,9 +85,7 @@ export const STREAK_MILESTONES: StreakMilestone[] = [
     verseRef: '2 Timothy 4:7',
     verseQuote: 'I have fought the good fight, I have finished the race, I have kept the faith.',
     themeColor: '#38BDF8',
-    flameColor: '#38BDF8',
     bgGradientStart: 'rgba(56, 189, 248, 0.45)',
-    badgeImage: require('../../assets/badges/badge_streak_100.jpg'),
     description: '100 days of profound scriptural insight.',
   },
   {
@@ -108,11 +96,18 @@ export const STREAK_MILESTONES: StreakMilestone[] = [
     verseRef: 'Psalm 103:17',
     verseQuote: 'From everlasting to everlasting the Lord’s love is with those who fear him.',
     themeColor: '#FDD223',
-    flameColor: '#FEF08A',
     bgGradientStart: 'rgba(245, 158, 11, 0.50)',
     description: 'Full calendar year of unbroken devotion.',
   },
 ];
+
+export function getTierForDays(days: number): 'bronze' | 'silver' | 'gold' | 'diamond' | 'celestial' {
+  if (days >= 365) return 'celestial';
+  if (days >= 100) return 'diamond';
+  if (days >= 30) return 'gold';
+  if (days >= 7) return 'silver';
+  return 'bronze';
+}
 
 export function getMilestoneForStreak(streak: number): StreakMilestone {
   const sorted = [...STREAK_MILESTONES].sort((a, b) => b.days - a.days);
