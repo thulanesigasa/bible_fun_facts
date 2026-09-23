@@ -109,6 +109,77 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     readerTheme: 'light',
   });
 
+  // Helper to sync streak, factsViewedCount (unfolded), and lastLoginDate to Supabase
+  const syncUserDataToRemote = async (updates: {
+    streak?: number;
+    factsViewedCount?: number;
+    lastLoginDate?: string;
+  }) => {
+    if (!SUPABASE_ANON_KEY) return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        // 1. Sync to Supabase auth user_metadata (guaranteed persistence across logins/devices)
+        await supabase.auth.updateUser({
+          data: updates,
+        });
+
+        // 2. Sync to public.profiles table
+        const profileUpdate: any = {};
+        if (typeof updates.streak === 'number') profileUpdate.streak = updates.streak;
+        if (typeof updates.factsViewedCount === 'number') profileUpdate.facts_viewed_count = updates.factsViewedCount;
+        if (updates.lastLoginDate) profileUpdate.last_login_date = updates.lastLoginDate;
+
+        if (Object.keys(profileUpdate).length > 0) {
+          await supabase.from('profiles').update(profileUpdate).eq('id', session.user.id);
+        }
+      }
+    } catch (err) {
+      console.warn('[UserContext] syncUserDataToRemote notice:', err);
+    }
+  };
+
+  // Helper to restore streak and unfolded count from Supabase on login or session restore
+  const restoreRemoteUserData = async (userId: string, meta: any) => {
+    try {
+      let remoteStreak = typeof meta?.streak === 'number' ? meta.streak : undefined;
+      let remoteUnfolded = typeof meta?.factsViewedCount === 'number' ? meta.factsViewedCount : undefined;
+      let remoteLastLogin = meta?.lastLoginDate;
+
+      // Query profiles table for latest realtime values
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('streak, facts_viewed_count, last_login_date')
+          .eq('id', userId)
+          .single();
+
+        if (profile) {
+          if (typeof profile.streak === 'number') remoteStreak = profile.streak;
+          if (typeof profile.facts_viewed_count === 'number') remoteUnfolded = profile.facts_viewed_count;
+          if (profile.last_login_date) remoteLastLogin = profile.last_login_date;
+        }
+      } catch (profileErr) {
+        // Silently fallback to metadata
+      }
+
+      setState(prev => {
+        const finalStreak = remoteStreak !== undefined ? Math.max(1, remoteStreak) : prev.streak;
+        const finalUnfolded = remoteUnfolded !== undefined ? Math.max(0, remoteUnfolded) : prev.factsViewedCount;
+        const finalLastLogin = remoteLastLogin || prev.lastLoginDate;
+
+        return {
+          ...prev,
+          streak: finalStreak,
+          factsViewedCount: finalUnfolded,
+          lastLoginDate: finalLastLogin,
+        };
+      });
+    } catch (err) {
+      console.warn('[UserContext] restoreRemoteUserData notice:', err);
+    }
+  };
+
   // Load data on mount
   useEffect(() => {
     const loadData = async () => {
@@ -142,7 +213,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           checkStreak(parsed.lastLoginDate, parsed.streak);
         } else {
           // First time user
-          checkStreak(null, 0);
+          checkStreak(null, 1);
         }
       } catch (e) {
         console.error('Failed to load user data');
@@ -158,6 +229,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const meta = user.user_metadata as any || {};
           const metaName = meta.name || user.email?.split('@')[0] || 'Believer';
           const metaUsername = meta.username || user.email?.split('@')[0] || 'believer';
+          restoreRemoteUserData(user.id, meta);
+
           setState(prev => ({
             ...prev,
             userProfile: {
@@ -186,6 +259,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const meta = user.user_metadata as any || {};
           const metaName = meta.name || user.email?.split('@')[0] || 'Believer';
           const metaUsername = meta.username || user.email?.split('@')[0] || 'believer';
+          restoreRemoteUserData(user.id, meta);
+
           setState(prev => ({
             ...prev,
             userProfile: {
@@ -218,6 +293,46 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
+  // Realtime Supabase Channel for instantaneous streak & unfolded sync
+  useEffect(() => {
+    if (!SUPABASE_ANON_KEY) return;
+    let channel: any = null;
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user?.id) {
+        channel = supabase
+          .channel(`profiles-realtime-${session.user.id}`)
+          .on(
+            'postgres_changes',
+            {
+              event: 'UPDATE',
+              schema: 'public',
+              table: 'profiles',
+              filter: `id=eq.${session.user.id}`,
+            },
+            (payload) => {
+              if (payload.new) {
+                const newStreak = payload.new.streak;
+                const newUnfolded = payload.new.facts_viewed_count;
+                setState(prev => ({
+                  ...prev,
+                  streak: typeof newStreak === 'number' ? Math.max(1, newStreak) : prev.streak,
+                  factsViewedCount: typeof newUnfolded === 'number' ? Math.max(0, newUnfolded) : prev.factsViewedCount,
+                }));
+              }
+            }
+          )
+          .subscribe();
+      }
+    });
+
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    };
+  }, [state.userProfile?.email]);
+
   // Save data on change
   useEffect(() => {
     const saveData = async () => {
@@ -248,6 +363,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     setState(prev => ({ ...prev, streak: newStreak, lastLoginDate: today }));
+    syncUserDataToRemote({ streak: newStreak, lastLoginDate: today });
   };
 
   const login = async (emailOrName: string, password?: string, name?: string) => {
@@ -270,6 +386,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const meta = (data.user.user_metadata as any) || {};
           const metaName = meta.name || formattedName;
           const metaUsername = meta.username || email.split('@')[0].toLowerCase().replace(/\s+/g, '_');
+          restoreRemoteUserData(data.user.id, meta);
           setState(prev => ({
             ...prev,
             userProfile: {
@@ -574,7 +691,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const incrementFactsViewed = () => {
-    setState(prev => ({ ...prev, factsViewedCount: prev.factsViewedCount + 1 }));
+    setState(prev => {
+      const nextCount = prev.factsViewedCount + 1;
+      syncUserDataToRemote({ factsViewedCount: nextCount });
+      return { ...prev, factsViewedCount: nextCount };
+    });
   };
 
   const isFactFavorited = (id: string) => state.favoritesFacts.some(f => f.id === id);
@@ -628,6 +749,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const clamped = Math.max(1, Math.min(9999, Math.round(days)));
     const today = new Date().toDateString();
     setState(prev => ({ ...prev, streak: clamped, lastLoginDate: today }));
+    syncUserDataToRemote({ streak: clamped, lastLoginDate: today });
   };
 
   return (
