@@ -56,6 +56,8 @@ graph TD
     SearchStack --> SearchMain["SearchScreen (User Discovery, Follow/Unfollow, Scholar Modal)"]
     ProfileStack --> ProfileMain["ProfileScreen (Preferences, Reader Typography, Bookmarks Section)"]
     ProfileStack --> FavoritesMain["FavoritesScreen (Saved Collection)"]
+    ProfileStack --> BookmarksMain["BookmarksScreen (Continuous Body Bookmarks Hub)"]
+    BookmarksMain -.->|One-Tap Jump| BibleReader
     ProfileStack --> Terms
     ProfileStack --> Privacy
     
@@ -208,6 +210,7 @@ exegeomai/
 │   │   └── AppNavigator.tsx              # Rule 20 floating pill tab navigation & stack navigators
 │   ├── screens/                          # Application views
 │   │   ├── AuthScreen.tsx                # Dedicated Login & Sign Up with 28x28 calibrated logo
+│   │   ├── BookmarksScreen.tsx           # Dedicated Bookmarks continuous body view (flat rows, dotted underlines)
 │   │   ├── DiscoverScreen.tsx            # Daily 1-message calendar exegesis view (paddingBottom: 96)
 │   │   ├── FactDetailsScreen.tsx         # In-depth modal sheet for biblical facts
 │   │   ├── FavoritesScreen.tsx           # Saved collection (Facts, Scriptures, WOTD)

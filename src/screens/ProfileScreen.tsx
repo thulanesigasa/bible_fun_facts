@@ -309,6 +309,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
       <ScrollView
         style={styles.scroll}
         scrollEnabled={scrollEnabled}
+        keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
       >
@@ -438,7 +439,9 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
               </View>
 
               {/* Text Input Format for Font Size */}
-              <View
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => fontSizeInputRef.current?.focus()}
                 style={[
                   styles.fontSizeInputContainer,
                   isEditingFontSize && styles.fontSizeInputContainerFocused,
@@ -466,10 +469,16 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                   placeholder="16"
                   placeholderTextColor={colors.textTertiary}
                 />
-                <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.pxUnitLabel}>
+                <Text
+                  variant="caption"
+                  weight="700"
+                  color={colors.textSecondary}
+                  style={styles.pxUnitLabel}
+                  pointerEvents="none"
+                >
                   px
                 </Text>
-              </View>
+              </TouchableOpacity>
             </View>
 
             {/* Smooth Left-to-Right Horizontal Scroller Track (1px to 24px) */}
@@ -621,7 +630,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           </View>
         </View>
 
-        {/* 3. SAVED CONTENT (ZERO ICONS) */}
+        {/* 3. SAVED CONTENT (ZERO ICONS, CONTINUOUS BODY) */}
         <View style={styles.bodySection}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             SAVED CONTENT
@@ -642,59 +651,24 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
             </View>
             <Text style={styles.rowDisclosureArrow}>›</Text>
           </TouchableOpacity>
-        </View>
 
-        {/* 3b. BOOKMARKS */}
-        <View style={styles.bodySection}>
-          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
-            BOOKMARKS
-          </Text>
-          <Text variant="caption" color={colors.textSecondary} style={styles.sectionSubHeader}>
-            {favoritesScriptures.length} verse{favoritesScriptures.length !== 1 ? 's' : ''} bookmarked
-          </Text>
+          <View style={styles.rowDivider} />
 
-          {favoritesScriptures.length === 0 ? (
-            <View style={styles.bookmarkEmptyState}>
-              <BookmarkSvg size={32} color={colors.textTertiary} />
-              <Text variant="caption" color={colors.textSecondary} style={styles.bookmarkEmptyText}>
-                No bookmarks yet. Select verses in the Bible reader and tap Bookmark.
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={() => navigation.navigate('Bookmarks')}
+            activeOpacity={0.75}
+          >
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Bookmarked Verses
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                {favoritesScriptures.length} {favoritesScriptures.length === 1 ? 'verse' : 'verses'} bookmarked
               </Text>
             </View>
-          ) : (
-            favoritesScriptures.map((s, idx) => (
-              <View
-                key={s.id}
-                style={[
-                  styles.bookmarkCard,
-                  idx < favoritesScriptures.length - 1 && styles.bookmarkCardDivider,
-                ]}
-              >
-                <View style={styles.bookmarkCardContent}>
-                  <Text variant="caption" weight="700" color={colors.accent} style={styles.bookmarkRef}>
-                    {s.reference}
-                  </Text>
-                  <Text
-                    variant="body"
-                    color={colors.textPrimary}
-                    numberOfLines={3}
-                    style={styles.bookmarkSnippet}
-                  >
-                    {s.text}
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  style={styles.bookmarkRemoveBtn}
-                  onPress={() => toggleFavoriteScripture(s)}
-                  activeOpacity={0.7}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                >
-                  <Text variant="caption" weight="700" color={colors.textTertiary}>
-                    ✕
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            ))
-          )}
+            <Text style={styles.rowDisclosureArrow}>›</Text>
+          </TouchableOpacity>
         </View>
 
         {/* 4. LEGAL & POLICIES (ZERO ICONS) */}
@@ -936,47 +910,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginBottom: 12,
     marginTop: -4,
-  },
-
-  // Bookmark section
-  bookmarkEmptyState: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 16,
-    opacity: 0.5,
-  },
-  bookmarkEmptyText: {
-    flex: 1,
-    lineHeight: 18,
-  },
-  bookmarkCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingVertical: 14,
-    gap: 12,
-  },
-  bookmarkCardDivider: {
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(15,23,42,0.06)',
-  },
-  bookmarkCardContent: {
-    flex: 1,
-    gap: 4,
-  },
-  bookmarkRef: {
-    fontSize: 11,
-    letterSpacing: 0.3,
-    marginBottom: 2,
-  },
-  bookmarkSnippet: {
-    fontSize: 13,
-    lineHeight: 20,
-    fontStyle: 'italic',
-  },
-  bookmarkRemoveBtn: {
-    paddingHorizontal: 6,
-    paddingVertical: 4,
   },
 
   // Settings Rows (Clean Minimalist Typography - Zero Icons)

@@ -126,7 +126,7 @@ const NAV_TILE_SIZE = Math.floor((SCREEN_WIDTH - 32 - (NAV_COLS - 1) * 10) / NAV
 
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-export default function WOTDScreen() {
+export default function WOTDScreen({ route, navigation }: any) {
   const [activeTab, setActiveTab] = useState<ActiveTab>('bible');
   const [activeLens, setActiveLens] = useState<LensKey>('original_intent');
 
@@ -173,13 +173,20 @@ export default function WOTDScreen() {
   // ── Translation picker ───────────────────────────────────────────
   const [isTranslationPickerOpen, setIsTranslationPickerOpen] = useState(false);
 
-  // ── Aa Settings Sheet ─────────────────────────────────────────────────────
+  // ── Aa Settings Sheet (Synchronized with UserContext userProfile) ───────────
   const [isAaOpen, setIsAaOpen] = useState(false);
-  const localFontSize = useRef(userProfile?.fontSize || 17);
-  const [fontSize, setFontSize] = useState<number>(localFontSize.current);
-  const [fontType, setFontType] = useState<'serif' | 'sans' | 'mono'>(
-    (userProfile?.fontType as 'serif' | 'sans' | 'mono') || 'serif'
-  );
+  const fontSize = userProfile?.fontSize ?? 17;
+  const fontType = (userProfile?.fontType as 'serif' | 'sans' | 'mono') || 'serif';
+
+  const handleDecreaseFontSize = useCallback(() => {
+    const newSize = Math.max(1, fontSize - 1);
+    updateProfile({ fontSize: newSize });
+  }, [fontSize, updateProfile]);
+
+  const handleIncreaseFontSize = useCallback(() => {
+    const newSize = Math.min(32, fontSize + 1);
+    updateProfile({ fontSize: newSize });
+  }, [fontSize, updateProfile]);
 
   // ── Action bar animation ─────────────────────────────────────────────────
   const actionBarAnim = useRef(new Animated.Value(0)).current;
@@ -194,12 +201,34 @@ export default function WOTDScreen() {
 
   const theme = THEMES[readerTheme];
 
+  // ── Deep-Linking Target Verse Ref ─────────────────────────────────────────
+  const targetVerseRef = useRef<number | null>(null);
+
+  // Handle external navigation from BookmarksScreen or Feed
+  useEffect(() => {
+    if (route?.params?.book) {
+      const { book, chapter, verse } = route.params;
+      const targetBook = BIBLE_BOOKS.find(
+        b => b.name.toLowerCase() === String(book).toLowerCase() ||
+             b.id.toLowerCase() === String(book).toLowerCase()
+      );
+      if (targetBook) {
+        setSelectedBook(targetBook);
+        const chap = typeof chapter === 'number' ? chapter : parseInt(String(chapter), 10) || 1;
+        setSelectedChapter(chap);
+        if (verse) {
+          const vNum = typeof verse === 'number' ? verse : parseInt(String(verse), 10);
+          if (!isNaN(vNum)) {
+            targetVerseRef.current = vNum;
+            setSelectedVerses([vNum]);
+          }
+        }
+        setActiveTab('bible');
+      }
+    }
+  }, [route?.params]);
+
   // ── Chapter Fetch ─────────────────────────────────────────────────────────
-  // Store setLastReadBible in a ref so loadCurrentChapter stays stable.
-  // Without this, every render gives setLastReadBible a new reference (it's
-  // not useCallback-wrapped in the context), which causes loadCurrentChapter
-  // to get a new reference too, which triggers the useEffect, which reloads
-  // the chapter — even when only selectedVerses changed.
   const setLastReadBibleRef = useRef(setLastReadBible);
   useEffect(() => {
     setLastReadBibleRef.current = setLastReadBible;
@@ -209,7 +238,12 @@ export default function WOTDScreen() {
     async (bookName: string, chapterNum: number, trans: BibleTranslation) => {
       setLoading(true);
       setErrorMsg(null);
-      setSelectedVerses([]);
+      if (targetVerseRef.current) {
+        setSelectedVerses([targetVerseRef.current]);
+        targetVerseRef.current = null;
+      } else {
+        setSelectedVerses([]);
+      }
       try {
         const data = await fetchChapter(bookName, chapterNum, trans);
         setChapterData(data);
@@ -770,14 +804,14 @@ export default function WOTDScreen() {
                 <View style={styles.aaFontSizeRow}>
                   <TouchableOpacity
                     style={[styles.aaFontBtn, { borderColor: colors.accent }]}
-                    onPress={() => setFontSize(s => Math.max(12, s - 1))}
+                    onPress={handleDecreaseFontSize}
                   >
                     <Text style={[styles.aaFontBtnText, { color: colors.accent }]}>A−</Text>
                   </TouchableOpacity>
                   <Text style={[styles.aaFontSizeVal, { color: theme.text }]}>{fontSize}px</Text>
                   <TouchableOpacity
                     style={[styles.aaFontBtn, { borderColor: colors.accent }]}
-                    onPress={() => setFontSize(s => Math.min(28, s + 1))}
+                    onPress={handleIncreaseFontSize}
                   >
                     <Text style={[styles.aaFontBtnText, { color: colors.accent }]}>A+</Text>
                   </TouchableOpacity>
@@ -789,7 +823,7 @@ export default function WOTDScreen() {
                     <TouchableOpacity
                       key={key}
                       style={[styles.aaTypePill, fontType === key && { backgroundColor: colors.accent }]}
-                      onPress={() => setFontType(key)}
+                      onPress={() => updateProfile({ fontType: key })}
                     >
                       <Text style={{ fontFamily: getFontFamily(key), color: fontType === key ? '#FFFFFF' : theme.textSecondary, fontSize: 14 }}>
                         {label}
