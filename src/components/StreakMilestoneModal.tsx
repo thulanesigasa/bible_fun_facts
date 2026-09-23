@@ -20,6 +20,7 @@ import {
   STREAK_MILESTONES,
   StreakMilestone,
   getMilestoneForStreak,
+  getTierForDays,
 } from '../data/streakMilestones';
 import {
   CloseSvg,
@@ -97,16 +98,31 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
   const handleStreakChange = (valStr: string) => {
     const digits = valStr.replace(/[^\d]/g, '');
     const num = parseInt(digits, 10);
-    const clamped = isNaN(num) ? 0 : Math.min(9999, num);
+    const clamped = isNaN(num) ? 1 : Math.max(1, Math.min(9999, num));
     onUpdateStreak?.(clamped);
     setSelectedMilestone(getMilestoneForStreak(clamped));
   };
 
   const handleStepStreak = (delta: number) => {
-    const next = Math.max(0, Math.min(9999, streak + delta));
+    const next = Math.max(1, Math.min(9999, streak + delta));
     onUpdateStreak?.(next);
     setSelectedMilestone(getMilestoneForStreak(next));
   };
+
+  // When inspecting active milestone, badge displays exact user streak count and tier color
+  const isViewingActiveStreak = selectedMilestone.days === currentEarnedMilestone.days;
+  const displayDays = isViewingActiveStreak ? streak : selectedMilestone.days;
+  const displayTier = isViewingActiveStreak ? getTierForDays(streak) : selectedMilestone.tier;
+
+  const activeGradient = isViewingActiveStreak
+    ? (displayTier === 'diamond'
+        ? 'rgba(56, 189, 248, 0.45)'
+        : displayTier === 'gold'
+        ? 'rgba(253, 210, 35, 0.45)'
+        : displayTier === 'silver'
+        ? 'rgba(148, 163, 184, 0.40)'
+        : 'rgba(217, 119, 6, 0.40)')
+    : selectedMilestone.bgGradientStart;
 
   return (
     <Modal
@@ -122,7 +138,7 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
           <Svg width="100%" height="100%">
             <Defs>
               <LinearGradient id="modalBgGrad" x1="0" y1="0" x2="0" y2="1">
-                <Stop offset="0" stopColor={selectedMilestone.bgGradientStart} stopOpacity="1" />
+                <Stop offset="0" stopColor={activeGradient} stopOpacity="1" />
                 <Stop offset="0.45" stopColor="#FFFFFF" stopOpacity="0.85" />
                 <Stop offset="0.8" stopColor="#FFFFFF" stopOpacity="1" />
                 <Stop offset="1" stopColor="#FFFFFF" stopOpacity="1" />
@@ -170,8 +186,8 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
               ]}
             >
               <StreakHexagonBadge
-                days={selectedMilestone.days}
-                tier={selectedMilestone.tier}
+                days={displayDays}
+                tier={displayTier}
                 size={220}
               />
             </Animated.View>

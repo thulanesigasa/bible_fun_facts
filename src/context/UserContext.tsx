@@ -100,7 +100,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     favoritesFacts: [],
     favoritesScriptures: [],
     completedWOTDs: [],
-    streak: 0,
+    streak: 1,
     factsViewedCount: 0,
     lastLoginDate: null,
     followedUserIds: [],
@@ -238,13 +238,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayStr = yesterday.toDateString();
 
-    let newStreak = currentStreak;
+    let newStreak = Math.max(1, currentStreak);
     if (lastLogin === yesterdayStr) {
       newStreak += 1;
     } else if (lastLogin === null) {
-      newStreak = 1;
+      newStreak = currentStreak > 0 ? currentStreak : 1;
     } else {
-      newStreak = 1; // Reset if missed a day
+      newStreak = 1; // Reset to Streak 1 if missed a day
     }
 
     setState(prev => ({ ...prev, streak: newStreak, lastLoginDate: today }));
@@ -625,7 +625,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const setStreak = (days: number) => {
-    const clamped = Math.max(0, Math.min(9999, Math.round(days)));
+    const clamped = Math.max(1, Math.min(9999, Math.round(days)));
     const today = new Date().toDateString();
     setState(prev => ({ ...prev, streak: clamped, lastLoginDate: today }));
   };

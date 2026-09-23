@@ -19,7 +19,13 @@ export interface StreakHexagonBadgeProps {
 }
 
 // 60-30-10 & metallic palettes for clean 3D hexagonal shields (strictly fire-free)
+// 4 Distinct Color Tiers:
+// 1. Day 1 to 6: Bronze (Warm Antique Copper)
+// 2. Day 7 to 30: Silver (Radiant Steel Platinum)
+// 3. Day 30 to Month 6: Gold (Biblical Amber Gold)
+// 4. Month 6 to 1 Year: Diamond (Radiant Sapphire Azure)
 const TIER_PALETTES = {
+  // 1. Day 1 to 6 (Color 1)
   bronze: {
     borderLight: '#F59E0B',
     borderMid: '#B45309',
@@ -33,6 +39,7 @@ const TIER_PALETTES = {
     textShadow: '#260B00',
     insignia: '#FDE68A',
   },
+  // 2. Day 7 to 30 (Color 2)
   silver: {
     borderLight: '#FFFFFF',
     borderMid: '#CBD5E1',
@@ -46,6 +53,7 @@ const TIER_PALETTES = {
     textShadow: '#020617',
     insignia: '#E2E8F0',
   },
+  // 3. Day 30 to Month 6 (Color 3)
   gold: {
     borderLight: '#FEF08A',
     borderMid: '#FACC15',
@@ -59,6 +67,7 @@ const TIER_PALETTES = {
     textShadow: '#1A0C00',
     insignia: '#FEF08A',
   },
+  // 4. Month 6 to 1 Year (Color 4)
   diamond: {
     borderLight: '#E0F2FE',
     borderMid: '#38BDF8',
@@ -72,18 +81,19 @@ const TIER_PALETTES = {
     textShadow: '#02101C',
     insignia: '#BAE6FD',
   },
+  // Compatible alias for Month 6 to 1 Year / Full Year
   celestial: {
-    borderLight: '#FEF9C3',
-    borderMid: '#F59E0B',
-    borderDark: '#B45309',
-    faceGradStart: '#FFFBEB',
-    faceGradEnd: '#D97706',
-    surfaceGradStart: '#78350F',
-    surfaceGradEnd: '#290E00',
-    accentGlaze: '#FEF08A',
-    textFront: '#FFFBEB',
-    textShadow: '#1A0700',
-    insignia: '#FEF08A',
+    borderLight: '#E0F2FE',
+    borderMid: '#38BDF8',
+    borderDark: '#0369A1',
+    faceGradStart: '#F0F9FF',
+    faceGradEnd: '#0284C7',
+    surfaceGradStart: '#075985',
+    surfaceGradEnd: '#031D30',
+    accentGlaze: '#BAE6FD',
+    textFront: '#FFFFFF',
+    textShadow: '#02101C',
+    insignia: '#BAE6FD',
   },
 };
 
@@ -107,9 +117,16 @@ export const StreakHexagonBadge: React.FC<StreakHexagonBadgeProps> = ({
 
   const gradId = `shield_${activeTier}_${days}_${Math.round(size)}`;
 
-  // Dynamic font sizing based on digits
-  const numberFontSize = days >= 1000 ? 44 : days >= 100 ? 54 : 66;
-  const numberY = days >= 1000 ? 134 : days >= 100 ? 135 : 138;
+  // Compact mode for small badges (size < 60) e.g. feed header and shelf
+  const isCompact = size < 60;
+
+  // Dynamic font sizing based on digits and layout mode
+  const numberFontSize = isCompact
+    ? (days >= 1000 ? 56 : days >= 100 ? 68 : 82)
+    : (days >= 1000 ? 44 : days >= 100 ? 54 : 66);
+  const numberY = isCompact
+    ? (days >= 1000 ? 150 : days >= 100 ? 154 : 158)
+    : (days >= 1000 ? 134 : days >= 100 ? 135 : 138);
 
   return (
     <View style={[styles.container, { width: size, height: (size * viewBoxHeight) / viewBoxWidth }, style]}>
@@ -162,24 +179,53 @@ export const StreakHexagonBadge: React.FC<StreakHexagonBadgeProps> = ({
         {/* 4. Diagonal Glossy Sheen Overlay */}
         <Polygon points={surfaceHex} fill={`url(#${gradId}_sheen)`} />
 
-        {/* 5. Sacred Cross / Theological Insignia at Top Peak (Zero Fire) */}
-        <G transform="translate(120, 62)">
-          {/* Subtle Cross Insignia */}
+        {/* 5. Sacred Top Crown Insignia */}
+        <G transform="translate(120, 52)">
           <Path
-            d="M0 -10 V10 M-7 -4 H7"
+            d="M0 -6 V6 M-5 -2 H5"
             stroke={palette.insignia}
-            strokeWidth="2.5"
+            strokeWidth="2"
             strokeLinecap="round"
-            opacity="0.85"
+            opacity="0.8"
           />
         </G>
 
-        {/* 6. Dynamic Extruded 3D Streak Number (Editable Daily) */}
+        {/* 6. Extruded 3D "STREAK" Label (Top Header on Full Badges) */}
+        {!isCompact && (
+          <G>
+            <SvgText
+              x="120"
+              y="82"
+              fill={palette.textShadow}
+              fontSize="14"
+              fontWeight="900"
+              letterSpacing="3"
+              textAnchor="middle"
+              fontFamily="System"
+            >
+              STREAK
+            </SvgText>
+            <SvgText
+              x="120"
+              y="80"
+              fill={`url(#${gradId}_text)`}
+              fontSize="14"
+              fontWeight="900"
+              letterSpacing="3"
+              textAnchor="middle"
+              fontFamily="System"
+            >
+              STREAK
+            </SvgText>
+          </G>
+        )}
+
+        {/* 7. Dynamic Extruded 3D Streak Number */}
         <G>
           {/* Deepest drop shadow */}
           <SvgText
             x="120"
-            y={numberY + 4}
+            y={isCompact ? numberY + 4 : numberY + 22}
             fill={palette.textShadow}
             fontSize={numberFontSize}
             fontWeight="900"
@@ -192,7 +238,7 @@ export const StreakHexagonBadge: React.FC<StreakHexagonBadgeProps> = ({
           {/* Mid bevel shadow */}
           <SvgText
             x="120"
-            y={numberY + 2}
+            y={isCompact ? numberY + 2 : numberY + 20}
             fill={palette.borderDark}
             fontSize={numberFontSize}
             fontWeight="900"
@@ -205,7 +251,7 @@ export const StreakHexagonBadge: React.FC<StreakHexagonBadgeProps> = ({
           {/* Front metallic face */}
           <SvgText
             x="120"
-            y={numberY}
+            y={isCompact ? numberY : numberY + 18}
             fill={`url(#${gradId}_text)`}
             fontSize={numberFontSize}
             fontWeight="900"
@@ -213,37 +259,6 @@ export const StreakHexagonBadge: React.FC<StreakHexagonBadgeProps> = ({
             fontFamily="System"
           >
             {days}
-          </SvgText>
-        </G>
-
-        {/* 7. Extruded 3D "STREAK" Label */}
-        <G>
-          {/* Shadow */}
-          <SvgText
-            x="120"
-            y="173"
-            fill={palette.textShadow}
-            fontSize="18"
-            fontWeight="900"
-            letterSpacing="3"
-            textAnchor="middle"
-            fontFamily="System"
-          >
-            STREAK
-          </SvgText>
-
-          {/* Front */}
-          <SvgText
-            x="120"
-            y="170"
-            fill={`url(#${gradId}_text)`}
-            fontSize="18"
-            fontWeight="900"
-            letterSpacing="3"
-            textAnchor="middle"
-            fontFamily="System"
-          >
-            STREAK
           </SvgText>
         </G>
 
