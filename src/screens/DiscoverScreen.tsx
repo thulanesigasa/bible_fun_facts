@@ -12,18 +12,17 @@ import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
 import { Card } from '../components/Card';
-import { facts as initialFacts, Fact } from '../data/mockDatabase';
 import { useUser } from '../context/UserContext';
 import { supabase } from '../services/supabase';
+import { getDailyMessage, getDayOfYear, DailyMessage } from '../data/dailyMessages';
 import {
-  DiscoverSvg,
   FlameSvg,
   FavoritesSvg,
   LandmarkSvg,
   StrongsIconSvg,
-  ChevronRightSvg,
   BookOpenSvg,
   ShareSvg,
+  ScrollSvg,
 } from '../components/SvgIcons';
 
 interface DiscoverScreenProps {
@@ -31,13 +30,10 @@ interface DiscoverScreenProps {
 }
 
 export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
-  const [factIndex, setFactIndex] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
-  const [liveFacts, setLiveFacts] = useState<Fact[]>(initialFacts);
 
   const {
     streak,
-    factsViewedCount,
     incrementFactsViewed,
     userProfile,
     toggleFavoriteFact,
@@ -45,56 +41,33 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
     lastReadBible,
   } = useUser();
 
-  const fetchLiveFacts = useCallback(async () => {
-    try {
-      const { data, error } = await supabase
-        .from('facts')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (data && !error && data.length > 0) {
-        setLiveFacts(data as Fact[]);
-      }
-    } catch (err) {
-      console.warn('Live facts fetch notice:', err);
-    }
-  }, []);
-
-  React.useEffect(() => {
-    fetchLiveFacts();
-  }, [fetchLiveFacts]);
-
-  // Curated list of historical and archaeological discoveries
-  const discoveryFacts = useMemo(() => {
-    return liveFacts.filter((f) => f.category === 'History' || f.category === 'Customs' || f.category === 'Prophecy');
-  }, [liveFacts]);
-
-  // Today's Exegetical Root Word (language category)
-  const languageFact: Fact = useMemo(() => {
-    const langList = liveFacts.filter((f) => f.category === 'Language');
-    return langList[factIndex % langList.length] || liveFacts[0] || initialFacts[0];
-  }, [liveFacts, factIndex]);
-
-  // Current Featured Discovery (cycle without scrolling)
-  const currentFact: Fact = discoveryFacts[factIndex % discoveryFacts.length] || liveFacts[0] || initialFacts[0];
+  const dayOfYear = useMemo(() => getDayOfYear(), []);
+  const todayMessage: DailyMessage = useMemo(() => getDailyMessage(), []);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await fetchLiveFacts();
-    setFactIndex((prev) => prev + 1);
+    try {
+      await supabase
+        .from('facts')
+        .select('*')
+        .limit(1);
+    } catch (err) {
+      console.warn('Sync notice:', err);
+    }
     incrementFactsViewed();
     setRefreshing(false);
-  }, [fetchLiveFacts, incrementFactsViewed]);
+  }, [incrementFactsViewed]);
 
-  const onShareCurrentFact = async (fact: Fact) => {
+  const onShareMessage = async (message: DailyMessage) => {
     try {
-      const message = `"${fact.fact_title}" (${fact.scripture_ref})\n\n"${fact.verse_text}"\n\nContext:\n${fact.historical_context}`;
-      await Share.share({ message });
+      const shareText = `"${message.fact_title}" (${message.scripture_ref})\n\n"${message.verse_text}"\n\nContext:\n${message.historical_context}\n\nShared from exégeomai • Day ${message.dayOfYear} of 365`;
+      await Share.share({ message: shareText });
     } catch (error) {
       console.error(error);
     }
   };
 
-  const isFavorited = isFactFavorited(currentFact.id);
+  const isFavorited = isFactFavorited(todayMessage.id);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
@@ -111,14 +84,14 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
           />
         }
       >
-        {/* Header Greeting & Compact Streak Pill */}
+        {/* Header Greeting & Day Progress + Compact Streak Pill */}
         <View style={styles.headerRow}>
           <View style={styles.headerTextWrap}>
             <Text variant="h2" style={styles.headerTitle}>
-              {userProfile?.name ? `Shalom, ${userProfile.name}` : 'Daily Discovery'}
+              {userProfile?.name ? `Shalom, ${userProfile.name}` : 'Daily Exegesis'}
             </Text>
             <Text variant="caption" color={colors.textSecondary} style={styles.headerSub}>
-              Essential biblical insights & archaeological context
+              Day {dayOfYear} of 365 • {todayMessage.calendarDate}
             </Text>
           </View>
 
@@ -156,111 +129,89 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
           </View>
         </TouchableOpacity>
 
-        {/* 2. Today's Original Root Word (Strong's Exegesis) */}
+        {/* 2. Today's Singular Daily Message (Locked to 1 per day) */}
         <TouchableOpacity
           activeOpacity={0.88}
-          onPress={() => navigation.navigate('FactDetails', { fact: languageFact })}
+          onPress={() => navigation.navigate('FactDetails', { fact: todayMessage })}
           accessibilityRole="button"
-          accessibilityLabel={`Original Root Word: ${languageFact.strongs_word}`}
+          accessibilityLabel={`Today's Message: ${todayMessage.fact_title}`}
         >
-          <Card style={styles.rootCard}>
+          <Card style={styles.dailyCard}>
+            {/* Header row with badge and calendar reference */}
             <View style={styles.cardSectionHeader}>
               <View style={styles.cardHeaderTitleRow}>
-                <StrongsIconSvg size={15} color={colors.accent} />
+                <ScrollSvg size={15} color={colors.accent} />
                 <Text variant="h3" color={colors.accent} style={styles.sectionHeaderTitle}>
-                  Original Language Root
+                  Today's Message
                 </Text>
               </View>
-              <Text variant="caption" color={colors.textTertiary}>
-                {languageFact.scripture_ref}
-              </Text>
-            </View>
-
-            <View style={styles.rootWordRow}>
-              <View style={styles.rootWordLeft}>
-                <Text variant="h2" color={colors.accent} style={styles.rootWord}>
-                  {languageFact.strongs_word}
-                </Text>
-                <Text variant="caption" color={colors.textSecondary}>
-                  Strong's {languageFact.strongs_number} • <Text variant="caption" weight="600" color={colors.textPrimary}>{languageFact.strongs_transliteration}</Text>
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.rootDefBox}>
-              <Text variant="body" color={colors.textPrimary} style={styles.rootDefText}>
-                "{languageFact.strongs_definition}"
-              </Text>
-            </View>
-
-            <Text variant="body" color={colors.textSecondary} style={styles.rootContextSnippet}>
-              {languageFact.historical_context}
-            </Text>
-
-            <View style={styles.cardActionsBar}>
-              <View style={styles.readMorePrompt}>
+              <View style={styles.dayBadge}>
                 <Text variant="caption" weight="700" color={colors.accent}>
-                  Read Root Word Exegesis ›
+                  Day {todayMessage.dayOfYear}
                 </Text>
-              </View>
-              <View style={styles.actionIconsRight}>
-                <TouchableOpacity
-                  style={styles.iconBtn}
-                  onPress={() => toggleFavoriteFact(languageFact)}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                >
-                  <FavoritesSvg
-                    size={18}
-                    color={colors.accent}
-                    fill={isFactFavorited(languageFact.id) ? colors.accent : 'none'}
-                  />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.iconBtn}
-                  onPress={() => onShareCurrentFact(languageFact)}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                >
-                  <ShareSvg size={18} color={colors.textSecondary} />
-                </TouchableOpacity>
               </View>
             </View>
-          </Card>
-        </TouchableOpacity>
 
-        {/* 3. Archaeological & Historical Discovery Card */}
-        <TouchableOpacity
-          activeOpacity={0.88}
-          onPress={() => navigation.navigate('FactDetails', { fact: currentFact })}
-          accessibilityRole="button"
-          accessibilityLabel={`Discovery: ${currentFact.fact_title}`}
-        >
-          <Card style={styles.discoveryCard}>
-            <View style={styles.cardSectionHeader}>
-              <View style={styles.cardHeaderTitleRow}>
-                <LandmarkSvg size={15} color={colors.accent} />
-                <Text variant="h3" color={colors.accent} style={styles.sectionHeaderTitle}>
-                  Archaeology & Customs
-                </Text>
-              </View>
+            {/* Scripture Reference & Title */}
+            <View style={styles.metaRow}>
+              <Text variant="caption" weight="700" color={colors.accent} style={{ letterSpacing: 0.5 }}>
+                {todayMessage.category.toUpperCase()}
+              </Text>
               <Text variant="caption" color={colors.textTertiary}>
-                {currentFact.scripture_ref}
+                • {todayMessage.scripture_ref}
               </Text>
             </View>
 
-            <Text variant="h3" style={styles.discoveryTitle}>
-              {currentFact.fact_title}
+            <Text variant="h2" style={styles.messageTitle}>
+              {todayMessage.fact_title}
             </Text>
 
-            <View style={styles.discoveryVerseBox}>
-              <Text variant="body" style={styles.discoveryVerseText}>
-                "{currentFact.verse_text}"
+            {/* Scripture Quote Box */}
+            <View style={styles.verseBox}>
+              <Text variant="body" style={styles.verseText}>
+                "{todayMessage.verse_text}"
+              </Text>
+              <Text variant="caption" weight="600" color={colors.textSecondary} style={styles.verseRef}>
+                — {todayMessage.scripture_ref}
               </Text>
             </View>
 
-            <Text variant="body" color={colors.textSecondary} style={styles.discoveryContext}>
-              {currentFact.historical_context}
+            {/* Historical Context Narrative */}
+            <Text variant="body" color={colors.textSecondary} style={styles.contextText}>
+              {todayMessage.historical_context}
             </Text>
+
+            {/* Root Word Pill if available */}
+            {todayMessage.strongs_word && (
+              <View style={styles.rootWordPill}>
+                <View style={styles.rootIconWrap}>
+                  <StrongsIconSvg size={14} color={colors.accent} />
+                </View>
+                <View style={styles.rootTextWrap}>
+                  <Text variant="caption" color={colors.textPrimary} weight="700">
+                    {todayMessage.strongs_word} ({todayMessage.strongs_transliteration})
+                  </Text>
+                  <Text variant="caption" color={colors.textSecondary}>
+                    Strong's {todayMessage.strongs_number}: "{todayMessage.strongs_definition}"
+                  </Text>
+                </View>
+              </View>
+            )}
+
+            {/* Cultural Practice Context if available */}
+            {todayMessage.cultural_practice && (
+              <View style={styles.culturalBox}>
+                <View style={styles.culturalHeader}>
+                  <LandmarkSvg size={13} color={colors.accent} />
+                  <Text variant="caption" weight="700" color={colors.accent}>
+                    Biblical Custom
+                  </Text>
+                </View>
+                <Text variant="caption" color={colors.textSecondary} style={styles.culturalText}>
+                  {todayMessage.cultural_practice}
+                </Text>
+              </View>
+            )}
 
             {/* Interactive Card Action Bar: Read Whole Message + Save + Share */}
             <View style={styles.cardActionsBar}>
@@ -273,7 +224,7 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
               <View style={styles.actionIconsRight}>
                 <TouchableOpacity
                   style={styles.iconBtn}
-                  onPress={() => toggleFavoriteFact(currentFact)}
+                  onPress={() => toggleFavoriteFact(todayMessage)}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
                   <FavoritesSvg
@@ -285,7 +236,7 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
 
                 <TouchableOpacity
                   style={styles.iconBtn}
-                  onPress={() => onShareCurrentFact(currentFact)}
+                  onPress={() => onShareMessage(todayMessage)}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
                   <ShareSvg size={18} color={colors.textSecondary} />
@@ -372,10 +323,6 @@ const styles = StyleSheet.create({
   continueTextWrap: {
     flex: 1,
   },
-  continueTag: {
-    letterSpacing: 0.8,
-    fontSize: 10,
-  },
   continueTitle: {
     fontSize: 15,
     marginTop: 1,
@@ -387,11 +334,11 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
   },
 
-  // Root Word Card
-  rootCard: {
+  // Daily Message Card
+  dailyCard: {
     backgroundColor: '#FFFFFF',
     padding: spacing.md,
-    marginBottom: spacing.md,
+    borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.06)',
   },
@@ -410,73 +357,92 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
   },
-  rootWordRow: {
+  dayBadge: {
+    backgroundColor: colors.accentSoft,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(253, 210, 35, 0.25)',
+  },
+  metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginVertical: 4,
+    gap: 6,
+    marginBottom: 4,
   },
-  rootWordLeft: {
-    gap: 1,
-  },
-  rootWord: {
+  messageTitle: {
     fontSize: 20,
     fontWeight: '800',
+    color: colors.textPrimary,
+    marginBottom: 10,
   },
-  rootDefBox: {
-    backgroundColor: 'rgba(15, 23, 42, 0.02)',
+  verseBox: {
+    backgroundColor: colors.accentSoft,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     borderRadius: radius.sm,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    marginVertical: 6,
-    borderLeftWidth: 2,
+    marginBottom: 10,
+    borderLeftWidth: 3,
     borderLeftColor: colors.accent,
   },
-  rootDefText: {
-    fontSize: 13,
+  verseText: {
     fontStyle: 'italic',
-  },
-  rootContextSnippet: {
     fontSize: 13,
-    lineHeight: 18,
-    marginTop: 4,
-  },
-
-  // Discovery Card
-  discoveryCard: {
-    backgroundColor: '#FFFFFF',
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
-  },
-  discoveryTitle: {
-    fontSize: 16,
+    lineHeight: 19,
     color: colors.textPrimary,
-    marginTop: 4,
-    marginBottom: 6,
   },
-  discoveryVerseBox: {
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+  verseRef: {
+    marginTop: 4,
+    textAlign: 'right',
+  },
+  contextText: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: colors.textSecondary,
+    marginBottom: 12,
+  },
+  rootWordPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: 'rgba(15, 23, 42, 0.03)',
     borderRadius: radius.sm,
-    marginBottom: 8,
+    padding: 10,
+    marginBottom: 10,
   },
-  discoveryVerseText: {
-    fontStyle: 'italic',
+  rootIconWrap: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.accentSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rootTextWrap: {
+    flex: 1,
+  },
+  culturalBox: {
+    backgroundColor: 'rgba(253, 210, 35, 0.08)',
+    borderRadius: radius.sm,
+    padding: 10,
+    marginBottom: 12,
+  },
+  culturalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
+  culturalText: {
     fontSize: 12,
-    color: colors.textPrimary,
-  },
-  discoveryContext: {
-    fontSize: 13,
-    lineHeight: 18,
-    marginBottom: spacing.md,
+    lineHeight: 17,
   },
   cardActionsBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 8,
+    paddingTop: 10,
     borderTopWidth: 1,
     borderTopColor: 'rgba(15, 23, 42, 0.05)',
   },

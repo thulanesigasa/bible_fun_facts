@@ -42,6 +42,28 @@ export const ScripturesSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59
   </Svg>
 );
 
+export const HistorySvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M12 8V12L15 15" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M3.05 11A9 9 0 1 1 4.5 16.5" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+    <Path d="M3 6V11H8" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const FeatherPenSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path
+      d="M20.24 12.24A6 6 0 0 0 16 3.76L4 15.76V20H8.24L20.24 8C20.7 7.54 21 6.91 21 6.24C21 5.57 20.7 4.94 20.24 4.48L19.52 3.76"
+      stroke={color}
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path d="M16 8L2 22" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+    <Path d="M17.5 15H9" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+  </Svg>
+);
+
 export const SearchSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', strokeWidth = 2, style }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
     <Circle cx="11" cy="11" r="7" stroke={color} strokeWidth={strokeWidth} />

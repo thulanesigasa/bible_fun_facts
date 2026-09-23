@@ -5,10 +5,9 @@
   <img src="https://img.shields.io/badge/React%20Native-0.86-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React Native 0.86" />
   <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript 5.9" />
   <img src="https://img.shields.io/badge/Holy%20Bible-66--Book%20Canon%20Reader-FDD223?style=for-the-badge" alt="Full Holy Bible Reader" />
-  <img src="https://img.shields.io/badge/Bible%20API-Multi--Tier%20Offline%20Cache-0284C7?style=for-the-badge" alt="Bible API Offline Cache" />
+  <img src="https://img.shields.io/badge/Daily%20Feed-365%20Calendar%20Exegesis-FDD223?style=for-the-badge" alt="365 Daily Exegesis" />
+  <img src="https://img.shields.io/badge/History%20Tab-Biblical%20Authors%20&%20Manuscripts-0284C7?style=for-the-badge" alt="Biblical Authors History" />
   <img src="https://img.shields.io/badge/Community-Believer%20&%20Scholar%20Hub-10B981?style=for-the-badge" alt="Believer & Scholar Hub" />
-  <img src="https://img.shields.io/badge/Verses%20Hub-Compact%20Lexical%20Cards-6366F1?style=for-the-badge" alt="Compact Verses Hub" />
-  <img src="https://img.shields.io/badge/Feed%20Stream-Rich%20Multi--Card%20Exegesis-F59E0B?style=for-the-badge" alt="Multi-Card Feed Stream" />
   <img src="https://img.shields.io/badge/Supabase-Auth%20&%20Backend-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase Backend" />
   <img src="https://img.shields.io/badge/CI%2FCD-Rule%2021%20Compliant-10B981?style=for-the-badge&logo=githubactions&logoColor=white" alt="Rule 21 Compliant" />
   <img src="https://img.shields.io/badge/EAS%20Channels-Production%20%7C%20Preview-000000?style=for-the-badge&logo=expo&logoColor=white" alt="EAS Channels" />
@@ -39,23 +38,23 @@ graph TD
     Auth --> Privacy["PrivacyPolicyScreen (11 Data Protection Sections)"]
     Nav --> Tabs["Rule 20 Floating Pill Tab Bar (280px)"]
     
-    Tabs --> DiscoverStack["Feed Tab (Multi-Card Exegetical Stream)"]
+    Tabs --> DiscoverStack["Feed Tab (365 Daily Calendar Exegesis)"]
     Tabs --> WOTDScreen["Word Tab (Full Holy Bible Reader + Daily Exegesis)"]
-    Tabs --> ScripturesStack["Verses Tab (Compact Scripture Library + Categories)"]
+    Tabs --> HistoryStack["History Tab (Biblical Authors & Manuscript History)"]
     Tabs --> SearchStack["Search Tab (Believers & Scholars Community Hub)"]
-    Tabs --> ProfileStack["Profile Tab (Settings, Reader Font Size 1-24px, Stats)"]
+    Tabs --> ProfileStack["Profile Tab (Settings, Red-Letter Toggle, Bookmarks, Stats)"]
     
-    DiscoverStack --> DiscoverMain["DiscoverScreen (Hero Spotlight + Continue Reading + Archaeology)"]
-    DiscoverStack --> FactDetails["FactDetailsScreen (PageSheet)"]
+    DiscoverStack --> DiscoverMain["DiscoverScreen (1 Deterministic Message/Day + Day X of 365)"]
+    DiscoverStack --> FactDetails["FactDetailsScreen (PageSheet Full Exegesis)"]
     
-    WOTDScreen --> BibleReader["Full 66-Book Holy Bible (WEB / KJV)"]
+    WOTDScreen --> BibleReader["Full 66-Book Holy Bible (WEB / KJV / BBE)"]
     WOTDScreen --> ExegesisLenses["4-Lens Daily Devotional (Original Intent, Theological Truth, Walk, Prayer)"]
     
-    ScripturesStack --> ScripturesMain["ScripturesScreen (People, Prophecy, Customs, History, Language)"]
-    ScripturesStack --> ScriptureDetails["ScriptureDetailsScreen (PageSheet)"]
+    HistoryStack --> HistoryMain["HistoryScreen (Authors Catalog, Search, Categories)"]
+    HistoryStack --> WriterDetails["WriterDetailsScreen (PageSheet Biography & Manuscripts)"]
     
     SearchStack --> SearchMain["SearchScreen (User Discovery, Follow/Unfollow, Scholar Modal)"]
-    ProfileStack --> ProfileMain["ProfileScreen (Preferences, Reader Typography, Followers)"]
+    ProfileStack --> ProfileMain["ProfileScreen (Preferences, Reader Typography, Bookmarks Section)"]
     ProfileStack --> FavoritesMain["FavoritesScreen (Saved Collection)"]
     ProfileStack --> Terms
     ProfileStack --> Privacy
@@ -135,12 +134,12 @@ The bottom navigation bar adheres strictly to the floating pill / curved rectang
 - **Dynamic Context State**: Reads `hideTabBar` and `accent` from `useApp()` hook
 - **Custom Label with Focused Indicator Dot**: Centered column with `fontSize: 8.5`, `fontWeight: focused ? '700' : '500'`, `color: focused ? accent : '#64748B'`, and when `focused`, a `4x4` rounded dot (`width: 4, height: 4, borderRadius: 2, backgroundColor: accent, marginTop: 2`)
 - **Iconography**: Pure vector `16px` SVGs (`react-native-svg`) adhering strictly to Rule 2 and Rule 4 (zero emojis, zero built-in icon fonts):
-  - Feed / Discover: `DiscoverSvg`
-  - Word of the Day: `WotdSvg`
-  - Scriptures Library: `ScripturesSvg`
-  - Search & Explore: `SearchSvg`
-  - Profile & Settings: `ProfileSvg` (replaces Saved; Saved Collection is nested within Profile)
-- **Header Standard**: Flat clean white header (`backgroundColor: '#FFFFFF', shadowColor: 'transparent', elevation: 0, borderBottomWidth: 1, borderBottomColor: 'rgba(15, 23, 42, 0.08)'`), `fontFamily: 'SpaceMono', fontSize: 18`. Across all 5 tabs (Feed, Word, Verses, Search, Profile), the header persistently displays the `24x24` transparent brand logo and `exégeomai` brand title without changing text between tabs.
+  - Feed / Discover: `DiscoverSvg` (1 singular deterministic message/day, Day X of 365, tap card for full exegesis)
+  - Word of the Day: `WotdSvg` (Full 66-book reader, red-letter Jesus words toggle, 4-lens devotions)
+  - Sacred History: `HistorySvg` (biographies, callings, books, and manuscript scholarship of biblical authors)
+  - Search & Explore: `SearchSvg` (believer community & scholar hub)
+  - Profile & Settings: `ProfileSvg` (replaces Saved; Saved Collection & Bookmarks nested within Profile)
+- **Header Standard**: Flat clean white header (`backgroundColor: '#FFFFFF', shadowColor: 'transparent', elevation: 0, borderBottomWidth: 1, borderBottomColor: 'rgba(15, 23, 42, 0.08)'`), `fontFamily: 'SpaceMono', fontSize: 18`. Across all 5 tabs (Feed, Word, History, Search, Profile), the header persistently displays the `24x24` transparent brand logo and `exégeomai` brand title without changing text between tabs.
 
 ### 3. App Icon, Launcher & In-App Logo Calibration (Rule 15 & Rule 19)
 - **Android Adaptive Launcher Icon**: `assets/android-icon-foreground.png` is centered on a `512x512` canvas with a target icon height of `96px` (bounding box ~`74x96px`), providing ~`72%` clean white breathing room so Samsung One UI squircle masks and standard Android launcher cutouts never crop or zoom into the icon. Background is solid `#FFFFFF`.
@@ -200,6 +199,8 @@ exegeomai/
 │   │   └── UserContext.tsx               # State management with useApp, useUser & Supabase Auth hooks
 │   ├── data/
 │   │   ├── bibleCanon.ts                 # Complete 66-book canon metadata and prebundled offline chapters
+│   │   ├── biblicalWriters.ts            # Biblical authors dataset (biographies, Hebrew/Greek names, manuscripts)
+│   │   ├── dailyMessages.ts              # 365 calendar-synchronized daily exegesis dataset
 │   │   ├── mockDatabase.ts               # Curated scriptures, facts, and Strong's database
 │   │   ├── mockUsers.ts                  # 8 theological scholars, pastors, and exegetes with follower tracking
 │   │   └── redLetterVerses.ts            # Canonical dataset of Jesus Christ's spoken words across NT books
@@ -207,17 +208,21 @@ exegeomai/
 │   │   └── AppNavigator.tsx              # Rule 20 floating pill tab navigation & stack navigators
 │   ├── screens/                          # Application views
 │   │   ├── AuthScreen.tsx                # Dedicated Login & Sign Up with 28x28 calibrated logo
-│   │   ├── DiscoverScreen.tsx            # Daily fact discovery view (paddingBottom: 96)
+│   │   ├── DiscoverScreen.tsx            # Daily 1-message calendar exegesis view (paddingBottom: 96)
 │   │   ├── FactDetailsScreen.tsx         # In-depth modal sheet for biblical facts
 │   │   ├── FavoritesScreen.tsx           # Saved collection (Facts, Scriptures, WOTD)
+│   │   ├── HistoryScreen.tsx             # Sacred History catalog of biblical authors with search & categories
 │   │   ├── HomeScreen.tsx                # Alternate home showcase
-│   │   ├── ProfileScreen.tsx             # Profile tab (Clean body surface, Social stats, Font size/type, Uiverse switch, Swipe to Sign Out)
+│   │   ├── PrivacyPolicyScreen.tsx       # 11-section privacy policy modal screen
+│   │   ├── ProfileScreen.tsx             # Profile tab (Bookmarks, Red-letter toggle, Reader font size)
 │   │   ├── ScriptureDetailsScreen.tsx    # In-depth modal sheet for scripture texts
-│   │   ├── ScripturesScreen.tsx          # Categorized scripture library
-│   │   ├── SearchScreen.tsx              # Unified search interface
+│   │   ├── ScripturesScreen.tsx          # Scripture library
+│   │   ├── SearchScreen.tsx              # Unified search and community scholar interface
+│   │   ├── TermsOfServiceScreen.tsx      # 13-section terms of service modal screen
 │   │   ├── WelcomeScreen.tsx             # 3-step onboarding flow with custom vector art & dual CTAs
 │   │   ├── WOTDDetailsScreen.tsx         # Deep-dive view for Word of the Day
-│   │   └── WOTDScreen.tsx                # Daily devotional with 4 analytical lenses
+│   │   ├── WOTDScreen.tsx                # Daily devotional with 4 analytical lenses & full Bible reader
+│   │   └── WriterDetailsScreen.tsx       # In-depth modal sheet for biblical author biography & manuscripts
 │   ├── services/
 │   │   ├── notifications.ts              # Expo notifications handler and scheduler
 │   │   ├── supabase.ts                   # Supabase client SDK with AsyncStorage persistence
@@ -225,7 +230,8 @@ exegeomai/
 │   └── theme/
 │       ├── colors.ts                     # Strict 60-30-10 light theme tokens
 │       └── index.ts                      # Spacing (8px grid), pillTabBar specs, and soft shadows
-├── scripts/                              # Database seeding and development automation
+├── scripts/                              # Development and dataset compilation scripts
+│   ├── generate_365_messages.js          # 365 daily exegesis messages compiler
 │   └── seed_database.ts                  # Canonical content extraction and SQL seeder generator
 ├── supabase/                             # Supabase CLI project configuration
 │   ├── config.toml                       # Supabase local and remote configuration
