@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { Text } from './Typography';
 import { StreakHexagonBadge } from './StreakHexagonBadge';
+import { CategoryBadge } from './CategoryBadge';
 import {
   STREAK_MILESTONES,
   StreakMilestone,
@@ -292,8 +293,10 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
               collapsable={false}
             >
               <View style={styles.shareCardInner} collapsable={false}>
-                {/* 3D Hexagon Badge */}
-                <StreakHexagonBadge
+                {/* 3D Multi-Shape Category Badge */}
+                <CategoryBadge
+                  category={activeAchievement?.category || 'streak'}
+                  shape={activeAchievement?.shape || 'hexagon'}
                   days={displayDays}
                   tier={displayTier}
                   size={220}
@@ -422,7 +425,9 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
                         activeOpacity={0.8}
                       >
                         <View style={styles.shelfBadgeMini}>
-                          <StreakHexagonBadge
+                          <CategoryBadge
+                            category={activeAchievement.category}
+                            shape={m.shape}
                             days={m.target}
                             tier={m.tier}
                             size={42}

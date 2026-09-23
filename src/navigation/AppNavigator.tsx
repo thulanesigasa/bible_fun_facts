@@ -25,6 +25,7 @@ import SearchScreen from '../screens/SearchScreen';
 import FavoritesScreen from '../screens/FavoritesScreen';
 import BookmarksScreen from '../screens/BookmarksScreen';
 import UnfoldedScreen from '../screens/UnfoldedScreen';
+import AchievementsScreen from '../screens/AchievementsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import FactDetailsScreen from '../screens/FactDetailsScreen';
 import ScriptureDetailsScreen from '../screens/ScriptureDetailsScreen';
@@ -59,6 +60,7 @@ export type RootStackParamList = {
   Favorites: undefined;
   Bookmarks: undefined;
   Unfolded: undefined;
+  Achievements: undefined;
   TermsOfService: undefined;
   PrivacyPolicy: undefined;
 };
@@ -74,6 +76,7 @@ function shouldShowTabHeader(route: any): boolean {
     'Favorites',
     'Bookmarks',
     'Unfolded',
+    'Achievements',
     'TermsOfService',
     'PrivacyPolicy',
     'FactDetails',
@@ -190,6 +193,24 @@ function ProfileStack() {
         options={{
           headerShown: true,
           title: 'Unfolded',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+        }}
+      />
+      <Stack.Screen
+        name="Achievements"
+        component={AchievementsScreen}
+        options={{
+          headerShown: true,
+          title: 'Study Achievements',
           headerStyle: {
             backgroundColor: '#FFFFFF',
           },
