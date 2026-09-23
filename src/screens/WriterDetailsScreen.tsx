@@ -7,9 +7,8 @@ import {
   Share,
 } from 'react-native';
 import { colors } from '../theme/colors';
-import { spacing, radius, shadow } from '../theme';
+import { spacing, radius } from '../theme';
 import { Text } from '../components/Typography';
-import { Card } from '../components/Card';
 import { BiblicalWriter } from '../data/biblicalWriters';
 import {
   ScrollSvg,
@@ -66,7 +65,7 @@ export default function WriterDetailsScreen({ navigation, route }: WriterDetails
             accessibilityRole="button"
             accessibilityLabel="Share writer biography"
           >
-            <ShareSvg size={20} color={colors.textPrimary} />
+            <ShareSvg size={18} color={colors.textPrimary} />
           </TouchableOpacity>
         </View>
 
@@ -103,25 +102,29 @@ export default function WriterDetailsScreen({ navigation, route }: WriterDetails
           </Text>
         </View>
 
-        {/* Calling & Role Card */}
-        <Card style={styles.roleCard}>
-          <View style={styles.roleHeaderRow}>
-            <FeatherPenSvg size={16} color={colors.accent} />
-            <Text variant="h3" color={colors.accent} style={styles.sectionTitle}>
-              Sacred Role & Calling
+        <View style={styles.hairlineDivider} />
+
+        {/* 1. Calling & Role Section (Continuous Body) */}
+        <View style={styles.bodySection}>
+          <View style={styles.sectionHeaderRow}>
+            <FeatherPenSvg size={15} color={colors.accent} />
+            <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionTitle}>
+              SACRED ROLE & CALLING
             </Text>
           </View>
           <Text variant="body" weight="600" color={colors.textPrimary} style={styles.roleText}>
             {writer.role}
           </Text>
-        </Card>
+        </View>
 
-        {/* Canonical Books Penned */}
-        <View style={styles.sectionWrap}>
+        <View style={styles.hairlineDivider} />
+
+        {/* 2. Canonical Books Penned */}
+        <View style={styles.bodySection}>
           <View style={styles.sectionHeaderRow}>
-            <BookOpenSvg size={16} color={colors.accent} />
-            <Text variant="h3" style={styles.sectionTitle}>
-              Canonical Books Penned ({writer.booksWritten.length})
+            <BookOpenSvg size={15} color={colors.accent} />
+            <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionTitle}>
+              CANONICAL BOOKS PENNED ({writer.booksWritten.length})
             </Text>
           </View>
           <View style={styles.booksWrap}>
@@ -138,49 +141,59 @@ export default function WriterDetailsScreen({ navigation, route }: WriterDetails
           </Text>
         </View>
 
-        {/* Key Scripture Quote Card */}
-        <Card style={styles.quoteCard}>
-          <Text variant="caption" weight="700" color={colors.accent} style={styles.quoteCardBadge}>
+        <View style={styles.hairlineDivider} />
+
+        {/* 3. Key Scripture Quote (Sacred Quote Block) */}
+        <View style={styles.bodySection}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.quoteCardBadge}>
             KEY SCRIPTURE
           </Text>
-          <Text variant="body" style={styles.quoteText}>
-            "{writer.keyVerse.text}"
-          </Text>
-          <Text variant="label" align="right" color={colors.textSecondary} style={styles.quoteRef}>
-            — {writer.keyVerse.reference}
-          </Text>
-        </Card>
+          <View style={styles.quoteBox}>
+            <Text variant="body" style={styles.quoteText}>
+              "{writer.keyVerse.text}"
+            </Text>
+            <Text variant="label" align="right" color={colors.textSecondary} style={styles.quoteRef}>
+              — {writer.keyVerse.reference}
+            </Text>
+          </View>
+        </View>
 
-        {/* Biography & Historical Context */}
-        <Card style={styles.narrativeCard}>
+        <View style={styles.hairlineDivider} />
+
+        {/* 4. Biography & Historical Context */}
+        <View style={styles.bodySection}>
           <View style={styles.sectionHeaderRow}>
-            <ScrollSvg size={16} color={colors.accent} />
-            <Text variant="h3" style={styles.sectionTitle}>
-              Biographical History
+            <ScrollSvg size={15} color={colors.accent} />
+            <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionTitle}>
+              BIOGRAPHICAL HISTORY
             </Text>
           </View>
           <Text variant="body" color={colors.textPrimary} style={styles.bodyParagraph}>
             {writer.biography}
           </Text>
-        </Card>
+        </View>
 
-        {/* Historical Setting */}
-        <Card style={styles.narrativeCard}>
+        <View style={styles.hairlineDivider} />
+
+        {/* 5. Historical Setting */}
+        <View style={styles.bodySection}>
           <View style={styles.sectionHeaderRow}>
-            <LandmarkSvg size={16} color={colors.accent} />
-            <Text variant="h3" style={styles.sectionTitle}>
-              Historical & Geo-Political Setting
+            <LandmarkSvg size={15} color={colors.accent} />
+            <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionTitle}>
+              HISTORICAL & GEO-POLITICAL SETTING
             </Text>
           </View>
           <Text variant="body" color={colors.textSecondary} style={styles.bodyParagraph}>
             {writer.historicalSetting}
           </Text>
-        </Card>
+        </View>
 
-        {/* Major Theological Themes */}
-        <Card style={styles.narrativeCard}>
-          <Text variant="h3" style={[styles.sectionTitle, { marginBottom: spacing.sm }]}>
-            Core Theological Themes
+        <View style={styles.hairlineDivider} />
+
+        {/* 6. Major Theological Themes */}
+        <View style={styles.bodySection}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={[styles.sectionTitle, { marginBottom: spacing.sm }]}>
+            CORE THEOLOGICAL THEMES
           </Text>
           {writer.theologicalThemes.map((theme, index) => (
             <View key={index} style={styles.themeRow}>
@@ -190,27 +203,31 @@ export default function WriterDetailsScreen({ navigation, route }: WriterDetails
               </Text>
             </View>
           ))}
-        </Card>
+        </View>
 
-        {/* Manuscript Scholarship */}
-        <Card style={styles.scholarCard}>
-          <Text variant="caption" weight="700" color={colors.accent} style={styles.scholarBadge}>
+        <View style={styles.hairlineDivider} />
+
+        {/* 7. Manuscript Scholarship */}
+        <View style={styles.bodySection}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.scholarBadge}>
             MANUSCRIPT EVIDENCE
           </Text>
           <Text variant="body" color={colors.textSecondary} style={styles.scholarText}>
             {writer.manuscriptEvidence}
           </Text>
-        </Card>
+        </View>
 
-        {/* Archaeological Corroboration */}
-        <Card style={styles.scholarCard}>
-          <Text variant="caption" weight="700" color={colors.accent} style={styles.scholarBadge}>
+        <View style={styles.hairlineDivider} />
+
+        {/* 8. Archaeological Corroboration */}
+        <View style={styles.bodySection}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.scholarBadge}>
             ARCHAEOLOGICAL DISCOVERIES
           </Text>
           <Text variant="body" color={colors.textSecondary} style={styles.scholarText}>
             {writer.archaeologicalFinds}
           </Text>
-        </Card>
+        </View>
       </ScrollView>
     </View>
   );
@@ -219,7 +236,7 @@ export default function WriterDetailsScreen({ navigation, route }: WriterDetails
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: '#FFFFFF',
   },
   dragHandle: {
     width: 36,
@@ -232,17 +249,19 @@ const styles = StyleSheet.create({
   },
   scroll: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   content: {
     paddingHorizontal: spacing.lg,
     paddingBottom: 48,
+    backgroundColor: '#FFFFFF',
   },
   topHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: spacing.sm,
-    marginBottom: spacing.sm,
+    marginBottom: 4,
   },
   doneBtn: {
     backgroundColor: colors.accent,
@@ -259,14 +278,14 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F8FAFC',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.08)',
   },
   identityHeader: {
-    marginBottom: spacing.md,
+    paddingVertical: 4,
   },
   categoryPillRow: {
     flexDirection: 'row',
@@ -312,30 +331,16 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 
-  // Role Card
-  roleCard: {
-    backgroundColor: '#FFFFFF',
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.accent,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
-  },
-  roleHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 6,
-  },
-  roleText: {
-    fontSize: 15,
-    lineHeight: 22,
+  // Subtle Hairline Divider (like Settings / ProfileScreen)
+  hairlineDivider: {
+    height: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.06)',
+    marginVertical: spacing.md,
   },
 
-  // Books Penned
-  sectionWrap: {
-    marginBottom: spacing.md,
+  // Continuous Body Section
+  bodySection: {
+    paddingVertical: 2,
   },
   sectionHeaderRow: {
     flexDirection: 'row',
@@ -344,17 +349,23 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   sectionTitle: {
+    letterSpacing: 0.5,
+  },
+  roleText: {
     fontSize: 15,
-    fontWeight: '700',
+    lineHeight: 22,
     color: colors.textPrimary,
   },
+
+  // Books Penned
   booksWrap: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
+    marginTop: 4,
   },
   bookPill: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F8FAFC',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: radius.sm,
@@ -362,23 +373,23 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(15, 23, 42, 0.08)',
   },
   totalChaptersNote: {
-    marginTop: 6,
+    marginTop: 8,
     fontSize: 12,
   },
 
-  // Key Scripture Card
-  quoteCard: {
-    backgroundColor: colors.accentSoft,
-    padding: spacing.md,
-    borderRadius: radius.md,
-    marginBottom: spacing.md,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.accent,
-  },
+  // Key Scripture Quote Box
   quoteCardBadge: {
     letterSpacing: 0.8,
     fontSize: 10,
-    marginBottom: 6,
+    marginBottom: 8,
+  },
+  quoteBox: {
+    backgroundColor: 'rgba(253, 210, 35, 0.08)',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: radius.sm,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.accent,
   },
   quoteText: {
     fontStyle: 'italic',
@@ -391,19 +402,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  // Narrative Cards
-  narrativeCard: {
-    backgroundColor: '#FFFFFF',
-    padding: spacing.md,
-    borderRadius: radius.md,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
-  },
+  // Narrative Body Paragraphs
   bodyParagraph: {
     fontSize: 14,
     lineHeight: 22,
-    marginTop: 6,
+    marginTop: 4,
   },
   themeRow: {
     flexDirection: 'row',
@@ -424,15 +427,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
-  // Scholar Cards
-  scholarCard: {
-    backgroundColor: '#FFFFFF',
-    padding: spacing.md,
-    borderRadius: radius.md,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
-  },
+  // Scholar Badges
   scholarBadge: {
     letterSpacing: 0.8,
     fontSize: 10,
@@ -440,6 +435,6 @@ const styles = StyleSheet.create({
   },
   scholarText: {
     fontSize: 13,
-    lineHeight: 20,
+    lineHeight: 21,
   },
 });
