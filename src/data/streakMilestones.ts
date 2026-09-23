@@ -119,18 +119,68 @@ export const STREAK_MILESTONES: StreakMilestone[] = [
   },
 ];
 
+export interface StreakTierInfo {
+  tier: 'bronze' | 'silver' | 'gold' | 'diamond';
+  name: string;
+  rangeLabel: string;
+  badgeLabel: string;
+  color: string;
+  bgGradient: string;
+}
+
 /**
  * 4 Distinct Color Tiers:
- * 1. Day 1 to 6: bronze
- * 2. Day 7 to 30: silver
- * 3. Day 30 to Month 6 (30 - 179 days): gold
- * 4. Month 6 to 1 Year (180 - 365+ days): diamond
+ * 1. Day 1 to 6: bronze (Warm Antique Copper)
+ * 2. Day 7 to 30: silver (Radiant Steel Platinum)
+ * 3. Day 30 to Month 6 (30 - 179 days): gold (Biblical Amber Gold)
+ * 4. Month 6 to 1 Year (180 - 365+ days): diamond (Radiant Sapphire Azure)
  */
 export function getTierForDays(days: number): 'bronze' | 'silver' | 'gold' | 'diamond' | 'celestial' {
   if (days >= 180) return 'diamond'; // Month 6 to 1 Year (and beyond)
   if (days >= 30) return 'gold';     // Day 30 to Month 6 (30 - 179 days)
   if (days >= 7) return 'silver';    // Day 7 to 30 (7 - 29 days)
   return 'bronze';                   // Day 1 to 6 (1 - 6 days)
+}
+
+export function getTierInfoForDays(days: number): StreakTierInfo {
+  if (days >= 180) {
+    return {
+      tier: 'diamond',
+      name: 'Diamond',
+      rangeLabel: 'Month 6 to 1 Year',
+      badgeLabel: 'DIAMOND SHIELD • MONTH 6 TO 1 YEAR',
+      color: '#0284C7',
+      bgGradient: 'rgba(56, 189, 248, 0.45)',
+    };
+  }
+  if (days >= 30) {
+    return {
+      tier: 'gold',
+      name: 'Gold',
+      rangeLabel: 'Day 30 to Month 6',
+      badgeLabel: 'GOLD SHIELD • DAY 30 TO MONTH 6',
+      color: '#CA8A04',
+      bgGradient: 'rgba(250, 204, 21, 0.45)',
+    };
+  }
+  if (days >= 7) {
+    return {
+      tier: 'silver',
+      name: 'Silver',
+      rangeLabel: 'Day 7 to 30',
+      badgeLabel: 'SILVER SHIELD • DAY 7 TO 30',
+      color: '#64748B',
+      bgGradient: 'rgba(148, 163, 184, 0.40)',
+    };
+  }
+  return {
+    tier: 'bronze',
+    name: 'Bronze',
+    rangeLabel: 'Day 1 to 6',
+    badgeLabel: 'BRONZE SHIELD • DAY 1 TO 6',
+    color: '#EA580C',
+    bgGradient: 'rgba(234, 88, 12, 0.40)',
+  };
 }
 
 export function getMilestoneForStreak(streak: number): StreakMilestone {

@@ -21,6 +21,7 @@ import {
   StreakMilestone,
   getMilestoneForStreak,
   getTierForDays,
+  getTierInfoForDays,
 } from '../data/streakMilestones';
 import {
   CloseSvg,
@@ -113,15 +114,10 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
   const isViewingActiveStreak = selectedMilestone.days === currentEarnedMilestone.days;
   const displayDays = isViewingActiveStreak ? streak : selectedMilestone.days;
   const displayTier = isViewingActiveStreak ? getTierForDays(streak) : selectedMilestone.tier;
+  const tierInfo = getTierInfoForDays(displayDays);
 
   const activeGradient = isViewingActiveStreak
-    ? (displayTier === 'diamond'
-        ? 'rgba(56, 189, 248, 0.45)'
-        : displayTier === 'gold'
-        ? 'rgba(253, 210, 35, 0.45)'
-        : displayTier === 'silver'
-        ? 'rgba(148, 163, 184, 0.40)'
-        : 'rgba(217, 119, 6, 0.40)')
+    ? tierInfo.bgGradient
     : selectedMilestone.bgGradientStart;
 
   return (
@@ -194,6 +190,9 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
 
             {/* Title & Epigram Subtitle */}
             <View style={styles.copyBlock}>
+              <Text variant="caption" weight="800" style={[styles.tierHeaderLabel, { color: tierInfo.color }]}>
+                {tierInfo.badgeLabel}
+              </Text>
               <Text variant="h1" style={styles.milestoneTitle}>
                 {selectedMilestone.title}
               </Text>
@@ -440,6 +439,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     maxWidth: 320,
     marginBottom: 12,
+  },
+  tierHeaderLabel: {
+    fontSize: 11,
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+    marginBottom: 6,
+    textAlign: 'center',
   },
   milestoneTitle: {
     fontSize: 28,
