@@ -53,7 +53,7 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
       ? STREAK_MILESTONES.find((m) => m.days === initialMilestoneDays) || currentEarnedMilestone
       : currentEarnedMilestone
   );
-  const shareCardRef = useRef<ViewShot>(null);
+  const shareCardRef = useRef<any>(null);
 
   // Smooth entrance scale & fade animation
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
