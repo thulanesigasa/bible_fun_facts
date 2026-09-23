@@ -61,6 +61,7 @@ graph TD
     ProfileStack --> FavoritesMain["FavoritesScreen (Saved Collection)"]
     ProfileStack --> BookmarksMain["BookmarksScreen (Continuous Body Bookmarks Hub)"]
     BookmarksMain -.->|One-Tap Jump| BibleReader
+    ProfileStack --> AchievementsMain["AchievementsScreen (48 Milestones, 4 Distinct Geometric Shapes, 3-per-Row Grid)"]
     ProfileStack --> Terms
     ProfileStack --> Privacy
     
@@ -526,28 +527,47 @@ To eliminate visual header stacking and duplicate headers across nested navigato
 
 ---
 
-## Multi-Category Study Achievements & High-Fidelity Share Engine
+## Multi-Category Study Achievements & Dedicated Screen Architecture
 
 <p align="left">
-  <img src="https://img.shields.io/badge/Achievements-4%20Distinct%20Categories-FDD223?style=for-the-badge" alt="4 Distinct Categories" />
-  <img src="https://img.shields.io/badge/Tiers-Bronze%20%7C%20Silver%20%7C%20Gold%20%7C%20Diamond-F59E0B?style=for-the-badge" alt="4 Metallic Tiers" />
+  <img src="https://img.shields.io/badge/Screen-Dedicated%20Achievements%20Screen-FDD223?style=for-the-badge" alt="Dedicated Achievements Screen" />
+  <img src="https://img.shields.io/badge/Catalog-48%20Total%20Milestones-F59E0B?style=for-the-badge" alt="48 Total Milestones" />
+  <img src="https://img.shields.io/badge/Layout-3--Per--Row%20Responsive%20Grid-10B981?style=for-the-badge" alt="3-Per-Row Responsive Grid" />
+  <img src="https://img.shields.io/badge/Shapes-Hexagon%20%7C%20Ribbon%20%7C%20Diamond%20%7C%20Star-0284C7?style=for-the-badge" alt="4 Distinct Geometric Shapes" />
   <img src="https://img.shields.io/badge/Sharing-Hardware%20Canvas%20PNG-10B981?style=for-the-badge" alt="Hardware Canvas PNG" />
 </p>
 
-### 1. Four Sacred Study Achievement Categories
-To motivate believers and maintain unbroken consistency in scripture study, exégeomai tracks milestones across four theological dimensions:
-- **Daily Streak Achievements**: Tracks unbroken consecutive days of Scripture engagement (`Day 1: First Step`, `Day 3: Rookie`, `Day 7: Faithful Scribe`, `Day 10: Getting Serious`, `Day 30: Devoted Scholar`, `Day 50: Pillar of Truth`, `Day 100: Triple Threat`, `Day 180: Half-Year Covenant`, `Day 365: Canon Completer`).
-- **Bookmark Achievements**: Celebrates saving foundational verses offline (`First Scribe` at 1, `Canon Keeper` at 5, `Wisdom Collector` at 10, `Scripture Custodian` at 25, `Treasury of Truth` at 50).
-- **Highlight Achievements**: Rewards contemplative underlining in the full reader (`Golden Quill` at 1, `Illuminator` at 5, `Truth Seeker` at 10, `Theologian's Mind` at 25, `Living Epigram` at 50).
-- **Share Achievements**: Encourages digital evangelism and spreading biblical truth (`Herald of Truth` at 1, `Evangelist` at 5, `Voice of Hope` at 10, `Beacon of Light` at 25, `Apostolic Reach` at 50).
+### 1. Dedicated Achievements Screen (`AchievementsScreen.tsx`)
+Rather than crowding the main Profile screen with cramped horizontal scroll carousels, achievements now reside in an expansive, dedicated full-stack screen:
+- **Global Overview Banner**: Live global progress display showing total milestones unlocked across the entire study life (`X of 48 UNLOCKED`) with a high-contrast progress bar.
+- **Category Switcher Tabs**: Clean, responsive tabs allowing seamless filtering across **Streaks**, **Bookmarks**, **Highlights**, and **Shares**.
+- **Responsive 3-Per-Row Grid Layout**: Dynamic column math `cardWidth = (width - 32 - 16) / 3` ensures cards fit flush in blocks of 3 across all Android screen sizes (360dp–412dp) with zero horizontal overflow.
+- **Card States & Tactile Feedback**:
+  - Earned milestones: Warm golden highlight borders (`#FEFCE8` surface, `#FDD223` border), high-contrast titles, and full-opacity metallic badges.
+  - Locked milestones: Clean translucent styling (`opacity: 0.45`), showing believers upcoming targets and scriptural promises to strive towards.
+  - Tapping any card opens `StreakMilestoneModal` to inspect the full theological title, target, biblical quote, book reference, and share via native high-fidelity image capture.
 
-### 2. High-Fidelity Image Share Engine (Zero Blank Screen)
+### 2. Four Sacred Study Categories & 48 Curated Milestones
+exégeomai defines 12 progressive milestones per category (targets: `1, 3, 5, 7, 10, 15, 20, 25, 35, 50, 75, 100`) for a grand total of 48 achievements:
+- **Daily Streak Achievements (12)**: Celebrating uninterrupted daily fidelity to God's Word (`First Step`, `Rookie`, `Faithful Scribe`, `Steadfast Heart`, `Pillar of Truth`, `Unshakable Walk`, `Covenant Keeper`, `Centurion of Faith`).
+- **Bookmark Achievements (12)**: Honoring the preservation of key scriptural promises (`First Scribe`, `Canon Keeper`, `Wisdom Collector`, `Treasury of Truth`, `Monument of Faith`, `Grand Anthology`).
+- **Highlight Achievements (12)**: Commending deep exegesis and contemplative underlining in the reader (`Golden Quill`, `Illuminator`, `Truth Seeker`, `Linguistic Luminary`, `Living Epigram`, `Master Exegete`).
+- **Share Achievements (12)**: Rewarding digital evangelism and broadcasting Christ's truth (`Herald of Truth`, `Evangelist`, `Voice of Hope`, `Beacon of Light`, `Ambassador of Christ`, `Great Commission`).
+
+### 3. Distinct Geometric Shapes & Metallic Tonal Shading (`CategoryBadge.tsx`)
+In strict adherence to Rule 1 (60-30-10 with dominant yellow/amber brand accents) and Rule 4 (Pure SVGs, zero raster icon packs):
+- **Streaks**: **Point-Top Hexagon Shield** in Deep Amber / Biblical Gold (`#FDD223` / `#78350F`).
+- **Bookmarks**: **Sacred Notched Bookmark Ribbon** (classic pennant V-cut) in Warm Bronze / Cinnamon Amber Gold (`#EAB308` / `#713F12`).
+- **Highlights**: **Faceted Octagonal Diamond Gem** in Radiant Sunlight Yellow / Lemon Gold (`#FACC15` / `#68370B`).
+- **Shares**: **8-Point Compass Star / Heraldic Seal** in Sunset Golden Ochre / Wheat Amber (`#D97706` / `#502004`).
+- **Pure Vector Scalability**: Supports both compact 48px grid rendering and high-resolution 220px export canvases with 3D extruded numerals and debossed category headers.
+
+### 4. High-Fidelity Image Share Engine (Zero Blank Screen)
 The share architecture in `StreakMilestoneModal.tsx` eliminates Android Dialog capture bugs:
 - **Hardware Acceleration**: `<Modal hardwareAccelerated={true}>` forces Android's window manager to allocate GPU-backed off-screen render caches.
 - **Unclipped Canvas Surface**: Removed `overflow: 'hidden'` from the captured card container, allowing child `react-native-svg` elements to rasterize without viewport clipping.
 - **Byte-Size Integrity Gate**: Uses `expo-file-system` to inspect captured image size (`info.size > 1000`). If a view capture is unrendered (< 1KB), it automatically invokes `captureScreen` hardware fallback.
-- **Dynamic Category Badging**: Passes custom category labels (`'STREAK'`, `'BOOKMARK'`, `'HIGHLIGHT'`, `'SHARE'`) directly into the 3D extruded hexagonal shield header.
-- **Global Share Tracking**: Tracks `sharesCount` across all share entry points in the app, persisting to `AsyncStorage` and Supabase profile state.
+- **Profile Navigation Integration**: Replaced the former inline shelf in `ProfileScreen.tsx` with a sleek navigation action card featuring `AwardSvg`, live `${unlocked}/48` pill, and progress fill.
 
 ---
 
@@ -566,6 +586,7 @@ bible_fun_facts/
 ├── src/
 │   ├── components/                  # Reusable UI components strictly adhering to 60-30-10
 │   │   ├── Card.tsx                 # Flat surface card with soft elevation shadow
+│   │   ├── CategoryBadge.tsx        # Pure SVG multi-shape vector badges (Hexagon, Ribbon, Diamond, Star)
 │   │   ├── FactCard.tsx             # Fact presentation card with zero badges
 │   │   ├── ScriptureCard.tsx        # Scripture reading card with inline typography
 │   │   ├── StreakHexagonBadge.tsx   # 3D metallic hexagonal shield badge (100% dynamic vector, zero fire, custom labels)
@@ -589,6 +610,7 @@ bible_fun_facts/
 │   ├── navigation/
 │   │   └── AppNavigator.tsx         # Tab navigation, AuthStack, ProfileStack, Root routes
 │   ├── screens/
+│   │   ├── AchievementsScreen.tsx   # Dedicated 3-per-row grid of 48 achievements across 4 categories
 │   │   ├── AuthScreen.tsx           # Flattened body canvas, keyboard next, FLAG_SECURE
 │   │   ├── DiscoverScreen.tsx       # Rich multi-card feed stream with streak modal trigger
 │   │   ├── FactDetailsScreen.tsx    # Modal sheet fact inspection

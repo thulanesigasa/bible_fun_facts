@@ -24,23 +24,14 @@ import {
   ProfileSvg,
   CameraSvg,
   ChevronRightSvg,
+  AwardSvg,
 } from '../components/SvgIcons';
 import { UiverseSwitch } from '../components/UiverseSwitch';
 import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
-import { StreakHexagonBadge } from '../components/StreakHexagonBadge';
 import {
-  AchievementCategory,
   AchievementMilestone,
-  getCategoryProgress,
-  getCategoryUnit,
+  getTotalAchievementsProgress,
 } from '../data/achievements';
-
-const ACHIEVEMENT_CATEGORIES: { key: AchievementCategory; label: string }[] = [
-  { key: 'streak', label: 'Streak' },
-  { key: 'bookmark', label: 'Bookmarks' },
-  { key: 'highlight', label: 'Highlights' },
-  { key: 'share', label: 'Shares' },
-];
 
 // ============================================================================
 // TYPOGRAPHY PRESETS
@@ -79,8 +70,6 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
 
   const [isUploading, setIsUploading] = useState(false);
   const [showStreakModal, setShowStreakModal] = useState<boolean>(false);
-  const [selectedAchievementCategory, setSelectedAchievementCategory] =
-    useState<AchievementCategory>('streak');
   const [inspectedAchievement, setInspectedAchievement] =
     useState<AchievementMilestone | null>(null);
 
@@ -88,19 +77,12 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
   const highlightsCount = Object.keys(bibleHighlights || {}).length;
   const currentSharesCount = sharesCount || 0;
 
-  const currentCategoryCount = (() => {
-    switch (selectedAchievementCategory) {
-      case 'streak': return streak || 1;
-      case 'bookmark': return bookmarksCount;
-      case 'highlight': return highlightsCount;
-      case 'share': return currentSharesCount;
-    }
-  })();
-
-  const categoryProgress = getCategoryProgress(
-    selectedAchievementCategory,
-    currentCategoryCount
-  );
+  const totalProgress = getTotalAchievementsProgress({
+    streak: streak || 1,
+    bookmarksCount,
+    highlightsCount,
+    sharesCount: currentSharesCount,
+  });
   const [notifications, setNotifications] = useState<boolean>(
     userProfile?.notificationsEnabled ?? true
   );
@@ -462,124 +444,53 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
         </View>
 
         {/* ================================================================ */}
-        {/* STUDY ACHIEVEMENTS SECTION (MOTIVATION: STREAK, BOOKMARKS, HIGHLIGHTS, SHARES) */}
+        {/* STUDY ACHIEVEMENTS (NAVIGATION ROW TO DEDICATED SCREEN)          */}
         {/* ================================================================ */}
         <View style={styles.bodySection}>
-          <View style={styles.sectionHeaderRow}>
-            <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
-              STUDY ACHIEVEMENTS
-            </Text>
-            <Text variant="caption" weight="700" color={colors.accent}>
-              {`${categoryProgress.unlockedCount}/${categoryProgress.totalCount} Unlocked`}
-            </Text>
-          </View>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+            MILESTONES & ACHIEVEMENTS
+          </Text>
 
-          {/* Category Tabs: Streak, Bookmarks, Highlights, Shares */}
-          <View style={styles.categoryPillsRow}>
-            {ACHIEVEMENT_CATEGORIES.map((cat) => {
-              const isSelected = selectedAchievementCategory === cat.key;
-              return (
-                <TouchableOpacity
-                  key={cat.key}
-                  style={[
-                    styles.categoryPill,
-                    isSelected && styles.categoryPillActive,
-                  ]}
-                  onPress={() => setSelectedAchievementCategory(cat.key)}
-                  activeOpacity={0.8}
-                >
-                  <Text
-                    variant="caption"
-                    weight={isSelected ? '700' : '600'}
-                    style={[
-                      styles.categoryPillText,
-                      isSelected && styles.categoryPillTextActive,
-                    ]}
-                  >
-                    {cat.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-
-          {/* Progress Bar Card */}
-          <View style={styles.achievementProgressCard}>
-            <View style={styles.achievementProgressInfo}>
-              <Text variant="body" weight="700" color={colors.textPrimary}>
-                {`${currentCategoryCount} ${getCategoryUnit(selectedAchievementCategory, currentCategoryCount)}`}
-              </Text>
-              <Text variant="caption" color={colors.textSecondary}>
-                {categoryProgress.nextMilestone
-                  ? `Next milestone: ${categoryProgress.nextMilestone.target} ${getCategoryUnit(selectedAchievementCategory, categoryProgress.nextMilestone.target)}`
-                  : 'All milestones completed!'}
-              </Text>
-            </View>
-            <View style={styles.progressBarTrack}>
-              <View
-                style={[
-                  styles.progressBarFill,
-                  { width: `${categoryProgress.progressPercent}%` },
-                ]}
-              />
-            </View>
-          </View>
-
-          {/* Horizontal Shelf of Hexagon Badges */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.achievementsShelfScroll}
+          <TouchableOpacity
+            style={styles.achievementNavCard}
+            onPress={() => navigation.navigate('Achievements')}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel={`Study Achievements. ${totalProgress.totalUnlocked} of ${totalProgress.totalAvailable} unlocked. Tap to view all categories.`}
           >
-            {categoryProgress.milestones.map((m) => {
-              const earned = currentCategoryCount >= m.target;
-              return (
-                <TouchableOpacity
-                  key={m.id}
-                  style={[
-                    styles.achievementShelfCard,
-                    earned && styles.achievementShelfCardEarned,
-                  ]}
-                  onPress={() => {
-                    if (selectedAchievementCategory === 'streak') {
-                      setInspectedAchievement(null);
-                    } else {
-                      setInspectedAchievement(m);
-                    }
-                    setShowStreakModal(true);
-                  }}
-                  activeOpacity={0.8}
-                >
-                  <View style={[styles.achievementBadgeWrapper, !earned && styles.achievementBadgeLocked]}>
-                    <StreakHexagonBadge
-                      days={m.target}
-                      tier={m.tier}
-                      size={52}
-                      label={m.badgeLabel}
-                    />
+            <View style={styles.achievementNavLeft}>
+              <View style={styles.achievementNavIconBox}>
+                <AwardSvg size={24} color="#C99A00" strokeWidth={2} />
+              </View>
+              <View style={styles.achievementNavTextBox}>
+                <View style={styles.achievementNavTitleRow}>
+                  <Text variant="h3" style={styles.achievementNavTitle}>
+                    Study Achievements
+                  </Text>
+                  <View style={styles.achievementNavPill}>
+                    <Text variant="caption" weight="800" color="#78350F" style={styles.achievementNavPillText}>
+                      {`${totalProgress.totalUnlocked}/${totalProgress.totalAvailable}`}
+                    </Text>
                   </View>
-                  <Text
-                    variant="caption"
-                    weight="700"
-                    color={earned ? '#0F172A' : '#64748B'}
-                    style={styles.achievementBadgeTarget}
-                  >
-                    {selectedAchievementCategory === 'streak'
-                      ? `Day ${m.target}`
-                      : `${m.target} ${getCategoryUnit(m.category, m.target)}`}
-                  </Text>
-                  <Text
-                    variant="caption"
-                    color={earned ? colors.accent : '#94A3B8'}
-                    numberOfLines={1}
-                    style={styles.achievementBadgeTitle}
-                  >
-                    {m.title}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
+                </View>
+                <Text variant="caption" color={colors.textSecondary} style={styles.achievementNavSubtitle}>
+                  Streaks, Bookmarks, Highlights & Shares (12 each)
+                </Text>
+
+                {/* Progress bar line */}
+                <View style={styles.achievementNavProgressTrack}>
+                  <View
+                    style={[
+                      styles.achievementNavProgressFill,
+                      { width: `${totalProgress.percent}%` },
+                    ]}
+                  />
+                </View>
+              </View>
+            </View>
+
+            <ChevronRightSvg size={20} color="#94A3B8" />
+          </TouchableOpacity>
         </View>
 
         {/* ================================================================ */}
@@ -1081,94 +992,79 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(15, 23, 42, 0.08)',
   },
-  sectionHeaderRow: {
+  achievementNavCard: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
-  },
-  categoryPillsRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 6,
-    marginBottom: 12,
-  },
-  categoryPill: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 14,
-    backgroundColor: '#F1F5F9',
-  },
-  categoryPillActive: {
-    backgroundColor: colors.accent,
-  },
-  categoryPillText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  categoryPillTextActive: {
-    color: '#0F172A',
-    fontWeight: '700',
-  },
-  achievementProgressCard: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: 12,
-    padding: 12,
+    justifyContent: 'space-between',
+    backgroundColor: '#FFFFFF', // 30% panel surface
+    borderRadius: 16,
+    padding: 16,
     borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
-    marginBottom: 12,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
+    marginTop: 4,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
-  achievementProgressInfo: {
+  achievementNavLeft: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    flex: 1,
+    marginRight: 12,
+  },
+  achievementNavIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: '#FEF9C3', // subtle warm amber surface
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(253, 210, 35, 0.3)',
+  },
+  achievementNavTextBox: {
+    flex: 1,
+  },
+  achievementNavTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 2,
+  },
+  achievementNavTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  achievementNavPill: {
+    backgroundColor: '#FEF9C3',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(201, 154, 0, 0.25)',
+  },
+  achievementNavPillText: {
+    fontSize: 11,
+  },
+  achievementNavSubtitle: {
+    fontSize: 12,
     marginBottom: 8,
   },
-  progressBarTrack: {
-    height: 6,
+  achievementNavProgressTrack: {
+    height: 5,
     width: '100%',
     backgroundColor: '#E2E8F0',
     borderRadius: 3,
     overflow: 'hidden',
   },
-  progressBarFill: {
+  achievementNavProgressFill: {
     height: '100%',
     backgroundColor: colors.accent,
     borderRadius: 3,
-  },
-  achievementsShelfScroll: {
-    paddingVertical: 4,
-    gap: 10,
-  },
-  achievementShelfCard: {
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 8,
-    borderRadius: 14,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    width: 96,
-  },
-  achievementShelfCardEarned: {
-    borderColor: colors.accent,
-    borderWidth: 1.5,
-    backgroundColor: '#FEFCE8',
-  },
-  achievementBadgeWrapper: {
-    marginBottom: 6,
-  },
-  achievementBadgeLocked: {
-    opacity: 0.45,
-  },
-  achievementBadgeTarget: {
-    fontSize: 10,
-    marginBottom: 2,
-    textAlign: 'center',
-  },
-  achievementBadgeTitle: {
-    fontSize: 9.5,
-    textAlign: 'center',
   },
   sectionHeader: {
     fontSize: 10.5,

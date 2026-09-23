@@ -84,6 +84,19 @@ export const FavoritesSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E
   </Svg>
 );
 
+export const AwardSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Circle cx="12" cy="8" r="6" stroke={color} strokeWidth={strokeWidth} />
+    <Path
+      d="M15.477 12.89L17 22L12 19L7 22L8.523 12.89"
+      stroke={color}
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
 // 2. Interactive & Detail Icons
 export const FlameSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', fill = 'none', strokeWidth = 2, style }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill={fill} style={style}>
