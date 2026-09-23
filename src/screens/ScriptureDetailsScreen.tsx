@@ -9,7 +9,6 @@ import {
 import { colors } from '../theme/colors';
 import { spacing, radius } from '../theme';
 import { Text } from '../components/Typography';
-import { Card } from '../components/Card';
 import { Scripture } from '../data/mockDatabase';
 import { useUser } from '../context/UserContext';
 import {
@@ -55,6 +54,8 @@ export default function ScriptureDetailsScreen({ navigation, route }: ScriptureD
             style={styles.doneBtn}
             onPress={() => navigation.goBack()}
             activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel="Done"
           >
             <Text variant="h3" style={styles.doneBtnText}>Done</Text>
           </TouchableOpacity>
@@ -63,9 +64,11 @@ export default function ScriptureDetailsScreen({ navigation, route }: ScriptureD
               style={styles.iconBtn}
               onPress={() => toggleFavoriteScripture(scripture)}
               activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="Bookmark scripture"
             >
               <FavoritesSvg
-                size={22}
+                size={20}
                 color={colors.accent}
                 fill={isFavorited ? colors.accent : 'none'}
               />
@@ -74,47 +77,56 @@ export default function ScriptureDetailsScreen({ navigation, route }: ScriptureD
               style={styles.iconBtn}
               onPress={handleShare}
               activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="Share scripture"
             >
-              <ShareSvg size={22} color={colors.textPrimary} />
+              <ShareSvg size={20} color={colors.textPrimary} />
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.mainContent}>
-          <Text variant="h1" style={styles.title}>Scripture Details</Text>
-
           <View style={styles.metaRow}>
             <View style={styles.genreIconRow}>
-              {getGenreSvg(scripture.genre, 16, colors.accent)}
+              {getGenreSvg(scripture.genre, 14, colors.accent)}
             </View>
             <Text variant="caption" weight="700" color={colors.accent}>
               {scripture.testament.toUpperCase()} • {scripture.genre}
             </Text>
           </View>
 
-          <Text variant="h2" style={styles.scriptureRef}>{scripture.reference}</Text>
+          <Text variant="h1" style={styles.scriptureRef}>{scripture.reference}</Text>
 
-          {/* Scripture Quote */}
-          <Card style={styles.quoteCard}>
+          {/* Scripture Quote (Flat Quote Block with Accent Left-Border) */}
+          <View style={styles.quoteBox}>
             <Text variant="body" style={styles.quoteText}>"{scripture.text}"</Text>
-            <Text variant="label" align="right" style={styles.quoteRef}>- {scripture.reference}</Text>
-          </Card>
+            <Text variant="label" align="right" style={styles.quoteRef}>— {scripture.reference}</Text>
+          </View>
 
-          {/* Context Sections */}
+          <View style={styles.hairlineDivider} />
+
+          {/* Historical Context Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <LandmarkSvg size={20} color={colors.accent} />
-              <Text variant="h3" style={styles.sectionLabel}>Historical Context</Text>
+              <LandmarkSvg size={18} color={colors.accent} />
+              <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionLabel}>
+                HISTORICAL CONTEXT
+              </Text>
             </View>
             <Text variant="body" color={colors.textSecondary} style={styles.bodyText}>
               {scripture.historical_context}
             </Text>
           </View>
 
+          <View style={styles.hairlineDivider} />
+
+          {/* Cultural Practice Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <UsersSvg size={20} color={colors.accent} />
-              <Text variant="h3" style={styles.sectionLabel}>Cultural Practice</Text>
+              <UsersSvg size={18} color={colors.accent} />
+              <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionLabel}>
+                CULTURAL PRACTICE
+              </Text>
             </View>
             <Text variant="body" color={colors.textSecondary} style={styles.bodyText}>
               {scripture.cultural_practice}
@@ -122,29 +134,42 @@ export default function ScriptureDetailsScreen({ navigation, route }: ScriptureD
           </View>
 
           {/* Strong's Concordance Details */}
-          <View style={styles.strongsCard}>
-            <View style={styles.strongsHeader}>
-              <StrongsIconSvg size={20} color={colors.accent} />
-              <Text variant="h3" style={styles.strongsHeaderTitle}>Key Original Language Word</Text>
-            </View>
+          {scripture.strongs_word ? (
+            <>
+              <View style={styles.hairlineDivider} />
+              <View style={styles.strongsSection}>
+                <View style={styles.strongsHeader}>
+                  <StrongsIconSvg size={18} color={colors.accent} />
+                  <Text variant="label" weight="800" color={colors.textTertiary} style={styles.strongsHeaderTitle}>
+                    KEY ORIGINAL LANGUAGE WORD
+                  </Text>
+                </View>
 
-            <View style={styles.strongsRow}>
-              <View>
-                <Text variant="h1" style={styles.strongsWord}>{scripture.strongs_word}</Text>
-                <Text variant="body" style={styles.strongsTrans}>{scripture.strongs_transliteration}</Text>
+                <View style={styles.strongsRow}>
+                  <View>
+                    <Text variant="h1" style={styles.strongsWord}>{scripture.strongs_word}</Text>
+                    {scripture.strongs_transliteration ? (
+                      <Text variant="body" style={styles.strongsTrans}>{scripture.strongs_transliteration}</Text>
+                    ) : null}
+                  </View>
+                  {scripture.strongs_number ? (
+                    <Text variant="body" weight="700" color={colors.accent}>{scripture.strongs_number}</Text>
+                  ) : null}
+                </View>
+
+                {scripture.strongs_definition ? (
+                  <View style={styles.definitionBox}>
+                    <Text variant="label" color={colors.textTertiary} style={{ marginBottom: 4, fontSize: 10, letterSpacing: 0.8 }}>
+                      LEXICAL DEFINITION
+                    </Text>
+                    <Text variant="body" color={colors.textPrimary} style={styles.definitionText}>
+                      {scripture.strongs_definition}
+                    </Text>
+                  </View>
+                ) : null}
               </View>
-              <Text variant="body" weight="700" color={colors.accent}>{scripture.strongs_number}</Text>
-            </View>
-
-            <View style={styles.definitionBox}>
-              <Text variant="label" color={colors.textTertiary} style={{ marginBottom: spacing.sm }}>
-                DEFINITION
-              </Text>
-              <Text variant="body" color={colors.textPrimary} style={styles.definitionText}>
-                {scripture.strongs_definition}
-              </Text>
-            </View>
-          </View>
+            </>
+          ) : null}
         </View>
       </ScrollView>
     </View>
@@ -154,157 +179,159 @@ export default function ScriptureDetailsScreen({ navigation, route }: ScriptureD
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: '#FFFFFF',
   },
   dragHandle: {
-    width: 40,
+    width: 36,
     height: 4,
-    backgroundColor: colors.border,
-    borderRadius: radius.full,
+    backgroundColor: '#CBD5E1',
+    borderRadius: 2,
     alignSelf: 'center',
-    marginTop: spacing.sm, // 8px
+    marginTop: 10,
+    marginBottom: 6,
   },
   scroll: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   content: {
-    padding: spacing.md, // 16px margins
-    paddingBottom: spacing.xxl, // 48px
+    paddingHorizontal: spacing.lg,
+    paddingBottom: 48,
+    backgroundColor: '#FFFFFF',
   },
   topHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.md, // 16px
-    paddingTop: spacing.sm, // 8px
+    paddingVertical: spacing.sm,
+    marginBottom: 4,
   },
   doneBtn: {
-    paddingVertical: spacing.sm, // 8px
-    paddingHorizontal: spacing.sm, // 8px
+    backgroundColor: colors.accent,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: radius.full,
   },
   doneBtnText: {
-    color: colors.accent,
+    color: '#0F172A',
+    fontSize: 14,
+    fontWeight: '700',
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm, // 8px
+    gap: 12,
   },
   iconBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.full,
-    backgroundColor: colors.surface,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F8FAFC',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   mainContent: {
-    marginTop: spacing.sm, // 8px
-  },
-  title: {
-    fontSize: 28,
-    color: colors.textPrimary,
-    marginBottom: spacing.md, // 16px
+    marginTop: 4,
   },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm, // 8px
-    marginBottom: spacing.md, // 16px
+    gap: 8,
+    marginBottom: 6,
   },
   genreIconRow: {
-    width: 24,
-    height: 24,
+    width: 20,
+    height: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
-
   scriptureRef: {
     fontSize: 24,
+    fontWeight: '800',
     color: colors.textPrimary,
-    marginBottom: spacing.md, // 16px
+    marginBottom: 14,
   },
-  quoteCard: {
-    backgroundColor: colors.surface,
+  quoteBox: {
+    backgroundColor: 'rgba(253, 210, 35, 0.08)',
     borderLeftWidth: 3,
     borderLeftColor: colors.accent,
-    borderRadius: radius.md, // 16px
-    padding: spacing.md, // 16px
-    marginBottom: spacing.lg, // 24px
+    borderRadius: radius.sm,
+    padding: spacing.md,
+    marginBottom: spacing.md,
   },
   quoteText: {
     fontStyle: 'italic',
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 15,
+    lineHeight: 22,
     color: colors.textPrimary,
   },
   quoteRef: {
-    color: colors.accent,
-    marginTop: spacing.sm, // 8px
+    color: colors.textSecondary,
+    marginTop: spacing.sm,
+    fontWeight: '600',
+  },
+  hairlineDivider: {
+    height: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.06)',
+    marginVertical: spacing.md,
   },
   section: {
-    marginBottom: spacing.lg, // 24px
+    paddingVertical: 2,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm, // 8px
-    marginBottom: spacing.sm, // 8px
+    gap: 8,
+    marginBottom: 8,
   },
   sectionLabel: {
-    color: colors.accent,
-    fontSize: 16,
-    fontWeight: '700',
+    letterSpacing: 0.5,
   },
   bodyText: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 15,
+    lineHeight: 22,
+    color: colors.textSecondary,
   },
-  strongsCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.xl, // 32px
-    padding: spacing.lg, // 24px
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginTop: spacing.sm, // 8px
+  strongsSection: {
+    paddingVertical: 2,
   },
   strongsHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm, // 8px
-    marginBottom: spacing.md, // 16px
+    gap: 8,
+    marginBottom: 8,
   },
   strongsHeaderTitle: {
-    color: colors.accent,
-    fontSize: 16,
+    letterSpacing: 0.5,
   },
   strongsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: spacing.md, // 16px
+    marginBottom: spacing.sm,
   },
   strongsWord: {
-    fontSize: 32,
+    fontSize: 28,
+    fontWeight: '700',
     color: colors.textPrimary,
   },
   strongsTrans: {
-    fontSize: 16,
+    fontSize: 15,
     fontStyle: 'italic',
-    color: colors.textSecondary,
-    marginTop: 4,
+    color: colors.accent,
+    marginTop: 2,
   },
-
   definitionBox: {
-    backgroundColor: colors.surfaceElevated,
-    borderRadius: radius.md, // 16px
-    padding: spacing.md, // 16px
+    backgroundColor: '#F8FAFC',
+    borderRadius: radius.sm,
+    padding: spacing.md,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(15, 23, 42, 0.06)',
   },
   definitionText: {
-    lineHeight: 24,
+    lineHeight: 21,
+    fontSize: 14,
   },
 });

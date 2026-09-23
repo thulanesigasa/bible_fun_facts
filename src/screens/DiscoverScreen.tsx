@@ -9,9 +9,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
-import { spacing, radius, shadow } from '../theme';
+import { spacing, radius } from '../theme';
 import { Text } from '../components/Typography';
-import { Card } from '../components/Card';
 import { useUser } from '../context/UserContext';
 import { supabase } from '../services/supabase';
 import { getDailyMessage, getDayOfYear, DailyMessage } from '../data/dailyMessages';
@@ -103,148 +102,162 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
           </View>
         </View>
 
-        {/* 1. Quick Jump: Continue Scripture Card */}
+        <View style={styles.hairlineDivider} />
+
+        {/* 1. Resume Reading Row (Flat Body Row - Zero Card Divs) */}
         <TouchableOpacity
-          activeOpacity={0.88}
+          activeOpacity={0.75}
           onPress={() => navigation.navigate('WOTD')}
-          style={[styles.continueCard, shadow.sm]}
+          style={styles.resumeReadingRow}
+          accessibilityRole="button"
+          accessibilityLabel={`Resume reading ${lastReadBible.book} Chapter ${lastReadBible.chapter}`}
         >
-          <View style={styles.continueLeft}>
-            <View style={styles.continueIconWrap}>
-              <BookOpenSvg size={18} color={colors.accent} />
+          <View style={styles.resumeLeft}>
+            <View style={styles.resumeIconWrap}>
+              <BookOpenSvg size={16} color={colors.accent} />
             </View>
-            <View style={styles.continueTextWrap}>
-              <Text variant="caption" color={colors.accent} weight="700">
-                Resume Reading
+            <View style={styles.resumeTextWrap}>
+              <Text variant="caption" color={colors.textTertiary} weight="700" style={styles.resumeLabel}>
+                RESUME READING
               </Text>
-              <Text variant="h3" style={styles.continueTitle}>
+              <Text variant="h3" style={styles.resumeBookTitle}>
                 {lastReadBible.book} Chapter {lastReadBible.chapter}
               </Text>
             </View>
           </View>
-          <View style={styles.continueActionBtn}>
-            <Text variant="caption" weight="700" color="#0F172A">
+
+          <View style={styles.resumeActionCue}>
+            <Text variant="caption" weight="700" color={colors.accent}>
               Open ›
             </Text>
           </View>
         </TouchableOpacity>
 
-        {/* 2. Today's Singular Daily Message (Locked to 1 per day) */}
-        <TouchableOpacity
-          activeOpacity={0.88}
-          onPress={() => navigation.navigate('FactDetails', { fact: todayMessage })}
-          accessibilityRole="button"
-          accessibilityLabel={`Today's Message: ${todayMessage.fact_title}`}
-        >
-          <Card style={styles.dailyCard}>
-            {/* Header row with badge and calendar reference */}
-            <View style={styles.cardSectionHeader}>
-              <View style={styles.cardHeaderTitleRow}>
-                <ScrollSvg size={15} color={colors.accent} />
-                <Text variant="h3" color={colors.accent} style={styles.sectionHeaderTitle}>
-                  Today's Message
-                </Text>
-              </View>
-              <View style={styles.dayBadge}>
-                <Text variant="caption" weight="700" color={colors.accent}>
-                  Day {todayMessage.dayOfYear}
-                </Text>
-              </View>
-            </View>
+        <View style={styles.hairlineDivider} />
 
-            {/* Scripture Reference & Title */}
-            <View style={styles.metaRow}>
-              <Text variant="caption" weight="700" color={colors.accent} style={{ letterSpacing: 0.5 }}>
-                {todayMessage.category.toUpperCase()}
-              </Text>
-              <Text variant="caption" color={colors.textTertiary}>
-                • {todayMessage.scripture_ref}
+        {/* 2. Today's Singular Daily Message (Flat Body Section - Zero Card Divs) */}
+        <View style={styles.dailySection}>
+          {/* Section Sub-Header Row */}
+          <View style={styles.sectionHeaderRow}>
+            <View style={styles.sectionHeaderLeft}>
+              <ScrollSvg size={15} color={colors.accent} />
+              <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeaderLabel}>
+                TODAY'S MESSAGE
               </Text>
             </View>
+            <View style={styles.dayBadge}>
+              <Text variant="caption" weight="700" color={colors.accent}>
+                Day {todayMessage.dayOfYear} of 365
+              </Text>
+            </View>
+          </View>
 
+          {/* Category & Scripture Meta */}
+          <View style={styles.metaRow}>
+            <Text variant="caption" weight="700" color={colors.accent} style={{ letterSpacing: 0.5 }}>
+              {todayMessage.category.toUpperCase()}
+            </Text>
+            <Text variant="caption" color={colors.textTertiary}>
+              • {todayMessage.scripture_ref}
+            </Text>
+          </View>
+
+          {/* Prominent Message Title */}
+          <TouchableOpacity
+            activeOpacity={0.88}
+            onPress={() => navigation.navigate('FactDetails', { fact: todayMessage })}
+          >
             <Text variant="h2" style={styles.messageTitle}>
               {todayMessage.fact_title}
             </Text>
+          </TouchableOpacity>
 
-            {/* Scripture Quote Box */}
-            <View style={styles.verseBox}>
-              <Text variant="body" style={styles.verseText}>
-                "{todayMessage.verse_text}"
-              </Text>
-              <Text variant="caption" weight="600" color={colors.textSecondary} style={styles.verseRef}>
-                — {todayMessage.scripture_ref}
-              </Text>
-            </View>
-
-            {/* Historical Context Narrative */}
-            <Text variant="body" color={colors.textSecondary} style={styles.contextText}>
-              {todayMessage.historical_context}
+          {/* Scripture Quote Box (Flat Quote Block with Accent Left-Border) */}
+          <View style={styles.verseBox}>
+            <Text variant="body" style={styles.verseText}>
+              "{todayMessage.verse_text}"
             </Text>
+            <Text variant="caption" weight="600" color={colors.textSecondary} style={styles.verseRef}>
+              — {todayMessage.scripture_ref}
+            </Text>
+          </View>
 
-            {/* Root Word Pill if available */}
-            {todayMessage.strongs_word && (
-              <View style={styles.rootWordPill}>
-                <View style={styles.rootIconWrap}>
-                  <StrongsIconSvg size={14} color={colors.accent} />
-                </View>
-                <View style={styles.rootTextWrap}>
-                  <Text variant="caption" color={colors.textPrimary} weight="700">
-                    {todayMessage.strongs_word} ({todayMessage.strongs_transliteration})
-                  </Text>
-                  <Text variant="caption" color={colors.textSecondary}>
-                    Strong's {todayMessage.strongs_number}: "{todayMessage.strongs_definition}"
-                  </Text>
-                </View>
+          {/* Historical Context Narrative Directly in Body */}
+          <Text variant="body" color={colors.textSecondary} style={styles.contextText}>
+            {todayMessage.historical_context}
+          </Text>
+
+          {/* Root Word Pill if available */}
+          {todayMessage.strongs_word && (
+            <View style={styles.rootWordPill}>
+              <View style={styles.rootIconWrap}>
+                <StrongsIconSvg size={14} color={colors.accent} />
               </View>
-            )}
-
-            {/* Cultural Practice Context if available */}
-            {todayMessage.cultural_practice && (
-              <View style={styles.culturalBox}>
-                <View style={styles.culturalHeader}>
-                  <LandmarkSvg size={13} color={colors.accent} />
-                  <Text variant="caption" weight="700" color={colors.accent}>
-                    Biblical Custom
-                  </Text>
-                </View>
-                <Text variant="caption" color={colors.textSecondary} style={styles.culturalText}>
-                  {todayMessage.cultural_practice}
+              <View style={styles.rootTextWrap}>
+                <Text variant="caption" color={colors.textPrimary} weight="700">
+                  {todayMessage.strongs_word} ({todayMessage.strongs_transliteration})
                 </Text>
-              </View>
-            )}
-
-            {/* Interactive Card Action Bar: Read Whole Message + Save + Share */}
-            <View style={styles.cardActionsBar}>
-              <View style={styles.readMorePrompt}>
-                <Text variant="caption" weight="700" color={colors.accent}>
-                  Read Whole Message ›
+                <Text variant="caption" color={colors.textSecondary}>
+                  Strong's {todayMessage.strongs_number}: "{todayMessage.strongs_definition}"
                 </Text>
-              </View>
-
-              <View style={styles.actionIconsRight}>
-                <TouchableOpacity
-                  style={styles.iconBtn}
-                  onPress={() => toggleFavoriteFact(todayMessage)}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                >
-                  <FavoritesSvg
-                    size={18}
-                    color={colors.accent}
-                    fill={isFavorited ? colors.accent : 'none'}
-                  />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.iconBtn}
-                  onPress={() => onShareMessage(todayMessage)}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                >
-                  <ShareSvg size={18} color={colors.textSecondary} />
-                </TouchableOpacity>
               </View>
             </View>
-          </Card>
-        </TouchableOpacity>
+          )}
+
+          {/* Cultural Practice Context if available */}
+          {todayMessage.cultural_practice && (
+            <View style={styles.culturalBox}>
+              <View style={styles.culturalHeader}>
+                <LandmarkSvg size={13} color={colors.accent} />
+                <Text variant="caption" weight="700" color={colors.accent}>
+                  Biblical Custom
+                </Text>
+              </View>
+              <Text variant="caption" color={colors.textSecondary} style={styles.culturalText}>
+                {todayMessage.cultural_practice}
+              </Text>
+            </View>
+          )}
+
+          {/* Interactive Card Action Bar: Read Whole Message + Save + Share */}
+          <View style={styles.cardActionsBar}>
+            <TouchableOpacity
+              style={styles.readMorePrompt}
+              onPress={() => navigation.navigate('FactDetails', { fact: todayMessage })}
+              activeOpacity={0.7}
+            >
+              <Text variant="caption" weight="700" color={colors.accent}>
+                Read Whole Message ›
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.actionIconsRight}>
+              <TouchableOpacity
+                style={styles.iconBtn}
+                onPress={() => toggleFavoriteFact(todayMessage)}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityRole="button"
+                accessibilityLabel="Bookmark today's message"
+              >
+                <FavoritesSvg
+                  size={18}
+                  color={colors.accent}
+                  fill={isFavorited ? colors.accent : 'none'}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.iconBtn}
+                onPress={() => onShareMessage(todayMessage)}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityRole="button"
+                accessibilityLabel="Share today's message"
+              >
+                <ShareSvg size={18} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -253,21 +266,23 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: '#FFFFFF',
   },
   scroll: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   scrollContent: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
     paddingBottom: 96,
+    backgroundColor: '#FFFFFF',
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: spacing.md,
+    paddingBottom: spacing.sm,
   },
   headerTextWrap: {
     flex: 1,
@@ -291,71 +306,67 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(253, 210, 35, 0.2)',
   },
 
-  // Continue Reading Card
-  continueCard: {
+  // Subtle Hairline Divider (like Settings / ProfileScreen)
+  hairlineDivider: {
+    height: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.06)',
+    marginVertical: spacing.md,
+  },
+
+  // Resume Reading Row (Flat Body Row)
+  resumeReadingRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: 10,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.accent,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
-    marginBottom: spacing.md,
+    paddingVertical: 4,
   },
-  continueLeft: {
+  resumeLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
     flex: 1,
   },
-  continueIconWrap: {
-    width: 34,
-    height: 34,
+  resumeIconWrap: {
+    width: 32,
+    height: 32,
     borderRadius: radius.sm,
     backgroundColor: colors.accentSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  continueTextWrap: {
+  resumeTextWrap: {
     flex: 1,
   },
-  continueTitle: {
+  resumeLabel: {
+    letterSpacing: 0.5,
+    fontSize: 10,
+  },
+  resumeBookTitle: {
     fontSize: 15,
     marginTop: 1,
+    color: colors.textPrimary,
   },
-  continueActionBtn: {
-    backgroundColor: colors.accent,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: radius.full,
+  resumeActionCue: {
+    paddingLeft: 8,
   },
 
-  // Daily Message Card
-  dailyCard: {
-    backgroundColor: '#FFFFFF',
-    padding: spacing.md,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
+  // Daily Message Body Section (Flat - Zero Card Divs)
+  dailySection: {
+    paddingTop: 4,
   },
-  cardSectionHeader: {
+  sectionHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 8,
   },
-  cardHeaderTitleRow: {
+  sectionHeaderLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
   },
-  sectionHeaderTitle: {
-    fontSize: 15,
-    fontWeight: '700',
+  sectionHeaderLabel: {
+    letterSpacing: 0.5,
   },
   dayBadge: {
     backgroundColor: colors.accentSoft,
@@ -375,32 +386,32 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '800',
     color: colors.textPrimary,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   verseBox: {
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    backgroundColor: 'rgba(253, 210, 35, 0.08)',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     borderRadius: radius.sm,
-    marginBottom: 10,
+    marginBottom: 12,
     borderLeftWidth: 3,
     borderLeftColor: colors.accent,
   },
   verseText: {
     fontStyle: 'italic',
-    fontSize: 13,
-    lineHeight: 19,
+    fontSize: 14,
+    lineHeight: 20,
     color: colors.textPrimary,
   },
   verseRef: {
-    marginTop: 4,
+    marginTop: 6,
     textAlign: 'right',
   },
   contextText: {
-    fontSize: 13,
-    lineHeight: 19,
+    fontSize: 14,
+    lineHeight: 21,
     color: colors.textSecondary,
-    marginBottom: 12,
+    marginBottom: 14,
   },
   rootWordPill: {
     flexDirection: 'row',
@@ -410,6 +421,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
     padding: 10,
     marginBottom: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.06)',
   },
   rootIconWrap: {
     width: 28,
@@ -426,7 +439,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(253, 210, 35, 0.08)',
     borderRadius: radius.sm,
     padding: 10,
-    marginBottom: 12,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(253, 210, 35, 0.2)',
   },
   culturalHeader: {
     flexDirection: 'row',
@@ -437,14 +452,15 @@ const styles = StyleSheet.create({
   culturalText: {
     fontSize: 12,
     lineHeight: 17,
+    color: colors.textSecondary,
   },
   cardActionsBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 10,
+    paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(15, 23, 42, 0.05)',
+    borderTopColor: 'rgba(15, 23, 42, 0.06)',
   },
   readMorePrompt: {
     flexDirection: 'row',
@@ -454,7 +470,7 @@ const styles = StyleSheet.create({
   actionIconsRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 16,
   },
   iconBtn: {
     padding: 2,

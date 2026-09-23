@@ -12,7 +12,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
-import { Card } from '../components/Card';
 import { useUser } from '../context/UserContext';
 import { CommunityUser } from '../data/mockUsers';
 import { supabase } from '../services/supabase';
@@ -419,11 +418,11 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
                 <Text variant="label" color={colors.textTertiary} style={styles.sectionHeading}>
                   THEOLOGICAL SPECIALTY & FOCUS
                 </Text>
-                <Card style={styles.focusCard}>
+                <View style={styles.focusCard}>
                   <Text variant="body" weight="600" color={colors.accent}>
                     {selectedUser.theologicalFocus}
                   </Text>
-                </Card>
+                </View>
               </View>
 
               {/* Bio Section */}
@@ -457,7 +456,7 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
                 <Text variant="label" color={colors.textTertiary} style={styles.sectionHeading}>
                   FAVORITE SCRIPTURE REFLECTION
                 </Text>
-                <Card style={styles.reflectionCard}>
+                <View style={styles.reflectionCard}>
                   <View style={styles.reflectionHeader}>
                     <QuoteSvg size={16} color={colors.accent} />
                     <Text variant="h3" color={colors.accent}>
@@ -471,7 +470,7 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
                   <Text variant="caption" color={colors.textSecondary} style={styles.reflectionNote}>
                     {selectedUser.favoriteVerse.note}
                   </Text>
-                </Card>
+                </View>
               </View>
             </ScrollView>
           </SafeAreaView>

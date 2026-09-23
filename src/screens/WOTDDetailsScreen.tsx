@@ -9,8 +9,7 @@ import {
 import { colors } from '../theme/colors';
 import { spacing, radius } from '../theme';
 import { Text } from '../components/Typography';
-import { Card } from '../components/Card';
-import { WOTDEntry, LENS_TABS } from '../data/mockDatabase';
+import { wotd, LENS_TABS } from '../data/mockDatabase';
 import {
   OriginalIntentSvg,
   TheologicalTruthSvg,
@@ -23,39 +22,46 @@ import {
 
 type LensKey = 'original_intent' | 'theological_truth' | 'modern_walk' | 'prayer_focus';
 
-const getLensIcon = (key: LensKey, color: string) => {
-  const size = 18;
-  switch (key) {
-    case 'original_intent':
-      return <OriginalIntentSvg size={size} color={color} />;
-    case 'theological_truth':
-      return <TheologicalTruthSvg size={size} color={color} />;
-    case 'modern_walk':
-      return <ModernWalkSvg size={size} color={color} />;
-    case 'prayer_focus':
-      return <PrayerFocusSvg size={size} color={color} />;
-  }
-};
-
-export default function WOTDDetailsScreen({ navigation, route }: { navigation: any; route: any }) {
-  const { wotd } = route.params as { wotd: WOTDEntry };
+export default function WOTDDetailsScreen({ navigation }: { navigation: any }) {
   const [activeLens, setActiveLens] = useState<LensKey>('original_intent');
 
-  const onShare = async () => {
-    try {
-      const message = `${wotd.verse}\n- ${wotd.reference}\n\nOriginal Intent:\n${wotd.original_intent}\n\nTheological Truth:\n${wotd.theological_truth}\n\nModern Walk:\n${wotd.modern_walk}\n\nPrayer Focus:\n${wotd.prayer_focus}`;
-      await Share.share({ message });
-    } catch (error) {
-      console.error(error);
+  const getLensIcon = (key: LensKey, color: string) => {
+    switch (key) {
+      case 'original_intent':
+        return <OriginalIntentSvg size={18} color={color} />;
+      case 'theological_truth':
+        return <TheologicalTruthSvg size={18} color={color} />;
+      case 'modern_walk':
+        return <ModernWalkSvg size={18} color={color} />;
+      case 'prayer_focus':
+        return <PrayerFocusSvg size={18} color={color} />;
+      default:
+        return null;
     }
   };
 
   const getLensContent = () => {
     switch (activeLens) {
-      case 'original_intent': return wotd.original_intent;
-      case 'theological_truth': return wotd.theological_truth;
-      case 'modern_walk': return wotd.modern_walk;
-      case 'prayer_focus': return wotd.prayer_focus;
+      case 'original_intent':
+        return wotd.original_intent;
+      case 'theological_truth':
+        return wotd.theological_truth;
+      case 'modern_walk':
+        return wotd.modern_walk;
+      case 'prayer_focus':
+        return wotd.prayer_focus;
+      default:
+        return '';
+    }
+  };
+
+  const onShare = async () => {
+    try {
+      await Share.share({
+        message: `"${wotd.verse}"\n— ${wotd.reference}\n\nShared from exégeomai Scripture Deep Dive`,
+      });
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -63,12 +69,24 @@ export default function WOTDDetailsScreen({ navigation, route }: { navigation: a
     <View style={styles.container}>
       {/* Header bar */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.8}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="Done"
+          style={styles.doneBtn}
+        >
           <Text variant="h3" style={styles.doneText}>Done</Text>
         </TouchableOpacity>
         <Text variant="h3" style={styles.headerTitle}>Scripture Deep Dive</Text>
-        <TouchableOpacity onPress={onShare} activeOpacity={0.8}>
-          <ShareSvg size={20} color={colors.textPrimary} />
+        <TouchableOpacity
+          onPress={onShare}
+          activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="Share scripture"
+          style={styles.shareBtn}
+        >
+          <ShareSvg size={18} color={colors.textPrimary} />
         </TouchableOpacity>
       </View>
 
@@ -77,24 +95,27 @@ export default function WOTDDetailsScreen({ navigation, route }: { navigation: a
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
       >
-        {/* Verse Card */}
-        <Card style={styles.verseCard}>
-          <View style={styles.metaRow}>
-            <CalendarSvg size={14} color={colors.accent} />
-            <Text variant="label" color={colors.accent} style={styles.metaLabel}>SAVED ENTRY</Text>
-          </View>
+        {/* Meta label */}
+        <View style={styles.metaRow}>
+          <CalendarSvg size={13} color={colors.accent} />
+          <Text variant="label" color={colors.accent} style={styles.metaLabel}>SAVED SCRIPTURE ENTRY</Text>
+        </View>
 
-          <View style={styles.quoteWrapper}>
-            <QuoteSvg size={24} color={colors.accent} style={{ marginBottom: spacing.md }} />
-            <Text variant="h2" style={styles.verseText}>
-              "{wotd.verse}"
-            </Text>
-            <Text variant="h3" style={styles.verseRef}>{wotd.reference}</Text>
-          </View>
-        </Card>
+        {/* Flat Sacred Quote Block */}
+        <View style={styles.quoteBox}>
+          <QuoteSvg size={20} color={colors.accent} style={{ marginBottom: 4 }} />
+          <Text variant="h2" style={styles.verseText}>
+            "{wotd.verse}"
+          </Text>
+          <Text variant="h3" style={styles.verseRef}>— {wotd.reference}</Text>
+        </View>
+
+        <View style={styles.hairlineDivider} />
 
         {/* Lens Selection */}
-        <Text variant="h3" style={styles.sectionTitle}>Understand the Depth</Text>
+        <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeaderLabel}>
+          EXEGETICAL LENSES
+        </Text>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -103,7 +124,7 @@ export default function WOTDDetailsScreen({ navigation, route }: { navigation: a
         >
           {LENS_TABS.map((tab) => {
             const active = activeLens === tab.key;
-            const iconColor = active ? colors.accent : colors.textSecondary;
+            const iconColor = active ? '#0F172A' : colors.textSecondary;
             return (
               <TouchableOpacity
                 key={tab.key}
@@ -113,7 +134,7 @@ export default function WOTDDetailsScreen({ navigation, route }: { navigation: a
               >
                 {getLensIcon(tab.key as LensKey, iconColor)}
                 <Text
-                  variant="label"
+                  variant="caption"
                   weight={active ? '700' : '500'}
                   style={[styles.lensTabLabel, active && styles.lensTabLabelActive]}
                 >
@@ -124,22 +145,24 @@ export default function WOTDDetailsScreen({ navigation, route }: { navigation: a
           })}
         </ScrollView>
 
-        {/* Dynamic Lens Content */}
-        <Card style={styles.contentCard}>
+        {/* Dynamic Lens Content (Continuous Body Section) */}
+        <View style={styles.lensContentSection}>
           <View style={styles.contentHeader}>
             {getLensIcon(activeLens, colors.accent)}
-            <Text variant="h2" style={styles.contentTitle}>
+            <Text variant="h3" style={styles.contentTitle}>
               {LENS_TABS.find(t => t.key === activeLens)?.label}
             </Text>
           </View>
           <Text variant="body" color={colors.textPrimary} style={styles.bodyText}>
             {getLensContent()}
           </Text>
-        </Card>
+        </View>
 
-        {/* Memory Verse Card */}
-        <View style={styles.memoryContainer}>
-          <Text variant="label" color={colors.accent} style={{ marginBottom: spacing.sm, letterSpacing: 1 }}>
+        <View style={styles.hairlineDivider} />
+
+        {/* Memory Verse Section */}
+        <View style={styles.memorySection}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={{ marginBottom: 4, letterSpacing: 0.8 }}>
             MEMORY VERSE
           </Text>
           <Text variant="body" color={colors.textSecondary} style={styles.memoryText}>
@@ -154,127 +177,150 @@ export default function WOTDDetailsScreen({ navigation, route }: { navigation: a
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: '#FFFFFF',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: spacing.md, // 16px
-    paddingVertical: spacing.md, // 16px
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
+    backgroundColor: '#FFFFFF',
+  },
+  doneBtn: {
+    backgroundColor: colors.accent,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: radius.full,
   },
   doneText: {
-    color: colors.accent,
+    color: '#0F172A',
+    fontSize: 14,
+    fontWeight: '700',
   },
   headerTitle: {
     color: colors.textPrimary,
+    fontSize: 16,
+  },
+  shareBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scroll: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   contentContainer: {
-    padding: spacing.md, // 16px margins & gutters
-    paddingBottom: spacing.xxl, // 48px
-  },
-  verseCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.xl, // 32px
-    padding: spacing.lg, // 24px
-    marginBottom: spacing.lg, // 24px
-    borderWidth: 1,
-    borderColor: colors.border,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: 48,
+    backgroundColor: '#FFFFFF',
   },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginBottom: spacing.sm, // 8px
+    marginBottom: 4,
   },
   metaLabel: {
-    fontSize: 11,
-    letterSpacing: 0.5,
+    fontSize: 10,
+    letterSpacing: 0.8,
+    fontWeight: '700',
   },
-  quoteWrapper: {
-    marginBottom: spacing.sm, // 8px
+  quoteBox: {
+    backgroundColor: 'rgba(253, 210, 35, 0.08)',
+    borderLeftWidth: 3,
+    borderLeftColor: colors.accent,
+    borderRadius: radius.sm,
+    padding: spacing.md,
+    marginVertical: 4,
   },
   verseText: {
-    fontSize: 20,
+    fontSize: 18,
     fontStyle: 'italic',
-    lineHeight: 28,
+    lineHeight: 26,
     color: colors.textPrimary,
-    marginBottom: spacing.md, // 16px
+    marginBottom: 4,
   },
   verseRef: {
     color: colors.accent,
-    fontSize: 16,
+    fontSize: 15,
+    fontWeight: '700',
+    textAlign: 'right',
   },
-  sectionTitle: {
-    fontSize: 18,
-    color: colors.textPrimary,
-    marginBottom: spacing.sm, // 8px
+  hairlineDivider: {
+    height: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.06)',
+    marginVertical: spacing.md,
+  },
+  sectionHeaderLabel: {
+    letterSpacing: 0.5,
+    marginBottom: 4,
   },
   lensTabsScroll: {
-    marginBottom: spacing.lg, // 24px
+    marginBottom: spacing.sm,
   },
   lensTabsContainer: {
     flexDirection: 'row',
-    gap: spacing.md, // 16px
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    paddingBottom: 2,
+    gap: 8,
+    paddingVertical: 4,
   },
   lensTab: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingVertical: spacing.sm, // 8px
-    paddingHorizontal: 4,
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: radius.full,
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
   },
   lensTabActive: {
-    borderBottomColor: colors.accent,
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
   },
   lensTabLabel: {
     color: colors.textSecondary,
-    fontSize: 13,
+    fontSize: 12,
   },
   lensTabLabelActive: {
-    color: colors.accent,
+    color: '#0F172A',
+    fontWeight: '700',
   },
-  contentCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg, // 24px
-    padding: spacing.lg, // 24px
-    marginBottom: spacing.lg, // 24px
-    borderWidth: 1,
-    borderColor: colors.border,
+  lensContentSection: {
+    paddingVertical: 4,
   },
   contentHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm, // 8px
-    marginBottom: spacing.md, // 16px
+    gap: 8,
+    marginBottom: 4,
   },
   contentTitle: {
-    fontSize: 18,
-    color: colors.accent,
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.textPrimary,
   },
   bodyText: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 15,
+    lineHeight: 23,
+    color: colors.textSecondary,
   },
-  memoryContainer: {
-    backgroundColor: colors.surfaceElevated,
-    borderRadius: radius.md, // 16px
-    padding: spacing.md, // 16px
-    borderWidth: 1,
-    borderColor: colors.border,
+  memorySection: {
+    paddingVertical: 4,
   },
   memoryText: {
     fontStyle: 'italic',
     lineHeight: 22,
+    fontSize: 14,
   },
 });

@@ -7,13 +7,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
-import { spacing, radius, shadow } from '../theme';
+import { spacing, radius } from '../theme';
 import { Text } from '../components/Typography';
-import { Card } from '../components/Card';
 import { useUser } from '../context/UserContext';
 import {
   CheckSvg,
   FavoritesSvg,
+  ChevronRightSvg,
 } from '../components/SvgIcons';
 
 type FavTab = 'Facts' | 'Scriptures' | 'WOTD';
@@ -37,7 +37,7 @@ export default function FavoritesScreen({ navigation }: { navigation: any }) {
         </Text>
 
         {/* 3-Way Tab Selector */}
-        <View style={[styles.toggleContainer, shadow.sm]}>
+        <View style={styles.toggleContainer}>
           {(['Facts', 'Scriptures', 'WOTD'] as FavTab[]).map(t => (
             <TouchableOpacity
               key={t}
@@ -56,57 +56,66 @@ export default function FavoritesScreen({ navigation }: { navigation: any }) {
           ))}
         </View>
 
-        {/* List Content */}
+        {/* List Content (Continuous Flat Rows - Zero Card Divs) */}
         {hasFavorites ? (
           <View style={styles.list}>
-            {tab === 'Facts' && (currentList as any[]).map(f => (
-              <Card
+            {tab === 'Facts' && (currentList as any[]).map((f, idx) => (
+              <TouchableOpacity
                 key={f.id}
                 onPress={() => navigation.navigate('FactDetails', { fact: f })}
-                showChevron
-                style={styles.itemCard}
+                style={[styles.itemRow, idx < currentList.length - 1 && styles.rowDivider]}
+                activeOpacity={0.75}
               >
-                <Text variant="label" color={colors.accent} weight="800" style={{ marginBottom: 4 }}>
-                  {f.category.toUpperCase()}
-                </Text>
-                <Text variant="h3" style={{ color: colors.textPrimary }}>{f.fact_title}</Text>
-                <Text variant="caption" color={colors.textSecondary} style={{ marginTop: 4 }}>
-                  {f.scripture_ref}
-                </Text>
-              </Card>
+                <View style={styles.itemMain}>
+                  <Text variant="label" color={colors.accent} weight="800" style={{ marginBottom: 4, letterSpacing: 0.5 }}>
+                    {f.category.toUpperCase()}
+                  </Text>
+                  <Text variant="h3" style={{ color: colors.textPrimary }}>{f.fact_title}</Text>
+                  <Text variant="caption" color={colors.textSecondary} style={{ marginTop: 4 }}>
+                    {f.scripture_ref}
+                  </Text>
+                </View>
+                <ChevronRightSvg size={16} color="#94A3B8" />
+              </TouchableOpacity>
             ))}
-            {tab === 'Scriptures' && (currentList as any[]).map(s => (
-              <Card
+            {tab === 'Scriptures' && (currentList as any[]).map((s, idx) => (
+              <TouchableOpacity
                 key={s.id}
                 onPress={() => navigation.navigate('ScriptureDetails', { scripture: s })}
-                showChevron
-                style={styles.itemCard}
+                style={[styles.itemRow, idx < currentList.length - 1 && styles.rowDivider]}
+                activeOpacity={0.75}
               >
-                <Text variant="label" color={colors.accent} weight="800" style={{ marginBottom: 4 }}>
-                  {s.book.toUpperCase()}
-                </Text>
-                <Text variant="h3" style={{ color: colors.textPrimary }}>{s.reference}</Text>
-                <Text variant="body" color={colors.textSecondary} numberOfLines={2} style={{ marginTop: 4 }}>
-                  {s.text}
-                </Text>
-              </Card>
+                <View style={styles.itemMain}>
+                  <Text variant="label" color={colors.accent} weight="800" style={{ marginBottom: 4, letterSpacing: 0.5 }}>
+                    {s.book.toUpperCase()}
+                  </Text>
+                  <Text variant="h3" style={{ color: colors.textPrimary }}>{s.reference}</Text>
+                  <Text variant="body" color={colors.textSecondary} numberOfLines={2} style={{ marginTop: 4 }}>
+                    {s.text}
+                  </Text>
+                </View>
+                <ChevronRightSvg size={16} color="#94A3B8" />
+              </TouchableOpacity>
             ))}
-            {tab === 'WOTD' && (currentList as any[]).map(w => (
-              <Card
+            {tab === 'WOTD' && (currentList as any[]).map((w, idx) => (
+              <TouchableOpacity
                 key={w.id}
                 onPress={() => navigation.navigate('WOTDDetails', { wotd: w })}
-                showChevron
-                style={styles.itemCard}
+                style={[styles.itemRow, idx < currentList.length - 1 && styles.rowDivider]}
+                activeOpacity={0.75}
               >
-                <View style={styles.completedHeader}>
-                  <CheckSvg size={14} color={colors.accent} />
-                  <Text variant="label" color={colors.accent} weight="800">COMPLETED</Text>
+                <View style={styles.itemMain}>
+                  <View style={styles.completedHeader}>
+                    <CheckSvg size={13} color={colors.accent} />
+                    <Text variant="label" color={colors.accent} weight="800" style={{ letterSpacing: 0.5 }}>COMPLETED</Text>
+                  </View>
+                  <Text variant="h3" style={{ color: colors.textPrimary }}>{w.reference}</Text>
+                  <Text variant="body" color={colors.textSecondary} numberOfLines={2} style={{ marginTop: 4 }}>
+                    {w.verse}
+                  </Text>
                 </View>
-                <Text variant="h3" style={{ color: colors.textPrimary }}>{w.reference}</Text>
-                <Text variant="body" color={colors.textSecondary} numberOfLines={2} style={{ marginTop: 4 }}>
-                  {w.verse}
-                </Text>
-              </Card>
+                <ChevronRightSvg size={16} color="#94A3B8" />
+              </TouchableOpacity>
             ))}
           </View>
         ) : (
@@ -121,7 +130,7 @@ export default function FavoritesScreen({ navigation }: { navigation: any }) {
             </Text>
 
             <TouchableOpacity
-              style={[styles.discoverBtn, shadow.sm]}
+              style={styles.discoverBtn}
               onPress={() => navigation.navigate('Discover')}
               activeOpacity={0.85}
             >
@@ -137,14 +146,17 @@ export default function FavoritesScreen({ navigation }: { navigation: any }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: '#FFFFFF',
   },
   scroll: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   contentContainer: {
-    padding: spacing.md, // 16px margins & gutters
-    paddingBottom: 96, // 96px padding clears floating pill tab bar
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: 96,
+    backgroundColor: '#FFFFFF',
   },
   subtitle: {
     fontSize: 14,
@@ -152,18 +164,18 @@ const styles = StyleSheet.create({
   },
   toggleContainer: {
     flexDirection: 'row',
-    backgroundColor: colors.surface,
-    padding: 4,
-    borderRadius: radius.md, // 16px
+    backgroundColor: '#F8FAFC',
+    padding: 3,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: spacing.lg, // 24px
+    borderColor: 'rgba(15, 23, 42, 0.08)',
+    marginBottom: spacing.md,
   },
   toggleBtn: {
     flex: 1,
-    paddingVertical: spacing.sm, // 8px
+    paddingVertical: spacing.sm,
     alignItems: 'center',
-    borderRadius: radius.sm, // 8px
+    borderRadius: radius.sm,
   },
   toggleBtnActive: {
     backgroundColor: colors.accent,
@@ -173,63 +185,63 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   toggleTextActive: {
-    color: '#FFFFFF',
+    color: '#0F172A',
+    fontWeight: '700',
   },
   list: {
-    gap: spacing.sm, // 8px
+    backgroundColor: '#FFFFFF',
   },
-  itemCard: {
-    backgroundColor: colors.surface,
-    padding: spacing.md, // 16px
-    borderRadius: radius.md, // 16px
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: spacing.sm, // 8px
+  itemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.md,
+  },
+  itemMain: {
+    flex: 1,
+    marginRight: 12,
+  },
+  rowDivider: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
   },
   completedHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm, // 8px
+    gap: 6,
     marginBottom: 4,
   },
   emptyContainer: {
     alignItems: 'center',
-    paddingVertical: spacing.xxl, // 48px
+    paddingVertical: spacing.xxl,
   },
   emptyCircle: {
     width: 64,
     height: 64,
-    borderRadius: radius.full,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    justifyContent: 'center',
+    borderRadius: 32,
+    backgroundColor: 'rgba(253, 210, 35, 0.1)',
     alignItems: 'center',
-    marginBottom: spacing.md, // 16px
+    justifyContent: 'center',
+    marginBottom: spacing.md,
   },
   emptyTitle: {
-    fontSize: 19,
     color: colors.textPrimary,
-    marginBottom: spacing.sm, // 8px
+    marginBottom: 4,
   },
   emptySub: {
-    fontSize: 14,
-    lineHeight: 22,
-    paddingHorizontal: spacing.lg, // 24px
-    marginBottom: spacing.lg, // 24px
+    paddingHorizontal: spacing.xl,
+    lineHeight: 20,
+    marginBottom: spacing.lg,
   },
   discoverBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm, // 8px
     backgroundColor: colors.accent,
-    paddingHorizontal: spacing.lg, // 24px
-    paddingVertical: spacing.md, // 16px
-    borderRadius: radius.md, // 16px
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: radius.full,
   },
   discoverBtnText: {
-    fontSize: 15,
-    color: '#FFFFFF',
+    color: '#0F172A',
+    fontSize: 14,
     fontWeight: '700',
   },
 });

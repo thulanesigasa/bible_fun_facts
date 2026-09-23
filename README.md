@@ -354,6 +354,42 @@ graph TD
 
 ---
 
+## Continuous Flat Body Architecture (Zero Card Divs Across All Screens)
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Layout-Continuous%20Flat%20Body-FDD223?style=for-the-badge" alt="Continuous Flat Body Layout" />
+  <img src="https://img.shields.io/badge/UI%20Containers-Zero%20Card%20Divs-0F172A?style=for-the-badge" alt="Zero Card Divs" />
+  <img src="https://img.shields.io/badge/Separators-Hairline%20Dividers-64748B?style=for-the-badge" alt="Hairline Dividers" />
+</p>
+
+To ensure a cohesive, unified, and distraction-free reading experience matching Settings (`ProfileScreen.tsx`), all floating card boxes, elevated containers, and wrapper divs have been systematically eliminated across the entire application:
+
+```mermaid
+graph TD
+    Screens["App Screens (Feed, History, Details, Favorites)"] --> FlatBody["Pure White Continuous Body (#FFFFFF)"]
+    FlatBody --> Dividers["Subtle Hairline Dividers (rgba(15, 23, 42, 0.06))"]
+    FlatBody --> SacredQuotes["Sacred Quote Blocks (Accent Left-Border + Subtle Warm Tint)"]
+    FlatBody --> EditorialTypography["Direct Editorial Typography & High-Contrast Headings"]
+    
+    Screens -.-> NoCards["Eliminated Floating <Card> Boxes, Card Shadows & Inset Divs"]
+```
+
+1. **Feed Tab (`DiscoverScreen.tsx`)**:
+   - Background set to pure continuous `#FFFFFF`.
+   - "Resume Reading": Refactored from an elevated shadow card into a seamless flat body row with subtle hairline dividers.
+   - "Today's Message": Stripped `<Card>` container. Renders directly in the screen body with a prominent title, editorial historical context, and sacred quote block (3px solid amber left-border).
+2. **History Tab (`HistoryScreen.tsx`)**:
+   - Completely removed `<Card>` wrappers from the biblical writers catalog.
+   - Writers are rendered as continuous flat body rows separated by hairline dividers (`borderBottomWidth: 1, borderBottomColor: 'rgba(15, 23, 42, 0.06)'`), identical to `BookmarksScreen.tsx`.
+3. **Writer Details (`WriterDetailsScreen.tsx`)**:
+   - Converted all narrative card blocks (`roleCard`, `quoteCard`, `narrativeCard`, `scholarCard`) into continuous body sections with clean section labels and hairline dividers.
+4. **Fact & Scripture Details (`FactDetailsScreen.tsx` & `ScriptureDetailsScreen.tsx`)**:
+   - Converted quote cards and Strong's concordance panels into continuous body layouts on `#FFFFFF` canvases.
+5. **Favorites & Word of the Day (`FavoritesScreen.tsx` & `WOTDDetailsScreen.tsx`)**:
+   - Replaced card containers with flat rows, inline disclosure indicators, and continuous exegetical lens sections.
+
+---
+
 ## Supabase Relational Database Architecture (`ibwooiejzxhbzplnldcz`)
 
 The application is backed by a full production-ready relational schema on Supabase with Row Level Security (RLS) enabled across every table:

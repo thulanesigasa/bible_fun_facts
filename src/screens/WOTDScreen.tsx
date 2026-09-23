@@ -17,7 +17,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
-import { Card } from '../components/Card';
 import { wotd, LENS_TABS, Scripture } from '../data/mockDatabase';
 import { useUser } from '../context/UserContext';
 import { BIBLE_BOOKS, BibleBook, BibleChapterData, BibleVerse } from '../data/bibleCanon';

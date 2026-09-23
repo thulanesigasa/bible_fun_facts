@@ -9,9 +9,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
-import { spacing, radius, shadow } from '../theme';
+import { spacing, radius } from '../theme';
 import { Text } from '../components/Typography';
-import { Card } from '../components/Card';
 import { BIBLICAL_WRITERS, BiblicalWriter } from '../data/biblicalWriters';
 import {
   SearchSvg,
@@ -64,95 +63,95 @@ export default function HistoryScreen({ navigation }: HistoryScreenProps) {
     return result;
   }, [searchQuery, selectedCategory]);
 
-  const renderWriterItem = ({ item }: { item: BiblicalWriter }) => {
+  const renderWriterItem = ({ item, index }: { item: BiblicalWriter; index: number }) => {
     const displayedBooks = item.booksWritten.slice(0, 4);
     const extraBooksCount = item.booksWritten.length - 4;
+    const isLast = index === filteredWriters.length - 1;
 
     return (
       <TouchableOpacity
-        activeOpacity={0.88}
+        style={[styles.writerRow, !isLast && styles.rowDivider]}
+        activeOpacity={0.75}
         onPress={() => navigation.navigate('WriterDetails', { writer: item })}
         accessibilityRole="button"
         accessibilityLabel={`View history of ${item.name}`}
       >
-        <Card style={styles.writerCard}>
-          {/* Top header row: Name + Hebrew/Greek script */}
-          <View style={styles.cardHeaderRow}>
-            <View style={styles.nameContainer}>
-              <View style={styles.titleWithIcon}>
-                <FeatherPenSvg size={16} color={colors.accent} />
-                <Text variant="h3" style={styles.writerName}>
-                  {item.name}
-                </Text>
-              </View>
-              <Text variant="caption" color={colors.accent} weight="700" style={styles.transliteration}>
-                {item.transliteration}
+        {/* Top header row: Name + Hebrew/Greek script */}
+        <View style={styles.cardHeaderRow}>
+          <View style={styles.nameContainer}>
+            <View style={styles.titleWithIcon}>
+              <FeatherPenSvg size={15} color={colors.accent} />
+              <Text variant="h3" style={styles.writerName}>
+                {item.name}
               </Text>
             </View>
-
-            <Text variant="h2" style={styles.originalScript}>
-              {item.originalName}
+            <Text variant="caption" color={colors.accent} weight="700" style={styles.transliteration}>
+              {item.transliteration}
             </Text>
           </View>
 
-          {/* Meta Category & Era */}
-          <View style={styles.metaRow}>
-            <View style={styles.categoryPill}>
-              <Text variant="caption" weight="700" color={colors.accent}>
-                {item.category.toUpperCase()}
-              </Text>
-            </View>
-            <Text variant="caption" color={colors.textTertiary} numberOfLines={1} style={styles.eraText}>
-              • {item.era}
-            </Text>
-          </View>
-
-          {/* Role Summary */}
-          <Text variant="body" color={colors.textPrimary} style={styles.roleSummary}>
-            {item.role}
+          <Text variant="h2" style={styles.originalScript}>
+            {item.originalName}
           </Text>
+        </View>
 
-          {/* Canonical Books Penned */}
-          <View style={styles.booksWrap}>
-            <View style={styles.bookIconWrap}>
-              <BookOpenSvg size={13} color={colors.textSecondary} />
-            </View>
-            {displayedBooks.map((book) => (
-              <View key={book} style={styles.bookBadge}>
-                <Text variant="caption" weight="600" color={colors.textPrimary} style={{ fontSize: 11 }}>
-                  {book}
-                </Text>
-              </View>
-            ))}
-            {extraBooksCount > 0 && (
-              <View style={styles.extraBooksBadge}>
-                <Text variant="caption" weight="700" color={colors.accent} style={{ fontSize: 11 }}>
-                  +{extraBooksCount} more
-                </Text>
-              </View>
-            )}
-          </View>
-
-          {/* Key Verse Box */}
-          <View style={styles.keyVerseBox}>
-            <Text variant="body" numberOfLines={2} style={styles.keyVerseText}>
-              "{item.keyVerse.text}"
-            </Text>
-            <Text variant="caption" color={colors.textSecondary} weight="700" style={styles.keyVerseRef}>
-              — {item.keyVerse.reference}
-            </Text>
-          </View>
-
-          {/* Action Footer */}
-          <View style={styles.cardFooter}>
+        {/* Meta Category & Era */}
+        <View style={styles.metaRow}>
+          <View style={styles.categoryPill}>
             <Text variant="caption" weight="700" color={colors.accent}>
-              Explore Biography & Manuscripts ›
-            </Text>
-            <Text variant="caption" color={colors.textTertiary}>
-              {item.totalChapters} chapters
+              {item.category.toUpperCase()}
             </Text>
           </View>
-        </Card>
+          <Text variant="caption" color={colors.textTertiary} numberOfLines={1} style={styles.eraText}>
+            • {item.era}
+          </Text>
+        </View>
+
+        {/* Role Summary */}
+        <Text variant="body" color={colors.textPrimary} style={styles.roleSummary}>
+          {item.role}
+        </Text>
+
+        {/* Canonical Books Penned */}
+        <View style={styles.booksWrap}>
+          <View style={styles.bookIconWrap}>
+            <BookOpenSvg size={13} color={colors.textSecondary} />
+          </View>
+          {displayedBooks.map((book) => (
+            <View key={book} style={styles.bookBadge}>
+              <Text variant="caption" weight="600" color={colors.textPrimary} style={{ fontSize: 11 }}>
+                {book}
+              </Text>
+            </View>
+          ))}
+          {extraBooksCount > 0 && (
+            <View style={styles.extraBooksBadge}>
+              <Text variant="caption" weight="700" color={colors.accent} style={{ fontSize: 11 }}>
+                +{extraBooksCount} more
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* Key Verse Box (Clean Sacred Quote with Accent Left-Border) */}
+        <View style={styles.keyVerseBox}>
+          <Text variant="body" numberOfLines={2} style={styles.keyVerseText}>
+            "{item.keyVerse.text}"
+          </Text>
+          <Text variant="caption" color={colors.textSecondary} weight="700" style={styles.keyVerseRef}>
+            — {item.keyVerse.reference}
+          </Text>
+        </View>
+
+        {/* Action Footer */}
+        <View style={styles.rowFooter}>
+          <Text variant="caption" weight="700" color={colors.accent}>
+            Explore Biography & Manuscripts ›
+          </Text>
+          <Text variant="caption" color={colors.textTertiary}>
+            {item.totalChapters} chapters
+          </Text>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -226,7 +225,10 @@ export default function HistoryScreen({ navigation }: HistoryScreenProps) {
         </ScrollView>
       </View>
 
-      {/* Writers List */}
+      {/* Subtle Hairline Divider before continuous body list */}
+      <View style={styles.hairlineDivider} />
+
+      {/* Writers Continuous Body List (Zero Card Divs) */}
       <FlatList
         data={filteredWriters}
         keyExtractor={(item) => item.id}
@@ -263,12 +265,13 @@ export default function HistoryScreen({ navigation }: HistoryScreenProps) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: '#FFFFFF',
   },
   header: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
     paddingBottom: spacing.sm,
+    backgroundColor: '#FFFFFF',
   },
   screenTitle: {
     color: colors.textPrimary,
@@ -279,14 +282,15 @@ const styles = StyleSheet.create({
   searchContainer: {
     paddingHorizontal: spacing.lg,
     marginBottom: spacing.sm,
+    backgroundColor: '#FFFFFF',
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F8FAFC',
     borderRadius: radius.md,
     paddingHorizontal: 12,
-    height: 44,
+    height: 42,
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.08)',
     gap: 8,
@@ -301,7 +305,8 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   categoryScrollContainer: {
-    marginBottom: spacing.sm,
+    marginBottom: 4,
+    backgroundColor: '#FFFFFF',
   },
   categoryScrollContent: {
     paddingHorizontal: spacing.lg,
@@ -309,9 +314,9 @@ const styles = StyleSheet.create({
   },
   filterPill: {
     paddingHorizontal: 12,
-    paddingVertical: 7,
+    paddingVertical: 6,
     borderRadius: radius.full,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F8FAFC',
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.08)',
   },
@@ -319,18 +324,25 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
     borderColor: colors.accent,
   },
-  listContent: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: 4,
-    paddingBottom: 104,
+  hairlineDivider: {
+    height: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.06)',
+    marginTop: 4,
   },
-  writerCard: {
+  listContent: {
+    paddingBottom: 104,
     backgroundColor: '#FFFFFF',
-    padding: spacing.md,
-    borderRadius: radius.lg,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
+  },
+
+  // Flat Continuous Body Item (Zero Card Divs)
+  writerRow: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: '#FFFFFF',
+  },
+  rowDivider: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
   },
   cardHeaderRow: {
     flexDirection: 'row',
@@ -365,7 +377,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginVertical: 6,
+    marginVertical: 4,
   },
   categoryPill: {
     backgroundColor: colors.accentSoft,
@@ -379,15 +391,16 @@ const styles = StyleSheet.create({
   },
   roleSummary: {
     fontSize: 13,
-    lineHeight: 18,
+    lineHeight: 19,
     marginVertical: 4,
+    color: colors.textSecondary,
   },
   booksWrap: {
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
     gap: 6,
-    marginVertical: 8,
+    marginVertical: 6,
   },
   bookIconWrap: {
     marginRight: 2,
@@ -405,8 +418,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
   },
   keyVerseBox: {
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 10,
+    backgroundColor: 'rgba(253, 210, 35, 0.08)',
+    paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: radius.sm,
     marginVertical: 6,
@@ -423,14 +436,12 @@ const styles = StyleSheet.create({
     marginTop: 4,
     textAlign: 'right',
   },
-  cardFooter: {
+  rowFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(15, 23, 42, 0.05)',
-    marginTop: 4,
+    marginTop: 2,
   },
   emptyContainer: {
     alignItems: 'center',
