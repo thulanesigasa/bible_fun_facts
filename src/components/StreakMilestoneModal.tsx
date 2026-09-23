@@ -12,8 +12,6 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import ViewShot, { captureRef } from 'react-native-view-shot';
-import * as Sharing from 'expo-sharing';
 import { colors } from '../theme/colors';
 import { Text } from './Typography';
 import { StreakHexagonBadge } from './StreakHexagonBadge';
@@ -88,17 +86,22 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
 
   const handleShare = async () => {
     try {
-      if (shareCardRef.current) {
-        let uri: string | null = null;
-        if (typeof (shareCardRef.current as any).capture === 'function') {
-          uri = await (shareCardRef.current as any).capture();
-        } else {
-          uri = await captureRef(shareCardRef.current, { format: 'png', quality: 1.0 });
-        }
-        if (uri) {
-          const canShare = await Sharing.isAvailableAsync();
-          if (canShare) {
-            await Sharing.shareAsync(uri, {
+      let SharingModule: any = null;
+      try {
+        SharingModule = require('expo-sharing');
+      } catch (_) {}
+
+      let captureRefFn: any = null;
+      try {
+        captureRefFn = require('react-native-view-shot').captureRef;
+      } catch (_) {}
+
+      if (SharingModule && captureRefFn && shareCardRef.current) {
+        const canShare = await SharingModule.isAvailableAsync().catch(() => false);
+        if (canShare) {
+          const uri = await captureRefFn(shareCardRef.current, { format: 'png', quality: 1.0 }).catch(() => null);
+          if (uri) {
+            await SharingModule.shareAsync(uri, {
               mimeType: 'image/png',
               UTI: 'public.png',
               dialogTitle: `${selectedMilestone.title} - Day ${selectedMilestone.days} Streak`,
@@ -108,7 +111,7 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
         }
       }
     } catch (shareErr) {
-      console.warn('Image share failed, falling back to text:', shareErr);
+      console.warn('Native image share not available, falling back to text:', shareErr);
     }
     try {
       const shareMessage = [
@@ -180,11 +183,11 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
           >
-            {/* Shareable card — captured by ViewShot */}
-            <ViewShot
+            {/* Shareable card — clean white surface, zero native crash */}
+            <View
               ref={shareCardRef}
-              options={{ format: 'png', quality: 1.0 }}
               style={styles.shareCard}
+              collapsable={false}
             >
               <View style={styles.shareCardInner}>
                 {/* Badge */}
@@ -215,7 +218,7 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
                   </Text>
                 </View>
               </View>
-            </ViewShot>
+            </View>
 
             {/* Title & Epigram Subtitle */}
             <View style={styles.copyBlock}>
