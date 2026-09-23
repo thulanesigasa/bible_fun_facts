@@ -29,6 +29,9 @@ import {
   BookmarkSvg,
 } from '../components/SvgIcons';
 import { UiverseSwitch } from '../components/UiverseSwitch';
+import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
+import { StreakHexagonBadge } from '../components/StreakHexagonBadge';
+import { getMilestoneForStreak } from '../data/streakMilestones';
 
 // ============================================================================
 // TYPOGRAPHY PRESETS
@@ -63,6 +66,8 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
   } = useUser();
 
   const [isUploading, setIsUploading] = useState(false);
+  const [showStreakModal, setShowStreakModal] = useState(false);
+  const currentMilestone = getMilestoneForStreak(streak);
   const [notifications, setNotifications] = useState<boolean>(
     userProfile?.notificationsEnabled ?? true
   );
@@ -388,7 +393,13 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
 
             <View style={styles.statDivider} />
 
-            <View style={styles.statColumn}>
+            <TouchableOpacity
+              style={styles.statColumn}
+              onPress={() => setShowStreakModal(true)}
+              activeOpacity={0.75}
+              accessibilityRole="button"
+              accessibilityLabel={`Streak: ${streak} days. Tap to open streak badge.`}
+            >
               <View style={styles.statIconRow}>
                 <FlameSvg size={14} color={colors.accent} fill={colors.accent} />
                 <Text variant="h3" style={[styles.statValue, { marginLeft: 4 }]}>
@@ -398,7 +409,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
               <Text variant="caption" color={colors.textSecondary} style={styles.statLabel}>
                 Streak
               </Text>
-            </View>
+            </TouchableOpacity>
 
             <View style={styles.statDivider} />
 
@@ -608,7 +619,40 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           </View>
         </View>
 
-        {/* 2. NOTIFICATIONS (ZERO ICONS) */}
+        {/* 2. STREAK & ACHIEVEMENTS */}
+        <View style={styles.bodySection}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+            STREAK & ACHIEVEMENTS
+          </Text>
+
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={() => setShowStreakModal(true)}
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel={`Streak badges and milestones. Current milestone: ${currentMilestone.title}.`}
+          >
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Streak Badges & Milestones
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                {currentMilestone.title} • {streak} {streak === 1 ? 'day streak' : 'days streak'}
+              </Text>
+            </View>
+            <View style={styles.badgeThumbnailWrap}>
+              <StreakHexagonBadge
+                days={currentMilestone.days}
+                tier={currentMilestone.tier}
+                size={34}
+                badgeImage={currentMilestone.badgeImage}
+              />
+              <Text style={styles.rowDisclosureArrow}>›</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* 3. NOTIFICATIONS (ZERO ICONS) */}
         <View style={styles.bodySection}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             NOTIFICATIONS
@@ -765,6 +809,13 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           </View>
         </View>
       </ScrollView>
+
+      {/* 3D Cal AI Style Streak Milestone Modal */}
+      <StreakMilestoneModal
+        visible={showStreakModal}
+        streak={streak}
+        onClose={() => setShowStreakModal(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -1125,5 +1176,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 4,
+  },
+  badgeThumbnailWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
 });

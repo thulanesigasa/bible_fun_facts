@@ -23,6 +23,7 @@ import {
   ShareSvg,
   ScrollSvg,
 } from '../components/SvgIcons';
+import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
 
 interface DiscoverScreenProps {
   navigation: any;
@@ -30,6 +31,7 @@ interface DiscoverScreenProps {
 
 export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
   const [refreshing, setRefreshing] = useState(false);
+  const [showStreakModal, setShowStreakModal] = useState(false);
 
   const {
     streak,
@@ -83,7 +85,7 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
           />
         }
       >
-        {/* Header Greeting & Day Progress + Compact Streak Pill */}
+        {/* Header Greeting & Day Progress + Interactive Streak Pill */}
         <View style={styles.headerRow}>
           <View style={styles.headerTextWrap}>
             <Text variant="h2" style={styles.headerTitle}>
@@ -94,12 +96,18 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
             </Text>
           </View>
 
-          <View style={styles.streakInline}>
+          <TouchableOpacity
+            style={styles.streakInline}
+            onPress={() => setShowStreakModal(true)}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`Streak: ${streak} days. Tap to open streak badge.`}
+          >
             <FlameSvg size={14} color={colors.accent} fill={colors.accent} />
             <Text variant="caption" weight="700" color={colors.accent}>
               {streak}d
             </Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.hairlineDivider} />
@@ -254,6 +262,13 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
           </View>
         </View>
       </ScrollView>
+
+      {/* 3D Cal AI Style Streak Milestone Modal */}
+      <StreakMilestoneModal
+        visible={showStreakModal}
+        streak={streak}
+        onClose={() => setShowStreakModal(false)}
+      />
     </SafeAreaView>
   );
 }
