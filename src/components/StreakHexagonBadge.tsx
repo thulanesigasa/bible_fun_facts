@@ -20,44 +20,44 @@ export interface StreakHexagonBadgeProps {
 
 // 60-30-10 & metallic palettes for clean 3D hexagonal shields (strictly fire-free)
 // 4 Distinct Color Tiers:
-// 1. Day 1 to 6: Bronze (Warm Antique Copper)
+// 1. Day 1 to 6: Bronze (Warm Antique Copper / Terracotta)
 // 2. Day 7 to 30: Silver (Radiant Steel Platinum)
-// 3. Day 30 to Month 6: Gold (Biblical Amber Gold)
+// 3. Day 30 to Month 6: Gold (Biblical Radiant Gold)
 // 4. Month 6 to 1 Year: Diamond (Radiant Sapphire Azure)
 const TIER_PALETTES = {
-  // 1. Day 1 to 6 (Color 1)
+  // 1. Day 1 to 6 (Color 1 - Copper Bronze)
   bronze: {
-    borderLight: '#F59E0B',
-    borderMid: '#B45309',
-    borderDark: '#78350F',
-    faceGradStart: '#FEF3C7',
-    faceGradEnd: '#B45309',
-    surfaceGradStart: '#78350F',
-    surfaceGradEnd: '#331302',
-    accentGlaze: '#FDE68A',
-    textFront: '#FEF3C7',
-    textShadow: '#260B00',
-    insignia: '#FDE68A',
+    borderLight: '#FB923C',
+    borderMid: '#EA580C',
+    borderDark: '#9A3412',
+    faceGradStart: '#FFEDD5',
+    faceGradEnd: '#EA580C',
+    surfaceGradStart: '#7C2D12',
+    surfaceGradEnd: '#371004',
+    accentGlaze: '#FED7AA',
+    textFront: '#FFEDD5',
+    textShadow: '#220802',
+    insignia: '#FB923C',
   },
-  // 2. Day 7 to 30 (Color 2)
+  // 2. Day 7 to 30 (Color 2 - Platinum Silver)
   silver: {
     borderLight: '#FFFFFF',
     borderMid: '#CBD5E1',
     borderDark: '#64748B',
     faceGradStart: '#FFFFFF',
     faceGradEnd: '#94A3B8',
-    surfaceGradStart: '#475569',
+    surfaceGradStart: '#334155',
     surfaceGradEnd: '#0F172A',
     accentGlaze: '#F8FAFC',
     textFront: '#FFFFFF',
     textShadow: '#020617',
     insignia: '#E2E8F0',
   },
-  // 3. Day 30 to Month 6 (Color 3)
+  // 3. Day 30 to Month 6 (Color 3 - Radiant Biblical Gold)
   gold: {
     borderLight: '#FEF08A',
     borderMid: '#FACC15',
-    borderDark: '#854D0E',
+    borderDark: '#A16207',
     faceGradStart: '#FEFCE8',
     faceGradEnd: '#CA8A04',
     surfaceGradStart: '#713F12',
@@ -65,35 +65,35 @@ const TIER_PALETTES = {
     accentGlaze: '#FEF9C3',
     textFront: '#FEFCE8',
     textShadow: '#1A0C00',
-    insignia: '#FEF08A',
+    insignia: '#FACC15',
   },
-  // 4. Month 6 to 1 Year (Color 4)
+  // 4. Month 6 to 1 Year (Color 4 - Brilliant Sapphire Diamond)
   diamond: {
     borderLight: '#E0F2FE',
     borderMid: '#38BDF8',
-    borderDark: '#0369A1',
+    borderDark: '#0284C7',
     faceGradStart: '#F0F9FF',
     faceGradEnd: '#0284C7',
     surfaceGradStart: '#075985',
-    surfaceGradEnd: '#031D30',
+    surfaceGradEnd: '#082F49',
     accentGlaze: '#BAE6FD',
     textFront: '#FFFFFF',
     textShadow: '#02101C',
-    insignia: '#BAE6FD',
+    insignia: '#38BDF8',
   },
   // Compatible alias for Month 6 to 1 Year / Full Year
   celestial: {
     borderLight: '#E0F2FE',
     borderMid: '#38BDF8',
-    borderDark: '#0369A1',
+    borderDark: '#0284C7',
     faceGradStart: '#F0F9FF',
     faceGradEnd: '#0284C7',
     surfaceGradStart: '#075985',
-    surfaceGradEnd: '#031D30',
+    surfaceGradEnd: '#082F49',
     accentGlaze: '#BAE6FD',
     textFront: '#FFFFFF',
     textShadow: '#02101C',
-    insignia: '#BAE6FD',
+    insignia: '#38BDF8',
   },
 };
 

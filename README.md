@@ -444,14 +444,18 @@ graph TD
 ```
 
 ### 1. Pure Dynamic 3D Metallic Hexagonal Shield Badges (`StreakHexagonBadge.tsx`)
-- **Feed Header Replacement**: Replaced the legacy text pill (`1d` / `{streak}d`) in `DiscoverScreen.tsx` with the interactive 3D metallic hexagonal shield badge (`size={42}`) and `"Streak 1"` label (auto-updating each day). Tapping this badge immediately presents the celebration milestone showcase modal (`StreakMilestoneModal.tsx`).
+- **Feed Header Replacement**: Replaced the legacy text pill (`1d` / `{streak}d`) in `DiscoverScreen.tsx` with the interactive 3D metallic hexagonal shield badge (`size={42}`) paired with a 2-line title and active tier indicator (`"Streak 1"`, `"Bronze"` / `"Silver"` / `"Gold"` / `"Diamond"`). Tapping this button immediately presents the celebration milestone showcase modal (`StreakMilestoneModal.tsx`).
 - **Profile Screen Streamlining**: Cleanly removed the `STREAK & ACHIEVEMENTS` section from `ProfileScreen.tsx`, preserving the profile body's clean typographic focus on Reading & Typography, Notifications, Saved Content, Legal & Policies, and Account.
 - **Strictly Fire-Free & Flame-Free**: Eliminated all fire and flame motifs across badges, icons, headers, and screens in favor of an authentic, sacred, and prestigious 3D metallic hexagonal shield.
 - **Dynamic Daily Update Engine ("Streak 1" Baseline)**: 100% procedural vector rendering via `react-native-svg` (zero baked static images). Defaults to `Streak 1` in `UserContext.tsx` and automatically advances consecutive daily study.
-- **Shield Layout Architecture**: Renders `STREAK` on top and the large extruded 3D number `{days}` centered directly underneath, reading seamlessly as "STREAK 1", "STREAK 2", etc.
-- **Beveled Metallic Rim**: Point-top hexagonal border with multi-stop reflection gradients (`Bronze`, `Silver`, `Gold`, `Diamond`, `Celestial`), chamfered depth borders, and specular highlights.
+- **Shield Layout Architecture**: Renders `STREAK` on top and the large extruded 3D number `{days}` centered directly underneath on full-sized badges, and a bold, centered number on compact 42px header badges.
+- **High-Contrast 4-Tier Palette Calibration**: Point-top hexagonal border with multi-stop reflection gradients, chamfered depth borders, and specular highlights distinctly calibrated across the 4 habit brackets:
+  - **Bronze (Day 1–6)**: Vibrant Terracotta Copper (`#FB923C` / `#EA580C` / `#7C2D12`)
+  - **Silver (Day 7–30)**: Pure Radiant Steel Platinum (`#FFFFFF` / `#CBD5E1` / `#334155`)
+  - **Gold (Day 30–Month 6)**: Bright Canary Biblical Gold (`#FEF08A` / `#FACC15` / `#713F12`)
+  - **Diamond (Month 6–1 Year)**: Icy Azure Sapphire Blue (`#E0F2FE` / `#38BDF8` / `#075985`)
 - **Top Sacred Insignia**: Sacred cross insignia crowning the upper interior of the shield with metallic luster.
-- **Dynamic Tier Computation**: Automatically applies the appropriate metallic tier palette (Bronze, Silver, Gold, Diamond, or Celestial) based on the user's active streak count.
+- **Dynamic Tier Computation (`getTierInfoForDays`)**: Automatically computes and applies the exact tier metadata, banner label, and theme color based on the user's active streak count.
 
 ### 2. Milestone Progression Tiers & 4-Color Bracket Standard (`streakMilestones.ts`)
 The metallic shield badges implement 4 distinct, prestigiously calibrated color tiers across the believer's habit journey:

@@ -25,6 +25,7 @@ import {
 } from '../components/SvgIcons';
 import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
 import { StreakHexagonBadge } from '../components/StreakHexagonBadge';
+import { getTierInfoForDays } from '../data/streakMilestones';
 
 interface DiscoverScreenProps {
   navigation: any;
@@ -46,6 +47,7 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
 
   const dayOfYear = useMemo(() => getDayOfYear(), []);
   const todayMessage: DailyMessage = useMemo(() => getDailyMessage(), []);
+  const streakInfo = useMemo(() => getTierInfoForDays(streak || 1), [streak]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -103,12 +105,17 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
             onPress={() => setShowStreakModal(true)}
             activeOpacity={0.8}
             accessibilityRole="button"
-            accessibilityLabel={`Streak ${streak || 1}. Tap to open streak badge.`}
+            accessibilityLabel={`Streak ${streak || 1}, ${streakInfo.name} Tier (${streakInfo.rangeLabel}). Tap to open streak badge.`}
           >
             <StreakHexagonBadge days={streak || 1} size={42} />
-            <Text variant="caption" weight="800" color={colors.textPrimary} style={styles.headerStreakBadgeLabel}>
-              Streak {streak || 1}
-            </Text>
+            <View style={styles.headerStreakTextCol}>
+              <Text variant="caption" weight="800" color={colors.textPrimary} style={styles.headerStreakBadgeLabel}>
+                Streak {streak || 1}
+              </Text>
+              <Text variant="caption" weight="700" style={[styles.headerStreakTierSub, { color: streakInfo.color }]}>
+                {streakInfo.name}
+              </Text>
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -325,7 +332,18 @@ const styles = StyleSheet.create({
   },
   headerStreakBadgeLabel: {
     fontSize: 12.5,
+    lineHeight: 15,
+  },
+  headerStreakTextCol: {
+    flexDirection: 'column',
+    justifyContent: 'center',
     marginRight: 2,
+  },
+  headerStreakTierSub: {
+    fontSize: 9.5,
+    lineHeight: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
 
   // Subtle Hairline Divider (like Settings / ProfileScreen)
