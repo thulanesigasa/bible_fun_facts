@@ -490,8 +490,8 @@ bible_fun_facts/
 - **Zero-Post Private Architecture**: Removed all social feed elements and mock user posting cards. The app is dedicated to individual biblical exegesis without social post clutter.
 - **Single-Screen Focused View with Full Context**:
   - **Resume Scripture Quick-Card**: 1-tap jump to the user's last read Bible book and chapter with clean subtitle header.
-  - **Original Language Root Card**: Daily Strong's Concordance exegesis highlighting Greek and Hebrew terms, transliterations, Strong's numbers, and complete, untruncated lexical definitions and historical context.
-  - **Archaeology & Customs Discovery**: Displays high-impact historical and cultural insights in full text with an in-place **"Next Discovery ›"** button to cycle discoveries without scrolling.
+  - **Interactive Original Language Root Card**: Daily Strong's Concordance exegesis highlighting Greek and Hebrew terms, transliterations, Strong's numbers, and complete lexical definitions; tapping the card directly navigates to the full exegesis sheet.
+  - **Interactive Archaeology & Customs Discovery**: Displays high-impact historical and cultural insights. Tapping the discovery card opens the comprehensive **FactDetails** sheet to inspect the entire unabridged message, cultural context, and Strong's concordance deep dive (replacing the previous cycle button with direct whole-message exploration).
   - **Zero Section Badges**: Removed container badge tags (`ORIGINAL LANGUAGE ROOT`, `ARCHAEOLOGY & CUSTOMS`, `RESUME READING`) in strict compliance with Rule 16, replaced by clean iconography and typography.
   - **Compact Header & Streak Ribbon**: Streak tracking and pull-to-refresh integration.
 

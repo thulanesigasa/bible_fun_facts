@@ -98,50 +98,62 @@ export default function FactDetailsScreen({ navigation, route }: FactDetailsScre
           </Card>
 
           {/* Context Sections */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <LandmarkSvg size={20} color={colors.accent} />
-              <Text variant="h3" style={styles.sectionLabel}>Historical Context</Text>
+          {fact.historical_context ? (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <LandmarkSvg size={20} color={colors.accent} />
+                <Text variant="h3" style={styles.sectionLabel}>Historical Context</Text>
+              </View>
+              <Text variant="body" color={colors.textSecondary} style={styles.bodyText}>
+                {fact.historical_context}
+              </Text>
             </View>
-            <Text variant="body" color={colors.textSecondary} style={styles.bodyText}>
-              {fact.historical_context}
-            </Text>
-          </View>
+          ) : null}
 
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <UsersSvg size={20} color={colors.accent} />
-              <Text variant="h3" style={styles.sectionLabel}>Cultural Practice</Text>
+          {fact.cultural_practice ? (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <UsersSvg size={20} color={colors.accent} />
+                <Text variant="h3" style={styles.sectionLabel}>Cultural Practice</Text>
+              </View>
+              <Text variant="body" color={colors.textSecondary} style={styles.bodyText}>
+                {fact.cultural_practice}
+              </Text>
             </View>
-            <Text variant="body" color={colors.textSecondary} style={styles.bodyText}>
-              {fact.cultural_practice}
-            </Text>
-          </View>
+          ) : null}
 
           {/* Strong's Deep Dive Detail Panel */}
-          <View style={styles.strongsCard}>
-            <View style={styles.strongsHeader}>
-              <StrongsIconSvg size={20} color={colors.accent} />
-              <Text variant="h3" style={styles.strongsHeaderTitle}>Strong's Deep Dive</Text>
-            </View>
-
-            <View style={styles.strongsRow}>
-              <View>
-                <Text variant="h1" style={styles.strongsWord}>{fact.strongs_word}</Text>
-                <Text variant="body" style={styles.strongsTrans}>{fact.strongs_transliteration}</Text>
+          {fact.strongs_word ? (
+            <View style={styles.strongsCard}>
+              <View style={styles.strongsHeader}>
+                <StrongsIconSvg size={20} color={colors.accent} />
+                <Text variant="h3" style={styles.strongsHeaderTitle}>Strong's Deep Dive</Text>
               </View>
-              <Text variant="body" weight="700" color={colors.accent}>{fact.strongs_number}</Text>
-            </View>
 
-            <View style={styles.definitionBox}>
-              <Text variant="label" color={colors.textTertiary} style={{ marginBottom: spacing.sm }}>
-                DEFINITION
-              </Text>
-              <Text variant="body" color={colors.textPrimary} style={styles.definitionText}>
-                {fact.strongs_definition}
-              </Text>
+              <View style={styles.strongsRow}>
+                <View>
+                  <Text variant="h1" style={styles.strongsWord}>{fact.strongs_word}</Text>
+                  {fact.strongs_transliteration ? (
+                    <Text variant="body" style={styles.strongsTrans}>{fact.strongs_transliteration}</Text>
+                  ) : null}
+                </View>
+                {fact.strongs_number ? (
+                  <Text variant="body" weight="700" color={colors.accent}>{fact.strongs_number}</Text>
+                ) : null}
+              </View>
+
+              {fact.strongs_definition ? (
+                <View style={styles.definitionBox}>
+                  <Text variant="label" color={colors.textTertiary} style={{ marginBottom: spacing.sm }}>
+                    DEFINITION
+                  </Text>
+                  <Text variant="body" color={colors.textPrimary} style={styles.definitionText}>
+                    {fact.strongs_definition}
+                  </Text>
+                </View>
+              ) : null}
             </View>
-          </View>
+          ) : null}
         </View>
       </ScrollView>
     </View>

@@ -24,7 +24,6 @@ import {
   ChevronRightSvg,
   BookOpenSvg,
   ShareSvg,
-  RefreshSvg,
 } from '../components/SvgIcons';
 
 interface DiscoverScreenProps {
@@ -78,17 +77,13 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
   // Current Featured Discovery (cycle without scrolling)
   const currentFact: Fact = discoveryFacts[factIndex % discoveryFacts.length] || liveFacts[0] || initialFacts[0];
 
-  const handleNextDiscovery = useCallback(() => {
-    setFactIndex((prev) => prev + 1);
-    incrementFactsViewed();
-  }, [incrementFactsViewed]);
-
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await fetchLiveFacts();
-    handleNextDiscovery();
+    setFactIndex((prev) => prev + 1);
+    incrementFactsViewed();
     setRefreshing(false);
-  }, [fetchLiveFacts, handleNextDiscovery]);
+  }, [fetchLiveFacts, incrementFactsViewed]);
 
   const onShareCurrentFact = async (fact: Fact) => {
     try {
@@ -162,105 +157,143 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
         </TouchableOpacity>
 
         {/* 2. Today's Original Root Word (Strong's Exegesis) */}
-        <Card style={styles.rootCard}>
-          <View style={styles.cardSectionHeader}>
-            <View style={styles.cardHeaderTitleRow}>
-              <StrongsIconSvg size={15} color={colors.accent} />
-              <Text variant="h3" color={colors.accent} style={styles.sectionHeaderTitle}>
-                Original Language Root
+        <TouchableOpacity
+          activeOpacity={0.88}
+          onPress={() => navigation.navigate('FactDetails', { fact: languageFact })}
+          accessibilityRole="button"
+          accessibilityLabel={`Original Root Word: ${languageFact.strongs_word}`}
+        >
+          <Card style={styles.rootCard}>
+            <View style={styles.cardSectionHeader}>
+              <View style={styles.cardHeaderTitleRow}>
+                <StrongsIconSvg size={15} color={colors.accent} />
+                <Text variant="h3" color={colors.accent} style={styles.sectionHeaderTitle}>
+                  Original Language Root
+                </Text>
+              </View>
+              <Text variant="caption" color={colors.textTertiary}>
+                {languageFact.scripture_ref}
               </Text>
             </View>
-            <Text variant="caption" color={colors.textTertiary}>
-              {languageFact.scripture_ref}
-            </Text>
-          </View>
 
-          <View style={styles.rootWordRow}>
-            <View style={styles.rootWordLeft}>
-              <Text variant="h2" color={colors.accent} style={styles.rootWord}>
-                {languageFact.strongs_word}
-              </Text>
-              <Text variant="caption" color={colors.textSecondary}>
-                Strong's {languageFact.strongs_number} • <Text variant="caption" weight="600" color={colors.textPrimary}>{languageFact.strongs_transliteration}</Text>
+            <View style={styles.rootWordRow}>
+              <View style={styles.rootWordLeft}>
+                <Text variant="h2" color={colors.accent} style={styles.rootWord}>
+                  {languageFact.strongs_word}
+                </Text>
+                <Text variant="caption" color={colors.textSecondary}>
+                  Strong's {languageFact.strongs_number} • <Text variant="caption" weight="600" color={colors.textPrimary}>{languageFact.strongs_transliteration}</Text>
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.rootDefBox}>
+              <Text variant="body" color={colors.textPrimary} style={styles.rootDefText}>
+                "{languageFact.strongs_definition}"
               </Text>
             </View>
-          </View>
 
-          <View style={styles.rootDefBox}>
-            <Text variant="body" color={colors.textPrimary} style={styles.rootDefText}>
-              "{languageFact.strongs_definition}"
+            <Text variant="body" color={colors.textSecondary} style={styles.rootContextSnippet}>
+              {languageFact.historical_context}
             </Text>
-          </View>
 
-          <Text variant="body" color={colors.textSecondary} style={styles.rootContextSnippet}>
-            {languageFact.historical_context}
-          </Text>
-        </Card>
+            <View style={styles.cardActionsBar}>
+              <View style={styles.readMorePrompt}>
+                <Text variant="caption" weight="700" color={colors.accent}>
+                  Read Root Word Exegesis ›
+                </Text>
+              </View>
+              <View style={styles.actionIconsRight}>
+                <TouchableOpacity
+                  style={styles.iconBtn}
+                  onPress={() => toggleFavoriteFact(languageFact)}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <FavoritesSvg
+                    size={18}
+                    color={colors.accent}
+                    fill={isFactFavorited(languageFact.id) ? colors.accent : 'none'}
+                  />
+                </TouchableOpacity>
 
-        {/* 3. Archaeological & Historical Discovery Card (With In-Place Shuffle) */}
-        <Card style={styles.discoveryCard}>
-          <View style={styles.cardSectionHeader}>
-            <View style={styles.cardHeaderTitleRow}>
-              <LandmarkSvg size={15} color={colors.accent} />
-              <Text variant="h3" color={colors.accent} style={styles.sectionHeaderTitle}>
-                Archaeology & Customs
+                <TouchableOpacity
+                  style={styles.iconBtn}
+                  onPress={() => onShareCurrentFact(languageFact)}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <ShareSvg size={18} color={colors.textSecondary} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Card>
+        </TouchableOpacity>
+
+        {/* 3. Archaeological & Historical Discovery Card */}
+        <TouchableOpacity
+          activeOpacity={0.88}
+          onPress={() => navigation.navigate('FactDetails', { fact: currentFact })}
+          accessibilityRole="button"
+          accessibilityLabel={`Discovery: ${currentFact.fact_title}`}
+        >
+          <Card style={styles.discoveryCard}>
+            <View style={styles.cardSectionHeader}>
+              <View style={styles.cardHeaderTitleRow}>
+                <LandmarkSvg size={15} color={colors.accent} />
+                <Text variant="h3" color={colors.accent} style={styles.sectionHeaderTitle}>
+                  Archaeology & Customs
+                </Text>
+              </View>
+              <Text variant="caption" color={colors.textTertiary}>
+                {currentFact.scripture_ref}
               </Text>
             </View>
-            <Text variant="caption" color={colors.textTertiary}>
-              {currentFact.scripture_ref}
+
+            <Text variant="h3" style={styles.discoveryTitle}>
+              {currentFact.fact_title}
             </Text>
-          </View>
 
-          <Text variant="h3" style={styles.discoveryTitle}>
-            {currentFact.fact_title}
-          </Text>
-
-          <View style={styles.discoveryVerseBox}>
-            <Text variant="body" style={styles.discoveryVerseText}>
-              "{currentFact.verse_text}"
-            </Text>
-          </View>
-
-          <Text variant="body" color={colors.textSecondary} style={styles.discoveryContext}>
-            {currentFact.historical_context}
-          </Text>
-
-          {/* Interactive Card Action Bar: Next Discovery + Save + Share */}
-          <View style={styles.cardActionsBar}>
-            <TouchableOpacity
-              style={styles.nextDiscoveryBtn}
-              onPress={handleNextDiscovery}
-              activeOpacity={0.8}
-            >
-              <RefreshSvg size={14} color={colors.accent} />
-              <Text variant="caption" weight="700" color={colors.accent}>
-                Next Discovery ›
+            <View style={styles.discoveryVerseBox}>
+              <Text variant="body" style={styles.discoveryVerseText}>
+                "{currentFact.verse_text}"
               </Text>
-            </TouchableOpacity>
-
-            <View style={styles.actionIconsRight}>
-              <TouchableOpacity
-                style={styles.iconBtn}
-                onPress={() => toggleFavoriteFact(currentFact)}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
-                <FavoritesSvg
-                  size={18}
-                  color={colors.accent}
-                  fill={isFavorited ? colors.accent : 'none'}
-                />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.iconBtn}
-                onPress={() => onShareCurrentFact(currentFact)}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
-                <ShareSvg size={18} color={colors.textSecondary} />
-              </TouchableOpacity>
             </View>
-          </View>
-        </Card>
+
+            <Text variant="body" color={colors.textSecondary} style={styles.discoveryContext}>
+              {currentFact.historical_context}
+            </Text>
+
+            {/* Interactive Card Action Bar: Read Whole Message + Save + Share */}
+            <View style={styles.cardActionsBar}>
+              <View style={styles.readMorePrompt}>
+                <Text variant="caption" weight="700" color={colors.accent}>
+                  Read Whole Message ›
+                </Text>
+              </View>
+
+              <View style={styles.actionIconsRight}>
+                <TouchableOpacity
+                  style={styles.iconBtn}
+                  onPress={() => toggleFavoriteFact(currentFact)}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <FavoritesSvg
+                    size={18}
+                    color={colors.accent}
+                    fill={isFavorited ? colors.accent : 'none'}
+                  />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.iconBtn}
+                  onPress={() => onShareCurrentFact(currentFact)}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <ShareSvg size={18} color={colors.textSecondary} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Card>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -447,14 +480,10 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'rgba(15, 23, 42, 0.05)',
   },
-  nextDiscoveryBtn: {
+  readMorePrompt: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: radius.full,
+    paddingVertical: 4,
   },
   actionIconsRight: {
     flexDirection: 'row',
