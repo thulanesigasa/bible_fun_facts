@@ -12,9 +12,8 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import ViewShot from 'react-native-view-shot';
+import ViewShot, { captureRef } from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
-import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
 import { colors } from '../theme/colors';
 import { Text } from './Typography';
 import { StreakHexagonBadge } from './StreakHexagonBadge';
@@ -90,18 +89,26 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
   const handleShare = async () => {
     try {
       if (shareCardRef.current) {
-        const uri = await (shareCardRef.current as any).capture();
-        const canShare = await Sharing.isAvailableAsync();
-        if (canShare) {
-          await Sharing.shareAsync(uri, {
-            mimeType: 'image/png',
-            dialogTitle: `${selectedMilestone.title} - Day ${selectedMilestone.days} Streak`,
-          });
-          return;
+        let uri: string | null = null;
+        if (typeof (shareCardRef.current as any).capture === 'function') {
+          uri = await (shareCardRef.current as any).capture();
+        } else {
+          uri = await captureRef(shareCardRef.current, { format: 'png', quality: 1.0 });
+        }
+        if (uri) {
+          const canShare = await Sharing.isAvailableAsync();
+          if (canShare) {
+            await Sharing.shareAsync(uri, {
+              mimeType: 'image/png',
+              UTI: 'public.png',
+              dialogTitle: `${selectedMilestone.title} - Day ${selectedMilestone.days} Streak`,
+            });
+            return;
+          }
         }
       }
-    } catch (_) {
-      // Fallback to text share
+    } catch (shareErr) {
+      console.warn('Image share failed, falling back to text:', shareErr);
     }
     try {
       const shareMessage = [
@@ -143,10 +150,6 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
   const displayTier = isViewingActiveStreak ? getTierForDays(streak) : selectedMilestone.tier;
   const tierInfo = getTierInfoForDays(displayDays);
 
-  const activeGradient = isViewingActiveStreak
-    ? tierInfo.bgGradient
-    : selectedMilestone.bgGradientStart;
-
   return (
     <Modal
       visible={visible}
@@ -156,21 +159,6 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
       statusBarTranslucent
     >
       <View style={styles.modalOverlay}>
-        {/* Full-bleed Top-Down Dynamic Tier Gradient */}
-        <View style={StyleSheet.absoluteFill}>
-          <Svg width="100%" height="100%">
-            <Defs>
-              <LinearGradient id="modalBgGrad" x1="0" y1="0" x2="0" y2="1">
-                <Stop offset="0" stopColor={activeGradient} stopOpacity="1" />
-                <Stop offset="0.45" stopColor="#FFFFFF" stopOpacity="0.85" />
-                <Stop offset="0.8" stopColor="#FFFFFF" stopOpacity="1" />
-                <Stop offset="1" stopColor="#FFFFFF" stopOpacity="1" />
-              </LinearGradient>
-            </Defs>
-            <Rect width="100%" height="100%" fill="url(#modalBgGrad)" />
-          </Svg>
-        </View>
-
         <SafeAreaView style={styles.safeArea}>
           {/* Top Bar: Close Button only */}
           <View style={styles.topBar}>
@@ -322,6 +310,7 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
                       key={milestone.days}
                       style={[
                         styles.shelfItem,
+                        isSelected && styles.shelfItemSelected,
                         !earned && styles.shelfItemLocked,
                       ]}
                       onPress={() => setSelectedMilestone(milestone)}
@@ -460,20 +449,17 @@ const styles = StyleSheet.create({
   },
   shareCard: {
     width: '100%',
+    backgroundColor: '#FFFFFF',
     marginTop: 12,
     marginBottom: 8,
     borderRadius: 20,
     overflow: 'hidden',
   },
-  shareCardBg: {
-    width: '100%',
-    borderRadius: 20,
-    padding: 24,
-    alignItems: 'center',
-  },
   shareCardInner: {
     alignItems: 'center',
     width: '100%',
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 12,
   },
   shareCardFooter: {
     flexDirection: 'row',
@@ -666,8 +652,8 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   shelfItemSelected: {
-    borderColor: colors.accent,
-    backgroundColor: '#FFFDF0',
+    borderColor: '#0F172A',
+    backgroundColor: '#FFFFFF',
   },
   shelfItemLocked: {
     opacity: 0.65,

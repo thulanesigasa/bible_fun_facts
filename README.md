@@ -542,7 +542,7 @@ bible_fun_facts/
 │   │   ├── FactCard.tsx             # Fact presentation card with zero badges
 │   │   ├── ScriptureCard.tsx        # Scripture reading card with inline typography
 │   │   ├── StreakHexagonBadge.tsx   # 3D metallic hexagonal shield badge (100% dynamic vector, zero fire)
-│   │   ├── StreakMilestoneModal.tsx # Fullscreen celebration modal with editable streak steppers & gradient
+│   │   ├── StreakMilestoneModal.tsx # Fullscreen streak milestone modal with clean white surface, ViewShot image sharing, and milestone shelf
 │   │   ├── SvgIcons.tsx             # Curated SVG icon collection (zero emojis)
 │   │   ├── Typography.tsx           # Scaled typographic components
 │   │   ├── UiverseSwitch.tsx        # Animated sliding toggle pill switch (60-30-10 tokens)
