@@ -14,6 +14,7 @@
   <img src="https://img.shields.io/badge/Outer%20Release-v1.0.2-2563EB?style=for-the-badge&logo=android&logoColor=white" alt="Outer Release v1.0.2" />
   <img src="https://img.shields.io/badge/Security-Kotlin%20FLAG__SECURE-DC2626?style=for-the-badge&logo=android&logoColor=white" alt="Kotlin FLAG_SECURE" />
   <img src="https://img.shields.io/badge/Tab%20Architecture-Floating%20Pill%20280px-FDD223?style=for-the-badge" alt="Floating Pill Tab Bar" />
+  <img src="https://img.shields.io/badge/Streak%20Milestones-3D%20Hexagonal%20Badges-F59E0B?style=for-the-badge" alt="3D Streak Milestone Badges" />
   <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
   <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License MIT" />
@@ -408,6 +409,67 @@ The application is backed by a full production-ready relational schema on Supaba
 
 ---
 
+## 3D Streak Milestone Badges System (Cal AI Architectural Standard)
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Milestones-3D%20Metallic%20Hexagonal%20Shields-F59E0B?style=for-the-badge" alt="3D Metallic Hexagonal Shields" />
+  <img src="https://img.shields.io/badge/Celebration-Modal%20Unlock%20Showcase-0F172A?style=for-the-badge" alt="Modal Unlock Showcase" />
+  <img src="https://img.shields.io/badge/Tiers-Bronze%20%7C%20Silver%20%7C%20Gold%20%7C%20Diamond%20%7C%20Celestial-38BDF8?style=for-the-badge" alt="Streak Tiers" />
+  <img src="https://img.shields.io/badge/Sharing-Native%20Share%20Sheet-10B981?style=for-the-badge" alt="Native Share Sheet" />
+</p>
+
+To celebrate consistent daily exegesis and devotion, exégeomai features a high-impact, 3D metallic streak milestone badge system inspired by modern fitness and habit architecture (Cal AI):
+
+```mermaid
+graph TD
+    UserDevotion["Daily Scripture Study / Unfolding"] --> StreakCounter["UserContext.streak Counter"]
+    StreakCounter --> HeaderTrigger["DiscoverScreen Header Streak Pill (Flame + Streak)"]
+    StreakCounter --> ProfileTrigger["ProfileScreen Study Metrics + Achievements Row"]
+    
+    HeaderTrigger --> MilestoneModal["StreakMilestoneModal.tsx (Celebration Showcase)"]
+    ProfileTrigger --> MilestoneModal
+    
+    MilestoneModal --> HexBadge["StreakHexagonBadge.tsx"]
+    HexBadge --> RenderBranch{"Asset Available?"}
+    RenderBranch -->|3d, 10d, 100d| PreRendered["Photorealistic 3D Image Asset (/assets/badges/)"]
+    RenderBranch -->|1d, 7d, 30d, 50d, 365d, Dynamic| VectorShield["Procedural 3D SVG Hexagonal Shield"]
+    
+    MilestoneModal --> ScriptureAnchor["Theological Scripture Grounding (e.g. Galatians 6:9)"]
+    MilestoneModal --> UnlockStatus["✓ Badge Unlocked / 🔒 Locked Countdown"]
+    MilestoneModal --> MilestoneShelf["Horizontal Interactive Milestone Shelf (1d to 365d)"]
+    MilestoneModal --> BrandFooter["Walk in the Word with exégeomai (24x24 Logo)"]
+    MilestoneModal --> NativeShare["Native Achievement Share Sheet"]
+```
+
+### 1. 3D Metallic Hexagonal Shield Badges (`StreakHexagonBadge.tsx`)
+- **Sculpted Top Flame**: 3D flame emblem crowning the hexagonal shield with multi-stop flame core gradients.
+- **Beveled Metallic Rim**: Point-top hexagonal border with metallic reflection stops, chamfered mid-shadows, and specular highlights.
+- **Extruded 3D Streak Number & Label**: Multi-layer depth shadow extrusion texturing for bold numbers (`3`, `10`, `100`, etc.) and the uppercase `STREAK` banner.
+- **Embedded exégeomai Brand Mark**: Flame/exégeomai brand glyph centered at the lower interior base of the shield.
+- **Hybrid Rendering Pipeline**: Renders photorealistic 3D image assets for core milestones (3d Rookie, 10d Getting Serious, 100d Triple Threat) and automatically falls back to an ultra-crisp, procedural `react-native-svg` metallic shield for all other arbitrary streak numbers (1d, 7d, 30d, 50d, 365d).
+
+### 2. Milestone Progression Tiers (`streakMilestones.ts`)
+| Days | Tier | Milestone Title | Cal AI-Style Subtitle | Theological Scripture Anchor |
+| :--- | :--- | :--- | :--- | :--- |
+| **1d** | Bronze | **First Step** | *The journey of 365 days begins with a single scripture.* | Philippians 1:6 |
+| **3d** | Bronze | **Rookie** | *Is this just fleeting motivation or real dedication?* | Galatians 6:9 |
+| **7d** | Silver | **Faithful Scribe** | *One full week of sacred consistency in God's Word.* | Genesis 2:2 |
+| **10d** | Silver | **Getting Serious** | *Still here? It's getting real.* | Revelation 2:10 |
+| **30d** | Gold | **Devoted Scholar** | *A full month immersed in biblical wisdom and exegesis.* | Psalm 119:105 |
+| **50d** | Gold | **Pillar of Truth** | *Consistency that deepens roots and moves mountains.* | 1 Corinthians 15:58 |
+| **100d** | Diamond | **Triple Threat** | *If consistency were a crime, you'd be doing life.* | 2 Timothy 4:7 |
+| **365d** | Celestial | **Canon Completer** | *A complete year walking through every sacred exegesis and covenant.* | Psalm 103:17 |
+
+### 3. Celebratory Showcase Modal (`StreakMilestoneModal.tsx`)
+- **Dynamic Full-Bleed Top-Down Gradient**: Smooth SVG linear gradient tint reflecting the selected milestone's tier color (Warm Bronze Amber, Platinum Slate, Rich Gold, Cyan Blue, or Celestial Gold).
+- **Clean Dismiss & Current Counter**: Minimalist close button (`CloseSvg`) and pill badge displaying the user's active streak.
+- **Scripture Grounding**: Displays the sacred verse anchor corresponding to each devotion milestone.
+- **Interactive Milestone Shelf**: Horizontal carousel letting users preview all 8 milestone badges, unlock states, and countdowns.
+- **Brand Integrity**: Footer displaying *"Walk in the Word with [logo 24x24] exégeomai"* adhering to Rule 15/19 calibration.
+- **One-Tap Sharing**: Integrates React Native `Share.share` with celebratory formatting.
+
+---
+
 ## Clean UI Architecture & Absolute Zero Badge Standard (Rule 16)
 
 <p align="left">
@@ -456,12 +518,15 @@ bible_fun_facts/
 │   ├── android-icon-foreground.png  # Calibrated launcher icon (96px centered, Rule 15/19)
 │   ├── icon.png                     # In-app brand icon (1024x1024, 800px symbol)
 │   ├── splash-icon.png              # Splash screen asset
+│   ├── badges/                      # High-res 3D rendered streak badge assets (3d, 10d, 100d)
 │   └── onboarding/                  # Compressed, transparent PNG onboarding slides (1, 2, 3)
 ├── src/
 │   ├── components/                  # Reusable UI components strictly adhering to 60-30-10
 │   │   ├── Card.tsx                 # Flat surface card with soft elevation shadow
 │   │   ├── FactCard.tsx             # Fact presentation card with zero badges
 │   │   ├── ScriptureCard.tsx        # Scripture reading card with inline typography
+│   │   ├── StreakHexagonBadge.tsx   # 3D metallic hexagonal shield badge (Image + SVG fallback)
+│   │   ├── StreakMilestoneModal.tsx # Fullscreen celebration modal with dynamic tier gradient
 │   │   ├── SvgIcons.tsx             # Curated SVG icon collection (zero emojis)
 │   │   ├── Typography.tsx           # Scaled typographic components
 │   │   ├── UiverseSwitch.tsx        # Animated sliding toggle pill switch (60-30-10 tokens)
@@ -473,18 +538,19 @@ bible_fun_facts/
 │   │   ├── bibleCanon.ts            # Complete 66-book canon metadata and prebundled offline chapters
 │   │   ├── mockDatabase.ts          # Offline database: 120 facts, 24 scriptures, WOTD
 │   │   ├── mockUsers.ts             # 8 theological scholars, pastors, and exegetes with follower tracking
-│   │   └── redLetterVerses.ts       # Words of Jesus Christ dataset across Matthew through Revelation
+│   │   ├── redLetterVerses.ts       # Words of Jesus Christ dataset across Matthew through Revelation
+│   │   └── streakMilestones.ts      # Milestone catalog (1d, 3d, 7d, 10d, 30d, 50d, 100d, 365d)
 │   ├── hooks/
 │   │   └── useSecurePasswordCapture.ts # Hardware FLAG_SECURE blackout protection & app switcher privacy
 │   ├── navigation/
 │   │   └── AppNavigator.tsx         # Tab navigation, AuthStack, ProfileStack, Root routes
 │   ├── screens/
 │   │   ├── AuthScreen.tsx           # Flattened body canvas, keyboard next, FLAG_SECURE
-│   │   ├── DiscoverScreen.tsx       # Rich multi-card feed stream (Spotlight + Bible Jump + Archaeology)
+│   │   ├── DiscoverScreen.tsx       # Rich multi-card feed stream with streak modal trigger
 │   │   ├── FactDetailsScreen.tsx    # Modal sheet fact inspection
 │   │   ├── FavoritesScreen.tsx      # Saved collections persisted offline
 │   │   ├── PrivacyPolicyScreen.tsx  # 11-section GDPR/CCPA privacy policy screen
-│   │   ├── ProfileScreen.tsx        # Profile management, reader font (1-24px), followers
+│   │   ├── ProfileScreen.tsx        # Profile management, reader font (1-24px), streak milestone row
 │   │   ├── ScriptureDetailsScreen.tsx # In-depth chapter & linguistic breakdown
 │   │   ├── ScripturesScreen.tsx     # Compact scripture hub with search categories (50% card reduction)
 │   │   ├── SearchScreen.tsx         # Believer & scholar discovery hub with follow state & profile modal
