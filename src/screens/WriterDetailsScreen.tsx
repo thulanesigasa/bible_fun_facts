@@ -9,6 +9,7 @@ import {
 import { colors } from '../theme/colors';
 import { spacing, radius } from '../theme';
 import { Text } from '../components/Typography';
+import { useUser } from '../context/UserContext';
 import { BiblicalWriter } from '../data/biblicalWriters';
 import {
   ScrollSvg,
@@ -25,12 +26,16 @@ interface WriterDetailsScreenProps {
 
 export default function WriterDetailsScreen({ navigation, route }: WriterDetailsScreenProps) {
   const { writer } = route.params;
+  const { incrementSharesCount } = useUser();
 
   const handleShare = async () => {
     try {
-      await Share.share({
+      const res = await Share.share({
         message: `${writer.name} (${writer.transliteration})\n${writer.role}\nEra: ${writer.era}\nBooks: ${writer.booksWritten.join(', ')}\n\nKey Verse: "${writer.keyVerse.text}" — ${writer.keyVerse.reference}\n\nShared from exégeomai Biblical History`,
       });
+      if (res.action === Share.sharedAction) {
+        incrementSharesCount();
+      }
     } catch (err) {
       console.error(err);
     }

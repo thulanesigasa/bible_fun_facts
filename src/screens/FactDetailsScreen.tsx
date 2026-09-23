@@ -26,14 +26,17 @@ interface FactDetailsScreenProps {
 
 export default function FactDetailsScreen({ navigation, route }: FactDetailsScreenProps) {
   const { fact } = route.params;
-  const { toggleFavoriteFact, isFactFavorited } = useUser();
+  const { toggleFavoriteFact, isFactFavorited, incrementSharesCount } = useUser();
   const isFavorited = isFactFavorited(fact.id);
 
   const handleShare = async () => {
     try {
-      await Share.share({
+      const res = await Share.share({
         message: `Did You Know? ${fact.fact_title}\n${fact.scripture_ref}: "${fact.verse_text}"\n\nShared from exégeomai`,
       });
+      if (res.action === Share.sharedAction) {
+        incrementSharesCount();
+      }
     } catch {}
   };
 

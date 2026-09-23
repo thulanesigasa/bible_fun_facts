@@ -54,6 +54,7 @@ interface UserState {
   completedWOTDs: WOTDEntry[];
   streak: number;
   factsViewedCount: number;
+  sharesCount: number;
   lastLoginDate: string | null;
   followedUserIds: string[];
   lastReadBible: LastReadBiblePosition;
@@ -77,6 +78,7 @@ interface AppContextType extends UserState {
   toggleFavoriteScripture: (scripture: Scripture) => void;
   markWOTDComplete: (wotd: WOTDEntry) => void;
   incrementFactsViewed: () => void;
+  incrementSharesCount: () => void;
   isFactFavorited: (id: string) => boolean;
   isScriptureFavorited: (id: string) => boolean;
   isWOTDCompleted: (id: string) => boolean;
@@ -102,6 +104,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     completedWOTDs: [],
     streak: 1,
     factsViewedCount: 0,
+    sharesCount: 0,
     lastLoginDate: null,
     followedUserIds: [],
     lastReadBible: { book: 'John', chapter: 3, translation: 'web' },
@@ -207,6 +210,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setState(prev => ({
             ...prev,
             ...parsed,
+            sharesCount: typeof parsed.sharesCount === 'number' ? parsed.sharesCount : 0,
             followedUserIds: cleanFollowed,
             userProfile: cleanProfile,
           }));
@@ -745,6 +749,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setState(prev => ({ ...prev, readerTheme: theme }));
   };
 
+  const incrementSharesCount = () => {
+    setState(prev => ({
+      ...prev,
+      sharesCount: (prev.sharesCount || 0) + 1,
+    }));
+  };
+
   const setStreak = (days: number) => {
     const clamped = Math.max(1, Math.min(9999, Math.round(days)));
     const today = new Date().toDateString();
@@ -770,6 +781,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toggleFavoriteScripture,
       markWOTDComplete,
       incrementFactsViewed,
+      incrementSharesCount,
       isFactFavorited,
       isScriptureFavorited,
       isWOTDCompleted,

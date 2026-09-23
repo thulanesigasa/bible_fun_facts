@@ -9,6 +9,7 @@ import {
 import { colors } from '../theme/colors';
 import { spacing, radius } from '../theme';
 import { Text } from '../components/Typography';
+import { useUser } from '../context/UserContext';
 import { wotd, LENS_TABS } from '../data/mockDatabase';
 import {
   OriginalIntentSvg,
@@ -23,6 +24,7 @@ import {
 type LensKey = 'original_intent' | 'theological_truth' | 'modern_walk' | 'prayer_focus';
 
 export default function WOTDDetailsScreen({ navigation }: { navigation: any }) {
+  const { incrementSharesCount } = useUser();
   const [activeLens, setActiveLens] = useState<LensKey>('original_intent');
 
   const getLensIcon = (key: LensKey, color: string) => {
@@ -57,9 +59,12 @@ export default function WOTDDetailsScreen({ navigation }: { navigation: any }) {
 
   const onShare = async () => {
     try {
-      await Share.share({
+      const res = await Share.share({
         message: `"${wotd.verse}"\n— ${wotd.reference}\n\nShared from exégeomai Scripture Deep Dive`,
       });
+      if (res.action === Share.sharedAction) {
+        incrementSharesCount();
+      }
     } catch (e) {
       console.error(e);
     }

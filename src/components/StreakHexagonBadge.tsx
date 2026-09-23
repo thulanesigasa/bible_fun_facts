@@ -17,6 +17,7 @@ export interface StreakHexagonBadgeProps {
   size?: number;
   style?: StyleProp<ViewStyle>;
   showText?: boolean;
+  label?: string;
 }
 
 // 60-30-10 & metallic palettes for clean 3D hexagonal shields (strictly fire-free)
@@ -104,6 +105,7 @@ export const StreakHexagonBadge: React.FC<StreakHexagonBadgeProps> = ({
   size = 220,
   style,
   showText = true,
+  label = 'STREAK',
 }) => {
   // Determine tier dynamically from day count if not provided
   const activeTier = tier || getTierForDays(days);
@@ -192,7 +194,7 @@ export const StreakHexagonBadge: React.FC<StreakHexagonBadgeProps> = ({
           />
         </G>
 
-        {/* 6. Extruded 3D "STREAK" Label (Top Header on Full Badges) */}
+        {/* 6. Extruded 3D Label (Top Header on Full Badges) */}
         {showText && !isCompact && (
           <G>
             <SvgText
@@ -205,7 +207,7 @@ export const StreakHexagonBadge: React.FC<StreakHexagonBadgeProps> = ({
               textAnchor="middle"
               fontFamily="System"
             >
-              STREAK
+              {label || 'STREAK'}
             </SvgText>
             <SvgText
               x="120"
@@ -217,7 +219,7 @@ export const StreakHexagonBadge: React.FC<StreakHexagonBadgeProps> = ({
               textAnchor="middle"
               fontFamily="System"
             >
-              STREAK
+              {label || 'STREAK'}
             </SvgText>
           </G>
         )}
