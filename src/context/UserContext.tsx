@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Alert } from 'react-native';
+import { Alert, AppState, AppStateStatus } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Fact, Scripture, WOTDEntry } from '../data/mockDatabase';
 import { colors } from '../theme/colors';
@@ -112,17 +112,68 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     readerTheme: 'light',
   });
 
-  // Helper to sync streak, factsViewedCount (unfolded), and lastLoginDate to Supabase
+  /**
+   * Computes study streak progression based on calendar days elapsed.
+   *
+   * Rules:
+   * 1. Same calendar day (diffDays === 0): User already engaged today. Streak remains intact.
+   * 2. Consecutive calendar day (diffDays === 1): User studied yesterday and returned today. Streak increases by +1.
+   * 3. Missed 1 or more calendar days (diffDays >= 2): Spiritual discipline broken. STREAK STRICTLY RESTARTS FROM SCRATCH (Day 1).
+   * 4. First time user (no previous login date): Streak starts at current streak or 1.
+   */
+  const evaluateDailyStreak = (
+    lastLogin: string | null | undefined,
+    currentStreak: number
+  ): { newStreak: number; shouldUpdate: boolean; resetFromScratch: boolean } => {
+    const today = new Date();
+    const todayDateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    if (!lastLogin) {
+      const initial = Math.max(1, currentStreak || 1);
+      return { newStreak: initial, shouldUpdate: true, resetFromScratch: false };
+    }
+
+    const lastDate = new Date(lastLogin);
+    if (isNaN(lastDate.getTime())) {
+      return { newStreak: 1, shouldUpdate: true, resetFromScratch: true };
+    }
+
+    const lastDateOnly = new Date(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate());
+    const diffTime = todayDateOnly.getTime() - lastDateOnly.getTime();
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+      // Already engaged today
+      return { newStreak: Math.max(1, currentStreak), shouldUpdate: false, resetFromScratch: false };
+    } else if (diffDays === 1) {
+      // Exactly consecutive day (+1 day)
+      return { newStreak: Math.max(1, currentStreak) + 1, shouldUpdate: true, resetFromScratch: false };
+    } else if (diffDays < 0) {
+      // Clock drift or future timestamp; keep safe
+      return { newStreak: Math.max(1, currentStreak), shouldUpdate: false, resetFromScratch: false };
+    } else {
+      // diffDays >= 2: User skipped 1 or more calendar days!
+      // Streak MUST RESTART FROM SCRATCH to Day 1!
+      return { newStreak: 1, shouldUpdate: true, resetFromScratch: true };
+    }
+  };
+
+  // Helper to sync streak, factsViewedCount (unfolded), and user data to Supabase
   const syncUserDataToRemote = async (updates: {
     streak?: number;
     factsViewedCount?: number;
     lastLoginDate?: string;
+    favoritesFacts?: Fact[];
+    favoritesScriptures?: Scripture[];
+    bibleHighlights?: Record<string, string>;
+    lastReadBible?: LastReadBiblePosition;
+    [key: string]: any;
   }) => {
     if (!SUPABASE_ANON_KEY) return;
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        // 1. Sync to Supabase auth user_metadata (guaranteed persistence across logins/devices)
+        // 1. Sync to Supabase auth user_metadata (guaranteed permanent persistence across logins/devices)
         await supabase.auth.updateUser({
           data: updates,
         });
@@ -142,7 +193,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Helper to restore streak and unfolded count from Supabase on login or session restore
+  // Helper to restore streak, unfolded count, and library from Supabase on login or session restore
   const restoreRemoteUserData = async (userId: string, meta: any) => {
     try {
       let remoteStreak = typeof meta?.streak === 'number' ? meta.streak : undefined;
@@ -167,15 +218,27 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       setState(prev => {
-        const finalStreak = remoteStreak !== undefined ? Math.max(1, remoteStreak) : prev.streak;
+        const streakCandidate = remoteStreak !== undefined ? remoteStreak : prev.streak;
+        const lastLoginCandidate = remoteLastLogin || prev.lastLoginDate;
+        const evaluation = evaluateDailyStreak(lastLoginCandidate, streakCandidate);
+        const finalStreak = evaluation.newStreak;
+        const todayStr = new Date().toDateString();
+        const finalLastLogin = evaluation.shouldUpdate ? todayStr : (lastLoginCandidate || todayStr);
         const finalUnfolded = remoteUnfolded !== undefined ? Math.max(0, remoteUnfolded) : prev.factsViewedCount;
-        const finalLastLogin = remoteLastLogin || prev.lastLoginDate;
+
+        if (evaluation.shouldUpdate) {
+          syncUserDataToRemote({ streak: finalStreak, lastLoginDate: finalLastLogin });
+        }
 
         return {
           ...prev,
           streak: finalStreak,
           factsViewedCount: finalUnfolded,
           lastLoginDate: finalLastLogin,
+          favoritesFacts: Array.isArray(meta?.favoritesFacts) ? meta.favoritesFacts : prev.favoritesFacts,
+          favoritesScriptures: Array.isArray(meta?.favoritesScriptures) ? meta.favoritesScriptures : prev.favoritesScriptures,
+          bibleHighlights: meta?.bibleHighlights && typeof meta.bibleHighlights === 'object' ? meta.bibleHighlights : prev.bibleHighlights,
+          lastReadBible: meta?.lastReadBible || prev.lastReadBible,
         };
       });
     } catch (err) {
@@ -318,11 +381,26 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
               if (payload.new) {
                 const newStreak = payload.new.streak;
                 const newUnfolded = payload.new.facts_viewed_count;
-                setState(prev => ({
-                  ...prev,
-                  streak: typeof newStreak === 'number' ? Math.max(1, newStreak) : prev.streak,
-                  factsViewedCount: typeof newUnfolded === 'number' ? Math.max(0, newUnfolded) : prev.factsViewedCount,
-                }));
+                const newLastLogin = payload.new.last_login_date;
+                setState(prev => {
+                  const candidateStreak = typeof newStreak === 'number' ? newStreak : prev.streak;
+                  const candidateDate = newLastLogin || prev.lastLoginDate;
+                  const evalResult = evaluateDailyStreak(candidateDate, candidateStreak);
+                  const resolvedStreak = evalResult.newStreak;
+                  const todayStr = new Date().toDateString();
+                  const resolvedDate = evalResult.shouldUpdate ? todayStr : (candidateDate || todayStr);
+
+                  if (evalResult.shouldUpdate) {
+                    syncUserDataToRemote({ streak: resolvedStreak, lastLoginDate: resolvedDate });
+                  }
+
+                  return {
+                    ...prev,
+                    streak: resolvedStreak,
+                    lastLoginDate: resolvedDate,
+                    factsViewedCount: typeof newUnfolded === 'number' ? Math.max(0, newUnfolded) : prev.factsViewedCount,
+                  };
+                });
               }
             }
           )
@@ -336,6 +414,30 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
   }, [state.userProfile?.email]);
+
+  // Re-evaluate streak immediately when app resumes from background or screen is unlocked
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'active') {
+        setState(prev => {
+          const evalResult = evaluateDailyStreak(prev.lastLoginDate, prev.streak);
+          if (!evalResult.shouldUpdate) return prev;
+
+          const todayStr = new Date().toDateString();
+          syncUserDataToRemote({ streak: evalResult.newStreak, lastLoginDate: todayStr });
+          return {
+            ...prev,
+            streak: evalResult.newStreak,
+            lastLoginDate: todayStr,
+          };
+        });
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   // Save data on change
   useEffect(() => {
@@ -351,23 +453,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const checkStreak = (lastLogin: string | null, currentStreak: number) => {
     const today = new Date().toDateString();
-    if (lastLogin === today) return;
+    const evaluation = evaluateDailyStreak(lastLogin, currentStreak);
 
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toDateString();
+    if (!evaluation.shouldUpdate && lastLogin === today) return;
 
-    let newStreak = Math.max(1, currentStreak);
-    if (lastLogin === yesterdayStr) {
-      newStreak += 1;
-    } else if (lastLogin === null) {
-      newStreak = currentStreak > 0 ? currentStreak : 1;
-    } else {
-      newStreak = 1; // Reset to Streak 1 if missed a day
-    }
-
-    setState(prev => ({ ...prev, streak: newStreak, lastLoginDate: today }));
-    syncUserDataToRemote({ streak: newStreak, lastLoginDate: today });
+    setState(prev => ({ ...prev, streak: evaluation.newStreak, lastLoginDate: today }));
+    syncUserDataToRemote({ streak: evaluation.newStreak, lastLoginDate: today });
   };
 
   const login = async (emailOrName: string, password?: string, name?: string) => {
@@ -648,11 +739,32 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const updateProfile = (updates: Partial<UserProfile>) => {
+  const updateProfile = async (updates: Partial<UserProfile>) => {
     setState(prev => ({
       ...prev,
       userProfile: prev.userProfile ? { ...prev.userProfile, ...updates } : null,
     }));
+
+    if (SUPABASE_ANON_KEY) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          await supabase.auth.updateUser({
+            data: updates,
+          });
+
+          const profileUpdates: any = {};
+          if (updates.name) profileUpdates.name = updates.name;
+          if (updates.username) profileUpdates.username = updates.username;
+          if (updates.avatarUrl) profileUpdates.avatar_url = updates.avatarUrl;
+          if (Object.keys(profileUpdates).length > 0) {
+            await supabase.from('profiles').update(profileUpdates).eq('id', session.user.id);
+          }
+        }
+      } catch (err) {
+        console.warn('[UserContext] updateProfile sync notice:', err);
+      }
+    }
   };
 
   const logout = async () => {
@@ -669,20 +781,22 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const toggleFavoriteFact = (fact: Fact) => {
     setState(prev => {
       const exists = prev.favoritesFacts.find(f => f.id === fact.id);
-      if (exists) {
-        return { ...prev, favoritesFacts: prev.favoritesFacts.filter(f => f.id !== fact.id) };
-      }
-      return { ...prev, favoritesFacts: [...prev.favoritesFacts, fact] };
+      const nextFavorites = exists
+        ? prev.favoritesFacts.filter(f => f.id !== fact.id)
+        : [...prev.favoritesFacts, fact];
+      syncUserDataToRemote({ favoritesFacts: nextFavorites });
+      return { ...prev, favoritesFacts: nextFavorites };
     });
   };
 
   const toggleFavoriteScripture = (scripture: Scripture) => {
     setState(prev => {
       const exists = prev.favoritesScriptures.find(s => s.id === scripture.id);
-      if (exists) {
-        return { ...prev, favoritesScriptures: prev.favoritesScriptures.filter(s => s.id !== scripture.id) };
-      }
-      return { ...prev, favoritesScriptures: [...prev.favoritesScriptures, scripture] };
+      const nextFavorites = exists
+        ? prev.favoritesScriptures.filter(s => s.id !== scripture.id)
+        : [...prev.favoritesScriptures, scripture];
+      syncUserDataToRemote({ favoritesScriptures: nextFavorites });
+      return { ...prev, favoritesScriptures: nextFavorites };
     });
   };
 
@@ -727,10 +841,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isUserFollowed = (userId: string) => state.followedUserIds.includes(userId);
 
   const setLastReadBible = (book: string, chapter: number, translation: string) => {
+    const nextLastRead = { book, chapter, translation };
     setState(prev => ({
       ...prev,
-      lastReadBible: { book, chapter, translation },
+      lastReadBible: nextLastRead,
     }));
+    syncUserDataToRemote({ lastReadBible: nextLastRead });
   };
 
   const setVerseHighlight = (verseKey: string, color?: string) => {
@@ -741,6 +857,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         delete updated[verseKey];
       }
+      syncUserDataToRemote({ bibleHighlights: updated });
       return { ...prev, bibleHighlights: updated };
     });
   };
