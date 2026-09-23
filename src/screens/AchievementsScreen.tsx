@@ -75,7 +75,8 @@ export default function AchievementsScreen() {
   // Responsive 3-per-row grid calculation (horizontal padding 16px, gap 8px)
   const horizontalPadding = 16;
   const gridGap = 8;
-  const cardWidth = (width - (horizontalPadding * 2) - (gridGap * 2)) / 3;
+  const screenWidth = width > 0 ? width : 360;
+  const cardWidth = Math.max(80, Math.floor((screenWidth - (horizontalPadding * 2) - (gridGap * 2)) / 3));
 
   const handleCardPress = (milestone: AchievementMilestone) => {
     setSelectedMilestone(milestone);

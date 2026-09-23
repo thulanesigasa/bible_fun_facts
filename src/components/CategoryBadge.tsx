@@ -235,6 +235,7 @@ export const CategoryBadge: React.FC<CategoryBadgeProps> = ({
 
   return (
     <View
+      collapsable={false}
       style={[
         styles.container,
         { width: size, height: (size * viewBoxHeight) / viewBoxWidth },
@@ -242,6 +243,7 @@ export const CategoryBadge: React.FC<CategoryBadgeProps> = ({
       ]}
     >
       <Svg
+        collapsable={false}
         width={size}
         height={(size * viewBoxHeight) / viewBoxWidth}
         viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
