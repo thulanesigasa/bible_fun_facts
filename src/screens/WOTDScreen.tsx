@@ -142,6 +142,7 @@ export default function WOTDScreen({ route, navigation }: any) {
     readerTheme,
     setVerseHighlight,
     setReaderTheme,
+    incrementSharesCount,
   } = useUser();
 
   // ── Bible Reader State ────────────────────────────────────────────────────
@@ -333,7 +334,10 @@ export default function WOTDScreen({ route, navigation }: any) {
     const ref = getSelectionRef();
     const text = getSelectedText();
     try {
-      await Share.share({ message: `"${text}"\n— ${ref}` });
+      const res = await Share.share({ message: `"${text}"\n— ${ref}` });
+      if (res.action === Share.sharedAction) {
+        incrementSharesCount();
+      }
     } catch {}
     setSelectedVerses([]);
   };
@@ -429,7 +433,10 @@ export default function WOTDScreen({ route, navigation }: any) {
   const onShareExegesis = async () => {
     try {
       const msg = `${wotd.verse}\n— ${wotd.reference}\n\nOriginal Intent:\n${wotd.original_intent}\n\nTheological Truth:\n${wotd.theological_truth}`;
-      await Share.share({ message: msg });
+      const res = await Share.share({ message: msg });
+      if (res.action === Share.sharedAction) {
+        incrementSharesCount();
+      }
     } catch {}
   };
 

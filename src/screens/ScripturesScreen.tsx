@@ -44,7 +44,7 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
   const [displayCount, setDisplayCount] = useState(3);
   const [liveScriptures, setLiveScriptures] = useState<Scripture[]>(initialScriptures);
 
-  const { isScriptureFavorited, toggleFavoriteScripture } = useUser();
+  const { isScriptureFavorited, toggleFavoriteScripture, incrementSharesCount } = useUser();
 
   const fetchLiveScriptures = async () => {
     try {
@@ -94,7 +94,10 @@ export default function ScripturesScreen({ navigation }: { navigation: any }) {
   const onShareScripture = async (scripture: Scripture) => {
     try {
       const message = `"${scripture.text}"\n- ${scripture.reference}\n\nRoot: ${scripture.strongs_transliteration} (${scripture.strongs_number}) - "${scripture.strongs_definition}"`;
-      await Share.share({ message });
+      const res = await Share.share({ message });
+      if (res.action === Share.sharedAction) {
+        incrementSharesCount();
+      }
     } catch (error) {
       console.error(error);
     }

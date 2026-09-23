@@ -15,6 +15,8 @@
   <img src="https://img.shields.io/badge/Security-Kotlin%20FLAG__SECURE-DC2626?style=for-the-badge&logo=android&logoColor=white" alt="Kotlin FLAG_SECURE" />
   <img src="https://img.shields.io/badge/Tab%20Architecture-Floating%20Pill%20280px-FDD223?style=for-the-badge" alt="Floating Pill Tab Bar" />
   <img src="https://img.shields.io/badge/Streak%20Milestones-3D%20Hexagonal%20Badges-F59E0B?style=for-the-badge" alt="3D Streak Milestone Badges" />
+  <img src="https://img.shields.io/badge/Achievements-Streak%20%7C%20Bookmarks%20%7C%20Highlights%20%7C%20Shares-FDD223?style=for-the-badge" alt="Multi-Category Achievements" />
+  <img src="https://img.shields.io/badge/Share%20Engine-Zero%20Blank%20%7C%20High--Fidelity%20PNG-10B981?style=for-the-badge" alt="Zero Blank Share Engine" />
   <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
   <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License MIT" />
@@ -524,6 +526,31 @@ To eliminate visual header stacking and duplicate headers across nested navigato
 
 ---
 
+## Multi-Category Study Achievements & High-Fidelity Share Engine
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Achievements-4%20Distinct%20Categories-FDD223?style=for-the-badge" alt="4 Distinct Categories" />
+  <img src="https://img.shields.io/badge/Tiers-Bronze%20%7C%20Silver%20%7C%20Gold%20%7C%20Diamond-F59E0B?style=for-the-badge" alt="4 Metallic Tiers" />
+  <img src="https://img.shields.io/badge/Sharing-Hardware%20Canvas%20PNG-10B981?style=for-the-badge" alt="Hardware Canvas PNG" />
+</p>
+
+### 1. Four Sacred Study Achievement Categories
+To motivate believers and maintain unbroken consistency in scripture study, exégeomai tracks milestones across four theological dimensions:
+- **Daily Streak Achievements**: Tracks unbroken consecutive days of Scripture engagement (`Day 1: First Step`, `Day 3: Rookie`, `Day 7: Faithful Scribe`, `Day 10: Getting Serious`, `Day 30: Devoted Scholar`, `Day 50: Pillar of Truth`, `Day 100: Triple Threat`, `Day 180: Half-Year Covenant`, `Day 365: Canon Completer`).
+- **Bookmark Achievements**: Celebrates saving foundational verses offline (`First Scribe` at 1, `Canon Keeper` at 5, `Wisdom Collector` at 10, `Scripture Custodian` at 25, `Treasury of Truth` at 50).
+- **Highlight Achievements**: Rewards contemplative underlining in the full reader (`Golden Quill` at 1, `Illuminator` at 5, `Truth Seeker` at 10, `Theologian's Mind` at 25, `Living Epigram` at 50).
+- **Share Achievements**: Encourages digital evangelism and spreading biblical truth (`Herald of Truth` at 1, `Evangelist` at 5, `Voice of Hope` at 10, `Beacon of Light` at 25, `Apostolic Reach` at 50).
+
+### 2. High-Fidelity Image Share Engine (Zero Blank Screen)
+The share architecture in `StreakMilestoneModal.tsx` eliminates Android Dialog capture bugs:
+- **Hardware Acceleration**: `<Modal hardwareAccelerated={true}>` forces Android's window manager to allocate GPU-backed off-screen render caches.
+- **Unclipped Canvas Surface**: Removed `overflow: 'hidden'` from the captured card container, allowing child `react-native-svg` elements to rasterize without viewport clipping.
+- **Byte-Size Integrity Gate**: Uses `expo-file-system` to inspect captured image size (`info.size > 1000`). If a view capture is unrendered (< 1KB), it automatically invokes `captureScreen` hardware fallback.
+- **Dynamic Category Badging**: Passes custom category labels (`'STREAK'`, `'BOOKMARK'`, `'HIGHLIGHT'`, `'SHARE'`) directly into the 3D extruded hexagonal shield header.
+- **Global Share Tracking**: Tracks `sharesCount` across all share entry points in the app, persisting to `AsyncStorage` and Supabase profile state.
+
+---
+
 ## Project Directory Structure (Rule 12 & Rule 13)
 
 ```
@@ -541,16 +568,17 @@ bible_fun_facts/
 │   │   ├── Card.tsx                 # Flat surface card with soft elevation shadow
 │   │   ├── FactCard.tsx             # Fact presentation card with zero badges
 │   │   ├── ScriptureCard.tsx        # Scripture reading card with inline typography
-│   │   ├── StreakHexagonBadge.tsx   # 3D metallic hexagonal shield badge (100% dynamic vector, zero fire)
-│   │   ├── StreakMilestoneModal.tsx # Fullscreen streak milestone modal with clean white surface, ViewShot image sharing, and milestone shelf
+│   │   ├── StreakHexagonBadge.tsx   # 3D metallic hexagonal shield badge (100% dynamic vector, zero fire, custom labels)
+│   │   ├── StreakMilestoneModal.tsx # Fullscreen streak & achievement milestone modal with verified PNG export
 │   │   ├── SvgIcons.tsx             # Curated SVG icon collection (zero emojis)
 │   │   ├── Typography.tsx           # Scaled typographic components
 │   │   ├── UiverseSwitch.tsx        # Animated sliding toggle pill switch (60-30-10 tokens)
 │   │   ├── UpdateModal.tsx          # Dual-action OTA update prompt with 30m snooze
 │   │   └── WOTDCard.tsx             # Word of the Day analytical lens viewer
 │   ├── context/
-│   │   └── UserContext.tsx          # Global authentication, preferences, streak state
+│   │   └── UserContext.tsx          # Global authentication, preferences, streak & sharesCount state
 │   ├── data/
+│   │   ├── achievements.ts          # Multi-category achievement catalog (Streak, Bookmark, Highlight, Share)
 │   │   ├── bibleCanon.ts            # Complete 66-book canon metadata and prebundled offline chapters
 │   │   ├── mockDatabase.ts          # Offline database: 120 facts, 24 scriptures, WOTD
 │   │   ├── mockUsers.ts             # 8 theological scholars, pastors, and exegetes with follower tracking

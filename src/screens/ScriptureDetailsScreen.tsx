@@ -27,14 +27,17 @@ interface ScriptureDetailsScreenProps {
 
 export default function ScriptureDetailsScreen({ navigation, route }: ScriptureDetailsScreenProps) {
   const { scripture } = route.params;
-  const { toggleFavoriteScripture, isScriptureFavorited } = useUser();
+  const { toggleFavoriteScripture, isScriptureFavorited, incrementSharesCount } = useUser();
   const isFavorited = isScriptureFavorited(scripture.id);
 
   const handleShare = async () => {
     try {
-      await Share.share({
+      const res = await Share.share({
         message: `"${scripture.text}" - ${scripture.reference}\n\nShared from exégeomai`,
       });
+      if (res.action === Share.sharedAction) {
+        incrementSharesCount();
+      }
     } catch {}
   };
 

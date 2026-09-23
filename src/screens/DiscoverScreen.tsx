@@ -39,6 +39,7 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
     streak,
     setStreak,
     incrementFactsViewed,
+    incrementSharesCount,
     userProfile,
     toggleFavoriteFact,
     isFactFavorited,
@@ -66,7 +67,10 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
   const onShareMessage = async (message: DailyMessage) => {
     try {
       const shareText = `"${message.fact_title}" (${message.scripture_ref})\n\n"${message.verse_text}"\n\nContext:\n${message.historical_context}\n\nShared from exégeomai • Day ${message.dayOfYear} of 365`;
-      await Share.share({ message: shareText });
+      const res = await Share.share({ message: shareText });
+      if (res.action === Share.sharedAction) {
+        incrementSharesCount();
+      }
     } catch (error) {
       console.error(error);
     }
