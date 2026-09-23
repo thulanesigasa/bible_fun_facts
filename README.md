@@ -546,6 +546,7 @@ Rather than crowding the main Profile screen with cramped horizontal scroll caro
   - Earned milestones: Warm golden highlight borders (`#FEFCE8` surface, `#FDD223` border), high-contrast titles, and full-opacity metallic badges.
   - Locked milestones: Clean translucent styling (`opacity: 0.45`), showing believers upcoming targets and scriptural promises to strive towards.
   - Tapping any card opens `StreakMilestoneModal` to inspect the full theological title, target, biblical quote, book reference, and share via native high-fidelity image capture.
+- **Direct Body Profile Navigation**: Replaced enclosing cards, div wrappers, and icons with a direct body action row (`styles.actionRow`) in `ProfileScreen.tsx` matching `Saved Collection` and reader preferences with clean typography and subtle `›` disclosure arrow.
 
 ### 2. Four Sacred Study Categories & 48 Curated Milestones
 exégeomai defines 12 progressive milestones per category (targets: `1, 3, 5, 7, 10, 15, 20, 25, 35, 50, 75, 100`) for a grand total of 48 achievements:

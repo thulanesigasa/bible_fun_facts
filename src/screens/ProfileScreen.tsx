@@ -24,7 +24,6 @@ import {
   ProfileSvg,
   CameraSvg,
   ChevronRightSvg,
-  AwardSvg,
 } from '../components/SvgIcons';
 import { UiverseSwitch } from '../components/UiverseSwitch';
 import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
@@ -444,52 +443,29 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
         </View>
 
         {/* ================================================================ */}
-        {/* STUDY ACHIEVEMENTS (NAVIGATION ROW TO DEDICATED SCREEN)          */}
+        {/* STUDY ACHIEVEMENTS (DIRECT BODY ROW, ZERO ICONS, ZERO DIVS)      */}
         {/* ================================================================ */}
         <View style={styles.bodySection}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
-            MILESTONES & ACHIEVEMENTS
+            STUDY ACHIEVEMENTS
           </Text>
 
           <TouchableOpacity
-            style={styles.achievementNavCard}
+            style={styles.actionRow}
             onPress={() => navigation.navigate('Achievements')}
-            activeOpacity={0.8}
+            activeOpacity={0.75}
             accessibilityRole="button"
             accessibilityLabel={`Study Achievements. ${totalProgress.totalUnlocked} of ${totalProgress.totalAvailable} unlocked. Tap to view all categories.`}
           >
-            <View style={styles.achievementNavLeft}>
-              <View style={styles.achievementNavIconBox}>
-                <AwardSvg size={24} color="#C99A00" strokeWidth={2} />
-              </View>
-              <View style={styles.achievementNavTextBox}>
-                <View style={styles.achievementNavTitleRow}>
-                  <Text variant="h3" style={styles.achievementNavTitle}>
-                    Study Achievements
-                  </Text>
-                  <View style={styles.achievementNavPill}>
-                    <Text variant="caption" weight="800" color="#78350F" style={styles.achievementNavPillText}>
-                      {`${totalProgress.totalUnlocked}/${totalProgress.totalAvailable}`}
-                    </Text>
-                  </View>
-                </View>
-                <Text variant="caption" color={colors.textSecondary} style={styles.achievementNavSubtitle}>
-                  Streaks, Bookmarks, Highlights & Shares (12 each)
-                </Text>
-
-                {/* Progress bar line */}
-                <View style={styles.achievementNavProgressTrack}>
-                  <View
-                    style={[
-                      styles.achievementNavProgressFill,
-                      { width: `${totalProgress.percent}%` },
-                    ]}
-                  />
-                </View>
-              </View>
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Study Milestones & Badges
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                {`${totalProgress.totalUnlocked} of ${totalProgress.totalAvailable} milestones unlocked`}
+              </Text>
             </View>
-
-            <ChevronRightSvg size={20} color="#94A3B8" />
+            <Text style={styles.rowDisclosureArrow}>›</Text>
           </TouchableOpacity>
         </View>
 
@@ -991,80 +967,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(15, 23, 42, 0.08)',
-  },
-  achievementNavCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF', // 30% panel surface
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    marginTop: 4,
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  achievementNavLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    marginRight: 12,
-  },
-  achievementNavIconBox: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: '#FEF9C3', // subtle warm amber surface
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(253, 210, 35, 0.3)',
-  },
-  achievementNavTextBox: {
-    flex: 1,
-  },
-  achievementNavTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 2,
-  },
-  achievementNavTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#0F172A',
-  },
-  achievementNavPill: {
-    backgroundColor: '#FEF9C3',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(201, 154, 0, 0.25)',
-  },
-  achievementNavPillText: {
-    fontSize: 11,
-  },
-  achievementNavSubtitle: {
-    fontSize: 12,
-    marginBottom: 8,
-  },
-  achievementNavProgressTrack: {
-    height: 5,
-    width: '100%',
-    backgroundColor: '#E2E8F0',
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
-  achievementNavProgressFill: {
-    height: '100%',
-    backgroundColor: colors.accent,
-    borderRadius: 3,
   },
   sectionHeader: {
     fontSize: 10.5,
