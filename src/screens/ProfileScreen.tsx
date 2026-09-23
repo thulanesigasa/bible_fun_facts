@@ -26,7 +26,6 @@ import {
   ChevronRightSvg,
 } from '../components/SvgIcons';
 import { UiverseSwitch } from '../components/UiverseSwitch';
-import { StreakHexagonBadge } from '../components/StreakHexagonBadge';
 import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
 
 // ============================================================================
@@ -394,8 +393,10 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
               onPress={() => setShowStreakModal(true)}
               activeOpacity={0.7}
             >
-              <StreakHexagonBadge days={streak || 1} size={32} />
-              <Text variant="caption" color={colors.textSecondary} style={[styles.statLabel, { marginTop: 4 }]}>
+              <Text variant="h3" style={styles.statValue}>
+                {streak || 1}
+              </Text>
+              <Text variant="caption" color={colors.textSecondary} style={styles.statLabel}>
                 Streak
               </Text>
             </TouchableOpacity>
