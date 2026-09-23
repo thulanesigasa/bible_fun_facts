@@ -101,21 +101,13 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
           </View>
 
           <TouchableOpacity
-            style={styles.headerStreakBadgeBtn}
+            style={styles.headerStreakBadgeOnlyBtn}
             onPress={() => setShowStreakModal(true)}
             activeOpacity={0.8}
             accessibilityRole="button"
-            accessibilityLabel={`Streak ${streak || 1}, ${streakInfo.name} Tier (${streakInfo.rangeLabel}). Tap to open streak badge.`}
+            accessibilityLabel={`Streak ${streak || 1}. Tap to open streak badge.`}
           >
-            <StreakHexagonBadge days={streak || 1} size={42} />
-            <View style={styles.headerStreakTextCol}>
-              <Text variant="caption" weight="800" color={colors.textPrimary} style={styles.headerStreakBadgeLabel}>
-                Streak {streak || 1}
-              </Text>
-              <Text variant="caption" weight="700" style={[styles.headerStreakTierSub, { color: streakInfo.color }]}>
-                {streakInfo.name}
-              </Text>
-            </View>
+            <StreakHexagonBadge days={streak || 1} size={46} showText={false} />
           </TouchableOpacity>
         </View>
 
@@ -314,36 +306,10 @@ const styles = StyleSheet.create({
   headerSub: {
     marginTop: 2,
   },
-  headerStreakBadgeBtn: {
-    flexDirection: 'row',
+  headerStreakBadgeOnlyBtn: {
+    padding: 2,
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    borderRadius: 14,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 2,
-    gap: 6,
-  },
-  headerStreakBadgeLabel: {
-    fontSize: 12.5,
-    lineHeight: 15,
-  },
-  headerStreakTextCol: {
-    flexDirection: 'column',
     justifyContent: 'center',
-    marginRight: 2,
-  },
-  headerStreakTierSub: {
-    fontSize: 9.5,
-    lineHeight: 12,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
   },
 
   // Subtle Hairline Divider (like Settings / ProfileScreen)

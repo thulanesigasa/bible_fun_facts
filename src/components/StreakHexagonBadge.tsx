@@ -16,6 +16,7 @@ export interface StreakHexagonBadgeProps {
   tier?: 'bronze' | 'silver' | 'gold' | 'diamond' | 'celestial';
   size?: number;
   style?: StyleProp<ViewStyle>;
+  showText?: boolean;
 }
 
 // 60-30-10 & metallic palettes for clean 3D hexagonal shields (strictly fire-free)
@@ -102,6 +103,7 @@ export const StreakHexagonBadge: React.FC<StreakHexagonBadgeProps> = ({
   tier,
   size = 220,
   style,
+  showText = true,
 }) => {
   // Determine tier dynamically from day count if not provided
   const activeTier = tier || getTierForDays(days);
@@ -191,7 +193,7 @@ export const StreakHexagonBadge: React.FC<StreakHexagonBadgeProps> = ({
         </G>
 
         {/* 6. Extruded 3D "STREAK" Label (Top Header on Full Badges) */}
-        {!isCompact && (
+        {showText && !isCompact && (
           <G>
             <SvgText
               x="120"
@@ -221,46 +223,48 @@ export const StreakHexagonBadge: React.FC<StreakHexagonBadgeProps> = ({
         )}
 
         {/* 7. Dynamic Extruded 3D Streak Number */}
-        <G>
-          {/* Deepest drop shadow */}
-          <SvgText
-            x="120"
-            y={isCompact ? numberY + 4 : numberY + 22}
-            fill={palette.textShadow}
-            fontSize={numberFontSize}
-            fontWeight="900"
-            textAnchor="middle"
-            fontFamily="System"
-          >
-            {days}
-          </SvgText>
+        {showText && (
+          <G>
+            {/* Deepest drop shadow */}
+            <SvgText
+              x="120"
+              y={isCompact ? numberY + 4 : numberY + 22}
+              fill={palette.textShadow}
+              fontSize={numberFontSize}
+              fontWeight="900"
+              textAnchor="middle"
+              fontFamily="System"
+            >
+              {days}
+            </SvgText>
 
-          {/* Mid bevel shadow */}
-          <SvgText
-            x="120"
-            y={isCompact ? numberY + 2 : numberY + 20}
-            fill={palette.borderDark}
-            fontSize={numberFontSize}
-            fontWeight="900"
-            textAnchor="middle"
-            fontFamily="System"
-          >
-            {days}
-          </SvgText>
+            {/* Mid bevel shadow */}
+            <SvgText
+              x="120"
+              y={isCompact ? numberY + 2 : numberY + 20}
+              fill={palette.borderDark}
+              fontSize={numberFontSize}
+              fontWeight="900"
+              textAnchor="middle"
+              fontFamily="System"
+            >
+              {days}
+            </SvgText>
 
-          {/* Front metallic face */}
-          <SvgText
-            x="120"
-            y={isCompact ? numberY : numberY + 18}
-            fill={`url(#${gradId}_text)`}
-            fontSize={numberFontSize}
-            fontWeight="900"
-            textAnchor="middle"
-            fontFamily="System"
-          >
-            {days}
-          </SvgText>
-        </G>
+            {/* Front metallic face */}
+            <SvgText
+              x="120"
+              y={isCompact ? numberY : numberY + 18}
+              fill={`url(#${gradId}_text)`}
+              fontSize={numberFontSize}
+              fontWeight="900"
+              textAnchor="middle"
+              fontFamily="System"
+            >
+              {days}
+            </SvgText>
+          </G>
+        )}
 
         {/* 8. Bottom Seal / Sacred Exegesis Wordmark Emblem (Zero Fire) */}
         <G transform="translate(120, 198)">
