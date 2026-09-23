@@ -12,14 +12,15 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
   DiscoverSvg,
   WotdSvg,
-  ScripturesSvg,
+  HistorySvg,
   SearchSvg,
   ProfileSvg,
 } from '../components/SvgIcons';
 
 import DiscoverScreen from '../screens/DiscoverScreen';
 import WOTDScreen from '../screens/WOTDScreen';
-import ScripturesScreen from '../screens/ScripturesScreen';
+import HistoryScreen from '../screens/HistoryScreen';
+import WriterDetailsScreen from '../screens/WriterDetailsScreen';
 import SearchScreen from '../screens/SearchScreen';
 import FavoritesScreen from '../screens/FavoritesScreen';
 import ProfileScreen from '../screens/ProfileScreen';
@@ -27,6 +28,7 @@ import FactDetailsScreen from '../screens/FactDetailsScreen';
 import ScriptureDetailsScreen from '../screens/ScriptureDetailsScreen';
 import WOTDDetailsScreen from '../screens/WOTDDetailsScreen';
 import { Fact, Scripture, WOTDEntry } from '../data/mockDatabase';
+import { BiblicalWriter } from '../data/biblicalWriters';
 import { colors } from '../theme/colors';
 import { useApp } from '../context/UserContext';
 import AuthScreen from '../screens/AuthScreen';
@@ -45,6 +47,8 @@ export type RootStackParamList = {
   Auth: undefined;
   DiscoverMain: undefined;
   FactDetails: { fact: Fact };
+  HistoryMain: undefined;
+  WriterDetails: { writer: BiblicalWriter };
   ScripturesMain: undefined;
   ScriptureDetails: { scripture: Scripture };
   SearchMain: undefined;
@@ -67,6 +71,7 @@ function shouldShowTabHeader(route: any): boolean {
     'TermsOfService',
     'PrivacyPolicy',
     'FactDetails',
+    'WriterDetails',
     'ScriptureDetails',
     'WOTDDetails',
   ];
@@ -99,13 +104,13 @@ function DiscoverStack() {
   );
 }
 
-function ScripturesStack() {
+function HistoryStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="ScripturesMain" component={ScripturesScreen} />
+      <Stack.Screen name="HistoryMain" component={HistoryScreen} />
       <Stack.Screen
-        name="ScriptureDetails"
-        component={ScriptureDetailsScreen}
+        name="WriterDetails"
+        component={WriterDetailsScreen}
         options={{
           presentation: 'pageSheet',
           headerShown: false,
@@ -386,11 +391,11 @@ export default function AppNavigator() {
             }}
           />
           <Tab.Screen
-            name="Scriptures"
-            component={ScripturesStack}
+            name="History"
+            component={HistoryStack}
             options={{
-              title: 'Verses',
-              tabBarIcon: ({ color }) => <ScripturesSvg size={16} color={color} strokeWidth={2} />,
+              title: 'History',
+              tabBarIcon: ({ color }) => <HistorySvg size={16} color={color} strokeWidth={2} />,
             }}
           />
           <Tab.Screen
