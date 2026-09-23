@@ -8,13 +8,12 @@ import {
   Share,
   Image,
   Animated,
-  Dimensions,
+  TextInput,
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
 import { colors } from '../theme/colors';
-import { spacing, radius, shadow } from '../theme';
 import { Text } from './Typography';
 import { StreakHexagonBadge } from './StreakHexagonBadge';
 import {
@@ -27,15 +26,14 @@ import {
   CheckSvg,
   LockSvg,
   ShareSvg,
-  FlameSvg,
+  ShieldCheckSvg,
 } from './SvgIcons';
-
-const { width, height } = Dimensions.get('window');
 
 export interface StreakMilestoneModalProps {
   visible: boolean;
   streak: number;
   initialMilestoneDays?: number;
+  onUpdateStreak?: (newStreak: number) => void;
   onClose: () => void;
 }
 
@@ -43,9 +41,9 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
   visible,
   streak,
   initialMilestoneDays,
+  onUpdateStreak,
   onClose,
 }) => {
-  // Determine initially active milestone based on user's current streak or prop
   const currentEarnedMilestone = getMilestoneForStreak(streak);
   const [selectedMilestone, setSelectedMilestone] = useState<StreakMilestone>(
     initialMilestoneDays
@@ -86,7 +84,7 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
 
   const handleShare = async () => {
     try {
-      const shareMessage = `🔥 ${selectedMilestone.days}-Day Scripture Streak: "${selectedMilestone.title}"!\n\n"${selectedMilestone.subtitle}"\n\n${selectedMilestone.verseQuote ? `"${selectedMilestone.verseQuote}" (${selectedMilestone.verseRef})\n\n` : ''}Studying daily on exégeomai • Walking in biblical truth.`;
+      const shareMessage = `✦ ${selectedMilestone.days}-Day Scripture Study Streak: "${selectedMilestone.title}"!\n\n"${selectedMilestone.subtitle}"\n\n${selectedMilestone.verseQuote ? `"${selectedMilestone.verseQuote}" (${selectedMilestone.verseRef})\n\n` : ''}Studying daily on exégeomai • Walking in biblical truth.`;
       await Share.share({
         message: shareMessage,
         title: `${selectedMilestone.title} - ${selectedMilestone.days} Day Streak`,
@@ -94,6 +92,20 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
     } catch (err) {
       console.warn('Share error:', err);
     }
+  };
+
+  const handleStreakChange = (valStr: string) => {
+    const digits = valStr.replace(/[^\d]/g, '');
+    const num = parseInt(digits, 10);
+    const clamped = isNaN(num) ? 0 : Math.min(9999, num);
+    onUpdateStreak?.(clamped);
+    setSelectedMilestone(getMilestoneForStreak(clamped));
+  };
+
+  const handleStepStreak = (delta: number) => {
+    const next = Math.max(0, Math.min(9999, streak + delta));
+    onUpdateStreak?.(next);
+    setSelectedMilestone(getMilestoneForStreak(next));
   };
 
   return (
@@ -121,12 +133,12 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
         </View>
 
         <SafeAreaView style={styles.safeArea}>
-          {/* Top Bar: Close Button */}
+          {/* Top Bar: Close Button & Active Streak Indicator */}
           <View style={styles.topBar}>
             <View style={styles.userStreakPill}>
-              <FlameSvg size={14} color={colors.accent} fill={colors.accent} />
+              <ShieldCheckSvg size={15} color={colors.accent} strokeWidth={2} />
               <Text variant="caption" weight="700" color="#0F172A" style={styles.userStreakText}>
-                Current: {streak} {streak === 1 ? 'Day' : 'Days'}
+                Active: {streak} {streak === 1 ? 'Day' : 'Days'}
               </Text>
             </View>
 
@@ -145,8 +157,9 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
           >
-            {/* Centered 3D Hexagonal Badge Container */}
+            {/* Centered 3D Hexagonal Shield Badge (100% Vector & Fire-Free) */}
             <Animated.View
               style={[
                 styles.badgeWrapper,
@@ -159,12 +172,11 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
               <StreakHexagonBadge
                 days={selectedMilestone.days}
                 tier={selectedMilestone.tier}
-                size={230}
-                badgeImage={selectedMilestone.badgeImage}
+                size={220}
               />
             </Animated.View>
 
-            {/* Title & Epigram Subtitle (Exact Cal AI Style) */}
+            {/* Title & Epigram Subtitle */}
             <View style={styles.copyBlock}>
               <Text variant="h1" style={styles.milestoneTitle}>
                 {selectedMilestone.title}
@@ -199,11 +211,59 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
                 <View style={styles.statusLockedPill}>
                   <LockSvg size={15} color="#64748B" strokeWidth={2} />
                   <Text variant="body" weight="600" color="#64748B" style={styles.statusLockedLabel}>
-                    Locked • {selectedMilestone.days - streak} {selectedMilestone.days - streak === 1 ? 'day' : 'days'} to reach
+                    Locked • {selectedMilestone.days - streak} {selectedMilestone.days - streak === 1 ? 'day' : 'days'} remaining
                   </Text>
                 </View>
               )}
             </View>
+
+            {/* Interactive Daily Streak Stepper & Direct Numeric Editor */}
+            {onUpdateStreak ? (
+              <View style={styles.editorSection}>
+                <Text variant="caption" weight="700" color="#64748B" style={styles.editorHeading}>
+                  EDIT DAILY STREAK COUNT
+                </Text>
+                <View style={styles.editorRow}>
+                  <TouchableOpacity
+                    style={styles.stepBtn}
+                    onPress={() => handleStepStreak(-1)}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel="Decrease streak day"
+                  >
+                    <Text variant="h2" color="#0F172A" style={styles.stepBtnText}>−</Text>
+                  </TouchableOpacity>
+
+                  <View style={styles.editorInputWrap}>
+                    <TextInput
+                      style={styles.editorInput}
+                      value={String(streak)}
+                      onChangeText={handleStreakChange}
+                      keyboardType="number-pad"
+                      maxLength={4}
+                      selectTextOnFocus
+                      accessibilityLabel="Directly edit daily streak number"
+                    />
+                    <Text variant="caption" color="#64748B" style={styles.editorUnitLabel}>
+                      {streak === 1 ? 'day' : 'days'}
+                    </Text>
+                  </View>
+
+                  <TouchableOpacity
+                    style={styles.stepBtn}
+                    onPress={() => handleStepStreak(1)}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel="Increase streak day"
+                  >
+                    <Text variant="h2" color="#0F172A" style={styles.stepBtnText}>+</Text>
+                  </TouchableOpacity>
+                </View>
+                <Text variant="caption" color="#94A3B8" style={styles.editorHelper}>
+                  Updates daily with Scripture reading, or adjust above to test milestone badges.
+                </Text>
+              </View>
+            ) : null}
 
             {/* Horizontal Milestone Shelf Selector */}
             <View style={styles.shelfSection}>
@@ -233,8 +293,7 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
                         <StreakHexagonBadge
                           days={milestone.days}
                           tier={milestone.tier}
-                          size={46}
-                          badgeImage={milestone.badgeImage}
+                          size={42}
                         />
                       </View>
                       <Text
@@ -329,7 +388,7 @@ const styles = StyleSheet.create({
   userStreakPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.08)',
     borderRadius: 20,
@@ -344,7 +403,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.08)',
     alignItems: 'center',
@@ -356,22 +415,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   badgeWrapper: {
-    marginTop: 16,
-    marginBottom: 20,
+    marginTop: 12,
+    marginBottom: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
   copyBlock: {
     alignItems: 'center',
     maxWidth: 320,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   milestoneTitle: {
     fontSize: 28,
     fontWeight: '800',
     color: '#0F172A',
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
     letterSpacing: -0.5,
   },
   milestoneSubtitle: {
@@ -381,9 +440,9 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
   scriptureBlock: {
-    marginTop: 14,
+    marginTop: 12,
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingVertical: 8,
     backgroundColor: 'rgba(15, 23, 42, 0.03)',
     borderRadius: 12,
     alignItems: 'center',
@@ -402,7 +461,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   statusSection: {
-    marginVertical: 12,
+    marginVertical: 10,
     alignItems: 'center',
   },
   statusUnlockedPill: {
@@ -433,15 +492,80 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     fontSize: 13,
   },
+  // Streak Editor Stepper Styles
+  editorSection: {
+    width: '100%',
+    padding: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  editorHeading: {
+    fontSize: 11,
+    letterSpacing: 0.8,
+    marginBottom: 8,
+  },
+  editorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  stepBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#F1F5F9',
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepBtnText: {
+    fontSize: 20,
+    lineHeight: 22,
+    textAlign: 'center',
+  },
+  editorInputWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: colors.accent,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    minWidth: 110,
+    justifyContent: 'center',
+  },
+  editorInput: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#0F172A',
+    textAlign: 'center',
+    minWidth: 44,
+    padding: 0,
+  },
+  editorUnitLabel: {
+    marginLeft: 4,
+    fontSize: 12,
+  },
+  editorHelper: {
+    fontSize: 11,
+    marginTop: 6,
+    textAlign: 'center',
+  },
   shelfSection: {
     width: '100%',
-    marginTop: 16,
-    marginBottom: 20,
+    marginTop: 12,
+    marginBottom: 16,
   },
   shelfHeading: {
     fontSize: 11,
     letterSpacing: 1.2,
-    marginBottom: 10,
+    marginBottom: 8,
     textAlign: 'left',
     paddingHorizontal: 4,
   },
@@ -473,11 +597,11 @@ const styles = StyleSheet.create({
     opacity: 0.65,
   },
   shelfBadgeMini: {
-    width: 46,
+    width: 42,
     height: 46,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   shelfDayText: {
     fontSize: 12,
@@ -491,8 +615,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 12,
-    marginBottom: 20,
+    marginTop: 8,
+    marginBottom: 16,
   },
   brandFooterPre: {
     fontSize: 13,

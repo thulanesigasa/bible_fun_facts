@@ -1,67 +1,63 @@
 import React from 'react';
-import { View, Image, StyleSheet, StyleProp, ViewStyle } from 'react-native';
+import { View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import Svg, {
   Defs,
   LinearGradient,
-  RadialGradient,
   Stop,
   Path,
   G,
   Text as SvgText,
   Polygon,
 } from 'react-native-svg';
+import { getTierForDays } from '../data/streakMilestones';
 
 export interface StreakHexagonBadgeProps {
   days: number;
   tier?: 'bronze' | 'silver' | 'gold' | 'diamond' | 'celestial';
   size?: number;
-  badgeImage?: any;
   style?: StyleProp<ViewStyle>;
 }
 
-// Color palettes for vector metallic rendering fallback
+// 60-30-10 & metallic palettes for clean 3D hexagonal shields (strictly fire-free)
 const TIER_PALETTES = {
   bronze: {
     borderLight: '#F59E0B',
     borderMid: '#B45309',
     borderDark: '#78350F',
-    faceGradStart: '#FDE68A',
+    faceGradStart: '#FEF3C7',
     faceGradEnd: '#B45309',
     surfaceGradStart: '#78350F',
-    surfaceGradEnd: '#451A03',
-    flameGradStart: '#FDE68A',
-    flameGradEnd: '#D97706',
-    flameCore: '#FEF3C7',
+    surfaceGradEnd: '#331302',
+    accentGlaze: '#FDE68A',
     textFront: '#FEF3C7',
-    textShadow: '#451A03',
+    textShadow: '#260B00',
+    insignia: '#FDE68A',
   },
   silver: {
-    borderLight: '#F8FAFC',
+    borderLight: '#FFFFFF',
     borderMid: '#CBD5E1',
     borderDark: '#64748B',
     faceGradStart: '#FFFFFF',
     faceGradEnd: '#94A3B8',
     surfaceGradStart: '#475569',
-    surfaceGradEnd: '#1E293B',
-    flameGradStart: '#FFFFFF',
-    flameGradEnd: '#94A3B8',
-    flameCore: '#F8FAFC',
+    surfaceGradEnd: '#0F172A',
+    accentGlaze: '#F8FAFC',
     textFront: '#FFFFFF',
-    textShadow: '#1E293B',
+    textShadow: '#020617',
+    insignia: '#E2E8F0',
   },
   gold: {
     borderLight: '#FEF08A',
     borderMid: '#FACC15',
     borderDark: '#854D0E',
-    faceGradStart: '#FEF9C3',
+    faceGradStart: '#FEFCE8',
     faceGradEnd: '#CA8A04',
     surfaceGradStart: '#713F12',
-    surfaceGradEnd: '#422006',
-    flameGradStart: '#FEF08A',
-    flameGradEnd: '#EAB308',
-    flameCore: '#FEFCE8',
+    surfaceGradEnd: '#2E1500',
+    accentGlaze: '#FEF9C3',
     textFront: '#FEFCE8',
-    textShadow: '#422006',
+    textShadow: '#1A0C00',
+    insignia: '#FEF08A',
   },
   diamond: {
     borderLight: '#E0F2FE',
@@ -70,61 +66,50 @@ const TIER_PALETTES = {
     faceGradStart: '#F0F9FF',
     faceGradEnd: '#0284C7',
     surfaceGradStart: '#075985',
-    surfaceGradEnd: '#082F49',
-    flameGradStart: '#BAE6FD',
-    flameGradEnd: '#0284C7',
-    flameCore: '#FFFFFF',
+    surfaceGradEnd: '#031D30',
+    accentGlaze: '#BAE6FD',
     textFront: '#FFFFFF',
-    textShadow: '#082F49',
+    textShadow: '#02101C',
+    insignia: '#BAE6FD',
   },
   celestial: {
-    borderLight: '#FEF08A',
+    borderLight: '#FEF9C3',
     borderMid: '#F59E0B',
     borderDark: '#B45309',
     faceGradStart: '#FFFBEB',
     faceGradEnd: '#D97706',
     surfaceGradStart: '#78350F',
-    surfaceGradEnd: '#331302',
-    flameGradStart: '#FEF08A',
-    flameGradEnd: '#F59E0B',
-    flameCore: '#FFFFFF',
+    surfaceGradEnd: '#290E00',
+    accentGlaze: '#FEF08A',
     textFront: '#FFFBEB',
-    textShadow: '#331302',
+    textShadow: '#1A0700',
+    insignia: '#FEF08A',
   },
 };
 
 export const StreakHexagonBadge: React.FC<StreakHexagonBadgeProps> = ({
   days,
-  tier = 'bronze',
+  tier,
   size = 220,
-  badgeImage,
   style,
 }) => {
-  // If a pre-rendered high-res 3D badge asset exists, render it with crisp fidelity
-  if (badgeImage) {
-    return (
-      <View style={[styles.imageContainer, { width: size, height: size }, style]}>
-        <Image
-          source={badgeImage}
-          style={{ width: size, height: size, borderRadius: size * 0.18 }}
-          resizeMode="contain"
-        />
-      </View>
-    );
-  }
+  // Determine tier dynamically from day count if not provided
+  const activeTier = tier || getTierForDays(days);
+  const palette = TIER_PALETTES[activeTier] || TIER_PALETTES.bronze;
 
-  // Otherwise, render a procedural 3D metallic hexagonal shield using react-native-svg
-  const palette = TIER_PALETTES[tier] || TIER_PALETTES.bronze;
   const viewBoxWidth = 240;
-  const viewBoxHeight = 280;
+  const viewBoxHeight = 260;
 
-  // Hexagon point-top coordinates:
-  // Center is (120, 168), radius approx 82
-  const outerHexPoints = '120,72 202,118 202,212 120,258 38,212 38,118';
-  const innerHexPoints = '120,78 196,121 196,209 120,252 44,209 44,121';
-  const surfaceHexPoints = '120,84 190,124 190,206 120,246 50,206 50,124';
+  // Point-top hexagonal geometry (balanced width & height, no fire)
+  const outerHex = '120,24 208,76 208,184 120,236 32,184 32,76';
+  const innerHex = '120,32 200,80 200,180 120,228 40,180 40,80';
+  const surfaceHex = '120,40 192,84 192,176 120,220 48,176 48,84';
 
-  const gradId = `badge_${tier}_${days}`;
+  const gradId = `shield_${activeTier}_${days}_${Math.round(size)}`;
+
+  // Dynamic font sizing based on digits
+  const numberFontSize = days >= 1000 ? 44 : days >= 100 ? 54 : 66;
+  const numberY = days >= 1000 ? 134 : days >= 100 ? 135 : 138;
 
   return (
     <View style={[styles.container, { width: size, height: (size * viewBoxHeight) / viewBoxWidth }, style]}>
@@ -134,85 +119,69 @@ export const StreakHexagonBadge: React.FC<StreakHexagonBadgeProps> = ({
         viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
       >
         <Defs>
-          {/* Beveled Rim Metallic Gradient */}
+          {/* Metallic Rim Reflection Gradient */}
           <LinearGradient id={`${gradId}_rim`} x1="0" y1="0" x2="1" y2="1">
             <Stop offset="0" stopColor={palette.borderLight} stopOpacity="1" />
-            <Stop offset="0.3" stopColor={palette.borderMid} stopOpacity="1" />
-            <Stop offset="0.7" stopColor={palette.borderDark} stopOpacity="1" />
+            <Stop offset="0.25" stopColor={palette.borderMid} stopOpacity="1" />
+            <Stop offset="0.55" stopColor={palette.borderDark} stopOpacity="1" />
+            <Stop offset="0.8" stopColor={palette.borderMid} stopOpacity="1" />
             <Stop offset="1" stopColor={palette.borderLight} stopOpacity="1" />
           </LinearGradient>
 
           {/* Recessed Shield Surface Gradient */}
           <LinearGradient id={`${gradId}_surface`} x1="0" y1="0" x2="0" y2="1">
             <Stop offset="0" stopColor={palette.surfaceGradStart} stopOpacity="1" />
-            <Stop offset="0.5" stopColor={palette.surfaceGradStart} stopOpacity="0.9" />
+            <Stop offset="0.6" stopColor={palette.surfaceGradStart} stopOpacity="0.95" />
             <Stop offset="1" stopColor={palette.surfaceGradEnd} stopOpacity="1" />
           </LinearGradient>
 
-          {/* Flame Gradient */}
-          <LinearGradient id={`${gradId}_flame`} x1="0" y1="1" x2="0" y2="0">
-            <Stop offset="0" stopColor={palette.flameGradEnd} stopOpacity="1" />
-            <Stop offset="0.6" stopColor={palette.flameGradStart} stopOpacity="1" />
-            <Stop offset="1" stopColor={palette.flameCore} stopOpacity="1" />
-          </LinearGradient>
-
-          {/* 3D Extruded Text Face Gradient */}
+          {/* 3D Number Face Gradient */}
           <LinearGradient id={`${gradId}_text`} x1="0" y1="0" x2="0" y2="1">
             <Stop offset="0" stopColor={palette.faceGradStart} stopOpacity="1" />
-            <Stop offset="0.7" stopColor={palette.faceGradEnd} stopOpacity="1" />
-            <Stop offset="1" stopColor={palette.faceGradStart} stopOpacity="0.9" />
+            <Stop offset="0.65" stopColor={palette.faceGradEnd} stopOpacity="1" />
+            <Stop offset="1" stopColor={palette.faceGradStart} stopOpacity="0.85" />
           </LinearGradient>
 
-          {/* Specular Diagonal Highlight */}
+          {/* Specular Diagonal Sheen */}
           <LinearGradient id={`${gradId}_sheen`} x1="0" y1="0" x2="1" y2="1">
-            <Stop offset="0" stopColor="#FFFFFF" stopOpacity="0.4" />
-            <Stop offset="0.4" stopColor="#FFFFFF" stopOpacity="0.05" />
+            <Stop offset="0" stopColor="#FFFFFF" stopOpacity="0.38" />
+            <Stop offset="0.45" stopColor="#FFFFFF" stopOpacity="0.04" />
             <Stop offset="1" stopColor="#FFFFFF" stopOpacity="0" />
           </LinearGradient>
         </Defs>
 
-        {/* 1. Sculpted Top Flame */}
-        <G>
-          {/* Flame Drop Shadow */}
+        {/* 1. Outer Beveled Rim */}
+        <Polygon points={outerHex} fill={`url(#${gradId}_rim)`} />
+
+        {/* 2. Chamfer Depth Border */}
+        <Polygon points={innerHex} fill={palette.borderDark} opacity="0.65" />
+
+        {/* 3. Recessed Inner Metallic Surface */}
+        <Polygon points={surfaceHex} fill={`url(#${gradId}_surface)`} />
+
+        {/* 4. Diagonal Glossy Sheen Overlay */}
+        <Polygon points={surfaceHex} fill={`url(#${gradId}_sheen)`} />
+
+        {/* 5. Sacred Cross / Theological Insignia at Top Peak (Zero Fire) */}
+        <G transform="translate(120, 62)">
+          {/* Subtle Cross Insignia */}
           <Path
-            d="M120 18 C110 38 88 62 92 90 C96 112 112 122 120 122 C128 122 144 112 148 90 C152 62 130 38 120 18 Z"
-            fill={palette.textShadow}
-            opacity="0.35"
-            transform="translate(0, 3)"
-          />
-          {/* Outer Flame Body */}
-          <Path
-            d="M120 18 C110 38 88 62 92 90 C96 112 112 122 120 122 C128 122 144 112 148 90 C152 62 130 38 120 18 Z"
-            fill={`url(#${gradId}_flame)`}
-          />
-          {/* Inner Flame Tongue Core */}
-          <Path
-            d="M120 42 C116 54 104 68 106 84 C108 96 115 104 120 104 C125 104 132 96 134 84 C136 68 124 54 120 42 Z"
-            fill={palette.flameCore}
+            d="M0 -10 V10 M-7 -4 H7"
+            stroke={palette.insignia}
+            strokeWidth="2.5"
+            strokeLinecap="round"
             opacity="0.85"
           />
         </G>
 
-        {/* 2. Outer Beveled Rim */}
-        <Polygon points={outerHexPoints} fill={`url(#${gradId}_rim)`} />
-
-        {/* 3. Mid Bevel Chamfer */}
-        <Polygon points={innerHexPoints} fill={palette.borderDark} opacity="0.6" />
-
-        {/* 4. Recessed Inner Surface */}
-        <Polygon points={surfaceHexPoints} fill={`url(#${gradId}_surface)`} />
-
-        {/* 5. Diagonal Glossy Sheen Overlay */}
-        <Polygon points={surfaceHexPoints} fill={`url(#${gradId}_sheen)`} />
-
-        {/* 6. 3D Extruded Streak Number */}
+        {/* 6. Dynamic Extruded 3D Streak Number (Editable Daily) */}
         <G>
-          {/* Extrusion Bottom Depth Shadow */}
+          {/* Deepest drop shadow */}
           <SvgText
             x="120"
-            y="172"
+            y={numberY + 4}
             fill={palette.textShadow}
-            fontSize="64"
+            fontSize={numberFontSize}
             fontWeight="900"
             textAnchor="middle"
             fontFamily="System"
@@ -220,57 +189,57 @@ export const StreakHexagonBadge: React.FC<StreakHexagonBadgeProps> = ({
             {days}
           </SvgText>
 
-          {/* Extrusion Mid Shadow */}
+          {/* Mid bevel shadow */}
+          <SvgText
+            x="120"
+            y={numberY + 2}
+            fill={palette.borderDark}
+            fontSize={numberFontSize}
+            fontWeight="900"
+            textAnchor="middle"
+            fontFamily="System"
+          >
+            {days}
+          </SvgText>
+
+          {/* Front metallic face */}
+          <SvgText
+            x="120"
+            y={numberY}
+            fill={`url(#${gradId}_text)`}
+            fontSize={numberFontSize}
+            fontWeight="900"
+            textAnchor="middle"
+            fontFamily="System"
+          >
+            {days}
+          </SvgText>
+        </G>
+
+        {/* 7. Extruded 3D "STREAK" Label */}
+        <G>
+          {/* Shadow */}
+          <SvgText
+            x="120"
+            y="173"
+            fill={palette.textShadow}
+            fontSize="18"
+            fontWeight="900"
+            letterSpacing="3"
+            textAnchor="middle"
+            fontFamily="System"
+          >
+            STREAK
+          </SvgText>
+
+          {/* Front */}
           <SvgText
             x="120"
             y="170"
-            fill={palette.borderDark}
-            fontSize="64"
-            fontWeight="900"
-            textAnchor="middle"
-            fontFamily="System"
-          >
-            {days}
-          </SvgText>
-
-          {/* Front Face Text */}
-          <SvgText
-            x="120"
-            y="167"
             fill={`url(#${gradId}_text)`}
-            fontSize="64"
+            fontSize="18"
             fontWeight="900"
-            textAnchor="middle"
-            fontFamily="System"
-          >
-            {days}
-          </SvgText>
-        </G>
-
-        {/* 7. 3D Extruded "STREAK" Label */}
-        <G>
-          {/* Extrusion Shadow */}
-          <SvgText
-            x="120"
-            y="204"
-            fill={palette.textShadow}
-            fontSize="20"
-            fontWeight="900"
-            letterSpacing="2"
-            textAnchor="middle"
-            fontFamily="System"
-          >
-            STREAK
-          </SvgText>
-
-          {/* Front Face */}
-          <SvgText
-            x="120"
-            y="201"
-            fill={`url(#${gradId}_text)`}
-            fontSize="20"
-            fontWeight="900"
-            letterSpacing="2"
+            letterSpacing="3"
             textAnchor="middle"
             fontFamily="System"
           >
@@ -278,11 +247,18 @@ export const StreakHexagonBadge: React.FC<StreakHexagonBadgeProps> = ({
           </SvgText>
         </G>
 
-        {/* 8. Small in-shield brand emblem at bottom */}
-        <G transform="translate(112, 222)">
+        {/* 8. Bottom Seal / Sacred Exegesis Wordmark Emblem (Zero Fire) */}
+        <G transform="translate(120, 198)">
           <Path
-            d="M8 2 C7 3.6 5 6 5 9.5 C5 12 7 14 8 14 C9 14 11 12 11 9.5 C11 6 9 3.6 8 2 Z"
-            fill={palette.flameCore}
+            d="M-14 0 H14"
+            stroke={palette.insignia}
+            strokeWidth="1.5"
+            opacity="0.4"
+            strokeLinecap="round"
+          />
+          <Path
+            d="M0 -3 L2 0 L0 3 L-2 0 Z"
+            fill={palette.insignia}
             opacity="0.8"
           />
         </G>
@@ -293,10 +269,6 @@ export const StreakHexagonBadge: React.FC<StreakHexagonBadgeProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  imageContainer: {
     alignItems: 'center',
     justifyContent: 'center',
   },

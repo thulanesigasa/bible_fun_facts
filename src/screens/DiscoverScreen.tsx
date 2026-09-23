@@ -15,13 +15,13 @@ import { useUser } from '../context/UserContext';
 import { supabase } from '../services/supabase';
 import { getDailyMessage, getDayOfYear, DailyMessage } from '../data/dailyMessages';
 import {
-  FlameSvg,
   FavoritesSvg,
   LandmarkSvg,
   StrongsIconSvg,
   BookOpenSvg,
   ShareSvg,
   ScrollSvg,
+  ShieldCheckSvg,
 } from '../components/SvgIcons';
 import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
 
@@ -35,6 +35,7 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
 
   const {
     streak,
+    setStreak,
     incrementFactsViewed,
     userProfile,
     toggleFavoriteFact,
@@ -103,7 +104,7 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
             accessibilityRole="button"
             accessibilityLabel={`Streak: ${streak} days. Tap to open streak badge.`}
           >
-            <FlameSvg size={14} color={colors.accent} fill={colors.accent} />
+            <ShieldCheckSvg size={14} color={colors.accent} strokeWidth={2} />
             <Text variant="caption" weight="700" color={colors.accent}>
               {streak}d
             </Text>
@@ -267,6 +268,7 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
       <StreakMilestoneModal
         visible={showStreakModal}
         streak={streak}
+        onUpdateStreak={setStreak}
         onClose={() => setShowStreakModal(false)}
       />
     </SafeAreaView>

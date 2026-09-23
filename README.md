@@ -418,22 +418,26 @@ The application is backed by a full production-ready relational schema on Supaba
   <img src="https://img.shields.io/badge/Sharing-Native%20Share%20Sheet-10B981?style=for-the-badge" alt="Native Share Sheet" />
 </p>
 
-To celebrate consistent daily exegesis and devotion, exégeomai features a high-impact, 3D metallic streak milestone badge system inspired by modern fitness and habit architecture (Cal AI):
+To celebrate consistent daily exegesis and devotion, exégeomai features a high-impact, fire-free 3D metallic streak milestone badge system inspired by modern habit architecture (Cal AI):
 
 ```mermaid
 graph TD
-    UserDevotion["Daily Scripture Study / Unfolding"] --> StreakCounter["UserContext.streak Counter"]
-    StreakCounter --> HeaderTrigger["DiscoverScreen Header Streak Pill (Flame + Streak)"]
+    UserDevotion["Daily Scripture Study / Unfolding"] --> StreakCounter["UserContext.streak Counter (Auto Daily Increment)"]
+    StreakCounter --> HeaderTrigger["DiscoverScreen Header Streak Pill (ShieldCheckSvg + Streak)"]
     StreakCounter --> ProfileTrigger["ProfileScreen Study Metrics + Achievements Row"]
     
     HeaderTrigger --> MilestoneModal["StreakMilestoneModal.tsx (Celebration Showcase)"]
     ProfileTrigger --> MilestoneModal
     
-    MilestoneModal --> HexBadge["StreakHexagonBadge.tsx"]
-    HexBadge --> RenderBranch{"Asset Available?"}
-    RenderBranch -->|3d, 10d, 100d| PreRendered["Photorealistic 3D Image Asset (/assets/badges/)"]
-    RenderBranch -->|1d, 7d, 30d, 50d, 365d, Dynamic| VectorShield["Procedural 3D SVG Hexagonal Shield"]
+    MilestoneModal --> HexBadge["StreakHexagonBadge.tsx (100% Dynamic Vector SVG)"]
+    HexBadge --> MetallicShield["Point-Top 3D Metallic Hexagonal Shield (Zero Fire)"]
+    MetallicShield --> SacredInsignia["Top Peak Sacred Insignia (Cross / Anchor)"]
+    MetallicShield --> ExtrudedNumber["Dynamic Extruded 3D Number (Auto-updates each day)"]
+    MetallicShield --> ExtrudedBanner["Extruded 3D STREAK Banner"]
+    MetallicShield --> LowerSeal["Lower Sacred Seal Glyph"]
     
+    MilestoneModal --> EditableControls["Direct Streak Editor (Numeric Input & Steppers +/-)"]
+    EditableControls --> UserContext["Immediate Persistence to UserContext & AsyncStorage"]
     MilestoneModal --> ScriptureAnchor["Theological Scripture Grounding (e.g. Galatians 6:9)"]
     MilestoneModal --> UnlockStatus["✓ Badge Unlocked / 🔒 Locked Countdown"]
     MilestoneModal --> MilestoneShelf["Horizontal Interactive Milestone Shelf (1d to 365d)"]
@@ -441,12 +445,13 @@ graph TD
     MilestoneModal --> NativeShare["Native Achievement Share Sheet"]
 ```
 
-### 1. 3D Metallic Hexagonal Shield Badges (`StreakHexagonBadge.tsx`)
-- **Sculpted Top Flame**: 3D flame emblem crowning the hexagonal shield with multi-stop flame core gradients.
-- **Beveled Metallic Rim**: Point-top hexagonal border with metallic reflection stops, chamfered mid-shadows, and specular highlights.
-- **Extruded 3D Streak Number & Label**: Multi-layer depth shadow extrusion texturing for bold numbers (`3`, `10`, `100`, etc.) and the uppercase `STREAK` banner.
-- **Embedded exégeomai Brand Mark**: Flame/exégeomai brand glyph centered at the lower interior base of the shield.
-- **Hybrid Rendering Pipeline**: Renders photorealistic 3D image assets for core milestones (3d Rookie, 10d Getting Serious, 100d Triple Threat) and automatically falls back to an ultra-crisp, procedural `react-native-svg` metallic shield for all other arbitrary streak numbers (1d, 7d, 30d, 50d, 365d).
+### 1. Pure Dynamic 3D Metallic Hexagonal Shield Badges (`StreakHexagonBadge.tsx`)
+- **Strictly Fire-Free & Flame-Free**: Eliminated all fire and flame motifs across badges, icons, and screens in favor of an authentic, sacred, and prestigious 3D metallic hexagonal shield.
+- **Dynamic Daily Update Engine**: 100% procedural vector rendering via `react-native-svg` (zero baked static images), allowing the badge to automatically update to any exact daily streak number (`1`, `2`, `3`, ... `365+`) in real time.
+- **Beveled Metallic Rim**: Point-top hexagonal border with multi-stop reflection gradients (`Bronze`, `Silver`, `Gold`, `Diamond`, `Celestial`), chamfered depth borders, and specular highlights.
+- **Top Sacred Insignia**: Sacred cross insignia crowning the upper interior of the shield with metallic luster.
+- **Extruded 3D Streak Number & Label**: Multi-layer depth shadow extrusion texturing for bold numbers (`1`, `3`, `10`, `100`, etc.) and the uppercase `STREAK` banner.
+- **Dynamic Tier Computation**: Automatically applies the appropriate metallic tier palette (Bronze, Silver, Gold, Diamond, or Celestial) based on the user's active streak count.
 
 ### 2. Milestone Progression Tiers (`streakMilestones.ts`)
 | Days | Tier | Milestone Title | Cal AI-Style Subtitle | Theological Scripture Anchor |
@@ -460,9 +465,10 @@ graph TD
 | **100d** | Diamond | **Triple Threat** | *If consistency were a crime, you'd be doing life.* | 2 Timothy 4:7 |
 | **365d** | Celestial | **Canon Completer** | *A complete year walking through every sacred exegesis and covenant.* | Psalm 103:17 |
 
-### 3. Celebratory Showcase Modal (`StreakMilestoneModal.tsx`)
+### 3. Celebratory Showcase Modal & Daily Editable Steppers (`StreakMilestoneModal.tsx`)
 - **Dynamic Full-Bleed Top-Down Gradient**: Smooth SVG linear gradient tint reflecting the selected milestone's tier color (Warm Bronze Amber, Platinum Slate, Rich Gold, Cyan Blue, or Celestial Gold).
-- **Clean Dismiss & Current Counter**: Minimalist close button (`CloseSvg`) and pill badge displaying the user's active streak.
+- **Interactive Daily Streak Editor**: Direct numeric `TextInput` and `[-]` / `[+]` quick steppers embedded in both `ProfileScreen.tsx` and `StreakMilestoneModal.tsx` allowing instantaneous manual adjustment, testing, and real-time badge morphing.
+- **Clean Dismiss & Active Counter**: Minimalist close button (`CloseSvg`) and pill badge displaying the user's active streak (`ShieldCheckSvg`).
 - **Scripture Grounding**: Displays the sacred verse anchor corresponding to each devotion milestone.
 - **Interactive Milestone Shelf**: Horizontal carousel letting users preview all 8 milestone badges, unlock states, and countdowns.
 - **Brand Integrity**: Footer displaying *"Walk in the Word with [logo 24x24] exégeomai"* adhering to Rule 15/19 calibration.
@@ -518,15 +524,14 @@ bible_fun_facts/
 │   ├── android-icon-foreground.png  # Calibrated launcher icon (96px centered, Rule 15/19)
 │   ├── icon.png                     # In-app brand icon (1024x1024, 800px symbol)
 │   ├── splash-icon.png              # Splash screen asset
-│   ├── badges/                      # High-res 3D rendered streak badge assets (3d, 10d, 100d)
 │   └── onboarding/                  # Compressed, transparent PNG onboarding slides (1, 2, 3)
 ├── src/
 │   ├── components/                  # Reusable UI components strictly adhering to 60-30-10
 │   │   ├── Card.tsx                 # Flat surface card with soft elevation shadow
 │   │   ├── FactCard.tsx             # Fact presentation card with zero badges
 │   │   ├── ScriptureCard.tsx        # Scripture reading card with inline typography
-│   │   ├── StreakHexagonBadge.tsx   # 3D metallic hexagonal shield badge (Image + SVG fallback)
-│   │   ├── StreakMilestoneModal.tsx # Fullscreen celebration modal with dynamic tier gradient
+│   │   ├── StreakHexagonBadge.tsx   # 3D metallic hexagonal shield badge (100% dynamic vector, zero fire)
+│   │   ├── StreakMilestoneModal.tsx # Fullscreen celebration modal with editable streak steppers & gradient
 │   │   ├── SvgIcons.tsx             # Curated SVG icon collection (zero emojis)
 │   │   ├── Typography.tsx           # Scaled typographic components
 │   │   ├── UiverseSwitch.tsx        # Animated sliding toggle pill switch (60-30-10 tokens)

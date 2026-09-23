@@ -23,7 +23,7 @@ import { useUser } from '../context/UserContext';
 import {
   ProfileSvg,
   CameraSvg,
-  FlameSvg,
+  ShieldCheckSvg,
   StrongsIconSvg,
   ChevronRightSvg,
   BookmarkSvg,
@@ -54,6 +54,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
   const {
     userProfile,
     streak,
+    setStreak,
     factsViewedCount,
     logout,
     updateProfile,
@@ -401,7 +402,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
               accessibilityLabel={`Streak: ${streak} days. Tap to open streak badge.`}
             >
               <View style={styles.statIconRow}>
-                <FlameSvg size={14} color={colors.accent} fill={colors.accent} />
+                <ShieldCheckSvg size={14} color={colors.accent} strokeWidth={2} />
                 <Text variant="h3" style={[styles.statValue, { marginLeft: 4 }]}>
                   {streak}
                 </Text>
@@ -645,11 +646,60 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                 days={currentMilestone.days}
                 tier={currentMilestone.tier}
                 size={34}
-                badgeImage={currentMilestone.badgeImage}
               />
               <Text style={styles.rowDisclosureArrow}>›</Text>
             </View>
           </TouchableOpacity>
+
+          <View style={styles.rowDivider} />
+
+          {/* Direct Daily Streak Counter & Stepper (Editable Each Day) */}
+          <View style={styles.actionRow}>
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Daily Streak Count
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                Updates each day with scripture study, or edit directly
+              </Text>
+            </View>
+
+            <View style={styles.streakInlineEditor}>
+              <TouchableOpacity
+                style={styles.streakStepBtn}
+                onPress={() => setStreak(Math.max(0, streak - 1))}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel="Decrease streak day"
+              >
+                <Text variant="body" weight="700" color="#0F172A">−</Text>
+              </TouchableOpacity>
+
+              <TextInput
+                style={styles.streakTextInput}
+                value={String(streak)}
+                onChangeText={(val) => {
+                  const digits = val.replace(/[^\d]/g, '');
+                  const num = parseInt(digits, 10);
+                  setStreak(isNaN(num) ? 0 : Math.min(9999, num));
+                }}
+                keyboardType="number-pad"
+                maxLength={4}
+                selectTextOnFocus
+                accessibilityLabel="Edit streak number"
+              />
+
+              <TouchableOpacity
+                style={styles.streakStepBtn}
+                onPress={() => setStreak(Math.min(9999, streak + 1))}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel="Increase streak day"
+              >
+                <Text variant="body" weight="700" color="#0F172A">+</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
 
         {/* 3. NOTIFICATIONS (ZERO ICONS) */}
@@ -814,6 +864,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
       <StreakMilestoneModal
         visible={showStreakModal}
         streak={streak}
+        onUpdateStreak={setStreak}
         onClose={() => setShowStreakModal(false)}
       />
     </SafeAreaView>
@@ -1181,5 +1232,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+  },
+  streakInlineEditor: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  streakStepBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F1F5F9',
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  streakTextInput: {
+    minWidth: 42,
+    height: 32,
+    borderWidth: 1.5,
+    borderColor: colors.accent,
+    borderRadius: 8,
+    textAlign: 'center',
+    fontWeight: '800',
+    fontSize: 15,
+    color: '#0F172A',
+    backgroundColor: '#FFFFFF',
+    padding: 0,
   },
 });

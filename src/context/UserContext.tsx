@@ -85,6 +85,7 @@ interface AppContextType extends UserState {
   setLastReadBible: (book: string, chapter: number, translation: string) => void;
   setVerseHighlight: (verseKey: string, color?: string) => void;
   setReaderTheme: (theme: 'light' | 'sepia' | 'dark') => void;
+  setStreak: (days: number) => void;
 }
 
 const UserContext = createContext<AppContextType | undefined>(undefined);
@@ -623,6 +624,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setState(prev => ({ ...prev, readerTheme: theme }));
   };
 
+  const setStreak = (days: number) => {
+    const clamped = Math.max(0, Math.min(9999, Math.round(days)));
+    const today = new Date().toDateString();
+    setState(prev => ({ ...prev, streak: clamped, lastLoginDate: today }));
+  };
+
   return (
     <UserContext.Provider value={{
       ...state,
@@ -649,6 +656,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLastReadBible,
       setVerseHighlight,
       setReaderTheme,
+      setStreak,
     }}>
 
       {children}
