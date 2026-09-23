@@ -86,10 +86,19 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
 
   const handleShare = async () => {
     try {
-      const shareMessage = `✦ ${selectedMilestone.days}-Day Scripture Study Streak: "${selectedMilestone.title}"!\n\n"${selectedMilestone.subtitle}"\n\n${selectedMilestone.verseQuote ? `"${selectedMilestone.verseQuote}" (${selectedMilestone.verseRef})\n\n` : ''}Studying daily on exégeomai • Walking in biblical truth.`;
+      const shareMessage = [
+        `✦ ${selectedMilestone.days}-Day Scripture Study Streak`,
+        `"${selectedMilestone.title}"`,
+        '',
+        selectedMilestone.verseQuote
+          ? `"${selectedMilestone.verseQuote}" — ${selectedMilestone.verseRef}`
+          : selectedMilestone.subtitle,
+        '',
+        `Powered by exégeomai • Walking in biblical truth daily.`,
+      ].join('\n');
       await Share.share({
         message: shareMessage,
-        title: `${selectedMilestone.title} - ${selectedMilestone.days} Day Streak`,
+        title: `${selectedMilestone.title} - Day ${selectedMilestone.days} Streak`,
       });
     } catch (err) {
       console.warn('Share error:', err);
@@ -145,15 +154,9 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
         </View>
 
         <SafeAreaView style={styles.safeArea}>
-          {/* Top Bar: Close Button & Active Streak Indicator */}
+          {/* Top Bar: Close Button only */}
           <View style={styles.topBar}>
-            <View style={styles.userStreakPill}>
-              <ShieldCheckSvg size={15} color={colors.accent} strokeWidth={2} />
-              <Text variant="caption" weight="700" color="#0F172A" style={styles.userStreakText}>
-                Active: {streak} {streak === 1 ? 'Day' : 'Days'}
-              </Text>
-            </View>
-
+            <View style={{ flex: 1 }} />
             <TouchableOpacity
               style={styles.closeBtn}
               onPress={onClose}
@@ -213,24 +216,7 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
               ) : null}
             </View>
 
-            {/* Unlock Status Row */}
-            <View style={styles.statusSection}>
-              {isUnlocked ? (
-                <View style={styles.statusUnlockedPill}>
-                  <CheckSvg size={16} color="#059669" strokeWidth={2.5} />
-                  <Text variant="body" weight="700" color="#059669" style={styles.statusUnlockedLabel}>
-                    Badge Unlocked
-                  </Text>
-                </View>
-              ) : (
-                <View style={styles.statusLockedPill}>
-                  <LockSvg size={15} color="#64748B" strokeWidth={2} />
-                  <Text variant="body" weight="600" color="#64748B" style={styles.statusLockedLabel}>
-                    Locked • {selectedMilestone.days - streak} {selectedMilestone.days - streak === 1 ? 'day' : 'days'} remaining
-                  </Text>
-                </View>
-              )}
-            </View>
+
 
             {/* Interactive Daily Streak Stepper & Direct Numeric Editor */}
             {onUpdateStreak ? (
@@ -298,7 +284,6 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
                       key={milestone.days}
                       style={[
                         styles.shelfItem,
-                        isSelected && styles.shelfItemSelected,
                         !earned && styles.shelfItemLocked,
                       ]}
                       onPress={() => setSelectedMilestone(milestone)}
@@ -317,7 +302,7 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
                         color={isSelected ? '#0F172A' : '#64748B'}
                         style={styles.shelfDayText}
                       >
-                        {milestone.days}d
+                        {`Day ${milestone.days}`}
                       </Text>
                       <Text
                         variant="caption"
