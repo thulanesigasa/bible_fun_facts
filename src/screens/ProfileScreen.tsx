@@ -23,12 +23,11 @@ import { useUser } from '../context/UserContext';
 import {
   ProfileSvg,
   CameraSvg,
-  ShieldCheckSvg,
-  StrongsIconSvg,
   ChevronRightSvg,
-  BookmarkSvg,
 } from '../components/SvgIcons';
 import { UiverseSwitch } from '../components/UiverseSwitch';
+import { StreakHexagonBadge } from '../components/StreakHexagonBadge';
+import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
 
 // ============================================================================
 // TYPOGRAPHY PRESETS
@@ -64,6 +63,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
   } = useUser();
 
   const [isUploading, setIsUploading] = useState(false);
+  const [showStreakModal, setShowStreakModal] = useState<boolean>(false);
   const [notifications, setNotifications] = useState<boolean>(
     userProfile?.notificationsEnabled ?? true
   );
@@ -389,31 +389,31 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
 
             <View style={styles.statDivider} />
 
-            <View style={styles.statColumn}>
-              <View style={styles.statIconRow}>
-                <ShieldCheckSvg size={14} color={colors.accent} strokeWidth={2} />
-                <Text variant="h3" style={[styles.statValue, { marginLeft: 4 }]}>
-                  {streak || 1}
-                </Text>
-              </View>
-              <Text variant="caption" color={colors.textSecondary} style={styles.statLabel}>
+            <TouchableOpacity
+              style={styles.statColumn}
+              onPress={() => setShowStreakModal(true)}
+              activeOpacity={0.7}
+            >
+              <StreakHexagonBadge days={streak || 1} size={32} />
+              <Text variant="caption" color={colors.textSecondary} style={[styles.statLabel, { marginTop: 4 }]}>
                 Streak
               </Text>
-            </View>
+            </TouchableOpacity>
 
             <View style={styles.statDivider} />
 
-            <View style={styles.statColumn}>
-              <View style={styles.statIconRow}>
-                <StrongsIconSvg size={14} color={colors.accent} strokeWidth={2} />
-                <Text variant="h3" style={[styles.statValue, { marginLeft: 4 }]}>
-                  {factsViewedCount}
-                </Text>
-              </View>
+            <TouchableOpacity
+              style={styles.statColumn}
+              onPress={() => navigation.navigate('HistoryMain')}
+              activeOpacity={0.7}
+            >
+              <Text variant="h3" style={styles.statValue}>
+                {factsViewedCount}
+              </Text>
               <Text variant="caption" color={colors.textSecondary} style={styles.statLabel}>
                 Unfolded
               </Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -766,6 +766,13 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           </View>
         </View>
       </ScrollView>
+
+      {/* Streak Milestone Modal */}
+      <StreakMilestoneModal
+        visible={showStreakModal}
+        streak={streak || 1}
+        onClose={() => setShowStreakModal(false)}
+      />
     </SafeAreaView>
   );
 }
