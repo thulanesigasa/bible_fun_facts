@@ -862,6 +862,18 @@ Native compilation runs automatically on push to `main` directly on GitHub Actio
 - **GitHub Releases (`/releases`)**: Houses official version tags (e.g. `v1.0.2`), changelogs, and direct `.apk` binary downloads compiled directly on GitHub Actions.
 - **Expo EAS OTA Updates**: Seamless JavaScript and asset updates deployed directly to user devices over the air across the `production` and `preview` channels (targeting `runtimeVersion: 1.0.1`) without requiring a manual APK reinstall.
 
+### Native Module Capabilities (Why Native APK Compilation is Required for Image Sharing)
+<p align="left">
+  <img src="https://img.shields.io/badge/Native%20Compilation-Required%20for%20ViewShot-DC2626?style=for-the-badge&logo=android&logoColor=white" alt="Native ViewShot Required" />
+  <img src="https://img.shields.io/badge/OTA%20Scope-JavaScript%20&%20Assets%20Only-FDD223?style=for-the-badge" alt="OTA Scope" />
+  <img src="https://img.shields.io/badge/GitHub%20Releases-Download%20Fresh%20APK-10B981?style=for-the-badge&logo=github&logoColor=white" alt="Download Fresh APK" />
+</p>
+
+- **What OTA Updates Deliver**: Over-The-Air (OTA) updates continuously deploy JavaScript bundle updates, styling tokens, and React components without requiring app reinstall.
+- **What Requires a Native Binary (`.apk`) Install**: Native Android libraries containing Java, Kotlin, or C++ code (such as `react-native-view-shot` for rasterizing view trees into PNG bitmaps and `expo-sharing` for system intent file broadcasts) **cannot be injected into an existing APK via OTA**.
+- **Why Older APKs Share as Text**: If a user runs an older APK compiled prior to the introduction of `react-native-view-shot`, the native `RNViewShot` module is absent from the Android binary. The JavaScript layer safely detects this via `NativeModules.RNViewShot` and falls back to formatted scripture text sharing.
+- **Resolution**: Downloading and installing the fresh `exegeomai-v1.0.2.apk` directly from [GitHub Releases](https://github.com/thulanesigasa/bible_fun_facts/releases/tag/v1.0.2) brings the compiled `react-native-view-shot` and `expo-sharing` native packages to the device, unlocking direct high-fidelity PNG image sharing.
+
 ### Type Checking & Validation
 ```bash
 npx tsc --noEmit
