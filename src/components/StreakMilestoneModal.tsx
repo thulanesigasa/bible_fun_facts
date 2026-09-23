@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
-  Modal,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
@@ -10,8 +9,13 @@ import {
   Animated,
   TextInput,
   Platform,
+  BackHandler,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { captureRef } from 'react-native-view-shot';
+import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system';
 import { colors } from '../theme/colors';
 import { Text } from './Typography';
 import { StreakHexagonBadge } from './StreakHexagonBadge';
@@ -28,7 +32,7 @@ import {
   getAchievementsForCategory,
   getCategoryUnit,
 } from '../data/achievements';
-import { useUser } from '../context/UserContext';
+import { useUser, useApp } from '../context/UserContext';
 import {
   CloseSvg,
   CheckSvg,
@@ -54,6 +58,7 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
   onClose,
 }) => {
   const { incrementSharesCount } = useUser();
+  const { setHideTabBar } = useApp();
   const currentEarnedMilestone = getMilestoneForStreak(streak);
 
   const [selectedMilestone, setSelectedMilestone] = useState<StreakMilestone>(
@@ -66,14 +71,17 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
     achievement || null
   );
 
-  const shareCardRef = useRef<any>(null);
+  const shareCardRef = useRef<View>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const [isSharing, setIsSharing] = useState(false);
 
   // Smooth entrance scale & fade animation
-  const scaleAnim = useRef(new Animated.Value(0.9)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (visible) {
+      setHideTabBar?.(true);
       if (achievement) {
         setActiveAchievement(achievement);
       } else {
@@ -84,7 +92,7 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
         setSelectedMilestone(active);
       }
 
-      scaleAnim.setValue(0.9);
+      scaleAnim.setValue(0.95);
       opacityAnim.setValue(0);
       Animated.parallel([
         Animated.spring(scaleAnim, {
@@ -95,12 +103,27 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
         }),
         Animated.timing(opacityAnim, {
           toValue: 1,
-          duration: 250,
+          duration: 200,
           useNativeDriver: true,
         }),
       ]).start();
+    } else {
+      setHideTabBar?.(false);
     }
-  }, [visible, streak, initialMilestoneDays, achievement]);
+    return () => {
+      setHideTabBar?.(false);
+    };
+  }, [visible, streak, initialMilestoneDays, achievement, setHideTabBar]);
+
+  // Handle Android hardware back press cleanly
+  useEffect(() => {
+    if (!visible) return;
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      onClose();
+      return true;
+    });
+    return () => backHandler.remove();
+  }, [visible, onClose]);
 
   // Determine active view metadata
   const isCustom = !!activeAchievement;
@@ -124,6 +147,9 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
   const tierInfo = getTierInfoForDays(displayDays);
 
   const handleShare = async () => {
+    if (isSharing) return;
+    setIsSharing(true);
+
     const shareTitle = isCustom
       ? `${displayTitle} - ${badgeLabel} Achievement`
       : `${selectedMilestone.title} - Day ${selectedMilestone.days} Streak`;
@@ -148,73 +174,41 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
         ].join('\n');
 
     try {
-      let SharingModule: any = null;
-      try {
-        SharingModule = require('expo-sharing');
-      } catch (_) {}
+      if (!shareCardRef.current) {
+        throw new Error('Share card view reference not ready');
+      }
 
-      let captureRefFn: any = null;
-      let captureScreenFn: any = null;
-      try {
-        const viewShot = require('react-native-view-shot');
-        captureRefFn = viewShot.captureRef;
-        captureScreenFn = viewShot.captureScreen;
-      } catch (_) {}
+      // 1. Scroll card into view if user had scrolled down to shelf
+      scrollViewRef.current?.scrollTo({ y: 0, animated: false });
 
-      let FileSystem: any = null;
-      try {
-        FileSystem = require('expo-file-system');
-      } catch (_) {}
+      // 2. Allow 120ms for view rendering & layout to settle completely
+      await new Promise((r) => setTimeout(r, 120));
 
-      if (SharingModule && (await SharingModule.isAvailableAsync().catch(() => false))) {
-        let uri: string | null = null;
+      // 3. Capture the in-tree shareCard directly via captureRef
+      const uri = await captureRef(shareCardRef.current, {
+        format: 'png',
+        quality: 1.0,
+        result: 'tmpfile',
+      });
 
-        // 1. Attempt view capture with solid white background
-        if (captureRefFn && shareCardRef.current) {
-          try {
-            uri = await captureRefFn(shareCardRef.current, {
-              format: 'png',
-              quality: 1.0,
-              result: 'tmpfile',
-            });
-          } catch (refErr) {
-            console.warn('captureRef notice, falling back:', refErr);
+      // 4. Verify file exists and has actual rendered byte-size
+      let isFileValid = false;
+      if (uri) {
+        try {
+          const info = await FileSystem.getInfoAsync(uri);
+          if (info.exists && (info.size ?? 0) > 300) {
+            isFileValid = true;
           }
+        } catch (_) {
+          isFileValid = !!uri;
         }
+      }
 
-        // 2. Verify file exists and is not blank/empty (< 1000 bytes)
-        let isFileValid = false;
-        if (uri && FileSystem) {
-          try {
-            const info = await FileSystem.getInfoAsync(uri);
-            if (info.exists && info.size > 1000) {
-              isFileValid = true;
-            }
-          } catch (_) {}
-        } else if (uri) {
-          isFileValid = true;
-        }
-
-        // 3. Fallback to captureScreen if ref capture was invalid or empty
-        if (!isFileValid && captureScreenFn) {
-          try {
-            const screenUri = await captureScreenFn({
-              format: 'png',
-              quality: 0.95,
-              result: 'tmpfile',
-            });
-            if (screenUri) {
-              uri = screenUri;
-              isFileValid = true;
-            }
-          } catch (screenErr) {
-            console.warn('captureScreen fallback notice:', screenErr);
-          }
-        }
-
-        // 4. Share the non-blank image
-        if (uri && isFileValid) {
-          await SharingModule.shareAsync(uri, {
+      // 5. Native image share via expo-sharing
+      if (uri && isFileValid) {
+        const canShare = await Sharing.isAvailableAsync().catch(() => false);
+        if (canShare) {
+          await Sharing.shareAsync(uri, {
             mimeType: 'image/png',
             UTI: 'public.png',
             dialogTitle: shareTitle,
@@ -223,12 +217,8 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
           return;
         }
       }
-    } catch (shareErr) {
-      console.warn('Native image share not available, falling back to text:', shareErr);
-    }
 
-    // 5. Clean text share fallback
-    try {
+      // 6. Text share fallback if native image sharing is unavailable
       const res = await Share.share({
         message: shareMessage,
         title: shareTitle,
@@ -237,7 +227,20 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
         incrementSharesCount();
       }
     } catch (err) {
-      console.warn('Share error:', err);
+      console.warn('Image share notice, falling back to text:', err);
+      try {
+        const res = await Share.share({
+          message: shareMessage,
+          title: shareTitle,
+        });
+        if (res.action === Share.sharedAction) {
+          incrementSharesCount();
+        }
+      } catch (fallbackErr) {
+        console.warn('Text share error:', fallbackErr);
+      }
+    } finally {
+      setIsSharing(false);
     }
   };
 
@@ -255,37 +258,41 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
     setSelectedMilestone(getMilestoneForStreak(next));
   };
 
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      hardwareAccelerated={true}
-      onRequestClose={onClose}
-      statusBarTranslucent
-    >
-      <View style={styles.modalOverlay}>
-        <SafeAreaView style={styles.safeArea}>
-          {/* Top Bar: Close Button only */}
-          <View style={styles.topBar}>
-            <View style={{ flex: 1 }} />
-            <TouchableOpacity
-              style={styles.closeBtn}
-              onPress={onClose}
-              activeOpacity={0.75}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-              accessibilityRole="button"
-              accessibilityLabel="Close achievement modal"
-            >
-              <CloseSvg size={20} color="#0F172A" strokeWidth={2.5} />
-            </TouchableOpacity>
-          </View>
+  if (!visible) return null;
 
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps="handled"
+  return (
+    <Animated.View
+      style={[
+        styles.overlayContainer,
+        {
+          opacity: opacityAnim,
+          transform: [{ scale: scaleAnim }],
+        },
+      ]}
+      pointerEvents="auto"
+    >
+      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+        {/* Top Bar: Close Button only */}
+        <View style={styles.topBar}>
+          <View style={{ flex: 1 }} />
+          <TouchableOpacity
+            style={styles.closeBtn}
+            onPress={onClose}
+            activeOpacity={0.75}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            accessibilityRole="button"
+            accessibilityLabel="Close achievement modal"
           >
+            <CloseSvg size={20} color="#0F172A" strokeWidth={2.5} />
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView
+          ref={scrollViewRef}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
             {/* Shareable card — solid white canvas, no overflow clip for 100% render fidelity */}
             <View
               ref={shareCardRef}
@@ -514,49 +521,59 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
               </Text>
             </View>
 
-            {/* Actions: Share Badge & Continue */}
-            <View style={styles.actionsRow}>
-              {isUnlocked && (
-                <TouchableOpacity
-                  style={styles.shareBtn}
-                  onPress={handleShare}
-                  activeOpacity={0.85}
-                  accessibilityRole="button"
-                  accessibilityLabel="Share achievement badge"
-                >
+        </ScrollView>
+
+        {/* Pinned Bottom Action Bar (Fixed, always visible, zero offscreen culling) */}
+        <View style={styles.fixedBottomBar}>
+          {isUnlocked && (
+            <TouchableOpacity
+              style={[styles.shareBtn, isSharing && styles.shareBtnDisabled]}
+              onPress={handleShare}
+              disabled={isSharing}
+              activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityLabel="Share achievement badge"
+            >
+              {isSharing ? (
+                <ActivityIndicator size="small" color="#0F172A" />
+              ) : (
+                <>
                   <ShareSvg size={16} color="#0F172A" strokeWidth={2} />
                   <Text variant="body" weight="700" color="#0F172A" style={styles.shareBtnText}>
                     Share Badge
                   </Text>
-                </TouchableOpacity>
+                </>
               )}
+            </TouchableOpacity>
+          )}
 
-              <TouchableOpacity
-                style={[styles.continueBtn, !isUnlocked && styles.continueBtnFull]}
-                onPress={onClose}
-                activeOpacity={0.85}
-                accessibilityRole="button"
-                accessibilityLabel="Close achievement modal"
-              >
-                <Text variant="body" weight="700" color="#0F172A">
-                  Continue Reading
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
-        </SafeAreaView>
-      </View>
-    </Modal>
+          <TouchableOpacity
+            style={[styles.continueBtn, !isUnlocked && styles.continueBtnFull]}
+            onPress={onClose}
+            activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel="Close achievement modal"
+          >
+            <Text variant="body" weight="700" color="#0F172A">
+              Continue Reading
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
+  overlayContainer: {
+    ...StyleSheet.absoluteFill,
     backgroundColor: '#FFFFFF',
+    zIndex: 99999,
+    elevation: 99999,
   },
   safeArea: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   topBar: {
     flexDirection: 'row',
@@ -783,10 +800,24 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 0.3,
   },
-  actionsRow: {
+  fixedBottomBar: {
     flexDirection: 'row',
-    width: '100%',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: Platform.OS === 'ios' ? 24 : 16,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(15, 23, 42, 0.08)',
     gap: 12,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  shareBtnDisabled: {
+    opacity: 0.65,
   },
   shareBtn: {
     flex: 1,
