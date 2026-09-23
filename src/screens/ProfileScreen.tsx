@@ -405,7 +405,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
 
             <TouchableOpacity
               style={styles.statColumn}
-              onPress={() => navigation.navigate('HistoryMain')}
+              onPress={() => navigation.navigate('History')}
               activeOpacity={0.7}
             >
               <Text variant="h3" style={styles.statValue}>
@@ -884,6 +884,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    minHeight: 52,
+    paddingVertical: 8,
   },
   statValue: {
     fontSize: 15,
