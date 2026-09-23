@@ -71,18 +71,9 @@ export default function WriterDetailsScreen({ navigation, route }: WriterDetails
 
         {/* Writer Identity Header */}
         <View style={styles.identityHeader}>
-          <View style={styles.categoryPillRow}>
-            <View style={styles.badgePill}>
-              <Text variant="caption" weight="700" color={colors.accent}>
-                {writer.testament.toUpperCase()}
-              </Text>
-            </View>
-            <View style={styles.secondaryPill}>
-              <Text variant="caption" weight="600" color={colors.textSecondary}>
-                {writer.category}
-              </Text>
-            </View>
-          </View>
+          <Text variant="caption" weight="700" color={colors.accent} style={{ letterSpacing: 0.5, marginBottom: 4 }}>
+            {writer.testament.toUpperCase()} • {writer.category.toUpperCase()}
+          </Text>
 
           <View style={styles.nameRow}>
             <Text variant="h1" style={styles.writerName}>
@@ -127,15 +118,9 @@ export default function WriterDetailsScreen({ navigation, route }: WriterDetails
               CANONICAL BOOKS PENNED ({writer.booksWritten.length})
             </Text>
           </View>
-          <View style={styles.booksWrap}>
-            {writer.booksWritten.map((book) => (
-              <View key={book} style={styles.bookPill}>
-                <Text variant="caption" weight="700" color={colors.textPrimary}>
-                  {book}
-                </Text>
-              </View>
-            ))}
-          </View>
+          <Text variant="body" color={colors.textPrimary} style={{ marginTop: 4, fontSize: 14, lineHeight: 22 }}>
+            {writer.booksWritten.join(' • ')}
+          </Text>
           <Text variant="caption" color={colors.textTertiary} style={styles.totalChaptersNote}>
             Total canonical output: {writer.totalChapters} chapters
           </Text>
@@ -145,7 +130,7 @@ export default function WriterDetailsScreen({ navigation, route }: WriterDetails
 
         {/* 3. Key Scripture Quote (Sacred Quote Block) */}
         <View style={styles.bodySection}>
-          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.quoteCardBadge}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeadingLabel}>
             KEY SCRIPTURE
           </Text>
           <View style={styles.quoteBox}>
@@ -209,7 +194,7 @@ export default function WriterDetailsScreen({ navigation, route }: WriterDetails
 
         {/* 7. Manuscript Scholarship */}
         <View style={styles.bodySection}>
-          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.scholarBadge}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionEvidenceLabel}>
             MANUSCRIPT EVIDENCE
           </Text>
           <Text variant="body" color={colors.textSecondary} style={styles.scholarText}>
@@ -221,7 +206,7 @@ export default function WriterDetailsScreen({ navigation, route }: WriterDetails
 
         {/* 8. Archaeological Corroboration */}
         <View style={styles.bodySection}>
-          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.scholarBadge}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionEvidenceLabel}>
             ARCHAEOLOGICAL DISCOVERIES
           </Text>
           <Text variant="body" color={colors.textSecondary} style={styles.scholarText}>
@@ -287,26 +272,6 @@ const styles = StyleSheet.create({
   identityHeader: {
     paddingVertical: 4,
   },
-  categoryPillRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
-  },
-  badgePill: {
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: 'rgba(253, 210, 35, 0.25)',
-  },
-  secondaryPill: {
-    backgroundColor: 'rgba(15, 23, 42, 0.04)',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: radius.full,
-  },
   nameRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
@@ -357,28 +322,13 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
 
-  // Books Penned
-  booksWrap: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginTop: 4,
-  },
-  bookPill: {
-    backgroundColor: '#F8FAFC',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: radius.sm,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-  },
   totalChaptersNote: {
     marginTop: 8,
     fontSize: 12,
   },
 
   // Key Scripture Quote Box
-  quoteCardBadge: {
+  sectionHeadingLabel: {
     letterSpacing: 0.8,
     fontSize: 10,
     marginBottom: 8,
@@ -427,8 +377,8 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
-  // Scholar Badges
-  scholarBadge: {
+  // Section Evidence Headings
+  sectionEvidenceLabel: {
     letterSpacing: 0.8,
     fontSize: 10,
     marginBottom: 6,

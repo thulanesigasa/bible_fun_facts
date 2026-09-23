@@ -97,12 +97,10 @@ export default function HistoryScreen({ navigation }: HistoryScreenProps) {
 
         {/* Meta Category & Era */}
         <View style={styles.metaRow}>
-          <View style={styles.categoryPill}>
-            <Text variant="caption" weight="700" color={colors.accent}>
-              {item.category.toUpperCase()}
-            </Text>
-          </View>
-          <Text variant="caption" color={colors.textTertiary} numberOfLines={1} style={styles.eraText}>
+          <Text variant="caption" weight="700" color={colors.accent} style={{ letterSpacing: 0.5 }}>
+            {item.category.toUpperCase()}
+          </Text>
+          <Text variant="caption" color={colors.textTertiary} numberOfLines={1}>
             • {item.era}
           </Text>
         </View>
@@ -114,23 +112,10 @@ export default function HistoryScreen({ navigation }: HistoryScreenProps) {
 
         {/* Canonical Books Penned */}
         <View style={styles.booksWrap}>
-          <View style={styles.bookIconWrap}>
-            <BookOpenSvg size={13} color={colors.textSecondary} />
-          </View>
-          {displayedBooks.map((book) => (
-            <View key={book} style={styles.bookBadge}>
-              <Text variant="caption" weight="600" color={colors.textPrimary} style={{ fontSize: 11 }}>
-                {book}
-              </Text>
-            </View>
-          ))}
-          {extraBooksCount > 0 && (
-            <View style={styles.extraBooksBadge}>
-              <Text variant="caption" weight="700" color={colors.accent} style={{ fontSize: 11 }}>
-                +{extraBooksCount} more
-              </Text>
-            </View>
-          )}
+          <BookOpenSvg size={13} color={colors.textSecondary} />
+          <Text variant="caption" color={colors.textSecondary} style={{ fontSize: 12 }}>
+            Books: {displayedBooks.join(', ')}{extraBooksCount > 0 ? ` (+${extraBooksCount} more)` : ''}
+          </Text>
         </View>
 
         {/* Key Verse Box (Clean Sacred Quote with Accent Left-Border) */}
@@ -379,16 +364,6 @@ const styles = StyleSheet.create({
     gap: 6,
     marginVertical: 4,
   },
-  categoryPill: {
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: radius.full,
-  },
-  eraText: {
-    flex: 1,
-    fontSize: 11,
-  },
   roleSummary: {
     fontSize: 13,
     lineHeight: 19,
@@ -398,24 +373,8 @@ const styles = StyleSheet.create({
   booksWrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    flexWrap: 'wrap',
     gap: 6,
     marginVertical: 6,
-  },
-  bookIconWrap: {
-    marginRight: 2,
-  },
-  bookBadge: {
-    backgroundColor: 'rgba(15, 23, 42, 0.04)',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: radius.sm,
-  },
-  extraBooksBadge: {
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: radius.sm,
   },
   keyVerseBox: {
     backgroundColor: 'rgba(253, 210, 35, 0.08)',

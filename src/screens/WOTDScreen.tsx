@@ -618,9 +618,6 @@ export default function WOTDScreen({ route, navigation }: any) {
               {/* Reference header */}
               <View style={styles.fabHeader}>
                 <View style={styles.fabRefRow}>
-                  <View style={styles.fabVerseCountBadge}>
-                    <Text style={styles.fabVerseCountText}>{selectedVerses.length}</Text>
-                  </View>
                   <Text style={[styles.fabRef, { color: theme.text }]} numberOfLines={1}>
                     {getSelectionRef()}
                   </Text>
@@ -1196,19 +1193,6 @@ const styles = StyleSheet.create({
     gap: 8,
     flex: 1,
     marginRight: 8,
-  },
-  fabVerseCountBadge: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: colors.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  fabVerseCountText: {
-    color: '#FFFFFF',
-    fontSize: 11,
-    fontWeight: '800',
   },
   fabRef: {
     fontSize: 13,

@@ -286,13 +286,9 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
 
                   {/* Tags row */}
                   <View style={styles.tagsRow}>
-                    {user.tags.slice(0, 3).map((tag) => (
-                      <View key={tag} style={styles.tagBadge}>
-                        <Text variant="caption" color={colors.accent} style={styles.tagText}>
-                          #{tag}
-                        </Text>
-                      </View>
-                    ))}
+                    <Text variant="caption" color={colors.accent} style={styles.tagText}>
+                      {user.tags.slice(0, 3).map((t) => `#${t}`).join('  ')}
+                    </Text>
                     <View style={styles.statsSummary}>
                       <Text variant="caption" color={colors.textTertiary}>
                         {totalFollowers.toLocaleString()} followers • {user.streak}d streak
@@ -441,13 +437,9 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
                   TOPICS & KEY THEMES
                 </Text>
                 <View style={styles.modalTagsRow}>
-                  {selectedUser.tags.map((tag) => (
-                    <View key={tag} style={styles.modalTagBadge}>
-                      <Text variant="caption" weight="600" color={colors.accent}>
-                        #{tag}
-                      </Text>
-                    </View>
-                  ))}
+                  <Text variant="body" weight="600" color={colors.accent}>
+                    {selectedUser.tags.map((tag) => `#${tag}`).join('   ')}
+                  </Text>
                 </View>
               </View>
 
@@ -672,15 +664,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'rgba(15, 23, 42, 0.04)',
   },
-  tagBadge: {
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: radius.sm,
-    marginRight: 6,
-  },
   tagText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
   },
   statsSummary: {
@@ -800,12 +785,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-  },
-  modalTagBadge: {
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: radius.full,
   },
   reflectionCard: {
     backgroundColor: '#FFFFFF',

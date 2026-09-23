@@ -94,10 +94,10 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
             </Text>
           </View>
 
-          <View style={styles.streakPill}>
+          <View style={styles.streakInline}>
             <FlameSvg size={14} color={colors.accent} fill={colors.accent} />
             <Text variant="caption" weight="700" color={colors.accent}>
-              {streak}d streak
+              {streak}d
             </Text>
           </View>
         </View>
@@ -143,11 +143,6 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
               <ScrollSvg size={15} color={colors.accent} />
               <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeaderLabel}>
                 TODAY'S MESSAGE
-              </Text>
-            </View>
-            <View style={styles.dayBadge}>
-              <Text variant="caption" weight="700" color={colors.accent}>
-                Day {todayMessage.dayOfYear} of 365
               </Text>
             </View>
           </View>
@@ -294,16 +289,10 @@ const styles = StyleSheet.create({
   headerSub: {
     marginTop: 2,
   },
-  streakPill: {
+  streakInline: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: 'rgba(253, 210, 35, 0.2)',
+    gap: 4,
   },
 
   // Subtle Hairline Divider (like Settings / ProfileScreen)
@@ -367,14 +356,6 @@ const styles = StyleSheet.create({
   },
   sectionHeaderLabel: {
     letterSpacing: 0.5,
-  },
-  dayBadge: {
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: 'rgba(253, 210, 35, 0.25)',
   },
   metaRow: {
     flexDirection: 'row',

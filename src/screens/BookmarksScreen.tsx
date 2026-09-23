@@ -44,20 +44,11 @@ export default function BookmarksScreen({ navigation }: BookmarksScreenProps) {
         accessibilityRole="button"
         accessibilityLabel={`View bookmarked verse ${item.reference} in Bible reader`}
       >
-        {/* Row Header: Reference, Testament & Remove Button */}
+        {/* Row Header: Reference & Remove Button */}
         <View style={styles.rowHeader}>
-          <View style={styles.refContainer}>
-            <Text variant="h3" style={styles.verseReference}>
-              {item.reference}
-            </Text>
-            {item.testament ? (
-              <View style={styles.testamentTag}>
-                <Text variant="caption" weight="700" color={colors.accent} style={styles.testamentText}>
-                  {item.testament.toUpperCase()}
-                </Text>
-              </View>
-            ) : null}
-          </View>
+          <Text variant="h3" style={styles.verseReference}>
+            {item.reference}
+          </Text>
 
           <TouchableOpacity
             style={styles.removeBtn}
@@ -104,16 +95,11 @@ export default function BookmarksScreen({ navigation }: BookmarksScreenProps) {
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
           <View style={styles.headerBlock}>
-            <View style={styles.countBadgeRow}>
-              <View style={styles.countBadge}>
-                <BookmarkSvg size={13} color={colors.accent} fill={colors.accent} />
-                <Text variant="caption" weight="700" color={colors.accent}>
-                  {favoritesScriptures.length} {favoritesScriptures.length === 1 ? 'Verse' : 'Verses'} Bookmarked
-                </Text>
-              </View>
-            </View>
+            <Text variant="h2" style={styles.headerTitle}>
+              Bookmarked Verses
+            </Text>
             <Text variant="caption" color={colors.textSecondary} style={styles.headerSub}>
-              Tap any verse to open and view directly inside the Holy Bible reader
+              {favoritesScriptures.length} {favoritesScriptures.length === 1 ? 'verse' : 'verses'} saved • Tap any verse to open in Bible reader
             </Text>
           </View>
         }
@@ -159,21 +145,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(15, 23, 42, 0.06)',
   },
-  countBadgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  countBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: 'rgba(253, 210, 35, 0.25)',
+  headerTitle: {
+    color: colors.textPrimary,
   },
   headerSub: {
     marginTop: 4,
@@ -196,26 +169,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 6,
   },
-  refContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    flex: 1,
-  },
   verseReference: {
     fontSize: 15,
     fontWeight: '800',
     color: colors.textPrimary,
-  },
-  testamentTag: {
-    backgroundColor: 'rgba(15, 23, 42, 0.04)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: radius.sm,
-  },
-  testamentText: {
-    fontSize: 9.5,
-    letterSpacing: 0.5,
   },
   removeBtn: {
     width: 28,
