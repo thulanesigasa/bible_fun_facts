@@ -29,9 +29,6 @@ import {
   BookmarkSvg,
 } from '../components/SvgIcons';
 import { UiverseSwitch } from '../components/UiverseSwitch';
-import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
-import { StreakHexagonBadge } from '../components/StreakHexagonBadge';
-import { getMilestoneForStreak } from '../data/streakMilestones';
 
 // ============================================================================
 // TYPOGRAPHY PRESETS
@@ -67,8 +64,6 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
   } = useUser();
 
   const [isUploading, setIsUploading] = useState(false);
-  const [showStreakModal, setShowStreakModal] = useState(false);
-  const currentMilestone = getMilestoneForStreak(streak);
   const [notifications, setNotifications] = useState<boolean>(
     userProfile?.notificationsEnabled ?? true
   );
@@ -394,23 +389,17 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
 
             <View style={styles.statDivider} />
 
-            <TouchableOpacity
-              style={styles.statColumn}
-              onPress={() => setShowStreakModal(true)}
-              activeOpacity={0.75}
-              accessibilityRole="button"
-              accessibilityLabel={`Streak: ${streak} days. Tap to open streak badge.`}
-            >
+            <View style={styles.statColumn}>
               <View style={styles.statIconRow}>
                 <ShieldCheckSvg size={14} color={colors.accent} strokeWidth={2} />
                 <Text variant="h3" style={[styles.statValue, { marginLeft: 4 }]}>
-                  {streak}
+                  {streak || 1}
                 </Text>
               </View>
               <Text variant="caption" color={colors.textSecondary} style={styles.statLabel}>
                 Streak
               </Text>
-            </TouchableOpacity>
+            </View>
 
             <View style={styles.statDivider} />
 
@@ -620,89 +609,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           </View>
         </View>
 
-        {/* 2. STREAK & ACHIEVEMENTS */}
-        <View style={styles.bodySection}>
-          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
-            STREAK & ACHIEVEMENTS
-          </Text>
-
-          <TouchableOpacity
-            style={styles.actionRow}
-            onPress={() => setShowStreakModal(true)}
-            activeOpacity={0.75}
-            accessibilityRole="button"
-            accessibilityLabel={`Streak badges and milestones. Current milestone: ${currentMilestone.title}.`}
-          >
-            <View style={styles.rowTitleBox}>
-              <Text variant="h3" style={styles.rowTitle}>
-                Streak Badges & Milestones
-              </Text>
-              <Text variant="caption" color={colors.textSecondary}>
-                {currentMilestone.title} • {streak} {streak === 1 ? 'day streak' : 'days streak'}
-              </Text>
-            </View>
-            <View style={styles.badgeThumbnailWrap}>
-              <StreakHexagonBadge
-                days={currentMilestone.days}
-                tier={currentMilestone.tier}
-                size={34}
-              />
-              <Text style={styles.rowDisclosureArrow}>›</Text>
-            </View>
-          </TouchableOpacity>
-
-          <View style={styles.rowDivider} />
-
-          {/* Direct Daily Streak Counter & Stepper (Editable Each Day) */}
-          <View style={styles.actionRow}>
-            <View style={styles.rowTitleBox}>
-              <Text variant="h3" style={styles.rowTitle}>
-                Daily Streak Count
-              </Text>
-              <Text variant="caption" color={colors.textSecondary}>
-                Updates each day with scripture study, or edit directly
-              </Text>
-            </View>
-
-            <View style={styles.streakInlineEditor}>
-              <TouchableOpacity
-                style={styles.streakStepBtn}
-                onPress={() => setStreak(Math.max(0, streak - 1))}
-                activeOpacity={0.7}
-                accessibilityRole="button"
-                accessibilityLabel="Decrease streak day"
-              >
-                <Text variant="body" weight="700" color="#0F172A">−</Text>
-              </TouchableOpacity>
-
-              <TextInput
-                style={styles.streakTextInput}
-                value={String(streak)}
-                onChangeText={(val) => {
-                  const digits = val.replace(/[^\d]/g, '');
-                  const num = parseInt(digits, 10);
-                  setStreak(isNaN(num) ? 0 : Math.min(9999, num));
-                }}
-                keyboardType="number-pad"
-                maxLength={4}
-                selectTextOnFocus
-                accessibilityLabel="Edit streak number"
-              />
-
-              <TouchableOpacity
-                style={styles.streakStepBtn}
-                onPress={() => setStreak(Math.min(9999, streak + 1))}
-                activeOpacity={0.7}
-                accessibilityRole="button"
-                accessibilityLabel="Increase streak day"
-              >
-                <Text variant="body" weight="700" color="#0F172A">+</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-
-        {/* 3. NOTIFICATIONS (ZERO ICONS) */}
+        {/* 2. NOTIFICATIONS (ZERO ICONS) */}
         <View style={styles.bodySection}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             NOTIFICATIONS
@@ -859,14 +766,6 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           </View>
         </View>
       </ScrollView>
-
-      {/* 3D Cal AI Style Streak Milestone Modal */}
-      <StreakMilestoneModal
-        visible={showStreakModal}
-        streak={streak}
-        onUpdateStreak={setStreak}
-        onClose={() => setShowStreakModal(false)}
-      />
     </SafeAreaView>
   );
 }
@@ -1227,38 +1126,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 4,
-  },
-  badgeThumbnailWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  streakInlineEditor: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  streakStepBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#F1F5F9',
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  streakTextInput: {
-    minWidth: 42,
-    height: 32,
-    borderWidth: 1.5,
-    borderColor: colors.accent,
-    borderRadius: 8,
-    textAlign: 'center',
-    fontWeight: '800',
-    fontSize: 15,
-    color: '#0F172A',
-    backgroundColor: '#FFFFFF',
-    padding: 0,
   },
 });

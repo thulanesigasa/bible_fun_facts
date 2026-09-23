@@ -24,6 +24,7 @@ import {
   ShieldCheckSvg,
 } from '../components/SvgIcons';
 import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
+import { StreakHexagonBadge } from '../components/StreakHexagonBadge';
 
 interface DiscoverScreenProps {
   navigation: any;
@@ -98,15 +99,15 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
           </View>
 
           <TouchableOpacity
-            style={styles.streakInline}
+            style={styles.headerStreakBadgeBtn}
             onPress={() => setShowStreakModal(true)}
-            activeOpacity={0.7}
+            activeOpacity={0.8}
             accessibilityRole="button"
-            accessibilityLabel={`Streak: ${streak} days. Tap to open streak badge.`}
+            accessibilityLabel={`Streak ${streak || 1}. Tap to open streak badge.`}
           >
-            <ShieldCheckSvg size={14} color={colors.accent} strokeWidth={2} />
-            <Text variant="caption" weight="700" color={colors.accent}>
-              {streak}d
+            <StreakHexagonBadge days={streak || 1} size={42} />
+            <Text variant="caption" weight="800" color={colors.textPrimary} style={styles.headerStreakBadgeLabel}>
+              Streak {streak || 1}
             </Text>
           </TouchableOpacity>
         </View>
@@ -306,10 +307,25 @@ const styles = StyleSheet.create({
   headerSub: {
     marginTop: 2,
   },
-  streakInline: {
+  headerStreakBadgeBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
+    borderRadius: 14,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 2,
+    gap: 6,
+  },
+  headerStreakBadgeLabel: {
+    fontSize: 12.5,
+    marginRight: 2,
   },
 
   // Subtle Hairline Divider (like Settings / ProfileScreen)

@@ -11,6 +11,7 @@ export interface StreakMilestone {
 }
 
 export const STREAK_MILESTONES: StreakMilestone[] = [
+  // 1. Day 1 to 6 (Color 1: Bronze / Warm Antique Copper)
   {
     days: 1,
     tier: 'bronze',
@@ -33,6 +34,8 @@ export const STREAK_MILESTONES: StreakMilestone[] = [
     bgGradientStart: 'rgba(217, 119, 6, 0.45)',
     description: '3 days of unbroken daily scripture study.',
   },
+
+  // 2. Day 7 to 30 (Color 2: Silver / Radiant Steel Platinum)
   {
     days: 7,
     tier: 'silver',
@@ -55,6 +58,8 @@ export const STREAK_MILESTONES: StreakMilestone[] = [
     bgGradientStart: 'rgba(148, 163, 184, 0.45)',
     description: 'Double-digit devotion milestone.',
   },
+
+  // 3. Day 30 to Month 6 (Color 3: Gold / Biblical Amber Accent)
   {
     days: 30,
     tier: 'gold',
@@ -79,34 +84,53 @@ export const STREAK_MILESTONES: StreakMilestone[] = [
   },
   {
     days: 100,
-    tier: 'diamond',
+    tier: 'gold',
     title: 'Triple Threat',
     subtitle: "If consistency were a crime, you'd be doing life.",
     verseRef: '2 Timothy 4:7',
     verseQuote: 'I have fought the good fight, I have finished the race, I have kept the faith.',
+    themeColor: '#FDD223',
+    bgGradientStart: 'rgba(253, 210, 35, 0.50)',
+    description: '100 days of profound scriptural insight.',
+  },
+
+  // 4. Month 6 to 1 Year (Color 4: Diamond / Radiant Sapphire Azure)
+  {
+    days: 180,
+    tier: 'diamond',
+    title: 'Half-Year Covenant',
+    subtitle: 'Six unbroken months anchored in God’s sacred truth.',
+    verseRef: 'Hebrews 6:19',
+    verseQuote: 'We have this hope as an anchor for the soul, firm and secure.',
     themeColor: '#38BDF8',
     bgGradientStart: 'rgba(56, 189, 248, 0.45)',
-    description: '100 days of profound scriptural insight.',
+    description: '6 full months of steadfast exegesis.',
   },
   {
     days: 365,
-    tier: 'celestial',
+    tier: 'diamond',
     title: 'Canon Completer',
     subtitle: 'A complete year walking through every sacred exegesis and covenant.',
     verseRef: 'Psalm 103:17',
     verseQuote: 'From everlasting to everlasting the Lord’s love is with those who fear him.',
-    themeColor: '#FDD223',
-    bgGradientStart: 'rgba(245, 158, 11, 0.50)',
+    themeColor: '#38BDF8',
+    bgGradientStart: 'rgba(56, 189, 248, 0.50)',
     description: 'Full calendar year of unbroken devotion.',
   },
 ];
 
+/**
+ * 4 Distinct Color Tiers:
+ * 1. Day 1 to 6: bronze
+ * 2. Day 7 to 30: silver
+ * 3. Day 30 to Month 6 (30 - 179 days): gold
+ * 4. Month 6 to 1 Year (180 - 365+ days): diamond
+ */
 export function getTierForDays(days: number): 'bronze' | 'silver' | 'gold' | 'diamond' | 'celestial' {
-  if (days >= 365) return 'celestial';
-  if (days >= 100) return 'diamond';
-  if (days >= 30) return 'gold';
-  if (days >= 7) return 'silver';
-  return 'bronze';
+  if (days >= 180) return 'diamond'; // Month 6 to 1 Year (and beyond)
+  if (days >= 30) return 'gold';     // Day 30 to Month 6 (30 - 179 days)
+  if (days >= 7) return 'silver';    // Day 7 to 30 (7 - 29 days)
+  return 'bronze';                   // Day 1 to 6 (1 - 6 days)
 }
 
 export function getMilestoneForStreak(streak: number): StreakMilestone {

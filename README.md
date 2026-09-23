@@ -422,18 +422,16 @@ To celebrate consistent daily exegesis and devotion, exégeomai features a high-
 
 ```mermaid
 graph TD
-    UserDevotion["Daily Scripture Study / Unfolding"] --> StreakCounter["UserContext.streak Counter (Auto Daily Increment)"]
-    StreakCounter --> HeaderTrigger["DiscoverScreen Header Streak Pill (ShieldCheckSvg + Streak)"]
-    StreakCounter --> ProfileTrigger["ProfileScreen Study Metrics + Achievements Row"]
+    UserDevotion["Daily Scripture Study / Unfolding"] --> StreakCounter["UserContext.streak Counter (Auto Daily Increment from Streak 1)"]
+    StreakCounter --> HeaderTrigger["DiscoverScreen Feed Header Badge (StreakHexagonBadge + 'Streak {streak}')"]
     
     HeaderTrigger --> MilestoneModal["StreakMilestoneModal.tsx (Celebration Showcase)"]
-    ProfileTrigger --> MilestoneModal
     
     MilestoneModal --> HexBadge["StreakHexagonBadge.tsx (100% Dynamic Vector SVG)"]
     HexBadge --> MetallicShield["Point-Top 3D Metallic Hexagonal Shield (Zero Fire)"]
     MetallicShield --> SacredInsignia["Top Peak Sacred Insignia (Cross / Anchor)"]
-    MetallicShield --> ExtrudedNumber["Dynamic Extruded 3D Number (Auto-updates each day)"]
-    MetallicShield --> ExtrudedBanner["Extruded 3D STREAK Banner"]
+    MetallicShield --> ExtrudedBanner["Extruded 3D STREAK Top Header"]
+    MetallicShield --> ExtrudedNumber["Dynamic Extruded 3D Number (Streak 1, 2, 3...)"]
     MetallicShield --> LowerSeal["Lower Sacred Seal Glyph"]
     
     MilestoneModal --> EditableControls["Direct Streak Editor (Numeric Input & Steppers +/-)"]
@@ -446,31 +444,40 @@ graph TD
 ```
 
 ### 1. Pure Dynamic 3D Metallic Hexagonal Shield Badges (`StreakHexagonBadge.tsx`)
-- **Strictly Fire-Free & Flame-Free**: Eliminated all fire and flame motifs across badges, icons, and screens in favor of an authentic, sacred, and prestigious 3D metallic hexagonal shield.
-- **Dynamic Daily Update Engine**: 100% procedural vector rendering via `react-native-svg` (zero baked static images), allowing the badge to automatically update to any exact daily streak number (`1`, `2`, `3`, ... `365+`) in real time.
+- **Feed Header Replacement**: Replaced the legacy text pill (`1d` / `{streak}d`) in `DiscoverScreen.tsx` with the interactive 3D metallic hexagonal shield badge (`size={42}`) and `"Streak 1"` label (auto-updating each day). Tapping this badge immediately presents the celebration milestone showcase modal (`StreakMilestoneModal.tsx`).
+- **Profile Screen Streamlining**: Cleanly removed the `STREAK & ACHIEVEMENTS` section from `ProfileScreen.tsx`, preserving the profile body's clean typographic focus on Reading & Typography, Notifications, Saved Content, Legal & Policies, and Account.
+- **Strictly Fire-Free & Flame-Free**: Eliminated all fire and flame motifs across badges, icons, headers, and screens in favor of an authentic, sacred, and prestigious 3D metallic hexagonal shield.
+- **Dynamic Daily Update Engine ("Streak 1" Baseline)**: 100% procedural vector rendering via `react-native-svg` (zero baked static images). Defaults to `Streak 1` in `UserContext.tsx` and automatically advances consecutive daily study.
+- **Shield Layout Architecture**: Renders `STREAK` on top and the large extruded 3D number `{days}` centered directly underneath, reading seamlessly as "STREAK 1", "STREAK 2", etc.
 - **Beveled Metallic Rim**: Point-top hexagonal border with multi-stop reflection gradients (`Bronze`, `Silver`, `Gold`, `Diamond`, `Celestial`), chamfered depth borders, and specular highlights.
 - **Top Sacred Insignia**: Sacred cross insignia crowning the upper interior of the shield with metallic luster.
-- **Extruded 3D Streak Number & Label**: Multi-layer depth shadow extrusion texturing for bold numbers (`1`, `3`, `10`, `100`, etc.) and the uppercase `STREAK` banner.
 - **Dynamic Tier Computation**: Automatically applies the appropriate metallic tier palette (Bronze, Silver, Gold, Diamond, or Celestial) based on the user's active streak count.
 
-### 2. Milestone Progression Tiers (`streakMilestones.ts`)
-| Days | Tier | Milestone Title | Cal AI-Style Subtitle | Theological Scripture Anchor |
+### 2. Milestone Progression Tiers & 4-Color Bracket Standard (`streakMilestones.ts`)
+The metallic shield badges implement 4 distinct, prestigiously calibrated color tiers across the believer's habit journey:
+1. **Tier 1 — Day 1 to 6 (Bronze / Warm Antique Copper)**: Celebrating the foundational first week of daily exegesis.
+2. **Tier 2 — Day 7 to 30 (Silver / Radiant Steel Platinum)**: Honoring the first month of steadfast commitment.
+3. **Tier 3 — Day 30 to Month 6 (Gold / Biblical Amber Accent)**: Dedicated to scholars persevering through half a year of study.
+4. **Tier 4 — Month 6 to 1 Year (Diamond / Radiant Sapphire Azure)**: Crown milestone honoring enduring covenant faithfulness through 365 days and beyond.
+
+| Days | Tier & Color Bracket | Milestone Title | Cal AI-Style Subtitle | Theological Scripture Anchor |
 | :--- | :--- | :--- | :--- | :--- |
-| **1d** | Bronze | **First Step** | *The journey of 365 days begins with a single scripture.* | Philippians 1:6 |
-| **3d** | Bronze | **Rookie** | *Is this just fleeting motivation or real dedication?* | Galatians 6:9 |
-| **7d** | Silver | **Faithful Scribe** | *One full week of sacred consistency in God's Word.* | Genesis 2:2 |
-| **10d** | Silver | **Getting Serious** | *Still here? It's getting real.* | Revelation 2:10 |
-| **30d** | Gold | **Devoted Scholar** | *A full month immersed in biblical wisdom and exegesis.* | Psalm 119:105 |
-| **50d** | Gold | **Pillar of Truth** | *Consistency that deepens roots and moves mountains.* | 1 Corinthians 15:58 |
-| **100d** | Diamond | **Triple Threat** | *If consistency were a crime, you'd be doing life.* | 2 Timothy 4:7 |
-| **365d** | Celestial | **Canon Completer** | *A complete year walking through every sacred exegesis and covenant.* | Psalm 103:17 |
+| **1d** | Bronze (Day 1 to 6) | **First Step** | *The journey of 365 days begins with a single scripture.* | Philippians 1:6 |
+| **3d** | Bronze (Day 1 to 6) | **Rookie** | *Is this just fleeting motivation or real dedication?* | Galatians 6:9 |
+| **7d** | Silver (Day 7 to 30) | **Faithful Scribe** | *One full week of sacred consistency in God's Word.* | Genesis 2:2 |
+| **10d** | Silver (Day 7 to 30) | **Getting Serious** | *Still here? It's getting real.* | Revelation 2:10 |
+| **30d** | Gold (Day 30 to Month 6) | **Devoted Scholar** | *A full month immersed in biblical wisdom and exegesis.* | Psalm 119:105 |
+| **50d** | Gold (Day 30 to Month 6) | **Pillar of Truth** | *Consistency that deepens roots and moves mountains.* | 1 Corinthians 15:58 |
+| **100d** | Gold (Day 30 to Month 6) | **Triple Threat** | *If consistency were a crime, you'd be doing life.* | 2 Timothy 4:7 |
+| **180d** | Diamond (Month 6 to 1 Year) | **Half-Year Covenant** | *Six unbroken months anchored in God’s sacred truth.* | Hebrews 6:19 |
+| **365d** | Diamond (Month 6 to 1 Year) | **Canon Completer** | *A complete year walking through every sacred exegesis and covenant.* | Psalm 103:17 |
 
 ### 3. Celebratory Showcase Modal & Daily Editable Steppers (`StreakMilestoneModal.tsx`)
-- **Dynamic Full-Bleed Top-Down Gradient**: Smooth SVG linear gradient tint reflecting the selected milestone's tier color (Warm Bronze Amber, Platinum Slate, Rich Gold, Cyan Blue, or Celestial Gold).
-- **Interactive Daily Streak Editor**: Direct numeric `TextInput` and `[-]` / `[+]` quick steppers embedded in both `ProfileScreen.tsx` and `StreakMilestoneModal.tsx` allowing instantaneous manual adjustment, testing, and real-time badge morphing.
+- **Dynamic Full-Bleed Top-Down Gradient**: Smooth SVG linear gradient tint reflecting the selected milestone's tier color (Bronze Copper, Silver Platinum, Biblical Gold, or Diamond Sapphire).
+- **Interactive Daily Streak Editor**: Direct numeric `TextInput` and `[-]` / `[+]` quick steppers embedded in `StreakMilestoneModal.tsx` allowing instantaneous manual adjustment, testing, and real-time badge and background morphing. Clamped to a minimum of Streak 1.
 - **Clean Dismiss & Active Counter**: Minimalist close button (`CloseSvg`) and pill badge displaying the user's active streak (`ShieldCheckSvg`).
 - **Scripture Grounding**: Displays the sacred verse anchor corresponding to each devotion milestone.
-- **Interactive Milestone Shelf**: Horizontal carousel letting users preview all 8 milestone badges, unlock states, and countdowns.
+- **Interactive Milestone Shelf**: Horizontal carousel letting users preview all 9 milestone badges, unlock states, and countdowns.
 - **Brand Integrity**: Footer displaying *"Walk in the Word with [logo 24x24] exégeomai"* adhering to Rule 15/19 calibration.
 - **One-Tap Sharing**: Integrates React Native `Share.share` with celebratory formatting.
 
