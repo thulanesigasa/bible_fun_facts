@@ -62,7 +62,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
   const {
     userProfile,
     streak,
-    factsViewedCount,
+    readFactIds,
     sharesCount,
     bibleHighlights,
     logout,
@@ -483,10 +483,10 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
               onPress={() => navigation.navigate('Unfolded')}
               activeOpacity={0.7}
               accessibilityRole="button"
-              accessibilityLabel={`${factsViewedCount} Unfolded exegeses. Tap to view your unfolded insights.`}
+              accessibilityLabel={`${readFactIds.length} Unfolded exegeses. Tap to view your unfolded insights.`}
             >
               <Text variant="h3" style={styles.statValue}>
-                {factsViewedCount}
+                {readFactIds.length}
               </Text>
               <Text variant="caption" color={colors.textSecondary} style={styles.statLabel}>
                 Unfolded
