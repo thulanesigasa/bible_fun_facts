@@ -990,13 +990,14 @@ Each writer entry in `biblicalWriters.ts` and `WriterDetailsScreen.tsx` provides
 ### 3. Non-Scrolling Horizontal Swiping Architecture (5 Spotlight Figures)
 To eliminate infinite vertical scroll fatigue and create a fast, tactile browsing experience:
 - **Zero Screen Scroll**: The History screen viewport is completely non-scrolling, fitting the search bar, category pills, swipe cards, and pagination neatly into the visible canvas.
+- **Badge-Free Header**: Displays clean, unencumbered typography for screen title and subtitle without artificial status pills or indicator tags per Rule 16.
 - **5-Character Carousel**: Restricts the active viewport to exactly 5 spotlighted figures for the active category or query.
 - **Magnetic Snap Navigation**: Uses `snapToInterval={CARD_WIDTH + 12}` with fast deceleration rate and dynamic horizontal centering (`paddingHorizontal: (width - CARD_WIDTH) / 2`).
 - **5-Dot Pagination Bar & Steppers**: Renders a dedicated 5-dot navigation track where the active figure expands into an amber indicator pill, complemented by left/right chevron stepper buttons (`‹` / `›`) for accessibility.
 - **Comprehensive Card Summary**: Each card integrates category tags, ancient script, sacred calling, canonical books penned, Strong's concordance tag, key verse quote, and a 1-tap action button into `WriterDetailsScreen`.
 
 ### 4. Real-Time Search Assistant & Autocomplete Overlay
-- **Instant Overlay Dropdown**: As the user types in the search input, a floating Search Assistant panel (`assistantOverlay`) dynamically appears with high-elevation shadow (`zIndex: 999`).
+- **Streamlined Overlay Dropdown**: As the user types in the search input, a floating Search Assistant panel (`assistantOverlay`) dynamically appears with high-elevation shadow (`zIndex: 999`), presenting instant, clean suggestion rows without banner headers or clutter.
 - **Categorized Match Engine**: Suggests up to 5 instant matches categorized by match type:
   - **Author Names**: English, phonetic transliteration, and Hebrew/Greek script matches.
   - **Penned Books**: Detects book names (e.g. typing "Gen" identifies Moses).
