@@ -1042,6 +1042,19 @@ To eliminate infinite vertical scroll fatigue and create a fast, tactile browsin
   - **Sacred Offices**: Identifies prophets, kings, apostles, and historians.
 - **1-Tap Direct Launch**: Tapping any search assistant suggestion immediately navigates to that author's comprehensive scholarly biography, while updating the search query and dismissing the keyboard.
 
+### 5. Streamlined 2-Step Bible Reader Navigation (`WOTDScreen.tsx`)
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Navigation-2--Step%20Navigator-FDD223?style=for-the-badge" alt="2-Step Navigator" />
+  <img src="https://img.shields.io/badge/Flow-Books%20%E2%86%92%20Chapters-0F172A?style=for-the-badge" alt="Books to Chapters Flow" />
+  <img src="https://img.shields.io/badge/UI-Zero%20Redundant%20Steps-3B82F6?style=for-the-badge" alt="Zero Redundant Steps" />
+</p>
+
+To eliminate clutter and provide an effortless, intuitive chapter selection experience:
+- **Two-Step Canonical Flow**: The Bible navigation picker modal is streamlined to two clear tabs: `BOOKS` and `CHAPTERS`.
+- **Elimination of Inactive Verses Step**: Removed the redundant `VERSES` tab and placeholder grid. Because the Bible reader renders full chapters with all verses simultaneously, chapter selection immediately dismisses the modal and renders the target scripture.
+- **Balanced 50/50 Navigation Header**: Navigation modal tabs now cleanly divide the header space with active amber indicators and seamless step transitions.
+
 ---
 
 ### Type Checking & Validation
