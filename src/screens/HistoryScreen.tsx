@@ -55,7 +55,12 @@ export default function HistoryScreen({ navigation }: HistoryScreenProps) {
           w.transliteration.toLowerCase().includes(q) ||
           w.role.toLowerCase().includes(q) ||
           w.era.toLowerCase().includes(q) ||
-          w.booksWritten.some((book) => book.toLowerCase().includes(q))
+          w.booksWritten.some((book) => book.toLowerCase().includes(q)) ||
+          (w.linguisticProfile && (
+            w.linguisticProfile.strongsRef.toLowerCase().includes(q) ||
+            w.linguisticProfile.rootWord.toLowerCase().includes(q) ||
+            w.linguisticProfile.literalMeaning.toLowerCase().includes(q)
+          ))
         );
       });
     }

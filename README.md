@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript 5.9" />
   <img src="https://img.shields.io/badge/Holy%20Bible-66--Book%20Canon%20Reader-FDD223?style=for-the-badge" alt="Full Holy Bible Reader" />
   <img src="https://img.shields.io/badge/Daily%20Feed-365%20Calendar%20Exegesis-FDD223?style=for-the-badge" alt="365 Daily Exegesis" />
-  <img src="https://img.shields.io/badge/History%20Tab-Biblical%20Authors%20&%20Manuscripts-0284C7?style=for-the-badge" alt="Biblical Authors History" />
+  <img src="https://img.shields.io/badge/History%20Tab-26%20Canonical%20Authors%20%7C%20Timelines%20%26%20Linguistics-0284C7?style=for-the-badge" alt="Biblical Authors History" />
   <img src="https://img.shields.io/badge/Community-Believer%20&%20Scholar%20Hub-10B981?style=for-the-badge" alt="Believer & Scholar Hub" />
   <img src="https://img.shields.io/badge/Supabase-Auth%20&%20Backend-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase Backend" />
   <img src="https://img.shields.io/badge/CI%2FCD-Rule%2021%20Compliant-10B981?style=for-the-badge&logo=githubactions&logoColor=white" alt="Rule 21 Compliant" />
@@ -942,6 +942,61 @@ When any chapter is requested in the Bible Reader (`fetchChapter(book, chapter, 
 - **In-Reader Translation Sheet**: Each translation row displays version name, scholarly tag, estimated download size, real-time downloading progress percentage bar, and clean "Offline Ready" continuous plain text typography (zero status pill badges per Rule 16). The sheet header displays a clean minimalist "{count} offline" plain text indicator.
 - **Profile Screen Management**: A dedicated "OFFLINE BIBLES & TRANSLATIONS" section in the Profile body provides an aggregated storage breakdown and 1-tap delete controls to reclaim disk space, rendering all translation labels as clean continuous text.
 
+---
+
+## Biblical History & Author Scholarship Engine
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Catalog-26%20Canonical%20Figures-FDD223?style=for-the-badge" alt="26 Canonical Figures" />
+  <img src="https://img.shields.io/badge/Scholarly%20Dimensions-7%20New%20Fields-10B981?style=for-the-badge" alt="7 New Fields" />
+  <img src="https://img.shields.io/badge/Concordance-Strong%27s%20Hebrew%20%26%20Greek-0284C7?style=for-the-badge" alt="Strong's Concordance" />
+  <img src="https://img.shields.io/badge/Life%20Milestones-Vertical%20Node%20Timeline-F59E0B?style=for-the-badge" alt="Chronological Timelines" />
+  <img src="https://img.shields.io/badge/Typology-Christological%20Fulfillment-DC2626?style=for-the-badge" alt="Christological Typology" />
+  <img src="https://img.shields.io/badge/Design%20Aesthetic-60--30--10%20Continuous%20Body-F8FAFC?style=for-the-badge" alt="60-30-10 Continuous Body" />
+</p>
+
+To provide believers, students, and exegetes with deep scholarly immersion into the human instruments God used to pen Sacred Scripture, the Sacred History engine was extensively upgraded across both Old and New Testaments.
+
+### 1. Expanded 26-Author Canonical Catalog
+The catalog was expanded from 16 to 26 major biblical authors and figures across 7 canonical genres:
+- **Torah & History**: Moses, Joshua, Samuel, Ezra, Nehemiah
+- **Wisdom**: David, Solomon
+- **Major Prophets**: Isaiah, Jeremiah, Ezekiel, Daniel
+- **Minor Prophets**: Hosea, Amos, Jonah, Micah, Habakkuk, Malachi
+- **Gospels**: Matthew, Mark, Luke, John
+- **Pauline Epistles**: Paul
+- **General Epistles**: Peter, James, Jude, Author of Hebrews
+
+### 2. Multi-Section Scholarly Architecture
+Each writer entry in `biblicalWriters.ts` and `WriterDetailsScreen.tsx` provides 15 structured sections:
+1. **Writer Identity & Script Header**: Original Hebrew or Greek script name, phonetic transliteration with root meaning, ministry era, and testament genre tag.
+2. **Strong's Linguistic Profile**: Root word and original script, Strong's concordance number (e.g. `H4872` for Moses, `G3972` for Paul), language designation, literal root meaning, and theological significance.
+3. **Sacred Role & Calling**: Formal canonical office, prophetic mandate, or apostolic mission.
+4. **Chronological Life Milestones Timeline**: Vertical timeline track featuring dot nodes, period dates, milestone titles, detailed historical narratives, and supporting scripture citations.
+5. **Canonical Books Penned**: List of penned books, total canonical chapter count, and biblical proportion.
+6. **Key Scripture Quote**: Prominent biblical quote set inside an amber left-bordered sacred quote block.
+7. **Biographical History**: Multi-paragraph narrative tracing lineage, education, wilderness preparation, trials, and death.
+8. **Historical & Geo-Political Setting**: Contemporary world empires (Egypt, Assyria, Babylon, Persia, Greece, Rome) and societal backdrop.
+9. **Historical Contemporaries & Companions**: Cards detailing contemporary monarchs, prophets, and ministry associates with their specific relationships.
+10. **Literary Genres & Rhetorical Style**: Canonical genres rendered as interactive chips, rhetorical devices, and vocabulary register analysis.
+11. **Core Theological Themes**: Bulleted thematic insights with amber accent dots.
+12. **Christological Foretelling & Fulfillment**: Dedicated amber-illuminated card analyzing how the figure's life, covenants, suffering, or prophetic words foreshadow Jesus Christ.
+13. **Notable Canonical Sayings**: Sacred quote blocks containing the verse text, context of utterance, and scripture citation.
+14. **Manuscript Evidence & Scholarship**: Codex discoveries, Dead Sea Scroll fragments, and papyrological attestations.
+15. **Archaeological Discoveries & Corroborations**: Excavated stelae, bullae, cylinder seals, and inscriptions validating the biblical account.
+16. **Fascinating Historical & Cultural Facts**: Numbered cards detailing cultural oddities, linguistic nuances, and historical trivia illustrated with the custom `LightbulbSvg`.
+
+### 3. Integrated Search & Discovery
+`HistoryScreen.tsx` provides instant real-time filtering across:
+- English author names and titles
+- Original Hebrew and Greek script characters
+- Phonetic transliterations
+- Written canonical book names
+- Strong's concordance numbers (e.g. searching "H4872" or "G3972")
+- Original root words and literal definitions
+
+---
+
 ### Type Checking & Validation
 ```bash
 npx tsc --noEmit
@@ -951,3 +1006,4 @@ npx tsc --noEmit
 
 ## License & Credits
 Crafted for Scripture scholars, Bible study groups, and everyday believers seeking the deeper historical, linguistic, and cultural dimensions of God's Word.
+
