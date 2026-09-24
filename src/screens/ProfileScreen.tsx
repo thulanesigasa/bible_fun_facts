@@ -466,6 +466,28 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
             </View>
             <Text style={styles.rowDisclosureArrow}>›</Text>
           </TouchableOpacity>
+
+          {/* Daily Study Streak Row (Direct Body Row, Zero Icons, Zero Divs) */}
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={() => {
+              setInspectedAchievement(null);
+              setShowStreakModal(true);
+            }}
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel={`Daily Study Streak. ${streak || 1} day streak. Tap to inspect streak milestone.`}
+          >
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Daily Study Streak
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                {`${streak || 1} day active streak • Inspect milestone`}
+              </Text>
+            </View>
+            <Text style={styles.rowDisclosureArrow}>›</Text>
+          </TouchableOpacity>
         </View>
 
         {/* ================================================================ */}

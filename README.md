@@ -482,12 +482,13 @@ The metallic shield badges implement 4 distinct, prestigiously calibrated color 
 ### 3. Celebratory Showcase Modal & Enriched Share Card Architecture (`StreakMilestoneModal.tsx`)
 - **Aesthetic Top-Faded Gradient Background**: Smooth SVG linear gradient tint transitioning from the selected milestone's tier color (28% opacity at top) to crisp clean white at the bottom with a subtle golden hairline border.
 - **Enriched Self-Contained Share Card Canvas**: The generated bitmap view (`shareCardRef`) unifies the entire devotion showcase directly on the card canvas for high-resolution sharing:
-  - **Illuminated Tier Header Pill**: Displays the exact tier category (e.g. `AMBER SHIELD • DAY 1 TO 6` or `${badgeLabel} MILESTONE`) in uppercase tracking.
+  - **Clean Inline Tier Typography (Zero Badge Pills, Zero Divs)**: Displays the exact tier category (e.g. `AMBER SHIELD • DAY 1 TO 6` or `${badgeLabel} MILESTONE`) as pure body typography positioned gracefully between the 3D shield badge and milestone title without artificial pill containers, backgrounds, or borders.
   - **Procedural 3D Category / Hexagonal Shield Badge**: Pure vector SVG badge rendering (`size={200}`).
   - **Milestone Title**: Primary milestone name (e.g. `First Step`, `Faithful Scribe`, `Canon Completer`).
   - **Inspirational Epigram Subtitle**: Devotional reflection text (e.g. `The journey of 365 days begins with a single scripture.`).
-  - **Theological Scripture Grounding Box**: Full scripture quote with sacred citation (e.g. `— Philippians 1:6`).
+  - **Theological Scripture Grounding**: Clean scripture quote with sacred citation (e.g. `— Philippians 1:6`) rendered with flat typography (zero card-in-card div).
   - **Brand Wordmark Footer**: Official `exégeomai` transparent logo and wordmark.
+- **Direct Profile Body Integration**: In `ProfileScreen.tsx`, Daily Study Streak is placed directly into the screen body under `STUDY ACHIEVEMENTS` alongside Study Achievements (zero icons, zero enclosing divs) ensuring streak is directly part of the profile settings body.
 - **Tamper-Proof Streak Integrity**: Daily study streak editing controls (numeric inputs and +/- steppers) have been strictly removed. Streaks can no longer be manually manipulated; progress is solely and authentically earned through the daily Scripture study engagement lifecycle.
 - **Unified Modal Layout**: Eliminates redundant lower copy blocks, keeping the modal clean and focused directly on the self-contained card and horizontal milestone shelf.
 - **Interactive Milestone Shelf**: Horizontal carousel letting users preview all 9 milestone badges, unlock states, and countdowns.
