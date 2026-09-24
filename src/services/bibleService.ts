@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BibleChapterData, PREBUNDLED_CHAPTERS } from '../data/bibleCanon';
 import {
   getOfflineChapter,
+  downloadTranslation,
   TRANSLATION_SOURCES,
 } from './offlineBibleService';
 
@@ -32,7 +33,7 @@ export interface LastReadPosition {
 export async function fetchChapter(
   book: string,
   chapter: number,
-  translation: 'web' | 'kjv' | 'bbe' | 'asv' | 'darby' | 'dra' | 'ylt' | 'oeb-cw' | 'webbe' | 'oeb-us' = 'web'
+  translation: string = 'web'
 ): Promise<BibleChapterData> {
   const normalizedBook = book.trim();
   const cacheKey = `${translation}_${normalizedBook.replace(/\s+/g, '_')}_${chapter}`;
@@ -65,7 +66,21 @@ export async function fetchChapter(
     console.warn('Cache read notice:', e);
   }
 
-  // 3. Network fetch from public bible-api.com
+  // 3. If translation source is defined in TRANSLATION_SOURCES, auto-download full package for instant offline reading
+  if (TRANSLATION_SOURCES[translation]) {
+    try {
+      await downloadTranslation(translation);
+      const freshlyDownloaded = await getOfflineChapter(normalizedBook, chapter, translation);
+      if (freshlyDownloaded) {
+        memoryCache.set(cacheKey, freshlyDownloaded);
+        return freshlyDownloaded;
+      }
+    } catch (dlErr) {
+      console.warn(`Auto-download failed for ${translation}:`, dlErr);
+    }
+  }
+
+  // 4. Network fetch from public bible-api.com
   try {
     const encodedBook = encodeURIComponent(normalizedBook);
     const url = `https://bible-api.com/${encodedBook}+${chapter}?translation=${translation}`;

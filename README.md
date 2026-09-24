@@ -16,7 +16,7 @@
   <img src="https://img.shields.io/badge/Tab%20Architecture-Floating%20Pill%20280px-FDD223?style=for-the-badge" alt="Floating Pill Tab Bar" />
   <img src="https://img.shields.io/badge/Streak%20Milestones-3D%20Hexagonal%20Badges-F59E0B?style=for-the-badge" alt="3D Streak Milestone Badges" />
   <img src="https://img.shields.io/badge/Achievements-Streak%20%7C%20Bookmarks%20%7C%20Highlights%20%7C%20Shares-FDD223?style=for-the-badge" alt="Multi-Category Achievements" />
-  <img src="https://img.shields.io/badge/Offline%20Bibles-10%20Full%20Translations%20%7C%200ms%20Local%20Cache-10B981?style=for-the-badge" alt="Offline Bible Translations" />
+  <img src="https://img.shields.io/badge/Offline%20Bibles-24%20Full%20Translations%20%7C%20isiZulu%20%7C%20isiXhosa%20%7C%20Sepedi%20%7C%20Afrikaans-10B981?style=for-the-badge" alt="Offline Bible Translations" />
   <img src="https://img.shields.io/badge/Share%20Engine-Zero%20Blank%20%7C%20High--Fidelity%20PNG-10B981?style=for-the-badge" alt="Zero Blank Share Engine" />
   <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
@@ -501,6 +501,41 @@ The metallic shield badges implement 4 distinct, prestigiously calibrated color 
 
 ---
 
+## Offline Scripture Engine & 24 Global Bible Translations (South African & Modern Editions)
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Total%20Translations-24%20Complete%20Bibles-FDD223?style=for-the-badge" alt="24 Complete Bibles" />
+  <img src="https://img.shields.io/badge/South%20Africa-isiZulu%20%7C%20isiXhosa%20%7C%20Sepedi%20%7C%20Afrikaans-0284C7?style=for-the-badge" alt="South African Bibles" />
+  <img src="https://img.shields.io/badge/East%20Africa-Kiswahili%20Union%20Version-10B981?style=for-the-badge" alt="Kiswahili Union Version" />
+  <img src="https://img.shields.io/badge/Modern%20English-NIV%20%7C%20ESV%20%7C%20NLT%20%7C%20NKJV%20%7C%20AMP%20%7C%20BSB%20%7C%20NASB%20%7C%20CSB-F59E0B?style=for-the-badge" alt="Modern English Bibles" />
+  <img src="https://img.shields.io/badge/Architecture-Multi--CDN%20%7C%20Zero%20Latency%20Offline%20Cache-0F172A?style=for-the-badge" alt="Multi-CDN Architecture" />
+</p>
+
+### 1. Authentic South African & African Indigenous Scripture Translations
+exégeomai integrates complete, authentic 66-book canonical translations for South Africa and the wider African continent:
+- **isiZulu (ZUL)**: *IBhayibheli Elingcwele* (1959 Translation) — South Africa's most widely spoken language, delivered with complete Old and New Testaments.
+- **isiXhosa (XHO)**: *IBhayibhile Engcwele* — Full 66-book canon with reverent Xhosa theological rendering.
+- **Sesotho sa Leboa / Sepedi (NSO)**: *Bibele Taba ye Botse* (1951 Translation) — Complete Northern Sotho canonical scriptures.
+- **Afrikaans (AFR)**: *Die Bybel (1933/1953 Vertaling)* — Historic South African Afrikaans Bible translation.
+- **Kiswahili (SWA)**: *Biblia Takatifu (Swahili Union Version)* — Spoken widely across East and Central Africa.
+
+### 2. Modern & Classic English Scripture Translations
+- **Modern English**: New International Version (NIV), English Standard Version (ESV), New Living Translation (NLT), New King James Version (NKJV), Amplified Bible (AMP), Berean Standard Bible (BSB), New American Standard Bible (NASB), Christian Standard Bible (CSB).
+- **Classic & Historic**: World English Bible (WEB), King James Version (KJV), American Standard Version (ASV), Bible in Basic English (BBE), Darby Bible (DARBY), Douay-Rheims 1899 (DRA), Young's Literal Translation (YLT), Geneva Bible 1599 (GNV), World English Bible British Edition (WEBBE), Open English Bible US (OEB-US), Open English Bible Commonwealth (OEB-CW).
+
+### 3. Multi-CDN Resilient Pipeline & Dynamic Schema Normalization (`offlineBibleService.ts`)
+- **Triple-Mirror CDN Redundancy**: Every translation is backed by three independent, global mirrors (jsDelivr CDN, GitHub Raw, Fastly CDN) with automatic failover to prevent download stalls.
+- **Dynamic Schema Normalization (`normalizeBibleJson`)**: Intelligently parses diverse digital scripture schemas (both standard array formats and deep `{ Book: [ { Chapter: [ { Verse: string } ] } ] }` structures), normalizing all translations into the unified canonical `RawBibleBook[]` standard upon download.
+- **Zero-Latency In-Memory & Local Disk Storage**: Downloaded Bibles are saved to `expo-file-system` (`offline_bibles/`) and loaded into high-speed memory caches (`Map<string, RawBibleBook[]>`) for instantaneous 0ms chapter and verse lookups even with zero cellular data or Wi-Fi.
+
+### 4. Dedicated Offline Downloads Hub (`DownloadedVersesScreen.tsx`)
+- **Separated Offline Library**: Isolates downloaded offline Bibles from available versions with direct 1-tap jump to the Word Reader (`translationOverride`).
+- **Available Catalog Categorization**: Neatly categorized by South African Translations, Modern English, and Classic Editions.
+- **Live Percentage Progress Tracking**: Provides immediate visual feedback during multi-megabyte package downloads with background download resilience.
+- **Clean Flat Body Standard**: Completely devoid of indicator badges, tags, or pills in strict adherence to Rule 16 and the 60-30-10 design system.
+
+---
+
 ## Clean UI Architecture & Absolute Zero Badge Standard (Rule 16)
 
 <p align="left">
@@ -632,6 +667,7 @@ bible_fun_facts/
 │   │   ├── AchievementsScreen.tsx   # Dedicated 3-per-row grid of 48 achievements across 4 categories
 │   │   ├── AuthScreen.tsx           # Flattened body canvas, keyboard next, FLAG_SECURE
 │   │   ├── DiscoverScreen.tsx       # Rich multi-card feed stream with streak modal trigger
+│   │   ├── DownloadedVersesScreen.tsx # Dedicated offline downloads & available 24-translation library
 │   │   ├── FactDetailsScreen.tsx    # Modal sheet fact inspection
 │   │   ├── FavoritesScreen.tsx      # Saved collections persisted offline
 │   │   ├── PrivacyPolicyScreen.tsx  # 11-section GDPR/CCPA privacy policy screen
@@ -643,9 +679,10 @@ bible_fun_facts/
 │   │   ├── UnfoldedScreen.tsx       # Continuous body catalog of unlocked daily calendar exegeses
 │   │   ├── WelcomeScreen.tsx        # 3-step onboarding introduction
 │   │   ├── WOTDDetailsScreen.tsx    # Full 4-lens exegesis & prayer focus
-│   │   └── WOTDScreen.tsx           # Full Holy Bible reader (66 books, WEB/KJV) + Daily Exegesis
+│   │   └── WOTDScreen.tsx           # Full Holy Bible reader (66 books, 24 translations) + Daily Exegesis
 │   ├── services/
 │   │   ├── bibleService.ts          # Multi-tier memory, persistent AsyncStorage & public domain API client
+│   │   ├── offlineBibleService.ts   # Multi-CDN resilient Bible download engine with schema normalization
 │   │   ├── supabase.ts              # Defensive Supabase client with fallback anon keys
 │   │   └── updates.ts               # Background OTA update listener & dispatcher
 │   └── theme/                       # 60-30-10 color tokens, 8px grid spacing, radius, shadow
