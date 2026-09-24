@@ -37,7 +37,6 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
 
   const {
     streak,
-    setStreak,
     incrementFactsViewed,
     incrementSharesCount,
     userProfile,
@@ -272,7 +271,6 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
       <StreakMilestoneModal
         visible={showStreakModal}
         streak={streak}
-        onUpdateStreak={setStreak}
         onClose={() => setShowStreakModal(false)}
       />
     </SafeAreaView>

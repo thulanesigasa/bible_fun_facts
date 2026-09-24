@@ -7,7 +7,6 @@ import {
   Share,
   Image,
   Animated,
-  TextInput,
   Platform,
   BackHandler,
   ActivityIndicator,
@@ -44,7 +43,6 @@ export interface StreakMilestoneModalProps {
   streak: number;
   initialMilestoneDays?: number;
   achievement?: AchievementMilestone | null;
-  onUpdateStreak?: (newStreak: number) => void;
   onClose: () => void;
 }
 
@@ -53,7 +51,6 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
   streak,
   initialMilestoneDays,
   achievement,
-  onUpdateStreak,
   onClose,
 }) => {
   const { incrementSharesCount } = useUser();
@@ -286,19 +283,7 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
     }
   };
 
-  const handleStreakChange = (valStr: string) => {
-    const digits = valStr.replace(/[^\d]/g, '');
-    const num = parseInt(digits, 10);
-    const clamped = isNaN(num) ? 1 : Math.max(1, Math.min(9999, num));
-    onUpdateStreak?.(clamped);
-    setSelectedMilestone(getMilestoneForStreak(clamped));
-  };
 
-  const handleStepStreak = (delta: number) => {
-    const next = Math.max(1, Math.min(9999, streak + delta));
-    onUpdateStreak?.(next);
-    setSelectedMilestone(getMilestoneForStreak(next));
-  };
 
   if (!visible) return null;
 
@@ -419,53 +404,7 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
               ) : null}
             </View>
 
-            {/* Interactive Daily Streak Stepper & Direct Numeric Editor (Only in Streak Mode) */}
-            {!isCustom && onUpdateStreak ? (
-              <View style={styles.editorSection}>
-                <Text variant="caption" weight="700" color="#64748B" style={styles.editorHeading}>
-                  EDIT DAILY STREAK COUNT
-                </Text>
-                <View style={styles.editorRow}>
-                  <TouchableOpacity
-                    style={styles.stepBtn}
-                    onPress={() => handleStepStreak(-1)}
-                    activeOpacity={0.7}
-                    accessibilityRole="button"
-                    accessibilityLabel="Decrease streak day"
-                  >
-                    <Text variant="h2" color="#0F172A" style={styles.stepBtnText}>−</Text>
-                  </TouchableOpacity>
 
-                  <View style={styles.editorInputWrap}>
-                    <TextInput
-                      style={styles.editorInput}
-                      value={String(streak)}
-                      onChangeText={handleStreakChange}
-                      keyboardType="number-pad"
-                      maxLength={4}
-                      selectTextOnFocus
-                      accessibilityLabel="Directly edit daily streak number"
-                    />
-                    <Text variant="caption" color="#64748B" style={styles.editorUnitLabel}>
-                      {streak === 1 ? 'day' : 'days'}
-                    </Text>
-                  </View>
-
-                  <TouchableOpacity
-                    style={styles.stepBtn}
-                    onPress={() => handleStepStreak(1)}
-                    activeOpacity={0.7}
-                    accessibilityRole="button"
-                    accessibilityLabel="Increase streak day"
-                  >
-                    <Text variant="h2" color="#0F172A" style={styles.stepBtnText}>+</Text>
-                  </TouchableOpacity>
-                </View>
-                <Text variant="caption" color="#94A3B8" style={styles.editorHelper}>
-                  Updates daily with Scripture reading, or adjust above to test milestone badges.
-                </Text>
-              </View>
-            ) : null}
 
             {/* Horizontal Milestone Shelf Selector */}
             <View style={styles.shelfSection}>
@@ -734,71 +673,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 0.3,
   },
-  editorSection: {
-    width: '100%',
-    backgroundColor: '#F8FAFC',
-    borderRadius: 16,
-    padding: 16,
-    alignItems: 'center',
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
-  },
-  editorHeading: {
-    fontSize: 11,
-    letterSpacing: 1.5,
-    marginBottom: 12,
-  },
-  editorRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 16,
-  },
-  stepBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stepBtnText: {
-    fontSize: 24,
-    lineHeight: 28,
-  },
-  editorInputWrap: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1.5,
-    borderColor: colors.accent,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    gap: 6,
-    minWidth: 100,
-    justifyContent: 'center',
-  },
-  editorInput: {
-    fontSize: 26,
-    fontWeight: '800',
-    color: '#0F172A',
-    textAlign: 'center',
-    minWidth: 40,
-    padding: 0,
-  },
-  editorUnitLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  editorHelper: {
-    fontSize: 11,
-    marginTop: 8,
-    textAlign: 'center',
-  },
+
   shelfSection: {
     width: '100%',
     marginBottom: 20,

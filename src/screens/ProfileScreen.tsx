@@ -53,7 +53,6 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
   const {
     userProfile,
     streak,
-    setStreak,
     factsViewedCount,
     sharesCount,
     bibleHighlights,
@@ -824,7 +823,6 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
         visible={showStreakModal}
         streak={streak || 1}
         achievement={inspectedAchievement}
-        onUpdateStreak={setStreak}
         onClose={() => {
           setShowStreakModal(false);
           setInspectedAchievement(null);
