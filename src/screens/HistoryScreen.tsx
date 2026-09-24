@@ -22,7 +22,6 @@ import {
   FeatherPenSvg,
   BookOpenSvg,
   ScrollSvg,
-  SparklesSvg,
   ChevronRightSvg,
   StrongsIconSvg,
 } from '../components/SvgIcons';
@@ -308,16 +307,9 @@ export default function HistoryScreen({ navigation }: HistoryScreenProps) {
     <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
       {/* Header Bar */}
       <View style={styles.header}>
-        <View style={styles.headerTopRow}>
-          <Text variant="h2" style={styles.screenTitle}>
-            Sacred History
-          </Text>
-          <View style={styles.counterBadge}>
-            <Text variant="caption" weight="800" color={colors.accent}>
-              5 SPOTLIGHT
-            </Text>
-          </View>
-        </View>
+        <Text variant="h2" style={styles.screenTitle}>
+          Sacred History
+        </Text>
         <Text variant="caption" color={colors.textSecondary} style={styles.screenSub}>
           Swipe through biblical authors with real-time search assistant
         </Text>
@@ -358,12 +350,6 @@ export default function HistoryScreen({ navigation }: HistoryScreenProps) {
         {/* Real-Time Autocomplete Search Assistant */}
         {isSearchFocused && suggestions.length > 0 && (
           <View style={styles.assistantOverlay}>
-            <View style={styles.assistantHeader}>
-              <SparklesSvg size={14} color={colors.accent} />
-              <Text variant="caption" weight="800" color={colors.accent} style={styles.assistantHeaderTitle}>
-                SEARCH ASSISTANT • TAP TO EXPLORE
-              </Text>
-            </View>
             {suggestions.map((item, idx) => (
               <TouchableOpacity
                 key={item.writer.id}
@@ -539,7 +525,7 @@ export default function HistoryScreen({ navigation }: HistoryScreenProps) {
 
           {/* Swipe Cue & Counter Label */}
           <Text variant="caption" color={colors.textTertiary} weight="700" style={styles.swipeCueText}>
-            SWIPE TO EXPLORE • {activeIndex + 1} OF {displayedWriters.length} SPOTLIGHT FIGURES
+            SWIPE TO EXPLORE • {activeIndex + 1} OF {displayedWriters.length}
           </Text>
         </View>
       )}
@@ -559,21 +545,8 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
     backgroundColor: '#FFFFFF',
   },
-  headerTopRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
   screenTitle: {
     color: colors.textPrimary,
-  },
-  counterBadge: {
-    backgroundColor: 'rgba(253, 210, 35, 0.15)',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: 'rgba(217, 119, 6, 0.2)',
   },
   screenSub: {
     marginTop: 2,
@@ -629,22 +602,7 @@ const styles = StyleSheet.create({
     elevation: 10,
     zIndex: 999,
     paddingVertical: 4,
-  },
-  assistantHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
-    backgroundColor: '#FFFBEB',
-    borderTopLeftRadius: 11,
-    borderTopRightRadius: 11,
-  },
-  assistantHeaderTitle: {
-    letterSpacing: 0.6,
-    fontSize: 10,
+    overflow: 'hidden',
   },
   suggestionRow: {
     flexDirection: 'row',
