@@ -24,7 +24,17 @@ import {
   ProfileSvg,
   CameraSvg,
   ChevronRightSvg,
+  DownloadSvg,
+  TrashSvg,
+  CheckCircleSvg,
 } from '../components/SvgIcons';
+import {
+  getDownloadedTranslations,
+  deleteDownloadedTranslation,
+  subscribeOfflineUpdates,
+  DownloadedTranslationMeta,
+  formatBytes,
+} from '../services/bibleService';
 import { UiverseSwitch } from '../components/UiverseSwitch';
 import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
 import {
@@ -97,6 +107,51 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
   const handleToggleRedLetter = (val: boolean) => {
     setRedLetter(val);
     updateProfile({ redLetterEnabled: val });
+  };
+
+  // Offline Downloaded Bibles State
+  const [downloadedTranslations, setDownloadedTranslations] = useState<DownloadedTranslationMeta[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const load = async () => {
+      try {
+        const list = await getDownloadedTranslations();
+        if (isMounted) setDownloadedTranslations(list);
+      } catch (e) {
+        console.warn('Failed to load downloaded bibles in profile:', e);
+      }
+    };
+    load();
+    const unsub = subscribeOfflineUpdates(() => {
+      load();
+    });
+    return () => {
+      isMounted = false;
+      unsub();
+    };
+  }, []);
+
+  const handleDeleteOfflineTranslation = (id: string, name: string) => {
+    Alert.alert(
+      'Remove Downloaded Bible',
+      `Are you sure you want to remove ${name} from offline storage? You can re-download it at any time.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteDownloadedTranslation(id);
+              setDownloadedTranslations((prev) => prev.filter((item) => item.id !== id));
+            } catch (err) {
+              console.warn('Failed to remove downloaded translation:', err);
+            }
+          },
+        },
+      ]
+    );
   };
 
   // Reader Settings State: 1px to 24px
@@ -745,7 +800,78 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           </TouchableOpacity>
         </View>
 
-        {/* 4. LEGAL & POLICIES (ZERO ICONS) */}
+        {/* 4. OFFLINE BIBLES & TRANSLATIONS (ZERO ICONS IN HEADER, CONTINUOUS BODY) */}
+        <View style={styles.bodySection}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+            OFFLINE BIBLES & TRANSLATIONS
+          </Text>
+
+          <View style={styles.actionRow}>
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Offline Storage
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                {downloadedTranslations.length > 0
+                  ? `${downloadedTranslations.length} ${downloadedTranslations.length === 1 ? 'version' : 'versions'} ready offline • ${formatBytes(downloadedTranslations.reduce((acc, t) => acc + (t.sizeBytes || 0), 0))}`
+                  : '0 versions downloaded • Tap below to download'}
+              </Text>
+            </View>
+          </View>
+
+          {downloadedTranslations.map((item) => (
+            <React.Fragment key={item.id}>
+              <View style={styles.rowDivider} />
+              <View style={styles.offlineTranslationRow}>
+                <View style={styles.rowTitleBox}>
+                  <View style={styles.offlineNameBadgeRow}>
+                    <Text variant="h3" style={styles.rowTitle}>
+                      {item.name}
+                    </Text>
+                    <View style={styles.offlineReadyPill}>
+                      <CheckCircleSvg size={12} color="#10B981" />
+                      <Text style={styles.offlineReadyPillText}>Ready</Text>
+                    </View>
+                  </View>
+                  <Text variant="caption" color={colors.textSecondary}>
+                    {item.id.toUpperCase()} • {item.booksCount} Books • {item.sizeFormatted}
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => handleDeleteOfflineTranslation(item.id, item.name)}
+                  style={styles.deleteTranslationBtn}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Delete ${item.name} from offline storage`}
+                >
+                  <TrashSvg size={18} color="#94A3B8" />
+                </TouchableOpacity>
+              </View>
+            </React.Fragment>
+          ))}
+
+          <View style={styles.rowDivider} />
+
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={() => navigation.navigate('WOTD', { openTranslationPicker: true })}
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel="Manage or download translations in Bible Reader"
+          >
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={[styles.rowTitle, { color: colors.accent }]}>
+                Download Bible Versions
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                Select and download any of the 10 translations for offline study
+              </Text>
+            </View>
+            <DownloadSvg size={18} color={colors.accent} />
+          </TouchableOpacity>
+        </View>
+
+        {/* 5. LEGAL & POLICIES (ZERO ICONS) */}
         <View style={styles.bodySection}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             LEGAL & POLICIES
@@ -1029,6 +1155,36 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: 'rgba(15, 23, 42, 0.06)',
     marginVertical: 6,
+  },
+  offlineTranslationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+  },
+  offlineNameBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 2,
+  },
+  offlineReadyPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 1.5,
+    borderRadius: 6,
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+  },
+  offlineReadyPillText: {
+    fontSize: 9.5,
+    fontWeight: '700',
+    color: '#059669',
+  },
+  deleteTranslationBtn: {
+    padding: 8,
+    borderRadius: 8,
   },
   settingRowBlock: {
     paddingVertical: 4,
