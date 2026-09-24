@@ -25,6 +25,7 @@ import SearchScreen from '../screens/SearchScreen';
 import FavoritesScreen from '../screens/FavoritesScreen';
 import BookmarksScreen from '../screens/BookmarksScreen';
 import UnfoldedScreen from '../screens/UnfoldedScreen';
+import DownloadedVersesScreen from '../screens/DownloadedVersesScreen';
 import AchievementsScreen from '../screens/AchievementsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import FactDetailsScreen from '../screens/FactDetailsScreen';
@@ -60,6 +61,7 @@ export type RootStackParamList = {
   Favorites: undefined;
   Bookmarks: undefined;
   Unfolded: undefined;
+  DownloadedVerses: undefined;
   Achievements: undefined;
   TermsOfService: undefined;
   PrivacyPolicy: undefined;
@@ -76,6 +78,7 @@ function shouldShowTabHeader(route: any): boolean {
     'Favorites',
     'Bookmarks',
     'Unfolded',
+    'DownloadedVerses',
     'Achievements',
     'TermsOfService',
     'PrivacyPolicy',
@@ -200,6 +203,22 @@ function ProfileStack() {
           headerStyle: {
             backgroundColor: '#FFFFFF',
           },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+        }}
+      />
+      <Stack.Screen
+        name="DownloadedVerses"
+        component={DownloadedVersesScreen}
+        options={{
+          headerShown: true,
+          title: 'Downloaded Translations',
+          headerStyle: { backgroundColor: '#FFFFFF' },
           headerTitleStyle: {
             fontWeight: 'bold',
             color: '#0F172A',

@@ -805,18 +805,27 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
             OFFLINE BIBLES & TRANSLATIONS
           </Text>
 
-          <View style={styles.actionRow}>
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={() => navigation.navigate('DownloadedVerses')}
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel={`View ${downloadedTranslations.length} downloaded Bible translations`}
+          >
             <View style={styles.rowTitleBox}>
               <Text variant="h3" style={styles.rowTitle}>
-                Offline Storage
+                Downloaded Translations
               </Text>
               <Text variant="caption" color={colors.textSecondary}>
                 {downloadedTranslations.length > 0
-                  ? `${downloadedTranslations.length} ${downloadedTranslations.length === 1 ? 'version' : 'versions'} ready offline • ${formatBytes(downloadedTranslations.reduce((acc, t) => acc + (t.sizeBytes || 0), 0))}`
-                  : '0 versions downloaded • Tap below to download'}
+                  ? `${downloadedTranslations.length} ${downloadedTranslations.length === 1 ? 'version' : 'versions'} ready offline - ${formatBytes(downloadedTranslations.reduce((acc, t) => acc + (t.sizeBytes || 0), 0))}`
+                  : '0 versions downloaded - Tap to manage'}
               </Text>
             </View>
-          </View>
+            <Text variant="caption" weight="700" color={colors.accent}>
+              View
+            </Text>
+          </TouchableOpacity>
 
           {downloadedTranslations.map((item) => (
             <React.Fragment key={item.id}>
