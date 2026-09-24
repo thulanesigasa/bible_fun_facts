@@ -26,8 +26,13 @@ interface FactDetailsScreenProps {
 
 export default function FactDetailsScreen({ navigation, route }: FactDetailsScreenProps) {
   const { fact } = route.params;
-  const { toggleFavoriteFact, isFactFavorited, incrementSharesCount } = useUser();
+  const { toggleFavoriteFact, isFactFavorited, incrementSharesCount, markFactRead } = useUser();
   const isFavorited = isFactFavorited(fact.id);
+
+  const handleDone = () => {
+    markFactRead(fact.id);
+    navigation.goBack();
+  };
 
   const handleShare = async () => {
     try {
@@ -54,10 +59,10 @@ export default function FactDetailsScreen({ navigation, route }: FactDetailsScre
         <View style={styles.topHeader}>
           <TouchableOpacity
             style={styles.doneBtn}
-            onPress={() => navigation.goBack()}
+            onPress={handleDone}
             activeOpacity={0.8}
             accessibilityRole="button"
-            accessibilityLabel="Done"
+            accessibilityLabel="Mark as read and go back"
           >
             <Text variant="h3" style={styles.doneBtnText}>Done</Text>
           </TouchableOpacity>

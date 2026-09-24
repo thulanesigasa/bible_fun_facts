@@ -54,6 +54,7 @@ interface UserState {
   completedWOTDs: WOTDEntry[];
   streak: number;
   factsViewedCount: number;
+  readFactIds: string[];
   sharesCount: number;
   lastLoginDate: string | null;
   followedUserIds: string[];
@@ -77,6 +78,8 @@ interface AppContextType extends UserState {
   toggleFavoriteFact: (fact: Fact) => void;
   toggleFavoriteScripture: (scripture: Scripture) => void;
   markWOTDComplete: (wotd: WOTDEntry) => void;
+  markFactRead: (id: string) => void;
+  isFactRead: (id: string) => boolean;
   incrementFactsViewed: () => void;
   incrementSharesCount: () => void;
   isFactFavorited: (id: string) => boolean;
@@ -104,6 +107,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     completedWOTDs: [],
     streak: 1,
     factsViewedCount: 0,
+    readFactIds: [],
     sharesCount: 0,
     lastLoginDate: null,
     followedUserIds: [],
@@ -237,6 +241,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           lastLoginDate: finalLastLogin,
           favoritesFacts: Array.isArray(meta?.favoritesFacts) ? meta.favoritesFacts : prev.favoritesFacts,
           favoritesScriptures: Array.isArray(meta?.favoritesScriptures) ? meta.favoritesScriptures : prev.favoritesScriptures,
+          readFactIds: Array.isArray(meta?.readFactIds) ? meta.readFactIds : prev.readFactIds,
           bibleHighlights: meta?.bibleHighlights && typeof meta.bibleHighlights === 'object' ? meta.bibleHighlights : prev.bibleHighlights,
           lastReadBible: meta?.lastReadBible || prev.lastReadBible,
         };
@@ -808,6 +813,18 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  const markFactRead = (id: string) => {
+    setState(prev => {
+      if (prev.readFactIds.includes(id)) return prev;
+      const nextIds = [...prev.readFactIds, id];
+      const nextCount = nextIds.length;
+      syncUserDataToRemote({ readFactIds: nextIds, factsViewedCount: nextCount });
+      return { ...prev, readFactIds: nextIds, factsViewedCount: nextCount };
+    });
+  };
+
+  const isFactRead = (id: string) => state.readFactIds.includes(id);
+
   const incrementFactsViewed = () => {
     setState(prev => {
       const nextCount = prev.factsViewedCount + 1;
@@ -897,6 +914,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toggleFavoriteFact,
       toggleFavoriteScripture,
       markWOTDComplete,
+      markFactRead,
+      isFactRead,
       incrementFactsViewed,
       incrementSharesCount,
       isFactFavorited,
