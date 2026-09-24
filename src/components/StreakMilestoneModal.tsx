@@ -344,26 +344,50 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
               </Svg>
 
               <View style={styles.shareCardInner} collapsable={false}>
-                {/* 3D Multi-Shape Category Badge */}
+                {/* 1. Amber Shield Tier Badge / Pill at the top */}
+                <View style={styles.shareCardTierWrap}>
+                  <Text variant="caption" weight="800" style={[styles.shareCardTierLabel, { color: tierInfo.color }]}>
+                    {isCustom ? `${badgeLabel} MILESTONE` : tierInfo.badgeLabel}
+                  </Text>
+                </View>
+
+                {/* 2. 3D Multi-Shape Category Badge */}
                 <CategoryBadge
                   category={activeAchievement?.category || 'streak'}
                   shape={activeAchievement?.shape || 'hexagon'}
                   days={displayDays}
                   tier={displayTier}
-                  size={220}
+                  size={200}
                   label={badgeLabel}
                 />
-                {/* Title */}
-                <Text variant="h2" style={[styles.milestoneTitle, { marginTop: 14 }]}>
+
+                {/* 3. First Step Title */}
+                <Text variant="h2" style={styles.shareCardTitle}>
                   {displayTitle}
                 </Text>
-                {/* Verse */}
-                {displayVerseQuote ? (
-                  <Text variant="caption" color="#475569" style={[styles.verseQuoteText, { marginTop: 8, textAlign: 'center' }]}>
-                    "{displayVerseQuote}"
+
+                {/* 4. Epigram Subtitle (e.g. "The journey of 365 days begins with a single scripture.") */}
+                {displaySubtitle ? (
+                  <Text variant="body" color="#64748B" style={styles.shareCardSubtitle}>
+                    {displaySubtitle}
                   </Text>
                 ) : null}
-                {/* Powered by footer */}
+
+                {/* 5. Scripture Quote & Reference Box */}
+                {displayVerseQuote ? (
+                  <View style={styles.shareCardScriptureBlock}>
+                    <Text variant="caption" color="#475569" style={styles.shareCardVerseQuote}>
+                      "{displayVerseQuote}"
+                    </Text>
+                    {displayVerseRef ? (
+                      <Text variant="caption" weight="700" color={colors.accent} style={styles.shareCardVerseRef}>
+                        — {displayVerseRef}
+                      </Text>
+                    ) : null}
+                  </View>
+                ) : null}
+
+                {/* 6. Powered by exégeomai brand footer */}
                 <View style={styles.shareCardFooter}>
                   <Image
                     source={require('../../assets/logo-transparent.png')}
@@ -375,33 +399,6 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
                   </Text>
                 </View>
               </View>
-            </View>
-
-            {/* Title & Epigram Subtitle */}
-            <View style={styles.copyBlock}>
-              <Text variant="caption" weight="800" style={[styles.tierHeaderLabel, { color: tierInfo.color }]}>
-                {isCustom ? `${badgeLabel} MILESTONE` : tierInfo.badgeLabel}
-              </Text>
-              <Text variant="h1" style={styles.milestoneTitle}>
-                {displayTitle}
-              </Text>
-              <Text variant="body" color="#64748B" style={styles.milestoneSubtitle}>
-                {displaySubtitle}
-              </Text>
-
-              {/* Biblical Scripture Grounding */}
-              {displayVerseQuote ? (
-                <View style={styles.scriptureBlock}>
-                  <Text variant="caption" color="#475569" style={styles.verseQuoteText}>
-                    "{displayVerseQuote}"
-                  </Text>
-                  {displayVerseRef ? (
-                    <Text variant="caption" weight="700" color={colors.accent} style={styles.verseRefText}>
-                      — {displayVerseRef}
-                    </Text>
-                  ) : null}
-                </View>
-              ) : null}
             </View>
 
 
@@ -600,22 +597,84 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: '#FFFFFF',
     marginTop: 8,
-    marginBottom: 8,
+    marginBottom: 16,
     borderRadius: 22,
     borderWidth: 1,
     borderColor: 'rgba(217, 119, 6, 0.16)',
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
   },
   shareCardInner: {
     alignItems: 'center',
     width: '100%',
     backgroundColor: 'transparent',
-    paddingVertical: 18,
-    paddingHorizontal: 16,
+    paddingVertical: 20,
+    paddingHorizontal: 18,
+  },
+  shareCardTierWrap: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
+    marginBottom: 14,
+  },
+  shareCardTierLabel: {
+    fontSize: 11,
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+  },
+  shareCardTitle: {
+    fontSize: 26,
+    fontWeight: '800',
+    color: '#0F172A',
+    textAlign: 'center',
+    marginTop: 12,
+    marginBottom: 6,
+    letterSpacing: -0.4,
+  },
+  shareCardSubtitle: {
+    fontSize: 13.5,
+    lineHeight: 19,
+    textAlign: 'center',
+    color: '#64748B',
+    paddingHorizontal: 8,
+    marginBottom: 10,
+  },
+  shareCardScriptureBlock: {
+    width: '100%',
+    marginTop: 4,
+    marginBottom: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    backgroundColor: 'rgba(15, 23, 42, 0.03)',
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.06)',
+  },
+  shareCardVerseQuote: {
+    fontStyle: 'italic',
+    textAlign: 'center',
+    fontSize: 12.5,
+    lineHeight: 18,
+    color: '#334155',
+  },
+  shareCardVerseRef: {
+    marginTop: 4,
+    fontSize: 11.5,
+    letterSpacing: 0.3,
+    textAlign: 'center',
   },
   shareCardFooter: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: 6,
     gap: 6,
   },
   shareCardLogo: {
@@ -624,53 +683,6 @@ const styles = StyleSheet.create({
   },
   shareCardAppName: {
     fontSize: 13,
-    letterSpacing: 0.3,
-  },
-  copyBlock: {
-    alignItems: 'center',
-    maxWidth: 320,
-    marginBottom: 12,
-  },
-  tierHeaderLabel: {
-    fontSize: 11,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-    marginBottom: 6,
-    textAlign: 'center',
-  },
-  milestoneTitle: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#0F172A',
-    textAlign: 'center',
-    marginBottom: 6,
-    letterSpacing: -0.5,
-  },
-  milestoneSubtitle: {
-    fontSize: 15,
-    lineHeight: 22,
-    textAlign: 'center',
-    color: '#64748B',
-  },
-  scriptureBlock: {
-    marginTop: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: 'rgba(15, 23, 42, 0.03)',
-    borderRadius: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
-  },
-  verseQuoteText: {
-    fontStyle: 'italic',
-    textAlign: 'center',
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  verseRefText: {
-    marginTop: 4,
-    fontSize: 12,
     letterSpacing: 0.3,
   },
 
