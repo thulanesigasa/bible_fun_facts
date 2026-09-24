@@ -19,19 +19,12 @@ import {
   DownloadedTranslationMeta,
   TRANSLATION_SOURCES,
   TranslationSourceConfig,
-  TranslationCategory,
 } from '../services/bibleService';
 import { DownloadSvg, TrashSvg, CheckSvg } from '../components/SvgIcons';
 
 interface DownloadedVersesScreenProps {
   navigation: any;
 }
-
-const CATEGORY_TITLES: Record<TranslationCategory, string> = {
-  african: 'SOUTH AFRICAN & AFRICAN TRANSLATIONS',
-  popular: 'POPULAR MODERN TRANSLATIONS',
-  classic: 'CLASSIC & HISTORIC TRANSLATIONS',
-};
 
 export default function DownloadedVersesScreen({ navigation }: DownloadedVersesScreenProps) {
   const [downloaded, setDownloaded] = useState<DownloadedTranslationMeta[]>([]);
@@ -122,13 +115,9 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
 
   const downloadedIds = useMemo(() => new Set(downloaded.map((d) => d.id)), [downloaded]);
 
-  const availableByCategory = useMemo(() => {
+  const availableTranslations = useMemo(() => {
     const all = Object.values(TRANSLATION_SOURCES);
-    return {
-      african: all.filter((t) => t.category === 'african' && !downloadedIds.has(t.id)),
-      popular: all.filter((t) => t.category === 'popular' && !downloadedIds.has(t.id)),
-      classic: all.filter((t) => t.category === 'classic' && !downloadedIds.has(t.id)),
-    };
+    return all.filter((t) => !downloadedIds.has(t.id));
   }, [downloadedIds]);
 
   return (
@@ -206,80 +195,75 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
             </View>
           )}
 
-          {/* 2. AVAILABLE SECTIONS BY CATEGORY */}
-          {(['african', 'popular', 'classic'] as TranslationCategory[]).map((cat) => {
-            const list = availableByCategory[cat];
-            if (!list || list.length === 0) return null;
+          {/* 2. AVAILABLE TRANSLATIONS (PLAIN UNIFIED LIST) */}
+          {availableTranslations.length > 0 && (
+            <View style={styles.sectionWrap}>
+              <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+                AVAILABLE TRANSLATIONS ({availableTranslations.length})
+              </Text>
+              <View style={styles.cardContainer}>
+                {availableTranslations.map((source, index) => {
+                  const isLast = index === availableTranslations.length - 1;
+                  const isDownloading = downloadingId === source.id;
+                  const progress = downloadProgress[source.id] || 0;
 
-            return (
-              <View key={cat} style={styles.sectionWrap}>
-                <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
-                  {CATEGORY_TITLES[cat]}
-                </Text>
-                <View style={styles.cardContainer}>
-                  {list.map((source, index) => {
-                    const isLast = index === list.length - 1;
-                    const isDownloading = downloadingId === source.id;
-                    const progress = downloadProgress[source.id] || 0;
-
-                    return (
-                      <View key={source.id} style={[styles.row, !isLast && styles.rowDivider]}>
-                        <View style={styles.rowLeft}>
-                          <Text variant="h3" style={styles.translationAbbr}>
-                            {source.abbreviation}
-                          </Text>
-                          <Text
-                            variant="body"
-                            weight="600"
-                            color={colors.textPrimary}
-                            style={styles.translationName}
-                          >
-                            {source.name}
-                          </Text>
-                          <Text variant="caption" color={colors.textSecondary} style={styles.descText}>
-                            {source.description} - {source.sizeEstimate}
-                          </Text>
-
-                          {/* Live download progress bar */}
-                          {isDownloading && (
-                            <View style={styles.progressWrap}>
-                              <View style={styles.progressBarTrack}>
-                                <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
-                              </View>
-                              <Text variant="caption" color={colors.textSecondary} style={styles.progressText}>
-                                Downloading 66 books... {progress}%
-                              </Text>
-                            </View>
-                          )}
-                        </View>
-
-                        {/* Download CTA Button */}
-                        <TouchableOpacity
-                          style={[styles.downloadBtn, isDownloading && styles.downloadBtnDisabled]}
-                          onPress={() => handleDownload(source)}
-                          disabled={Boolean(downloadingId)}
-                          activeOpacity={0.8}
-                          accessibilityRole="button"
-                          accessibilityLabel={`Download ${source.name} for offline reading`}
+                  return (
+                    <View key={source.id} style={[styles.row, !isLast && styles.rowDivider]}>
+                      <View style={styles.rowLeft}>
+                        <Text variant="h3" style={styles.translationAbbr}>
+                          {source.abbreviation}
+                        </Text>
+                        <Text
+                          variant="body"
+                          weight="600"
+                          color={colors.textPrimary}
+                          style={styles.translationName}
                         >
-                          {isDownloading ? (
-                            <ActivityIndicator size="small" color="#0F172A" />
-                          ) : (
-                            <>
-                              <DownloadSvg size={14} color="#0F172A" strokeWidth={2} />
-                              <Text variant="caption" weight="700" color="#0F172A">
-                                Download
-                              </Text>
-                            </>
-                          )}
-                        </TouchableOpacity>
+                          {source.name}
+                        </Text>
+                        <Text variant="caption" color={colors.textSecondary} style={styles.descText}>
+                          {source.description} - {source.sizeEstimate}
+                        </Text>
+
+                        {/* Live download progress bar */}
+                        {isDownloading && (
+                          <View style={styles.progressWrap}>
+                            <View style={styles.progressBarTrack}>
+                              <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
+                            </View>
+                            <Text variant="caption" color={colors.textSecondary} style={styles.progressText}>
+                              Downloading 66 books... {progress}%
+                            </Text>
+                          </View>
+                        )}
                       </View>
-                    );
-                  })}
-                </View>
+
+                      {/* Download CTA Button */}
+                      <TouchableOpacity
+                        style={[styles.downloadBtn, isDownloading && styles.downloadBtnDisabled]}
+                        onPress={() => handleDownload(source)}
+                        disabled={Boolean(downloadingId)}
+                        activeOpacity={0.8}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Download ${source.name} for offline reading`}
+                      >
+                        {isDownloading ? (
+                          <ActivityIndicator size="small" color="#0F172A" />
+                        ) : (
+                          <>
+                            <DownloadSvg size={14} color="#0F172A" strokeWidth={2} />
+                            <Text variant="caption" weight="700" color="#0F172A">
+                              Download
+                            </Text>
+                          </>
+                        )}
+                      </TouchableOpacity>
+                    </View>
+                  );
+                })}
               </View>
-            );
-          })}
+            </View>
+          )}
         </ScrollView>
       )}
     </SafeAreaView>

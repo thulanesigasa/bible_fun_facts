@@ -82,13 +82,12 @@ const TRANSLATION_LABELS: Record<string, string> = Object.fromEntries(
   Object.entries(TRANSLATION_SOURCES).map(([k, v]) => [k, v.abbreviation || k.toUpperCase()])
 );
 
-const TRANSLATION_META: Record<string, { name: string; desc: string; tag: string }> = Object.fromEntries(
+const TRANSLATION_META: Record<string, { name: string; desc: string }> = Object.fromEntries(
   Object.entries(TRANSLATION_SOURCES).map(([k, v]) => [
     k,
     {
       name: v.name,
       desc: v.description,
-      tag: v.category === 'african' ? 'AFRICAN' : v.category === 'popular' ? 'MODERN' : 'CLASSIC',
     },
   ])
 );
@@ -998,11 +997,6 @@ export default function WOTDScreen({ route, navigation }: any) {
                             <Text style={[styles.translationKey, { color: isActive ? colors.accent : theme.text }]}>
                               {TRANSLATION_LABELS[key]}
                             </Text>
-                            <View style={[styles.translationTag, { backgroundColor: isActive ? colors.accent : 'rgba(15,23,42,0.07)' }]}>
-                              <Text style={[styles.translationTagText, { color: isActive ? '#0F172A' : theme.textSecondary }]}>
-                                {meta.tag}
-                              </Text>
-                            </View>
                             {isDownloaded && (
                               <Text style={[styles.downloadedStatusText, { color: theme.textSecondary }]}>
                                 Offline Ready
