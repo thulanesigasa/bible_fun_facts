@@ -745,10 +745,10 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           <View style={styles.actionRow}>
             <View style={styles.rowTitleBox}>
               <Text variant="h3" style={styles.rowTitle}>
-                Daily Devotional Reminder
+                Daily Word & Devotional Reminders
               </Text>
               <Text variant="caption" color={colors.textSecondary}>
-                Morning inspiration at 08:00 AM
+                Morning Word (08:00 AM), Midday Affirmations & Evening Streak Guardian
               </Text>
             </View>
             <UiverseSwitch

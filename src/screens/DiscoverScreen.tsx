@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   View,
   ScrollView,
@@ -26,6 +26,7 @@ import {
 import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
 import { StreakHexagonBadge } from '../components/StreakHexagonBadge';
 import { getTierInfoForDays } from '../data/streakMilestones';
+import { registerAllAutomatedNotifications } from '../services/notifications';
 
 interface DiscoverScreenProps {
   navigation: any;
@@ -48,6 +49,12 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
   const dayOfYear = useMemo(() => getDayOfYear(), []);
   const todayMessage: DailyMessage = useMemo(() => getDailyMessage(), []);
   const streakInfo = useMemo(() => getTierInfoForDays(streak || 1), [streak]);
+
+  useEffect(() => {
+    if (userProfile?.notificationsEnabled ?? true) {
+      registerAllAutomatedNotifications().catch(() => {});
+    }
+  }, [userProfile?.notificationsEnabled]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
