@@ -18,15 +18,18 @@ interface UnfoldedScreenProps {
 }
 
 export default function UnfoldedScreen({ navigation }: UnfoldedScreenProps) {
-  const { factsViewedCount } = useUser();
+  useUser(); // keeps context subscription alive for realtime streak sync
   const dayOfYear = useMemo(() => getDayOfYear(), []);
 
-  // Determine how many days have been unfolded: at least today's, or user's count
+  // Today's day-of-year is the authoritative ceiling — every day from Day 1
+  // up to and including today has been "unfolded". factsViewedCount from
+  // Supabase is a stale engagement counter, NOT the calendar window.
   const unlockedCount = useMemo(() => {
-    return Math.max(1, Math.min(365, factsViewedCount || dayOfYear));
-  }, [factsViewedCount, dayOfYear]);
+    return Math.max(1, Math.min(365, dayOfYear));
+  }, [dayOfYear]);
 
-  // Reverse so newest unfolded insight is at the top
+  // Slice DAILY_MESSAGES[0..unlockedCount-1] (Day 1 → today), then reverse
+  // so today's entry appears at the top of the list.
   const unfoldedFacts: DailyMessage[] = useMemo(() => {
     return DAILY_MESSAGES.slice(0, unlockedCount).reverse();
   }, [unlockedCount]);
