@@ -530,7 +530,7 @@ exégeomai integrates complete, authentic 66-book canonical translations for Sou
 
 ### 4. Dedicated Offline Downloads Hub (`DownloadedVersesScreen.tsx`)
 - **Separated Offline Library**: Isolates downloaded offline Bibles from available versions with direct 1-tap jump to the Word Reader (`translationOverride`).
-- **Available Catalog Categorization**: Neatly categorized by South African Translations, Modern English, and Classic Editions.
+- **Unified Available Catalog**: Clean, unified continuous list of all 24 available scripture translations with zero category pills or sub-header clutter.
 - **Live Percentage Progress Tracking**: Provides immediate visual feedback during multi-megabyte package downloads with background download resilience.
 - **Clean Flat Body Standard**: Completely devoid of indicator badges, tags, or pills in strict adherence to Rule 16 and the 60-30-10 design system.
 
