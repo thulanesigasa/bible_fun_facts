@@ -21,57 +21,116 @@ export interface RawBibleBook {
   chapters: string[][];
 }
 
-// Translation CDN source mapping (verified public domain JSON sources)
-export const TRANSLATION_SOURCES: Record<string, { url: string; fallbackUrl?: string; name: string; sizeEstimate: string }> = {
+// Translation CDN source mapping (verified public domain JSON sources with multi-CDN redundancy)
+export const TRANSLATION_SOURCES: Record<
+  string,
+  {
+    url: string;
+    urls: string[];
+    fallbackUrl?: string;
+    name: string;
+    sizeEstimate: string;
+  }
+> = {
   web: {
-    url: 'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_web.json',
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_web.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_web.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_web.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_web.json',
+    ],
     name: 'World English Bible',
-    sizeEstimate: '4.1 MB',
-  },
-  kjv: {
-    url: 'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_kjv.json',
-    name: 'King James Version',
-    sizeEstimate: '4.2 MB',
-  },
-  asv: {
-    url: 'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_asv.json',
-    name: 'American Standard Version',
-    sizeEstimate: '4.2 MB',
-  },
-  bbe: {
-    url: 'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_bbe.json',
-    name: 'Bible in Basic English',
     sizeEstimate: '4.0 MB',
   },
+  kjv: {
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_kjv.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_kjv.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_kjv.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_kjv.json',
+    ],
+    name: 'King James Version',
+    sizeEstimate: '4.1 MB',
+  },
+  asv: {
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_asv.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_asv.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_asv.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_asv.json',
+    ],
+    name: 'American Standard Version',
+    sizeEstimate: '4.1 MB',
+  },
+  bbe: {
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_bbe.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_bbe.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_bbe.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_bbe.json',
+    ],
+    name: 'Bible in Basic English',
+    sizeEstimate: '4.1 MB',
+  },
   darby: {
-    url: 'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_darby.json',
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_darby.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_darby.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_darby.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_darby.json',
+    ],
     name: 'Darby Bible',
-    sizeEstimate: '4.2 MB',
+    sizeEstimate: '4.0 MB',
   },
   dra: {
-    url: 'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_dra.json',
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_dra.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_dra.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_dra.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_dra.json',
+    ],
     name: 'Douay-Rheims 1899',
-    sizeEstimate: '4.3 MB',
+    sizeEstimate: '4.0 MB',
   },
   ylt: {
-    url: 'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_ylt98.json',
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_ylt98.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_ylt98.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_ylt98.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_ylt98.json',
+    ],
     name: "Young's Literal Translation",
-    sizeEstimate: '4.2 MB',
+    sizeEstimate: '4.1 MB',
   },
   webbe: {
-    url: 'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_webbe.json',
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_webbe.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_webbe.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_webbe.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_webbe.json',
+    ],
     name: 'World English Bible (British)',
-    sizeEstimate: '4.1 MB',
+    sizeEstimate: '4.0 MB',
   },
   'oeb-us': {
-    url: 'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_webus.json',
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_webus.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_webus.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_webus.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_webus.json',
+    ],
     name: 'Open English Bible (US)',
-    sizeEstimate: '4.1 MB',
+    sizeEstimate: '3.9 MB',
   },
   'oeb-cw': {
-    url: 'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_web.json',
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_web.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_web.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_web.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_web.json',
+    ],
     name: 'Open English Bible (Commonwealth)',
-    sizeEstimate: '4.1 MB',
+    sizeEstimate: '4.0 MB',
   },
 };
 
@@ -102,12 +161,23 @@ function notifySubscribers() {
 }
 
 /**
- * Format bytes to readable string (e.g. 4.2 MB)
+ * Format bytes to readable string (e.g. 4.1 MB)
  */
 export function formatBytes(bytes: number): string {
   if (bytes <= 0) return '0 B';
   const mb = bytes / (1024 * 1024);
   return `${mb.toFixed(1)} MB`;
+}
+
+/**
+ * Strip UTF-8 BOM (\uFEFF) and trim leading/trailing whitespace
+ */
+export function sanitizeJsonText(text: string): string {
+  if (!text) return '';
+  if (text.charCodeAt(0) === 0xfeff) {
+    return text.slice(1).trim();
+  }
+  return text.trim();
 }
 
 /**
@@ -166,7 +236,7 @@ function getTranslationFilePath(translationId: string): string {
 }
 
 /**
- * Load translation books into memory cache
+ * Load translation books into memory cache with automatic BOM stripping
  */
 async function loadTranslationIntoMemory(translationId: string): Promise<RawBibleBook[] | null> {
   if (memoryTranslationData.has(translationId)) {
@@ -181,7 +251,8 @@ async function loadTranslationIntoMemory(translationId: string): Promise<RawBibl
     }
 
     const content = await FileSystem.readAsStringAsync(filePath);
-    const parsed: RawBibleBook[] = JSON.parse(content);
+    const cleanContent = sanitizeJsonText(content);
+    const parsed: RawBibleBook[] = JSON.parse(cleanContent);
     if (Array.isArray(parsed) && parsed.length > 0) {
       memoryTranslationData.set(translationId, parsed);
       return parsed;
@@ -193,7 +264,7 @@ async function loadTranslationIntoMemory(translationId: string): Promise<RawBibl
 }
 
 /**
- * Download a full translation package with progress tracking
+ * Download a full translation package with multi-CDN fallback, progress tracking, and BOM resilience
  */
 export async function downloadTranslation(
   translationId: string,
@@ -207,7 +278,7 @@ export async function downloadTranslation(
   await ensureDirExists();
   const filePath = getTranslationFilePath(translationId);
 
-  // If already exists, delete first to ensure fresh download
+  // If already exists, delete first to ensure fresh clean download
   try {
     const existing = await FileSystem.getInfoAsync(filePath);
     if (existing.exists) {
@@ -215,43 +286,125 @@ export async function downloadTranslation(
     }
   } catch {}
 
-  // Initial progress
+  // Initial progress signal
   if (onProgress) onProgress(5);
 
-  const downloadResumable = FileSystem.createDownloadResumable(
-    source.url,
-    filePath,
-    {},
-    (progressData) => {
-      if (progressData.totalBytesExpectedToWrite > 0) {
-        const pct = Math.floor(
-          (progressData.totalBytesWritten / progressData.totalBytesExpectedToWrite) * 90
-        );
-        if (onProgress) onProgress(Math.min(90, Math.max(10, pct)));
-      }
-    }
-  );
+  const candidateUrls = source.urls && source.urls.length > 0 ? source.urls : [source.url];
+  let downloadSuccess = false;
+  let parsedBooks: RawBibleBook[] | null = null;
+  let lastError: Error | null = null;
 
-  const result = await downloadResumable.downloadAsync();
-  if (!result || !result.uri) {
-    throw new Error(`Failed to download translation ${translationId}`);
+  for (let i = 0; i < candidateUrls.length; i++) {
+    const mirrorUrl = candidateUrls[i];
+    try {
+      if (onProgress) onProgress(10 + i * 5);
+
+      // Strategy 1: Attempt FileSystem.createDownloadResumable
+      let succeededWithResumable = false;
+      try {
+        const downloadResumable = FileSystem.createDownloadResumable(
+          mirrorUrl,
+          filePath,
+          {},
+          (progressData) => {
+            if (progressData.totalBytesExpectedToWrite > 0) {
+              const pct = Math.floor(
+                (progressData.totalBytesWritten / progressData.totalBytesExpectedToWrite) * 85
+              );
+              if (onProgress) onProgress(Math.min(90, Math.max(10, pct)));
+            } else if (progressData.totalBytesWritten > 0) {
+              // Interpolate for chunked transfers without content-length header (~4.2MB estimated)
+              const estimatedBytes = 4300000;
+              const pct = Math.floor((progressData.totalBytesWritten / estimatedBytes) * 85);
+              if (onProgress) onProgress(Math.min(90, Math.max(10, pct)));
+            }
+          }
+        );
+
+        const result = await downloadResumable.downloadAsync();
+        if (result && result.uri && (!result.status || result.status === 200)) {
+          succeededWithResumable = true;
+        } else {
+          console.warn(
+            `createDownloadResumable returned non-200 status (${result?.status}) for ${mirrorUrl}`
+          );
+        }
+      } catch (resumableErr) {
+        console.warn(`createDownloadResumable error for ${mirrorUrl}:`, resumableErr);
+      }
+
+      // Strategy 2: If resumable failed or returned non-200, attempt direct fetch fallback
+      if (!succeededWithResumable) {
+        if (onProgress) onProgress(35 + i * 10);
+        const response = await fetch(mirrorUrl, {
+          headers: {
+            Accept: 'application/json',
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status} from mirror: ${mirrorUrl}`);
+        }
+        const textPayload = await response.text();
+        const cleanPayload = sanitizeJsonText(textPayload);
+        const booksCandidate: RawBibleBook[] = JSON.parse(cleanPayload);
+        if (!Array.isArray(booksCandidate) || booksCandidate.length < 66) {
+          throw new Error(
+            `Invalid books array (${booksCandidate?.length || 0}) from ${mirrorUrl}`
+          );
+        }
+        // Write verified clean JSON directly
+        await FileSystem.writeAsStringAsync(filePath, cleanPayload);
+        parsedBooks = booksCandidate;
+        downloadSuccess = true;
+        break;
+      }
+
+      // If we downloaded via resumable, inspect and sanitize file content
+      const fileInfo = await FileSystem.getInfoAsync(filePath);
+      if (!fileInfo.exists) {
+        throw new Error(`Downloaded file missing at ${filePath}`);
+      }
+
+      const text = await FileSystem.readAsStringAsync(filePath);
+      const clean = sanitizeJsonText(text);
+      const books: RawBibleBook[] = JSON.parse(clean);
+
+      if (!Array.isArray(books) || books.length < 66) {
+        throw new Error(`Downloaded Bible has ${books?.length || 0} books (expected >= 66)`);
+      }
+
+      // If file had BOM or whitespace, rewrite with sanitized text so future disk reads are fast & clean
+      if (text.charCodeAt(0) === 0xfeff || text.length !== clean.length) {
+        await FileSystem.writeAsStringAsync(filePath, clean);
+      }
+
+      parsedBooks = books;
+      downloadSuccess = true;
+      break;
+    } catch (err: any) {
+      console.warn(`Mirror failed (${mirrorUrl}):`, err?.message || err);
+      lastError = err;
+      // Clean up partial invalid file before trying next mirror
+      try {
+        await FileSystem.deleteAsync(filePath, { idempotent: true });
+      } catch {}
+    }
+  }
+
+  if (!downloadSuccess || !parsedBooks) {
+    throw new Error(
+      `Failed to download ${source.name} after trying ${candidateUrls.length} mirrors. ${lastError?.message || ''}`
+    );
   }
 
   if (onProgress) onProgress(95);
 
-  // Verify file integrity
-  const fileInfo = await FileSystem.getInfoAsync(filePath);
-  const sizeBytes = (fileInfo as any).size || 4000000;
-
-  // Validate JSON contents
-  const text = await FileSystem.readAsStringAsync(filePath);
-  const books: RawBibleBook[] = JSON.parse(text);
-  if (!Array.isArray(books) || books.length < 66) {
-    throw new Error(`Downloaded file is invalid or incomplete for ${translationId}`);
-  }
+  // File integrity & sizing
+  const finalInfo = await FileSystem.getInfoAsync(filePath);
+  const sizeBytes = (finalInfo as any).size || 4200000;
 
   // Populate memory cache immediately
-  memoryTranslationData.set(translationId, books);
+  memoryTranslationData.set(translationId, parsedBooks);
 
   const meta: DownloadedTranslationMeta = {
     id: translationId,
@@ -259,11 +412,11 @@ export async function downloadTranslation(
     downloadedAt: Date.now(),
     sizeBytes,
     sizeFormatted: formatBytes(sizeBytes),
-    booksCount: books.length,
+    booksCount: parsedBooks.length,
     isComplete: true,
   };
 
-  // Update registry
+  // Update persistent registry
   const currentList = await getDownloadedTranslations();
   const updatedList = currentList.filter((item) => item.id !== translationId);
   updatedList.push(meta);
@@ -306,7 +459,9 @@ export async function deleteDownloadedTranslation(translationId: string): Promis
  */
 function findBookIndex(bookName: string): number {
   const norm = bookName.trim().toLowerCase();
-  return BIBLE_BOOKS.findIndex((b) => b.name.toLowerCase() === norm);
+  return BIBLE_BOOKS.findIndex(
+    (b) => b.name.toLowerCase() === norm || b.id.toLowerCase() === norm
+  );
 }
 
 /**
@@ -338,7 +493,8 @@ export async function getOfflineChapter(
   }
 
   const canonicalBook = BIBLE_BOOKS[bookIdx];
-  const translationName = TRANSLATION_SOURCES[translationId]?.name || translationId.toUpperCase();
+  const translationName =
+    TRANSLATION_SOURCES[translationId]?.name || translationId.toUpperCase();
 
   const verses = rawVerses.map((verseText, vIdx) => ({
     book_id: canonicalBook.id,
