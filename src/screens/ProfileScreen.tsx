@@ -799,7 +799,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           </TouchableOpacity>
         </View>
 
-        {/* 4. OFFLINE BIBLES & TRANSLATIONS (ZERO ICONS IN HEADER, CONTINUOUS BODY) */}
+        {/* 4. OFFLINE BIBLES & TRANSLATIONS */}
         <View style={styles.bodySection}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             OFFLINE BIBLES & TRANSLATIONS
@@ -810,7 +810,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
             onPress={() => navigation.navigate('DownloadedVerses')}
             activeOpacity={0.75}
             accessibilityRole="button"
-            accessibilityLabel={`View ${downloadedTranslations.length} downloaded Bible translations`}
+            accessibilityLabel="View downloaded Bible translations"
           >
             <View style={styles.rowTitleBox}>
               <Text variant="h3" style={styles.rowTitle}>
@@ -818,58 +818,10 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
               </Text>
               <Text variant="caption" color={colors.textSecondary}>
                 {downloadedTranslations.length > 0
-                  ? `${downloadedTranslations.length} ${downloadedTranslations.length === 1 ? 'version' : 'versions'} ready offline - ${formatBytes(downloadedTranslations.reduce((acc, t) => acc + (t.sizeBytes || 0), 0))}`
-                  : '0 versions downloaded - Tap to manage'}
+                  ? `${downloadedTranslations.length} ${downloadedTranslations.length === 1 ? 'version' : 'versions'} ready offline`
+                  : 'No versions downloaded yet'}
               </Text>
             </View>
-            <Text variant="caption" weight="700" color={colors.accent}>
-              View
-            </Text>
-          </TouchableOpacity>
-
-          {downloadedTranslations.map((item) => (
-            <React.Fragment key={item.id}>
-              <View style={styles.rowDivider} />
-              <View style={styles.offlineTranslationRow}>
-                <View style={styles.rowTitleBox}>
-                  <Text variant="h3" style={styles.rowTitle}>
-                    {item.name}
-                  </Text>
-                  <Text variant="caption" color={colors.textSecondary}>
-                    {item.id.toUpperCase()} • {item.booksCount} Books • {item.sizeFormatted} • Offline Ready
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  onPress={() => handleDeleteOfflineTranslation(item.id, item.name)}
-                  style={styles.deleteTranslationBtn}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Delete ${item.name} from offline storage`}
-                >
-                  <TrashSvg size={18} color="#94A3B8" />
-                </TouchableOpacity>
-              </View>
-            </React.Fragment>
-          ))}
-
-          <View style={styles.rowDivider} />
-
-          <TouchableOpacity
-            style={styles.actionRow}
-            onPress={() => navigation.navigate('WOTD', { openTranslationPicker: true })}
-            activeOpacity={0.75}
-            accessibilityRole="button"
-            accessibilityLabel="Manage or download translations in Bible Reader"
-          >
-            <View style={styles.rowTitleBox}>
-              <Text variant="h3" style={[styles.rowTitle, { color: colors.accent }]}>
-                Download Bible Versions
-              </Text>
-              <Text variant="caption" color={colors.textSecondary}>
-                Select and download any of the 10 translations for offline study
-              </Text>
-            </View>
-            <DownloadSvg size={18} color={colors.accent} />
           </TouchableOpacity>
         </View>
 
