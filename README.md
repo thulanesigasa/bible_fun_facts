@@ -491,6 +491,7 @@ The metallic shield badges implement 4 distinct, prestigiously calibrated color 
 - **Direct Profile Body Integration**: In `ProfileScreen.tsx`, Daily Study Streak is placed directly into the screen body under `STUDY ACHIEVEMENTS` alongside Study Achievements (zero icons, zero enclosing divs) ensuring streak is directly part of the profile settings body.
 - **Tamper-Proof Streak Integrity**: Daily study streak editing controls (numeric inputs and +/- steppers) have been strictly removed. Streaks can no longer be manually manipulated; progress is solely and authentically earned through the daily Scripture study engagement lifecycle.
 - **Unified Modal Layout**: Eliminates redundant lower copy blocks, keeping the modal clean and focused directly on the self-contained card and horizontal milestone shelf.
+- **Headerless Immersive Modal Architecture**: Removed the top close X button and header bar in `StreakMilestoneModal.tsx`. Dismissal is cleanly handled via the prominent bottom "Continue Reading" action button or native hardware back gestures.
 - **Interactive Milestone Shelf**: Horizontal carousel letting users preview all 9 milestone badges, unlock states, and countdowns.
 - **One-Tap High-Resolution Sharing**: Preflight-checked PNG bitmap sharing via `react-native-view-shot` and `expo-sharing` with graceful text fallback.
 

@@ -32,7 +32,6 @@ import {
 } from '../data/achievements';
 import { useUser, useApp } from '../context/UserContext';
 import {
-  CloseSvg,
   CheckSvg,
   LockSvg,
   ShareSvg,
@@ -299,20 +298,7 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
       pointerEvents="auto"
     >
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-        {/* Top Bar: Close Button only */}
-        <View style={styles.topBar}>
-          <View style={{ flex: 1 }} />
-          <TouchableOpacity
-            style={styles.closeBtn}
-            onPress={onClose}
-            activeOpacity={0.75}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            accessibilityRole="button"
-            accessibilityLabel="Close achievement modal"
-          >
-            <CloseSvg size={20} color="#0F172A" strokeWidth={2.5} />
-          </TouchableOpacity>
-        </View>
+
 
         <ScrollView
           ref={scrollViewRef}
@@ -572,26 +558,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  topBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 8,
-  },
-  closeBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   scrollContent: {
     paddingHorizontal: 24,
+    paddingTop: 16,
     paddingBottom: 40,
     alignItems: 'center',
   },
