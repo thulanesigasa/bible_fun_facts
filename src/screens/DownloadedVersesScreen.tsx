@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   FlatList,
@@ -17,7 +17,7 @@ import {
   subscribeOfflineUpdates,
   DownloadedTranslationMeta,
 } from '../services/bibleService';
-import { DownloadSvg, TrashSvg, BookOpenSvg } from '../components/SvgIcons';
+import { DownloadSvg, TrashSvg } from '../components/SvgIcons';
 
 interface DownloadedVersesScreenProps {
   navigation: any;
@@ -109,16 +109,9 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
         accessibilityLabel={`Open ${meta?.name || item.id} in Bible reader`}
       >
         <View style={styles.rowLeft}>
-          <View style={styles.rowTopLine}>
-            <Text variant="h3" style={styles.translationAbbr}>
-              {item.id.toUpperCase()}
-            </Text>
-            {meta?.tag ? (
-              <Text variant="caption" weight="700" style={styles.tagText}>
-                {meta.tag}
-              </Text>
-            ) : null}
-          </View>
+          <Text variant="h3" style={styles.translationAbbr}>
+            {item.id.toUpperCase()}
+          </Text>
           <Text variant="body" weight="600" color={colors.textPrimary} style={styles.translationName}>
             {meta?.name || item.id.toUpperCase()}
           </Text>
@@ -126,12 +119,6 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
             {meta?.desc ?? 'Public domain'}
             {item.sizeBytes ? ` - ${formatSize(item.sizeBytes)}` : ''}
           </Text>
-          <View style={styles.openCueRow}>
-            <BookOpenSvg size={12} color={colors.accent} />
-            <Text variant="caption" weight="700" color={colors.accent} style={styles.openCueText}>
-              Open in Word Reader
-            </Text>
-          </View>
         </View>
         <TouchableOpacity
           style={styles.deleteBtn}
@@ -211,24 +198,9 @@ const styles = StyleSheet.create({
   },
   rowDivider: { borderBottomWidth: 1, borderBottomColor: 'rgba(15, 23, 42, 0.06)' },
   rowLeft:    { flex: 1, paddingRight: spacing.sm },
-  rowTopLine: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 2 },
   translationAbbr: { fontSize: 15, fontWeight: '800', color: colors.textPrimary, letterSpacing: 0.5 },
-  tagText: {
-    fontSize: 10,
-    letterSpacing: 0.8,
-    backgroundColor: 'rgba(253, 210, 35, 0.12)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 99,
-    borderWidth: 1,
-    borderColor: 'rgba(253, 210, 35, 0.28)',
-    overflow: 'hidden',
-    color: '#B45309',
-  },
   translationName: { fontSize: 13.5, marginBottom: 2 },
-  descText:        { fontSize: 12, lineHeight: 17, marginBottom: 6 },
-  openCueRow:      { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  openCueText:     { fontSize: 12 },
+  descText:        { fontSize: 12, lineHeight: 17 },
   deleteBtn: {
     width: 36,
     height: 36,
