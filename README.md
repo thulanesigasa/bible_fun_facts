@@ -1055,6 +1055,22 @@ To eliminate clutter and provide an effortless, intuitive chapter selection expe
 - **Elimination of Inactive Verses Step**: Removed the redundant `VERSES` tab and placeholder grid. Because the Bible reader renders full chapters with all verses simultaneously, chapter selection immediately dismisses the modal and renders the target scripture.
 - **Balanced 50/50 Navigation Header**: Navigation modal tabs now cleanly divide the header space with active amber indicators and seamless step transitions.
 
+### 6. Automated Smart Scripture & Streak Guardian Notifications (`notifications.ts`)
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Notifications-Automated%20Smart%20Scheduler-FDD223?style=for-the-badge" alt="Automated Smart Scheduler" />
+  <img src="https://img.shields.io/badge/Reminders-8:00%20AM%20Word%20%7C%208:30%20PM%20Streak%20Guardian-0F172A?style=for-the-badge" alt="Word & Streak Reminders" />
+  <img src="https://img.shields.io/badge/Encouragement-God's%20Love%20%26%20Identity%20Affirmations-3B82F6?style=for-the-badge" alt="God's Love Affirmations" />
+</p>
+
+An intelligent, non-intrusive local notification engine that runs automatically in the background to sustain daily spiritual fidelity without manual user configuration:
+- **Zero Configuration / Single Master Toggle**: Powered entirely by the user's primary notification switch in Profile Settings. All schedules register automatically upon app launch and cancel cleanly when disabled.
+- **Morning Word & Devotion (08:00 AM Daily)**: Delivers daily morning manna from curated scripture promises (`Psalm 119:105`, `Lamentations 3:22–23`, `Proverbs 3:5–6`), encouraging believers to start their day anchored in Scripture.
+- **Mid-Day God's Love & Identity in Christ Affirmations (13:15 & 16:30 Daily)**: Randomly cycles through high-conviction identity scriptures (`Psalm 139:14`, `Jeremiah 31:3`, `Ephesians 2:10`, `Isaiah 43:4`, `Zephaniah 3:17`, `Romans 8:38–39`, `1 John 3:1`), reminding believers how deeply loved, honored, and precious they are in God's sight.
+- **Evening Streak Guardian (20:30 / 8:30 PM Daily)**: Proactively alerts believers before the day concludes to complete their daily reading and preserve their sacred study streak.
+- **Nightly Scripture of Peace (22:00 / 10:00 PM Daily)**: Delivers calming rest scriptures (`Psalm 4:8`, `John 14:27`, `Proverbs 3:24`, `Philippians 4:6–7`, `Psalm 91:1–2`) to quiet anxious minds and anchor nighttime thoughts in divine peace.
+- **Native Android Notification Channels**: Full support for Android 8.0+ channel architecture (`morning-word`, `streak-guardian`, `divine-affirmations`, `nightly-peace`) with calibrated amber brand accent illumination (`#FDD223`).
+
 ---
 
 ### Type Checking & Validation

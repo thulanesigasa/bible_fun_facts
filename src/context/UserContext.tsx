@@ -4,6 +4,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Fact, Scripture, WOTDEntry } from '../data/mockDatabase';
 import { colors } from '../theme/colors';
 import { supabase, SUPABASE_ANON_KEY } from '../services/supabase';
+import {
+  registerAllAutomatedNotifications,
+  cancelAllAutomatedNotifications,
+} from '../services/notifications';
 
 export interface UserProfile {
   name: string;
@@ -283,9 +287,15 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             userProfile: cleanProfile,
           }));
           checkStreak(parsed.lastLoginDate, parsed.streak);
+
+          const isNotifEnabled = cleanProfile ? cleanProfile.notificationsEnabled : true;
+          if (isNotifEnabled) {
+            registerAllAutomatedNotifications().catch(() => {});
+          }
         } else {
           // First time user
           checkStreak(null, 1);
+          registerAllAutomatedNotifications().catch(() => {});
         }
       } catch (e) {
         console.error('Failed to load user data');
@@ -749,6 +759,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ...prev,
       userProfile: prev.userProfile ? { ...prev.userProfile, ...updates } : null,
     }));
+
+    if (updates.notificationsEnabled !== undefined) {
+      if (updates.notificationsEnabled) {
+        registerAllAutomatedNotifications().catch(() => {});
+      } else {
+        cancelAllAutomatedNotifications().catch(() => {});
+      }
+    }
 
     if (SUPABASE_ANON_KEY) {
       try {
