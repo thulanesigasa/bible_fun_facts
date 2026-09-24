@@ -948,10 +948,11 @@ When any chapter is requested in the Bible Reader (`fetchChapter(book, chapter, 
 
 <p align="left">
   <img src="https://img.shields.io/badge/Catalog-26%20Canonical%20Figures-FDD223?style=for-the-badge" alt="26 Canonical Figures" />
+  <img src="https://img.shields.io/badge/History%20Navigation-Horizontal%20Swiping%20%7C%205%20Spotlight%20Cards-FDD223?style=for-the-badge" alt="Horizontal Swiping" />
+  <img src="https://img.shields.io/badge/Search%20Assistant-Real--Time%20Autocomplete-10B981?style=for-the-badge" alt="Search Assistant Autocomplete" />
   <img src="https://img.shields.io/badge/Scholarly%20Dimensions-7%20New%20Fields-10B981?style=for-the-badge" alt="7 New Fields" />
   <img src="https://img.shields.io/badge/Concordance-Strong%27s%20Hebrew%20%26%20Greek-0284C7?style=for-the-badge" alt="Strong's Concordance" />
   <img src="https://img.shields.io/badge/Life%20Milestones-Vertical%20Node%20Timeline-F59E0B?style=for-the-badge" alt="Chronological Timelines" />
-  <img src="https://img.shields.io/badge/Typology-Christological%20Fulfillment-DC2626?style=for-the-badge" alt="Christological Typology" />
   <img src="https://img.shields.io/badge/Design%20Aesthetic-60--30--10%20Continuous%20Body-F8FAFC?style=for-the-badge" alt="60-30-10 Continuous Body" />
 </p>
 
@@ -986,14 +987,22 @@ Each writer entry in `biblicalWriters.ts` and `WriterDetailsScreen.tsx` provides
 15. **Archaeological Discoveries & Corroborations**: Excavated stelae, bullae, cylinder seals, and inscriptions validating the biblical account.
 16. **Fascinating Historical & Cultural Facts**: Numbered cards detailing cultural oddities, linguistic nuances, and historical trivia illustrated with the custom `LightbulbSvg`.
 
-### 3. Integrated Search & Discovery
-`HistoryScreen.tsx` provides instant real-time filtering across:
-- English author names and titles
-- Original Hebrew and Greek script characters
-- Phonetic transliterations
-- Written canonical book names
-- Strong's concordance numbers (e.g. searching "H4872" or "G3972")
-- Original root words and literal definitions
+### 3. Non-Scrolling Horizontal Swiping Architecture (5 Spotlight Figures)
+To eliminate infinite vertical scroll fatigue and create a fast, tactile browsing experience:
+- **Zero Screen Scroll**: The History screen viewport is completely non-scrolling, fitting the search bar, category pills, swipe cards, and pagination neatly into the visible canvas.
+- **5-Character Carousel**: Restricts the active viewport to exactly 5 spotlighted figures for the active category or query.
+- **Magnetic Snap Navigation**: Uses `snapToInterval={CARD_WIDTH + 12}` with fast deceleration rate and dynamic horizontal centering (`paddingHorizontal: (width - CARD_WIDTH) / 2`).
+- **5-Dot Pagination Bar & Steppers**: Renders a dedicated 5-dot navigation track where the active figure expands into an amber indicator pill, complemented by left/right chevron stepper buttons (`‹` / `›`) for accessibility.
+- **Comprehensive Card Summary**: Each card integrates category tags, ancient script, sacred calling, canonical books penned, Strong's concordance tag, key verse quote, and a 1-tap action button into `WriterDetailsScreen`.
+
+### 4. Real-Time Search Assistant & Autocomplete Overlay
+- **Instant Overlay Dropdown**: As the user types in the search input, a floating Search Assistant panel (`assistantOverlay`) dynamically appears with high-elevation shadow (`zIndex: 999`).
+- **Categorized Match Engine**: Suggests up to 5 instant matches categorized by match type:
+  - **Author Names**: English, phonetic transliteration, and Hebrew/Greek script matches.
+  - **Penned Books**: Detects book names (e.g. typing "Gen" identifies Moses).
+  - **Strong's Concordance**: Matches root words and Strong's numbers (e.g. "H4872", "G3972").
+  - **Sacred Offices**: Identifies prophets, kings, apostles, and historians.
+- **1-Tap Direct Launch**: Tapping any search assistant suggestion immediately navigates to that author's comprehensive scholarly biography, while updating the search query and dismissing the keyboard.
 
 ---
 
