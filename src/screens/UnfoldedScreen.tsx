@@ -49,7 +49,7 @@ export default function UnfoldedScreen({ navigation }: UnfoldedScreenProps) {
         accessibilityRole="button"
         accessibilityLabel={`View unfolded exegesis for Day ${item.dayOfYear}: ${item.fact_title}`}
       >
-        {/* Top Header: Day Badge & Calendar Date + Category Pill */}
+        {/* Top Header: Day Badge & Calendar Date */}
         <View style={styles.rowHeader}>
           <View style={styles.dayBadgeWrap}>
             <View style={styles.dayDot} />
@@ -60,14 +60,6 @@ export default function UnfoldedScreen({ navigation }: UnfoldedScreenProps) {
               • {item.calendarDate}
             </Text>
           </View>
-
-          {item.category ? (
-            <View style={styles.categoryPill}>
-              <Text variant="caption" weight="700" color={colors.accentDark} style={styles.categoryText}>
-                {item.category}
-              </Text>
-            </View>
-          ) : null}
         </View>
 
         {/* Fact Title */}
@@ -195,19 +187,7 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 12,
   },
-  categoryPill: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    backgroundColor: 'rgba(253, 210, 35, 0.12)',
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: 'rgba(253, 210, 35, 0.28)',
-  },
-  categoryText: {
-    fontSize: 10,
-    letterSpacing: 0.4,
-    textTransform: 'uppercase',
-  },
+
 
   factTitle: {
     color: '#0F172A',
