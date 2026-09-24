@@ -47,9 +47,7 @@ import {
   AaTextSvg,
   BookmarkSvg,
   DownloadSvg,
-  CheckCircleSvg,
   TrashSvg,
-  OfflineCloudSvg,
 } from '../components/SvgIcons';
 import { isRedLetter } from '../data/redLetterVerses';
 import { UiverseSwitch } from '../components/UiverseSwitch';
@@ -962,12 +960,9 @@ export default function WOTDScreen({ route, navigation }: any) {
                     </Text>
                   </View>
                   {downloadedTranslations.length > 0 && (
-                    <View style={styles.offlineStatsPill}>
-                      <OfflineCloudSvg size={13} color={colors.accent} />
-                      <Text style={styles.offlineStatsText}>
-                        {downloadedTranslations.length} OFFLINE
-                      </Text>
-                    </View>
+                    <Text style={[styles.offlineStatsText, { color: theme.textSecondary }]}>
+                      {downloadedTranslations.length} offline
+                    </Text>
                   )}
                 </View>
 
@@ -1005,10 +1000,9 @@ export default function WOTDScreen({ route, navigation }: any) {
                               </Text>
                             </View>
                             {isDownloaded && (
-                              <View style={styles.downloadedStatusPill}>
-                                <CheckCircleSvg size={12} color="#10B981" />
-                                <Text style={styles.downloadedStatusText}>Offline Ready</Text>
-                              </View>
+                              <Text style={[styles.downloadedStatusText, { color: theme.textSecondary }]}>
+                                Offline Ready
+                              </Text>
                             )}
                           </View>
                           <Text style={[styles.translationDesc, { color: isActive ? theme.text : theme.textSecondary }]}>
@@ -1675,36 +1669,17 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 12,
   },
-  offlineStatsPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    backgroundColor: colors.accentSoft,
-    borderWidth: 1,
-    borderColor: 'rgba(253, 210, 35, 0.4)',
-  },
   offlineStatsText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.accent,
-    letterSpacing: 0.5,
-  },
-  downloadedStatusPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.textSecondary,
+    marginTop: 2,
   },
   downloadedStatusText: {
-    fontSize: 9.5,
-    fontWeight: '700',
-    color: '#059669',
+    fontSize: 11,
+    fontWeight: '500',
+    color: colors.textSecondary,
+    marginLeft: 6,
   },
   downloadProgressContainer: {
     marginTop: 6,

@@ -920,8 +920,8 @@ When any chapter is requested in the Bible Reader (`fetchChapter(book, chapter, 
 5. **Tier 4 — Prebundled Canon Fallback**: Embedded foundational chapters (`Genesis 1`, `John 3`, `Psalms 23`) ensuring the reader never crashes even on fresh installations with no internet.
 
 ### 3. Translation Management & Disk Space Control
-- **In-Reader Translation Sheet**: Each translation row displays version name, scholarly tag, estimated download size, real-time downloading progress percentage bar, and an "Offline Ready" checkmark status badge.
-- **Profile Screen Management**: A dedicated "OFFLINE BIBLES & TRANSLATIONS" section in the Profile body provides an aggregated storage breakdown and 1-tap delete controls to reclaim disk space.
+- **In-Reader Translation Sheet**: Each translation row displays version name, scholarly tag, estimated download size, real-time downloading progress percentage bar, and clean "Offline Ready" continuous plain text typography (zero status pill badges per Rule 16). The sheet header displays a clean minimalist "{count} offline" plain text indicator.
+- **Profile Screen Management**: A dedicated "OFFLINE BIBLES & TRANSLATIONS" section in the Profile body provides an aggregated storage breakdown and 1-tap delete controls to reclaim disk space, rendering all translation labels as clean continuous text.
 
 ### Type Checking & Validation
 ```bash
