@@ -56,9 +56,7 @@ import { UiverseSwitch } from '../components/UiverseSwitch';
 // ─── Types ───────────────────────────────────────────────────────────────────
 type LensKey = 'original_intent' | 'theological_truth' | 'modern_walk' | 'prayer_focus';
 type ActiveTab = 'bible' | 'exegesis';
-type BibleTranslation =
-  | 'web' | 'kjv' | 'asv' | 'bbe' | 'darby'
-  | 'dra' | 'ylt' | 'oeb-cw' | 'webbe' | 'oeb-us';
+type BibleTranslation = string;
 type ReaderTheme = 'light' | 'sepia' | 'dark';
 type NavStep = 'books' | 'chapters' | 'verses';
 
@@ -78,33 +76,22 @@ const THEMES: Record<ReaderTheme, { bg: string; surface: string; text: string; t
   dark:  { bg: '#0F172A', surface: '#1E293B', text: '#F8FAFC', textSecondary: '#94A3B8', label: 'Dark' },
 };
 
-const TRANSLATIONS: BibleTranslation[] = [
-  'web', 'kjv', 'asv', 'bbe', 'darby', 'dra', 'ylt', 'oeb-cw', 'webbe', 'oeb-us',
-];
-const TRANSLATION_LABELS: Record<BibleTranslation, string> = {
-  web:      'WEB',
-  kjv:      'KJV',
-  asv:      'ASV',
-  bbe:      'BBE',
-  darby:    'DARBY',
-  dra:      'DRA',
-  ylt:      'YLT',
-  'oeb-cw': 'OEB-CW',
-  webbe:    'WEBBE',
-  'oeb-us': 'OEB-US',
-};
-const TRANSLATION_META: Record<BibleTranslation, { name: string; desc: string; tag: string }> = {
-  web:      { name: 'World English Bible',                   desc: 'Modern English - Full Bible - Public domain',    tag: 'MODERN'    },
-  kjv:      { name: 'King James Version',                    desc: 'Classic 1611 - Full Bible - Public domain',      tag: 'CLASSIC'   },
-  asv:      { name: 'American Standard Version',             desc: 'Literal 1901 - Full Bible - Public domain',      tag: 'SCHOLARLY' },
-  bbe:      { name: 'Bible in Basic English',                desc: 'Simple vocab - Full Bible - Public domain',      tag: 'SIMPLE'    },
-  darby:    { name: 'Darby Bible',                           desc: 'Precise 1890 - Full Bible - Public domain',      tag: 'SCHOLARLY' },
-  dra:      { name: 'Douay-Rheims 1899',                     desc: 'Catholic - Full Bible - Public domain',          tag: 'CLASSIC'   },
-  ylt:      { name: "Young's Literal Translation",          desc: 'Very literal - NT only - Public domain',        tag: 'SCHOLARLY' },
-  'oeb-cw': { name: 'Open English Bible (Commonwealth)',     desc: 'Modern UK English - Full Bible - Open license', tag: 'MODERN'    },
-  webbe:    { name: 'World English Bible (British Ed.)',     desc: 'British spelling - Full Bible - Public domain',  tag: 'MODERN'    },
-  'oeb-us': { name: 'Open English Bible (US Edition)',       desc: 'Modern US English - Full Bible - Open license', tag: 'MODERN'    },
-};
+const TRANSLATIONS: BibleTranslation[] = Object.keys(TRANSLATION_SOURCES);
+
+const TRANSLATION_LABELS: Record<string, string> = Object.fromEntries(
+  Object.entries(TRANSLATION_SOURCES).map(([k, v]) => [k, v.abbreviation || k.toUpperCase()])
+);
+
+const TRANSLATION_META: Record<string, { name: string; desc: string; tag: string }> = Object.fromEntries(
+  Object.entries(TRANSLATION_SOURCES).map(([k, v]) => [
+    k,
+    {
+      name: v.name,
+      desc: v.description,
+      tag: v.category === 'african' ? 'AFRICAN' : v.category === 'popular' ? 'MODERN' : 'CLASSIC',
+    },
+  ])
+);
 
 
 // ─── Helper: font family ─────────────────────────────────────────────────────
@@ -207,6 +194,17 @@ export default function WOTDScreen({ route, navigation }: any) {
       unsubscribe();
     };
   }, []);
+
+  // Handle translationOverride from navigation (e.g. from DownloadedVersesScreen)
+  useEffect(() => {
+    if (route?.params?.translationOverride) {
+      const overrideKey = route.params.translationOverride;
+      if (TRANSLATIONS.includes(overrideKey)) {
+        setTranslation(overrideKey);
+        setActiveTab('bible');
+      }
+    }
+  }, [route?.params?.translationOverride]);
 
   const handleDownloadTranslation = async (key: BibleTranslation) => {
     if (downloadingId) return;

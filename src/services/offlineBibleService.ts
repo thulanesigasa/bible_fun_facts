@@ -21,118 +21,428 @@ export interface RawBibleBook {
   chapters: string[][];
 }
 
-// Translation CDN source mapping (verified public domain JSON sources with multi-CDN redundancy)
-export const TRANSLATION_SOURCES: Record<
-  string,
-  {
-    url: string;
-    urls: string[];
-    fallbackUrl?: string;
-    name: string;
-    sizeEstimate: string;
-  }
-> = {
+export type TranslationCategory = 'african' | 'popular' | 'classic';
+
+export interface TranslationSourceConfig {
+  id: string;
+  name: string;
+  abbreviation: string;
+  description: string;
+  language: string;
+  category: TranslationCategory;
+  url: string;
+  urls: string[];
+  fallbackUrl?: string;
+  sizeEstimate: string;
+}
+
+// Translation CDN source mapping (verified public domain & open digital scripture sources with multi-CDN redundancy)
+export const TRANSLATION_SOURCES: Record<string, TranslationSourceConfig> = {
+  // ── 1. SOUTH AFRICAN & AFRICAN TRANSLATIONS ─────────────────────────────
+  zulu: {
+    id: 'zulu',
+    name: 'IBhayibheli Elingcwele',
+    abbreviation: 'ZUL',
+    description: 'isiZulu 1959 Translation - Full Bible',
+    language: 'isiZulu',
+    category: 'african',
+    url: 'https://cdn.jsdelivr.net/gh/godlytalias/Bible-Database@master/Zulu/bible.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/godlytalias/Bible-Database@master/Zulu/bible.json',
+      'https://raw.githubusercontent.com/godlytalias/Bible-Database/master/Zulu/bible.json',
+      'https://fastly.jsdelivr.net/gh/godlytalias/Bible-Database@master/Zulu/bible.json',
+    ],
+    sizeEstimate: '5.1 MB',
+  },
+  xhosa: {
+    id: 'xhosa',
+    name: 'IBhayibhile Engcwele',
+    abbreviation: 'XHO',
+    description: 'isiXhosa Translation - Full Bible',
+    language: 'isiXhosa',
+    category: 'african',
+    url: 'https://cdn.jsdelivr.net/gh/godlytalias/Bible-Database@master/Xhosa/bible.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/godlytalias/Bible-Database@master/Xhosa/bible.json',
+      'https://raw.githubusercontent.com/godlytalias/Bible-Database/master/Xhosa/bible.json',
+      'https://fastly.jsdelivr.net/gh/godlytalias/Bible-Database@master/Xhosa/bible.json',
+    ],
+    sizeEstimate: '5.2 MB',
+  },
+  sepedi: {
+    id: 'sepedi',
+    name: 'Bibele Taba ye Botse',
+    abbreviation: 'NSO',
+    description: 'Sesotho sa Leboa / Sepedi - Full Bible',
+    language: 'Sesotho sa Leboa',
+    category: 'african',
+    url: 'https://cdn.jsdelivr.net/gh/godlytalias/Bible-Database@master/Sepedi/bible.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/godlytalias/Bible-Database@master/Sepedi/bible.json',
+      'https://raw.githubusercontent.com/godlytalias/Bible-Database/master/Sepedi/bible.json',
+      'https://fastly.jsdelivr.net/gh/godlytalias/Bible-Database@master/Sepedi/bible.json',
+    ],
+    sizeEstimate: '6.1 MB',
+  },
+  afr: {
+    id: 'afr',
+    name: 'Die Bybel (1933/1953)',
+    abbreviation: 'AFR',
+    description: 'Afrikaans 1933/1953 Vertaling - Full Bible',
+    language: 'Afrikaans',
+    category: 'african',
+    url: 'https://cdn.jsdelivr.net/gh/godlytalias/Bible-Database@master/Afrikaans/bible.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/godlytalias/Bible-Database@master/Afrikaans/bible.json',
+      'https://raw.githubusercontent.com/godlytalias/Bible-Database/master/Afrikaans/bible.json',
+      'https://fastly.jsdelivr.net/gh/godlytalias/Bible-Database@master/Afrikaans/bible.json',
+    ],
+    sizeEstimate: '5.6 MB',
+  },
+  sw: {
+    id: 'sw',
+    name: 'Biblia Takatifu (Union)',
+    abbreviation: 'SWA',
+    description: 'Kiswahili Union Version - Full Bible',
+    language: 'Kiswahili',
+    category: 'african',
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/sw_sruv.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/sw_sruv.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/sw_sruv.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/sw_sruv.json',
+    ],
+    sizeEstimate: '4.4 MB',
+  },
+
+  // ── 2. POPULAR MODERN TRANSLATIONS ───────────────────────────────────────
+  niv: {
+    id: 'niv',
+    name: 'New International Version',
+    abbreviation: 'NIV',
+    description: 'Modern readable English - Full Bible',
+    language: 'English',
+    category: 'popular',
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_niv.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_niv.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_niv.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_niv.json',
+    ],
+    sizeEstimate: '4.2 MB',
+  },
+  esv: {
+    id: 'esv',
+    name: 'English Standard Version',
+    abbreviation: 'ESV',
+    description: 'Essentially literal English - Full Bible',
+    language: 'English',
+    category: 'popular',
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_esv.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_esv.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_esv.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_esv.json',
+    ],
+    sizeEstimate: '4.2 MB',
+  },
+  nlt: {
+    id: 'nlt',
+    name: 'New Living Translation',
+    abbreviation: 'NLT',
+    description: 'Dynamic clarity & readability - Full Bible',
+    language: 'English',
+    category: 'popular',
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_nlt.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_nlt.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_nlt.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_nlt.json',
+    ],
+    sizeEstimate: '4.1 MB',
+  },
+  nkjv: {
+    id: 'nkjv',
+    name: 'New King James Version',
+    abbreviation: 'NKJV',
+    description: 'Modernized classic reverence - Full Bible',
+    language: 'English',
+    category: 'popular',
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_nkjv.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_nkjv.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_nkjv.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_nkjv.json',
+    ],
+    sizeEstimate: '4.2 MB',
+  },
+  amp: {
+    id: 'amp',
+    name: 'Amplified Bible',
+    abbreviation: 'AMP',
+    description: 'Expanded shades of word meaning - Full Bible',
+    language: 'English',
+    category: 'popular',
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_amp.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_amp.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_amp.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_amp.json',
+    ],
+    sizeEstimate: '4.5 MB',
+  },
+  bsb: {
+    id: 'bsb',
+    name: 'Berean Standard Bible',
+    abbreviation: 'BSB',
+    description: 'Accurate, clear Greek/Hebrew text - Full Bible',
+    language: 'English',
+    category: 'popular',
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_bsb.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_bsb.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_bsb.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_bsb.json',
+    ],
+    sizeEstimate: '4.1 MB',
+  },
+  nasb: {
+    id: 'nasb',
+    name: 'New American Standard Bible',
+    abbreviation: 'NASB',
+    description: 'Word-for-word fidelity - Full Bible',
+    language: 'English',
+    category: 'popular',
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_nasb.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_nasb.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_nasb.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_nasb.json',
+    ],
+    sizeEstimate: '4.2 MB',
+  },
+  csb: {
+    id: 'csb',
+    name: 'Christian Standard Bible',
+    abbreviation: 'CSB',
+    description: 'Optimal equivalence - Full Bible',
+    language: 'English',
+    category: 'popular',
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_csb.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_csb.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_csb.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_csb.json',
+    ],
+    sizeEstimate: '4.2 MB',
+  },
+
+  // ── 3. CLASSIC & HISTORIC TRANSLATIONS ────────────────────────────────────
   web: {
+    id: 'web',
+    name: 'World English Bible',
+    abbreviation: 'WEB',
+    description: 'Modern English - Full Bible - Public Domain',
+    language: 'English',
+    category: 'classic',
     url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_web.json',
     urls: [
       'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_web.json',
       'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_web.json',
       'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_web.json',
     ],
-    name: 'World English Bible',
     sizeEstimate: '4.0 MB',
   },
   kjv: {
+    id: 'kjv',
+    name: 'King James Version',
+    abbreviation: 'KJV',
+    description: 'Historic 1611 - Full Bible - Public Domain',
+    language: 'English',
+    category: 'classic',
     url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_kjv.json',
     urls: [
       'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_kjv.json',
       'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_kjv.json',
       'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_kjv.json',
     ],
-    name: 'King James Version',
     sizeEstimate: '4.1 MB',
   },
   asv: {
+    id: 'asv',
+    name: 'American Standard Version',
+    abbreviation: 'ASV',
+    description: 'Literal 1901 - Full Bible - Public Domain',
+    language: 'English',
+    category: 'classic',
     url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_asv.json',
     urls: [
       'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_asv.json',
       'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_asv.json',
       'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_asv.json',
     ],
-    name: 'American Standard Version',
     sizeEstimate: '4.1 MB',
   },
   bbe: {
+    id: 'bbe',
+    name: 'Bible in Basic English',
+    abbreviation: 'BBE',
+    description: 'Simple 1,000-word vocabulary - Full Bible',
+    language: 'English',
+    category: 'classic',
     url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_bbe.json',
     urls: [
       'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_bbe.json',
       'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_bbe.json',
       'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_bbe.json',
     ],
-    name: 'Bible in Basic English',
     sizeEstimate: '4.1 MB',
   },
   darby: {
+    id: 'darby',
+    name: 'Darby Bible',
+    abbreviation: 'DARBY',
+    description: 'Precise 1890 translation - Full Bible',
+    language: 'English',
+    category: 'classic',
     url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_darby.json',
     urls: [
       'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_darby.json',
       'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_darby.json',
       'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_darby.json',
     ],
-    name: 'Darby Bible',
     sizeEstimate: '4.0 MB',
   },
   dra: {
+    id: 'dra',
+    name: 'Douay-Rheims 1899',
+    abbreviation: 'DRA',
+    description: 'Historic Catholic English Bible - Full Bible',
+    language: 'English',
+    category: 'classic',
     url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_dra.json',
     urls: [
       'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_dra.json',
       'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_dra.json',
       'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_dra.json',
     ],
-    name: 'Douay-Rheims 1899',
     sizeEstimate: '4.0 MB',
   },
   ylt: {
+    id: 'ylt',
+    name: "Young's Literal Translation",
+    abbreviation: 'YLT',
+    description: 'Strict literal verbal translation',
+    language: 'English',
+    category: 'classic',
     url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_ylt98.json',
     urls: [
       'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_ylt98.json',
       'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_ylt98.json',
       'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_ylt98.json',
     ],
-    name: "Young's Literal Translation",
     sizeEstimate: '4.1 MB',
   },
+  gnv: {
+    id: 'gnv',
+    name: 'Geneva Bible 1599',
+    abbreviation: 'GNV',
+    description: 'Historic Reformation Bible of the Pilgrims',
+    language: 'English',
+    category: 'classic',
+    url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_gnv.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_gnv.json',
+      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_gnv.json',
+      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_gnv.json',
+    ],
+    sizeEstimate: '4.3 MB',
+  },
   webbe: {
+    id: 'webbe',
+    name: 'World English Bible (British)',
+    abbreviation: 'WEBBE',
+    description: 'Modern UK/Commonwealth spelling - Full Bible',
+    language: 'English',
+    category: 'classic',
     url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_webbe.json',
     urls: [
       'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_webbe.json',
       'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_webbe.json',
       'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_webbe.json',
     ],
-    name: 'World English Bible (British)',
     sizeEstimate: '4.0 MB',
   },
   'oeb-us': {
+    id: 'oeb-us',
+    name: 'Open English Bible (US)',
+    abbreviation: 'OEB-US',
+    description: 'Open license modern US English - Full Bible',
+    language: 'English',
+    category: 'classic',
     url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_webus.json',
     urls: [
       'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_webus.json',
       'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_webus.json',
       'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_webus.json',
     ],
-    name: 'Open English Bible (US)',
     sizeEstimate: '3.9 MB',
   },
   'oeb-cw': {
+    id: 'oeb-cw',
+    name: 'Open English Bible (Commonwealth)',
+    abbreviation: 'OEB-CW',
+    description: 'Open license modern UK English - Full Bible',
+    language: 'English',
+    category: 'classic',
     url: 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_web.json',
     urls: [
       'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_web.json',
       'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_web.json',
       'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_web.json',
     ],
-    name: 'Open English Bible (Commonwealth)',
     sizeEstimate: '4.0 MB',
   },
 };
+
+/**
+ * Normalize diverse Bible JSON structures into the unified RawBibleBook[] schema.
+ * Handles both:
+ * 1. Standard / thiagobodruk schema: RawBibleBook[]
+ * 2. godlytalias/Bible-Database schema: { Book: [ { Chapter: [ { Verse: [ { Verse: string } ] } ] } ] }
+ */
+export function normalizeBibleJson(rawParsed: any): RawBibleBook[] {
+  if (Array.isArray(rawParsed) && rawParsed.length >= 66) {
+    return rawParsed;
+  }
+  if (rawParsed && Array.isArray(rawParsed.Book) && rawParsed.Book.length >= 66) {
+    return rawParsed.Book.map((bookObj: any, bIdx: number) => {
+      const canon = BIBLE_BOOKS[bIdx];
+      const chapters: string[][] = (bookObj.Chapter || []).map((chObj: any) => {
+        const rawVerses = chObj.Verse || [];
+        return rawVerses.map((v: any) => {
+          if (typeof v === 'string') return v.trim();
+          if (v && typeof v.Verse === 'string') return v.Verse.trim();
+          return '';
+        });
+      });
+      return {
+        abbrev: canon ? canon.id : `b${bIdx + 1}`,
+        name: canon ? canon.name : `Book ${bIdx + 1}`,
+        chapters,
+      };
+    });
+  }
+  throw new Error('Unrecognized Bible JSON schema: expected canonical 66-book array or { Book: [...] }');
+}
+
+export function getAllAvailableTranslations(): TranslationSourceConfig[] {
+  return Object.values(TRANSLATION_SOURCES);
+}
+
+export function getTranslationsByCategory(category: TranslationCategory): TranslationSourceConfig[] {
+  return Object.values(TRANSLATION_SOURCES).filter((t) => t.category === category);
+}
 
 // Fast in-memory cache of loaded translations
 const memoryTranslationData = new Map<string, RawBibleBook[]>();
@@ -346,14 +656,15 @@ export async function downloadTranslation(
         }
         const textPayload = await response.text();
         const cleanPayload = sanitizeJsonText(textPayload);
-        const booksCandidate: RawBibleBook[] = JSON.parse(cleanPayload);
+        const rawJson = JSON.parse(cleanPayload);
+        const booksCandidate = normalizeBibleJson(rawJson);
         if (!Array.isArray(booksCandidate) || booksCandidate.length < 66) {
           throw new Error(
             `Invalid books array (${booksCandidate?.length || 0}) from ${mirrorUrl}`
           );
         }
-        // Write verified clean JSON directly
-        await FileSystem.writeAsStringAsync(filePath, cleanPayload);
+        // Write verified normalized clean JSON directly
+        await FileSystem.writeAsStringAsync(filePath, JSON.stringify(booksCandidate));
         parsedBooks = booksCandidate;
         downloadSuccess = true;
         break;
@@ -367,16 +678,15 @@ export async function downloadTranslation(
 
       const text = await FileSystem.readAsStringAsync(filePath);
       const clean = sanitizeJsonText(text);
-      const books: RawBibleBook[] = JSON.parse(clean);
+      const rawJson = JSON.parse(clean);
+      const books: RawBibleBook[] = normalizeBibleJson(rawJson);
 
       if (!Array.isArray(books) || books.length < 66) {
         throw new Error(`Downloaded Bible has ${books?.length || 0} books (expected >= 66)`);
       }
 
-      // If file had BOM or whitespace, rewrite with sanitized text so future disk reads are fast & clean
-      if (text.charCodeAt(0) === 0xfeff || text.length !== clean.length) {
-        await FileSystem.writeAsStringAsync(filePath, clean);
-      }
+      // Always write clean normalized JSON so subsequent disk reads are uniform RawBibleBook[]
+      await FileSystem.writeAsStringAsync(filePath, JSON.stringify(books));
 
       parsedBooks = books;
       downloadSuccess = true;

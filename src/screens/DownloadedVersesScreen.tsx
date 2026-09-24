@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
-  FlatList,
+  ScrollView,
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
@@ -14,37 +14,36 @@ import { Text } from '../components/Typography';
 import {
   getDownloadedTranslations,
   deleteDownloadedTranslation,
+  downloadTranslation,
   subscribeOfflineUpdates,
   DownloadedTranslationMeta,
+  TRANSLATION_SOURCES,
+  TranslationSourceConfig,
+  TranslationCategory,
 } from '../services/bibleService';
-import { DownloadSvg, TrashSvg } from '../components/SvgIcons';
+import { DownloadSvg, TrashSvg, CheckSvg } from '../components/SvgIcons';
 
 interface DownloadedVersesScreenProps {
   navigation: any;
 }
 
-const TRANSLATION_META: Record<string, { name: string; desc: string; tag: string }> = {
-  web:      { name: 'World English Bible',               desc: 'Modern English - Full Bible',          tag: 'MODERN'    },
-  kjv:      { name: 'King James Version',                desc: 'Classic 1611 - Full Bible',            tag: 'CLASSIC'   },
-  asv:      { name: 'American Standard Version',         desc: 'Literal 1901 - Full Bible',            tag: 'SCHOLARLY' },
-  bbe:      { name: 'Bible in Basic English',            desc: 'Simple vocabulary - Full Bible',       tag: 'SIMPLE'    },
-  darby:    { name: 'Darby Bible',                       desc: 'Precise 1890 - Full Bible',            tag: 'SCHOLARLY' },
-  dra:      { name: 'Douay-Rheims 1899',                 desc: 'Catholic - Full Bible',                tag: 'CLASSIC'   },
-  ylt:      { name: "Young's Literal Translation",       desc: 'Very literal - NT only',               tag: 'SCHOLARLY' },
-  'oeb-cw': { name: 'Open English Bible (Commonwealth)', desc: 'Modern UK English - Full Bible',       tag: 'MODERN'    },
-  webbe:    { name: 'World English Bible (British Ed.)', desc: 'British spelling - Full Bible',        tag: 'MODERN'    },
-  'oeb-us': { name: 'Open English Bible (US Edition)',   desc: 'Modern US English - Full Bible',       tag: 'MODERN'    },
+const CATEGORY_TITLES: Record<TranslationCategory, string> = {
+  african: 'SOUTH AFRICAN & AFRICAN TRANSLATIONS',
+  popular: 'POPULAR MODERN TRANSLATIONS',
+  classic: 'CLASSIC & HISTORIC TRANSLATIONS',
 };
 
 export default function DownloadedVersesScreen({ navigation }: DownloadedVersesScreenProps) {
-  const [translations, setTranslations] = useState<DownloadedTranslationMeta[]>([]);
+  const [downloaded, setDownloaded] = useState<DownloadedTranslationMeta[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [downloadProgress, setDownloadProgress] = useState<Record<string, number>>({});
 
-  const loadTranslations = useCallback(async () => {
+  const loadDownloaded = useCallback(async () => {
     try {
       const list = await getDownloadedTranslations();
-      setTranslations(list);
+      setDownloaded(list);
     } catch (e) {
       console.warn('Failed to load downloaded translations:', e);
     } finally {
@@ -53,21 +52,21 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
   }, []);
 
   useEffect(() => {
-    loadTranslations();
-    const unsubscribe = subscribeOfflineUpdates(loadTranslations);
+    loadDownloaded();
+    const unsubscribe = subscribeOfflineUpdates(loadDownloaded);
     return unsubscribe;
-  }, [loadTranslations]);
+  }, [loadDownloaded]);
 
   const handleOpen = (item: DownloadedTranslationMeta) => {
     navigation.navigate('WOTD', { translationOverride: item.id });
   };
 
   const handleDelete = (item: DownloadedTranslationMeta) => {
-    const meta = TRANSLATION_META[item.id];
+    const meta = TRANSLATION_SOURCES[item.id];
     const displayName = meta?.name || item.id.toUpperCase();
     Alert.alert(
       'Remove Translation',
-      `Remove ${displayName} from offline storage? You can re-download it from the Word tab at any time.`,
+      `Remove ${displayName} from offline storage? You can re-download it at any time.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -77,7 +76,7 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
             setDeletingId(item.id);
             try {
               await deleteDownloadedTranslation(item.id);
-              setTranslations(prev => prev.filter(t => t.id !== item.id));
+              setDownloaded((prev) => prev.filter((t) => t.id !== item.id));
             } catch (err) {
               console.warn('Failed to remove translation:', err);
             } finally {
@@ -89,55 +88,48 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
     );
   };
 
+  const handleDownload = async (source: TranslationSourceConfig) => {
+    if (downloadingId) return;
+    setDownloadingId(source.id);
+    setDownloadProgress((prev) => ({ ...prev, [source.id]: 5 }));
+
+    try {
+      await downloadTranslation(source.id, (progressPercent) => {
+        setDownloadProgress((prev) => ({ ...prev, [source.id]: progressPercent }));
+      });
+      await loadDownloaded();
+    } catch (err: any) {
+      console.warn(`Failed to download ${source.name}:`, err);
+      Alert.alert(
+        'Download Failed',
+        `Unable to download ${source.name}. Please check your internet connection and try again.`
+      );
+    } finally {
+      setDownloadingId(null);
+      setDownloadProgress((prev) => {
+        const next = { ...prev };
+        delete next[source.id];
+        return next;
+      });
+    }
+  };
+
   const formatSize = (bytes?: number): string => {
     if (!bytes || bytes === 0) return '';
     const mb = bytes / (1024 * 1024);
     return mb >= 1 ? `${mb.toFixed(1)} MB` : `${(bytes / 1024).toFixed(0)} KB`;
   };
 
-  const renderRow = ({ item, index }: { item: DownloadedTranslationMeta; index: number }) => {
-    const meta = TRANSLATION_META[item.id];
-    const isLast = index === translations.length - 1;
-    const isDeleting = deletingId === item.id;
+  const downloadedIds = useMemo(() => new Set(downloaded.map((d) => d.id)), [downloaded]);
 
-    return (
-      <TouchableOpacity
-        style={[styles.row, !isLast && styles.rowDivider]}
-        activeOpacity={0.75}
-        onPress={() => handleOpen(item)}
-        accessibilityRole="button"
-        accessibilityLabel={`Open ${meta?.name || item.id} in Bible reader`}
-      >
-        <View style={styles.rowLeft}>
-          <Text variant="h3" style={styles.translationAbbr}>
-            {item.id.toUpperCase()}
-          </Text>
-          <Text variant="body" weight="600" color={colors.textPrimary} style={styles.translationName}>
-            {meta?.name || item.id.toUpperCase()}
-          </Text>
-          <Text variant="caption" color={colors.textSecondary} style={styles.descText}>
-            {meta?.desc ?? 'Public domain'}
-            {item.sizeBytes ? ` - ${formatSize(item.sizeBytes)}` : ''}
-          </Text>
-        </View>
-        <TouchableOpacity
-          style={styles.deleteBtn}
-          onPress={() => handleDelete(item)}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          activeOpacity={0.7}
-          accessibilityRole="button"
-          accessibilityLabel={`Remove ${meta?.name || item.id} offline download`}
-          disabled={isDeleting}
-        >
-          {isDeleting ? (
-            <ActivityIndicator size="small" color="#94A3B8" />
-          ) : (
-            <TrashSvg size={16} color="#94A3B8" />
-          )}
-        </TouchableOpacity>
-      </TouchableOpacity>
-    );
-  };
+  const availableByCategory = useMemo(() => {
+    const all = Object.values(TRANSLATION_SOURCES);
+    return {
+      african: all.filter((t) => t.category === 'african' && !downloadedIds.has(t.id)),
+      popular: all.filter((t) => t.category === 'popular' && !downloadedIds.has(t.id)),
+      classic: all.filter((t) => t.category === 'classic' && !downloadedIds.has(t.id)),
+    };
+  }, [downloadedIds]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -145,62 +137,221 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
         <View style={styles.loaderContainer}>
           <ActivityIndicator size="small" color={colors.accent} />
           <Text variant="caption" color={colors.textSecondary} style={{ marginTop: spacing.sm }}>
-            Loading downloaded translations...
+            Loading offline library...
           </Text>
         </View>
       ) : (
-        <FlatList
-          data={translations}
-          keyExtractor={item => item.id}
-          renderItem={renderRow}
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContent}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <View style={styles.emptyIconWrap}>
-                <DownloadSvg size={36} color={colors.accent} strokeWidth={1.5} />
+        >
+          {/* 1. DOWNLOADED OFFLINE SECTION */}
+          {downloaded.length > 0 && (
+            <View style={styles.sectionWrap}>
+              <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+                OFFLINE READY ({downloaded.length})
+              </Text>
+              <View style={styles.cardContainer}>
+                {downloaded.map((item, index) => {
+                  const meta = TRANSLATION_SOURCES[item.id];
+                  const isLast = index === downloaded.length - 1;
+                  const isDeleting = deletingId === item.id;
+
+                  return (
+                    <TouchableOpacity
+                      key={item.id}
+                      style={[styles.row, !isLast && styles.rowDivider]}
+                      activeOpacity={0.75}
+                      onPress={() => handleOpen(item)}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Open ${meta?.name || item.id} in Bible reader`}
+                    >
+                      <View style={styles.rowLeft}>
+                        <Text variant="h3" style={styles.translationAbbr}>
+                          {meta?.abbreviation || item.id.toUpperCase()}
+                        </Text>
+                        <Text
+                          variant="body"
+                          weight="600"
+                          color={colors.textPrimary}
+                          style={styles.translationName}
+                        >
+                          {meta?.name || item.id.toUpperCase()}
+                        </Text>
+                        <Text variant="caption" color={colors.textSecondary} style={styles.descText}>
+                          {meta?.description || 'Full Bible'}
+                          {item.sizeBytes ? ` - ${formatSize(item.sizeBytes)}` : ''}
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        style={styles.deleteBtn}
+                        onPress={() => handleDelete(item)}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        activeOpacity={0.7}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Remove ${meta?.name || item.id} offline download`}
+                        disabled={isDeleting}
+                      >
+                        {isDeleting ? (
+                          <ActivityIndicator size="small" color="#94A3B8" />
+                        ) : (
+                          <TrashSvg size={16} color="#94A3B8" />
+                        )}
+                      </TouchableOpacity>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
-              <Text variant="h3" style={styles.emptyTitle}>
-                No Translations Downloaded
-              </Text>
-              <Text variant="body" color={colors.textSecondary} style={styles.emptyMessage}>
-                Open the Word tab, tap any translation in reader settings, and tap Download to save a full Bible for offline reading.
-              </Text>
-              <TouchableOpacity
-                style={styles.openReaderBtn}
-                onPress={() => navigation.navigate('WOTD')}
-                activeOpacity={0.8}
-                accessibilityRole="button"
-                accessibilityLabel="Open Bible reader to download translations"
-              >
-                <Text variant="caption" weight="700" color="#0F172A">
-                  Open Word Reader
-                </Text>
-              </TouchableOpacity>
             </View>
-          }
-        />
+          )}
+
+          {/* 2. AVAILABLE SECTIONS BY CATEGORY */}
+          {(['african', 'popular', 'classic'] as TranslationCategory[]).map((cat) => {
+            const list = availableByCategory[cat];
+            if (!list || list.length === 0) return null;
+
+            return (
+              <View key={cat} style={styles.sectionWrap}>
+                <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+                  {CATEGORY_TITLES[cat]}
+                </Text>
+                <View style={styles.cardContainer}>
+                  {list.map((source, index) => {
+                    const isLast = index === list.length - 1;
+                    const isDownloading = downloadingId === source.id;
+                    const progress = downloadProgress[source.id] || 0;
+
+                    return (
+                      <View key={source.id} style={[styles.row, !isLast && styles.rowDivider]}>
+                        <View style={styles.rowLeft}>
+                          <Text variant="h3" style={styles.translationAbbr}>
+                            {source.abbreviation}
+                          </Text>
+                          <Text
+                            variant="body"
+                            weight="600"
+                            color={colors.textPrimary}
+                            style={styles.translationName}
+                          >
+                            {source.name}
+                          </Text>
+                          <Text variant="caption" color={colors.textSecondary} style={styles.descText}>
+                            {source.description} - {source.sizeEstimate}
+                          </Text>
+
+                          {/* Live download progress bar */}
+                          {isDownloading && (
+                            <View style={styles.progressWrap}>
+                              <View style={styles.progressBarTrack}>
+                                <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
+                              </View>
+                              <Text variant="caption" color={colors.textSecondary} style={styles.progressText}>
+                                Downloading 66 books... {progress}%
+                              </Text>
+                            </View>
+                          )}
+                        </View>
+
+                        {/* Download CTA Button */}
+                        <TouchableOpacity
+                          style={[styles.downloadBtn, isDownloading && styles.downloadBtnDisabled]}
+                          onPress={() => handleDownload(source)}
+                          disabled={Boolean(downloadingId)}
+                          activeOpacity={0.8}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Download ${source.name} for offline reading`}
+                        >
+                          {isDownloading ? (
+                            <ActivityIndicator size="small" color="#0F172A" />
+                          ) : (
+                            <>
+                              <DownloadSvg size={14} color="#0F172A" strokeWidth={2} />
+                              <Text variant="caption" weight="700" color="#0F172A">
+                                Download
+                              </Text>
+                            </>
+                          )}
+                        </TouchableOpacity>
+                      </View>
+                    );
+                  })}
+                </View>
+              </View>
+            );
+          })}
+        </ScrollView>
       )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea:       { flex: 1, backgroundColor: '#FFFFFF' },
-  listContent:    { paddingBottom: 96 },
-  loaderContainer:{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 96,
+    paddingTop: 4,
+  },
+  loaderContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  sectionWrap: {
+    marginTop: spacing.md,
+  },
+  sectionHeader: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+    paddingHorizontal: spacing.lg,
+    marginBottom: 4,
+  },
+  cardContainer: {
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.06)',
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     backgroundColor: '#FFFFFF',
   },
-  rowDivider: { borderBottomWidth: 1, borderBottomColor: 'rgba(15, 23, 42, 0.06)' },
-  rowLeft:    { flex: 1, paddingRight: spacing.sm },
-  translationAbbr: { fontSize: 15, fontWeight: '800', color: colors.textPrimary, letterSpacing: 0.5 },
-  translationName: { fontSize: 13.5, marginBottom: 2 },
-  descText:        { fontSize: 12, lineHeight: 17 },
+  rowDivider: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
+  },
+  rowLeft: {
+    flex: 1,
+    paddingRight: spacing.md,
+  },
+  translationAbbr: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: colors.textPrimary,
+    letterSpacing: 0.5,
+  },
+  translationName: {
+    fontSize: 13.5,
+    marginTop: 1,
+    marginBottom: 2,
+  },
+  descText: {
+    fontSize: 12,
+    lineHeight: 17,
+  },
   deleteBtn: {
     width: 36,
     height: 36,
@@ -209,29 +360,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  emptyContainer: {
+  downloadBtn: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.xl,
-    paddingTop: 80,
-    gap: 12,
-  },
-  emptyIconWrap: {
-    width: 68,
-    height: 68,
-    borderRadius: 34,
-    backgroundColor: 'rgba(253, 210, 35, 0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 4,
-  },
-  emptyTitle:   { fontSize: 17, fontWeight: '700', color: colors.textPrimary, textAlign: 'center' },
-  emptyMessage: { fontSize: 13, lineHeight: 19, textAlign: 'center', maxWidth: 280 },
-  openReaderBtn: {
     backgroundColor: colors.accent,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 99,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: radius.full,
+    gap: 5,
+  },
+  downloadBtnDisabled: {
+    opacity: 0.7,
+  },
+  progressWrap: {
     marginTop: 8,
+  },
+  progressBarTrack: {
+    height: 4,
+    backgroundColor: 'rgba(15, 23, 42, 0.06)',
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: 4,
+    backgroundColor: colors.accent,
+    borderRadius: 2,
+  },
+  progressText: {
+    fontSize: 11,
+    marginTop: 4,
   },
 });
