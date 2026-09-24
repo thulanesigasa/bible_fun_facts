@@ -18,6 +18,7 @@ import { colors } from '../theme/colors';
 import { Text } from './Typography';
 import { StreakHexagonBadge } from './StreakHexagonBadge';
 import { CategoryBadge } from './CategoryBadge';
+import Svg, { Defs, LinearGradient as SvgLinearGradient, Stop, Rect } from 'react-native-svg';
 import {
   STREAK_MILESTONES,
   StreakMilestone,
@@ -334,12 +335,29 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-            {/* Shareable card — solid white canvas, no overflow clip for 100% render fidelity */}
+            {/* Shareable card — aesthetic top-faded gradient into crisp white canvas */}
             <View
               ref={shareCardRef}
               style={styles.shareCard}
               collapsable={false}
             >
+              {/* Aesthetic Faded Gradient Background Canvas */}
+              <Svg
+                style={StyleSheet.absoluteFill}
+                width="100%"
+                height="100%"
+              >
+                <Defs>
+                  <SvgLinearGradient id="cardFadedGrad" x1="0" y1="0" x2="0" y2="1">
+                    <Stop offset="0%" stopColor={tierInfo?.color || colors.accent || '#FDD223'} stopOpacity={0.28} />
+                    <Stop offset="28%" stopColor={tierInfo?.color || colors.accent || '#FDD223'} stopOpacity={0.12} />
+                    <Stop offset="62%" stopColor="#FFFFFF" stopOpacity={0.88} />
+                    <Stop offset="100%" stopColor="#FFFFFF" stopOpacity={1} />
+                  </SvgLinearGradient>
+                </Defs>
+                <Rect width="100%" height="100%" rx={22} ry={22} fill="url(#cardFadedGrad)" />
+              </Svg>
+
               <View style={styles.shareCardInner} collapsable={false}>
                 {/* 3D Multi-Shape Category Badge */}
                 <CategoryBadge
@@ -351,7 +369,7 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
                   label={badgeLabel}
                 />
                 {/* Title */}
-                <Text variant="h2" style={[styles.milestoneTitle, { marginTop: 12 }]}>
+                <Text variant="h2" style={[styles.milestoneTitle, { marginTop: 14 }]}>
                   {displayTitle}
                 </Text>
                 {/* Verse */}
@@ -644,13 +662,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     marginTop: 8,
     marginBottom: 8,
-    borderRadius: 20,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: 'rgba(217, 119, 6, 0.16)',
   },
   shareCardInner: {
     alignItems: 'center',
     width: '100%',
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 16,
+    backgroundColor: 'transparent',
+    paddingVertical: 18,
     paddingHorizontal: 16,
   },
   shareCardFooter: {

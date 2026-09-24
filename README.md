@@ -11,7 +11,7 @@
   <img src="https://img.shields.io/badge/Supabase-Auth%20&%20Backend-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase Backend" />
   <img src="https://img.shields.io/badge/CI%2FCD-Rule%2021%20Compliant-10B981?style=for-the-badge&logo=githubactions&logoColor=white" alt="Rule 21 Compliant" />
   <img src="https://img.shields.io/badge/EAS%20Channels-Production%20%7C%20Preview-000000?style=for-the-badge&logo=expo&logoColor=white" alt="EAS Channels" />
-  <img src="https://img.shields.io/badge/Outer%20Release-v1.0.2-2563EB?style=for-the-badge&logo=android&logoColor=white" alt="Outer Release v1.0.2" />
+  <img src="https://img.shields.io/badge/Outer%20Release-v1.0.3-2563EB?style=for-the-badge&logo=android&logoColor=white" alt="Outer Release v1.0.3" />
   <img src="https://img.shields.io/badge/Security-Kotlin%20FLAG__SECURE-DC2626?style=for-the-badge&logo=android&logoColor=white" alt="Kotlin FLAG_SECURE" />
   <img src="https://img.shields.io/badge/Tab%20Architecture-Floating%20Pill%20280px-FDD223?style=for-the-badge" alt="Floating Pill Tab Bar" />
   <img src="https://img.shields.io/badge/Streak%20Milestones-3D%20Hexagonal%20Badges-F59E0B?style=for-the-badge" alt="3D Streak Milestone Badges" />
@@ -810,8 +810,8 @@ This project strictly adheres to **Rule 21** of our global mobile standards:
 | :--- | :--- |
 | **Direct Runner Compilation** | Android APKs compile on `ubuntu-latest` GitHub Actions runners using Java 17 Temurin, Android SDK, and `./gradlew assembleRelease`, bypassing cloud build queues entirely. |
 | **EAS Exclusively for OTA** | EAS CLI is reserved exclusively for Over-The-Air updates (`production` and `preview` channels) via `npx eas-cli update`. |
-| **Automated Release Distribution** | Compiled APKs are automatically uploaded to GitHub Releases (`exegeomai-v1.0.2.apk` under release tag `v1.0.2`) using `gh release upload --clobber`. |
-| **Locked Runtime Versioning** | `runtimeVersion` is explicitly locked to `1.0.1` in `app.json`, guaranteeing continuous OTA compatibility across all installed clients while CI injects dynamic `versionCode = github.run_number`. |
+| **Automated Release Distribution** | Compiled APKs are automatically uploaded to GitHub Releases (e.g. `exegeomai-v1.0.3.apk` under release tag `v1.0.3`) using `gh release upload --clobber`. |
+| **Locked Runtime Versioning** | `runtimeVersion` is explicitly locked to `1.0.1` in `app.json`, guaranteeing continuous OTA compatibility across all installed clients while CI injects dynamic `versionCode = github.run_number` and creates dynamic release tags (`v${VERSION}`). |
 | **In-App Update Modal** | Implemented in `src/components/UpdateModal.tsx` with foreground resume listening, "Update Now", and 30-minute "Remind Me Later" snooze. |
 | **Peer Dependency Stability** | `.npmrc` with `legacy-peer-deps=true` committed at root to prevent React 19 / Expo peer dependency collisions. |
 | **TypeScript Base Config** | `tsconfig.json` extends `expo/tsconfig.base.json` with explicit `jsx: "react-jsx"` and `esModuleInterop: true`. |
@@ -856,10 +856,10 @@ Native compilation runs automatically on push to `main` directly on GitHub Actio
 
 - **Workflow**: `.github/workflows/compile-and-ota.yml` (`compile_native_app` job)
 - **Engine**: `npx expo prebuild --platform android --no-install` + `./gradlew assembleRelease -x lint -x test --no-daemon`
-- **Output**: Generates `exegeomai-v1.0.2.apk` and uploads it directly to the repository's GitHub Releases page under **Assets** with automatic clobbering.
+- **Output**: Generates `exegeomai-v${VERSION}.apk` (e.g. `exegeomai-v1.0.3.apk`) and uploads it directly to the repository's GitHub Releases page under **Assets** with automatic clobbering.
 
 ### GitHub Releases vs. Over-The-Air (OTA) Updates
-- **GitHub Releases (`/releases`)**: Houses official version tags (e.g. `v1.0.2`), changelogs, and direct `.apk` binary downloads compiled directly on GitHub Actions.
+- **GitHub Releases (`/releases`)**: Houses official version tags (e.g. `v1.0.3`), changelogs, and direct `.apk` binary downloads compiled directly on GitHub Actions.
 - **Expo EAS OTA Updates**: Seamless JavaScript and asset updates deployed directly to user devices over the air across the `production` and `preview` channels (targeting `runtimeVersion: 1.0.1`) without requiring a manual APK reinstall.
 
 ### Native Module Capabilities (Why Native APK Compilation is Required for Image Sharing)
@@ -871,8 +871,8 @@ Native compilation runs automatically on push to `main` directly on GitHub Actio
 
 - **What OTA Updates Deliver**: Over-The-Air (OTA) updates continuously deploy JavaScript bundle updates, styling tokens, and React components without requiring app reinstall.
 - **What Requires a Native Binary (`.apk`) Install**: Native Android libraries containing Java, Kotlin, or C++ code (such as `react-native-view-shot` for rasterizing view trees into PNG bitmaps and `expo-sharing` for system intent file broadcasts) **cannot be injected into an existing APK via OTA**.
-- **Why Older APKs Share as Text**: If a user runs an older APK compiled prior to the introduction of `react-native-view-shot`, the native `RNViewShot` module is absent from the Android binary. The JavaScript layer safely detects this via `NativeModules.RNViewShot` and falls back to formatted scripture text sharing.
-- **Resolution**: Downloading and installing the fresh `exegeomai-v1.0.2.apk` directly from [GitHub Releases](https://github.com/thulanesigasa/bible_fun_facts/releases/tag/v1.0.2) brings the compiled `react-native-view-shot` and `expo-sharing` native packages to the device, unlocking direct high-fidelity PNG image sharing.
+- **Aesthetic Top-Faded Gradient Card**: The shareable milestone picture card renders an SVG linear gradient transitioning from an illuminated warm amber/tier tone at the top (opacity 0.28) to clean, high-contrast white at the bottom, framed in a delicate golden hairline border (`rgba(217, 119, 6, 0.16)`).
+- **Resolution**: Downloading and installing the fresh `exegeomai-v1.0.3.apk` directly from [GitHub Releases](https://github.com/thulanesigasa/bible_fun_facts/releases/tag/v1.0.3) brings the compiled `react-native-view-shot` and `expo-sharing` native packages to the device, unlocking direct high-fidelity PNG image sharing.
 
 ### Type Checking & Validation
 ```bash
