@@ -437,10 +437,10 @@ graph TD
     MetallicShield --> ExtrudedNumber["Dynamic Extruded 3D Number (Streak 1, 2, 3...)"]
     MetallicShield --> LowerSeal["Lower Sacred Seal Glyph"]
     
-    MilestoneModal --> EditableControls["Direct Streak Editor (Numeric Input & Steppers +/-)"]
-    EditableControls --> UserContext["Immediate Persistence to UserContext & AsyncStorage"]
     MilestoneModal --> ScriptureAnchor["Theological Scripture Grounding (e.g. Galatians 6:9)"]
-    MilestoneModal --> UnlockStatus["✓ Badge Unlocked / 🔒 Locked Countdown"]
+    MilestoneModal --> TamperProofStreak["Tamper-Proof Daily Streak Engine (Auto Daily Progression & Skip-Day Reset)"]
+    TamperProofStreak --> UserContext["Immediate Persistence to UserContext, AsyncStorage & PostgreSQL"]
+    MilestoneModal --> UnlockStatus["Badge Unlocked / Locked Countdown"]
     MilestoneModal --> MilestoneShelf["Horizontal Interactive Milestone Shelf (1d to 365d)"]
     MilestoneModal --> BrandFooter["Walk in the Word with exégeomai (24x24 Logo)"]
     MilestoneModal --> NativeShare["Native Achievement Share Sheet"]
@@ -479,14 +479,14 @@ The metallic shield badges implement 4 distinct, prestigiously calibrated color 
 | **180d** | Diamond (Month 6 to 1 Year) | **Half-Year Covenant** | *Six unbroken months anchored in God’s sacred truth.* | Hebrews 6:19 |
 | **365d** | Diamond (Month 6 to 1 Year) | **Canon Completer** | *A complete year walking through every sacred exegesis and covenant.* | Psalm 103:17 |
 
-### 3. Celebratory Showcase Modal & Daily Editable Steppers (`StreakMilestoneModal.tsx`)
-- **Dynamic Full-Bleed Top-Down Gradient**: Smooth SVG linear gradient tint reflecting the selected milestone's tier color (Bronze Copper, Silver Platinum, Biblical Gold, or Diamond Sapphire).
-- **Interactive Daily Streak Editor**: Direct numeric `TextInput` and `[-]` / `[+]` quick steppers embedded in `StreakMilestoneModal.tsx` allowing instantaneous manual adjustment, testing, and real-time badge and background morphing. Clamped to a minimum of Streak 1.
-- **Clean Dismiss & Active Counter**: Minimalist close button (`CloseSvg`) and pill badge displaying the user's active streak (`ShieldCheckSvg`).
+### 3. Celebratory Showcase Modal & Tamper-Proof Streak Integrity (`StreakMilestoneModal.tsx`)
+- **Aesthetic Top-Faded Gradient Background**: Smooth SVG linear gradient tint transitioning from the selected milestone's tier color (28% opacity at top) to crisp clean white at the bottom with a subtle golden hairline border.
+- **Tamper-Proof Streak Architecture**: Daily study streak editing controls (numeric inputs and +/- steppers) have been strictly removed. Streaks can no longer be manually manipulated; progress is solely and authentically earned through the daily Scripture study engagement lifecycle.
+- **Clean Dismiss & Active Counter**: Minimalist close button (`CloseSvg`) and modal header preserving focus on the sacred badge.
 - **Scripture Grounding**: Displays the sacred verse anchor corresponding to each devotion milestone.
 - **Interactive Milestone Shelf**: Horizontal carousel letting users preview all 9 milestone badges, unlock states, and countdowns.
-- **Brand Integrity**: Footer displaying *"Walk in the Word with [logo 24x24] exégeomai"* adhering to Rule 15/19 calibration.
-- **One-Tap Sharing**: Integrates React Native `Share.share` with celebratory formatting.
+- **Brand Integrity**: Footer displaying *"exégeomai"* with 20x20 transparent logo adhering to Rule 15/19 calibration.
+- **One-Tap High-Resolution Sharing**: Preflight-checked PNG bitmap sharing via `react-native-view-shot` and `expo-sharing` with graceful text fallback.
 
 ---
 

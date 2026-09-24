@@ -33,7 +33,6 @@ export default function AchievementsScreen() {
   const { width } = useWindowDimensions();
   const {
     streak,
-    setStreak,
     favoritesScriptures,
     bibleHighlights,
     sharesCount,
@@ -269,7 +268,6 @@ export default function AchievementsScreen() {
         visible={isModalVisible}
         streak={currentStreak}
         achievement={selectedMilestone}
-        onUpdateStreak={setStreak}
         onClose={() => {
           setIsModalVisible(false);
           setSelectedMilestone(null);
