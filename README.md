@@ -479,13 +479,18 @@ The metallic shield badges implement 4 distinct, prestigiously calibrated color 
 | **180d** | Diamond (Month 6 to 1 Year) | **Half-Year Covenant** | *Six unbroken months anchored in God’s sacred truth.* | Hebrews 6:19 |
 | **365d** | Diamond (Month 6 to 1 Year) | **Canon Completer** | *A complete year walking through every sacred exegesis and covenant.* | Psalm 103:17 |
 
-### 3. Celebratory Showcase Modal & Tamper-Proof Streak Integrity (`StreakMilestoneModal.tsx`)
+### 3. Celebratory Showcase Modal & Enriched Share Card Architecture (`StreakMilestoneModal.tsx`)
 - **Aesthetic Top-Faded Gradient Background**: Smooth SVG linear gradient tint transitioning from the selected milestone's tier color (28% opacity at top) to crisp clean white at the bottom with a subtle golden hairline border.
-- **Tamper-Proof Streak Architecture**: Daily study streak editing controls (numeric inputs and +/- steppers) have been strictly removed. Streaks can no longer be manually manipulated; progress is solely and authentically earned through the daily Scripture study engagement lifecycle.
-- **Clean Dismiss & Active Counter**: Minimalist close button (`CloseSvg`) and modal header preserving focus on the sacred badge.
-- **Scripture Grounding**: Displays the sacred verse anchor corresponding to each devotion milestone.
+- **Enriched Self-Contained Share Card Canvas**: The generated bitmap view (`shareCardRef`) unifies the entire devotion showcase directly on the card canvas for high-resolution sharing:
+  - **Illuminated Tier Header Pill**: Displays the exact tier category (e.g. `AMBER SHIELD • DAY 1 TO 6` or `${badgeLabel} MILESTONE`) in uppercase tracking.
+  - **Procedural 3D Category / Hexagonal Shield Badge**: Pure vector SVG badge rendering (`size={200}`).
+  - **Milestone Title**: Primary milestone name (e.g. `First Step`, `Faithful Scribe`, `Canon Completer`).
+  - **Inspirational Epigram Subtitle**: Devotional reflection text (e.g. `The journey of 365 days begins with a single scripture.`).
+  - **Theological Scripture Grounding Box**: Full scripture quote with sacred citation (e.g. `— Philippians 1:6`).
+  - **Brand Wordmark Footer**: Official `exégeomai` transparent logo and wordmark.
+- **Tamper-Proof Streak Integrity**: Daily study streak editing controls (numeric inputs and +/- steppers) have been strictly removed. Streaks can no longer be manually manipulated; progress is solely and authentically earned through the daily Scripture study engagement lifecycle.
+- **Unified Modal Layout**: Eliminates redundant lower copy blocks, keeping the modal clean and focused directly on the self-contained card and horizontal milestone shelf.
 - **Interactive Milestone Shelf**: Horizontal carousel letting users preview all 9 milestone badges, unlock states, and countdowns.
-- **Brand Integrity**: Footer displaying *"exégeomai"* with 20x20 transparent logo adhering to Rule 15/19 calibration.
 - **One-Tap High-Resolution Sharing**: Preflight-checked PNG bitmap sharing via `react-native-view-shot` and `expo-sharing` with graceful text fallback.
 
 ---
