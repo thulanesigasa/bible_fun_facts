@@ -1,5 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BibleChapterData, PREBUNDLED_CHAPTERS } from '../data/bibleCanon';
+import {
+  getOfflineChapter,
+  TRANSLATION_SOURCES,
+} from './offlineBibleService';
+
+export * from './offlineBibleService';
 
 const CACHE_PREFIX = '@bible_chapter_cache_';
 const LAST_READ_KEY = '@bible_last_read_position';
@@ -16,7 +22,8 @@ export interface LastReadPosition {
 }
 
 /**
- * Fetch full chapter from bible-api.com with multi-tier caching:
+ * Fetch full chapter from multi-tier caching:
+ * 0. Offline downloaded full Bible translation packages (instant 0ms)
  * 1. Memory cache
  * 2. AsyncStorage persistent local cache
  * 3. Network fetch via bible-api.com (free, public domain)
@@ -29,6 +36,17 @@ export async function fetchChapter(
 ): Promise<BibleChapterData> {
   const normalizedBook = book.trim();
   const cacheKey = `${translation}_${normalizedBook.replace(/\s+/g, '_')}_${chapter}`;
+
+  // 0. Check offline downloaded full translation package (instant 0ms, complete 66 books)
+  try {
+    const offlineChapter = await getOfflineChapter(normalizedBook, chapter, translation);
+    if (offlineChapter) {
+      memoryCache.set(cacheKey, offlineChapter);
+      return offlineChapter;
+    }
+  } catch (offlineErr) {
+    console.warn('Offline package lookup error:', offlineErr);
+  }
 
   // 1. Check memory cache
   if (memoryCache.has(cacheKey)) {
@@ -105,7 +123,7 @@ export async function fetchChapter(
         book_name: normalizedBook,
         chapter: chapter,
         verse: 1,
-        text: `Please connect to the internet to download ${normalizedBook} Chapter ${chapter}. Once downloaded, it will be available offline permanently.`,
+        text: `You are currently offline. Please connect to the internet to load ${normalizedBook} ${chapter}, or download ${translation.toUpperCase()} in the translation picker for full offline access to all 66 books.`,
       },
     ],
     text: `Connecting to Bible Library for ${normalizedBook} ${chapter}...`,

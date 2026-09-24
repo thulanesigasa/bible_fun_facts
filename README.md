@@ -16,6 +16,7 @@
   <img src="https://img.shields.io/badge/Tab%20Architecture-Floating%20Pill%20280px-FDD223?style=for-the-badge" alt="Floating Pill Tab Bar" />
   <img src="https://img.shields.io/badge/Streak%20Milestones-3D%20Hexagonal%20Badges-F59E0B?style=for-the-badge" alt="3D Streak Milestone Badges" />
   <img src="https://img.shields.io/badge/Achievements-Streak%20%7C%20Bookmarks%20%7C%20Highlights%20%7C%20Shares-FDD223?style=for-the-badge" alt="Multi-Category Achievements" />
+  <img src="https://img.shields.io/badge/Offline%20Bibles-10%20Full%20Translations%20%7C%200ms%20Local%20Cache-10B981?style=for-the-badge" alt="Offline Bible Translations" />
   <img src="https://img.shields.io/badge/Share%20Engine-Zero%20Blank%20%7C%20High--Fidelity%20PNG-10B981?style=for-the-badge" alt="Zero Blank Share Engine" />
   <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
@@ -66,7 +67,8 @@ graph TD
     ProfileStack --> Privacy
     
     subgraph DataUpdates["Data, State, Canon and Caching"]
-        BibleService["bibleService.ts (Public Domain API)"] <--> AsyncStorage[("AsyncStorage Cache (@bible_chapter_cache_)")]
+        BibleService["bibleService.ts & offlineBibleService.ts"] <--> OfflineFS[("expo-file-system (offline_bibles/)")]
+        BibleService <--> AsyncStorage[("AsyncStorage Cache (@bible_chapter_cache_)")]
         BibleCanon["bibleCanon.ts (66 Books & Fallback)"] --> BibleReader
         MockUsers["mockUsers.ts (8 Theological Scholars)"] --> SearchMain
         AsyncStorage <--> UserContext["UserContext (useApp / useUser)"]
@@ -231,7 +233,9 @@ exegeomai/
 │   │   ├── WOTDScreen.tsx                # Daily devotional with 4 analytical lenses & full Bible reader
 │   │   └── WriterDetailsScreen.tsx       # In-depth modal sheet for biblical author biography & manuscripts
 │   ├── services/
+│   │   ├── bibleService.ts               # Multi-tier Bible reading and chapter caching engine
 │   │   ├── notifications.ts              # Expo notifications handler and scheduler
+│   │   ├── offlineBibleService.ts        # Offline full-translation download, filesystem storage, and 0ms reader
 │   │   ├── supabase.ts                   # Supabase client SDK with AsyncStorage persistence
 │   │   └── updates.ts                    # Expo OTA updates check, download, and reload service
 │   └── theme/
@@ -880,6 +884,44 @@ Native compilation runs automatically on push to `main` directly on GitHub Actio
 - **What Requires a Native Binary (`.apk`) Install**: Native Android libraries containing Java, Kotlin, or C++ code (such as `react-native-view-shot` for rasterizing view trees into PNG bitmaps and `expo-sharing` for system intent file broadcasts) **cannot be injected into an existing APK via OTA**.
 - **Aesthetic Top-Faded Gradient Card**: The shareable milestone picture card renders an SVG linear gradient transitioning from an illuminated warm amber/tier tone at the top (opacity 0.28) to clean, high-contrast white at the bottom, framed in a delicate golden hairline border (`rgba(217, 119, 6, 0.16)`).
 - **Resolution**: Downloading and installing the fresh `exegeomai-v1.0.3.apk` directly from [GitHub Releases](https://github.com/thulanesigasa/bible_fun_facts/releases/tag/v1.0.3) brings the compiled `react-native-view-shot` and `expo-sharing` native packages to the device, unlocking direct high-fidelity PNG image sharing.
+
+---
+
+## Offline Bible Versions & Download Architecture
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Offline%20Engine-expo--file--system-000000?style=for-the-badge&logo=expo&logoColor=white" alt="expo-file-system" />
+  <img src="https://img.shields.io/badge/Translations-10%20Public%20Domain%20Versions-FDD223?style=for-the-badge" alt="10 Public Domain Versions" />
+  <img src="https://img.shields.io/badge/Cache%20Latency-0ms%20Instant-10B981?style=for-the-badge" alt="0ms Instant" />
+  <img src="https://img.shields.io/badge/Storage%20Path-offline__bibles%2F-2563EB?style=for-the-badge" alt="Storage Path" />
+</p>
+
+exégeomai includes a resilient, high-speed offline Bible translation download and storage engine that empowers users to read, study, and cross-reference Scripture completely offline without cellular or Wi-Fi connectivity.
+
+### 1. Supported Public Domain Translations
+Users can download full 66-book canonical translations with a single tap directly inside the Bible Reader:
+- **WEB (World English Bible)**: Modern English, complete 66 books (~4.1 MB)
+- **KJV (King James Version)**: Classic 1611 authorized text, complete 66 books (~4.2 MB)
+- **ASV (American Standard Version)**: Literal 1901 scholarly text, complete 66 books (~4.2 MB)
+- **BBE (Bible in Basic English)**: Simple 1,000-word vocabulary, complete 66 books (~4.0 MB)
+- **DARBY (Darby Bible)**: Precise 1890 translation, complete 66 books (~4.2 MB)
+- **DRA (Douay-Rheims 1899)**: Catholic public domain text, complete 66 books (~4.3 MB)
+- **YLT (Young's Literal Translation)**: Strict literal rendering, complete 66 books (~4.2 MB)
+- **WEBBE (World English Bible - British)**: British spelling edition, complete 66 books (~4.1 MB)
+- **OEB-US (Open English Bible - US)**: Modern open-license American English (~4.1 MB)
+- **OEB-CW (Open English Bible - Commonwealth)**: Modern open-license UK English (~4.1 MB)
+
+### 2. Multi-Tier Resolution Pipeline
+When any chapter is requested in the Bible Reader (`fetchChapter(book, chapter, translation)`), the engine resolves content across five deterministic tiers:
+1. **Tier 0 — Offline Downloaded Package (0ms)**: Direct file read from local device storage (`FileSystem.documentDirectory + 'offline_bibles/' + translation + '.json'`) with an in-memory fast book index.
+2. **Tier 1 — In-Memory Chapter Cache (0ms)**: Fast `Map<string, BibleChapterData>` storing recently accessed chapters in RAM.
+3. **Tier 2 — AsyncStorage Local Cache (<5ms)**: Persistent individual chapter cache (`@bible_chapter_cache_${translation}_${book}_${chapter}`).
+4. **Tier 3 — Network API Fetch (bible-api.com)**: Dynamic fetch and persistent chapter cache when connected to the internet.
+5. **Tier 4 — Prebundled Canon Fallback**: Embedded foundational chapters (`Genesis 1`, `John 3`, `Psalms 23`) ensuring the reader never crashes even on fresh installations with no internet.
+
+### 3. Translation Management & Disk Space Control
+- **In-Reader Translation Sheet**: Each translation row displays version name, scholarly tag, estimated download size, real-time downloading progress percentage bar, and an "Offline Ready" checkmark status badge.
+- **Profile Screen Management**: A dedicated "OFFLINE BIBLES & TRANSLATIONS" section in the Profile body provides an aggregated storage breakdown and 1-tap delete controls to reclaim disk space.
 
 ### Type Checking & Validation
 ```bash

@@ -20,7 +20,14 @@ import { Text } from '../components/Typography';
 import { wotd, LENS_TABS, Scripture } from '../data/mockDatabase';
 import { useUser } from '../context/UserContext';
 import { BIBLE_BOOKS, BibleBook, BibleChapterData, BibleVerse } from '../data/bibleCanon';
-import { fetchChapter } from '../services/bibleService';
+import {
+  fetchChapter,
+  getDownloadedTranslations,
+  downloadTranslation,
+  deleteDownloadedTranslation,
+  subscribeOfflineUpdates,
+  TRANSLATION_SOURCES,
+} from '../services/bibleService';
 import {
   OriginalIntentSvg,
   TheologicalTruthSvg,
@@ -39,6 +46,10 @@ import {
   SearchSvg,
   AaTextSvg,
   BookmarkSvg,
+  DownloadSvg,
+  CheckCircleSvg,
+  TrashSvg,
+  OfflineCloudSvg,
 } from '../components/SvgIcons';
 import { isRedLetter } from '../data/redLetterVerses';
 import { UiverseSwitch } from '../components/UiverseSwitch';
@@ -170,8 +181,63 @@ export default function WOTDScreen({ route, navigation }: any) {
   const [navChapter, setNavChapter] = useState<number | null>(null);
   const [bookSearchText, setBookSearchText] = useState('');
 
-  // ── Translation picker ───────────────────────────────────────────
+  // ── Translation picker & Offline Download State ─────────────────────
   const [isTranslationPickerOpen, setIsTranslationPickerOpen] = useState(false);
+  const [downloadedTranslations, setDownloadedTranslations] = useState<string[]>([]);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [downloadProgress, setDownloadProgress] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadDownloaded = async () => {
+      try {
+        const list = await getDownloadedTranslations();
+        if (isMounted) {
+          setDownloadedTranslations(list.map((t) => t.id));
+        }
+      } catch (err) {
+        console.warn('Error loading downloaded translations:', err);
+      }
+    };
+    loadDownloaded();
+    const unsubscribe = subscribeOfflineUpdates(() => {
+      loadDownloaded();
+    });
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
+  }, []);
+
+  const handleDownloadTranslation = async (key: BibleTranslation) => {
+    if (downloadingId) return;
+    try {
+      setDownloadingId(key);
+      setDownloadProgress((prev) => ({ ...prev, [key]: 10 }));
+      await downloadTranslation(key, (pct) => {
+        setDownloadProgress((prev) => ({ ...prev, [key]: pct }));
+      });
+      setDownloadedTranslations((prev) => [...new Set([...prev, key])]);
+    } catch (e) {
+      console.warn('Failed to download translation:', e);
+    } finally {
+      setDownloadingId(null);
+      setDownloadProgress((prev) => {
+        const copy = { ...prev };
+        delete copy[key];
+        return copy;
+      });
+    }
+  };
+
+  const handleDeleteTranslation = async (key: BibleTranslation) => {
+    try {
+      await deleteDownloadedTranslation(key);
+      setDownloadedTranslations((prev) => prev.filter((id) => id !== key));
+    } catch (e) {
+      console.warn('Failed to delete translation:', e);
+    }
+  };
 
   // ── Aa Settings Sheet (Synchronized with UserContext userProfile) ───────────
   const [isAaOpen, setIsAaOpen] = useState(false);
@@ -204,8 +270,12 @@ export default function WOTDScreen({ route, navigation }: any) {
   // ── Deep-Linking Target Verse Ref ─────────────────────────────────────────
   const targetVerseRef = useRef<number | null>(null);
 
-  // Handle external navigation from BookmarksScreen or Feed
+  // Handle external navigation from BookmarksScreen, Feed, or Profile
   useEffect(() => {
+    if (route?.params?.openTranslationPicker) {
+      setActiveTab('bible');
+      setIsTranslationPickerOpen(true);
+    }
     if (route?.params?.book) {
       const { book, chapter, verse } = route.params;
       const targetBook = BIBLE_BOOKS.find(
@@ -884,29 +954,47 @@ export default function WOTDScreen({ route, navigation }: any) {
                 onStartShouldSetResponder={() => true}
               >
                 <View style={[styles.aaSheetHandle, { backgroundColor: readerTheme === 'dark' ? '#334155' : '#E2E8F0' }]} />
-                <Text style={[styles.aaSectionLabel, { color: theme.textSecondary }]}>SELECT TRANSLATION</Text>
-                <Text style={[styles.translationSubLabel, { color: theme.textSecondary }]}>
-                  10 public domain versions from bible-api.com
-                </Text>
+                <View style={styles.translationSheetHeader}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.aaSectionLabel, { color: theme.textSecondary }]}>SELECT TRANSLATION</Text>
+                    <Text style={[styles.translationSubLabel, { color: theme.textSecondary }]}>
+                      10 public domain versions • 1-tap offline download
+                    </Text>
+                  </View>
+                  {downloadedTranslations.length > 0 && (
+                    <View style={styles.offlineStatsPill}>
+                      <OfflineCloudSvg size={13} color={colors.accent} />
+                      <Text style={styles.offlineStatsText}>
+                        {downloadedTranslations.length} OFFLINE
+                      </Text>
+                    </View>
+                  )}
+                </View>
 
                 <ScrollView showsVerticalScrollIndicator={false} style={styles.translationScrollList}>
                   {TRANSLATIONS.map(key => {
                     const isActive = translation === key;
                     const meta = TRANSLATION_META[key];
+                    const isDownloaded = downloadedTranslations.includes(key);
+                    const isDownloading = downloadingId === key;
+                    const progress = downloadProgress[key] || 0;
+
                     return (
-                      <TouchableOpacity
+                      <View
                         key={key}
                         style={[
                           styles.translationRow,
                           isActive && { backgroundColor: colors.accentSoft, borderColor: colors.accent, borderWidth: 1 },
                         ]}
-                        onPress={() => {
-                          setTranslation(key);
-                          setIsTranslationPickerOpen(false);
-                        }}
-                        activeOpacity={0.75}
                       >
-                        <View style={styles.translationRowLeft}>
+                        <TouchableOpacity
+                          style={styles.translationRowLeft}
+                          onPress={() => {
+                            setTranslation(key);
+                            setIsTranslationPickerOpen(false);
+                          }}
+                          activeOpacity={0.75}
+                        >
                           <View style={styles.translationNameRow}>
                             <Text style={[styles.translationKey, { color: isActive ? colors.accent : theme.text }]}>
                               {TRANSLATION_LABELS[key]}
@@ -916,18 +1004,64 @@ export default function WOTDScreen({ route, navigation }: any) {
                                 {meta.tag}
                               </Text>
                             </View>
+                            {isDownloaded && (
+                              <View style={styles.downloadedStatusPill}>
+                                <CheckCircleSvg size={12} color="#10B981" />
+                                <Text style={styles.downloadedStatusText}>Offline Ready</Text>
+                              </View>
+                            )}
                           </View>
                           <Text style={[styles.translationDesc, { color: isActive ? theme.text : theme.textSecondary }]}>
                             {meta.name}
                           </Text>
                           <Text style={[styles.translationMeta, { color: theme.textSecondary }]}>
-                            {meta.desc}
+                            {meta.desc} • {TRANSLATION_SOURCES[key]?.sizeEstimate || '4.1 MB'}
                           </Text>
+
+                          {/* Progress bar if downloading */}
+                          {isDownloading && (
+                            <View style={styles.downloadProgressContainer}>
+                              <View style={styles.downloadProgressBarBg}>
+                                <View style={[styles.downloadProgressBarFill, { width: `${progress}%` }]} />
+                              </View>
+                              <Text style={styles.downloadProgressText}>
+                                Downloading full 66 books... {progress}%
+                              </Text>
+                            </View>
+                          )}
+                        </TouchableOpacity>
+
+                        {/* Right action: Download / Delete / Active indicator */}
+                        <View style={styles.translationRowRight}>
+                          {isDownloading ? (
+                            <ActivityIndicator size="small" color={colors.accent} />
+                          ) : isDownloaded ? (
+                            <View style={styles.downloadedActionsRow}>
+                              <TouchableOpacity
+                                onPress={() => handleDeleteTranslation(key)}
+                                style={styles.deleteTranslationIconBtn}
+                                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                                accessibilityLabel={`Remove ${TRANSLATION_LABELS[key]} offline download`}
+                              >
+                                <TrashSvg size={16} color="#94A3B8" />
+                              </TouchableOpacity>
+                              {isActive ? (
+                                <View style={[styles.translationCheck, { backgroundColor: colors.accent }]} />
+                              ) : null}
+                            </View>
+                          ) : (
+                            <TouchableOpacity
+                              onPress={() => handleDownloadTranslation(key)}
+                              style={styles.downloadActionBtn}
+                              activeOpacity={0.8}
+                              accessibilityLabel={`Download ${TRANSLATION_LABELS[key]} for offline reading`}
+                            >
+                              <DownloadSvg size={14} color={colors.accent} />
+                              <Text style={styles.downloadActionBtnText}>Download</Text>
+                            </TouchableOpacity>
+                          )}
                         </View>
-                        {isActive && (
-                          <View style={[styles.translationCheck, { backgroundColor: colors.accent }]} />
-                        )}
-                      </TouchableOpacity>
+                      </View>
                     );
                   })}
                 </ScrollView>
@@ -1534,6 +1668,93 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: '700',
     letterSpacing: 0.5,
+  },
+  translationSheetHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  offlineStatsPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    backgroundColor: colors.accentSoft,
+    borderWidth: 1,
+    borderColor: 'rgba(253, 210, 35, 0.4)',
+  },
+  offlineStatsText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: colors.accent,
+    letterSpacing: 0.5,
+  },
+  downloadedStatusPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+  },
+  downloadedStatusText: {
+    fontSize: 9.5,
+    fontWeight: '700',
+    color: '#059669',
+  },
+  downloadProgressContainer: {
+    marginTop: 6,
+    gap: 3,
+  },
+  downloadProgressBarBg: {
+    height: 4,
+    backgroundColor: 'rgba(15, 23, 42, 0.08)',
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  downloadProgressBarFill: {
+    height: '100%',
+    backgroundColor: colors.accent,
+    borderRadius: 2,
+  },
+  downloadProgressText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: colors.accent,
+  },
+  translationRowRight: {
+    marginLeft: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  downloadActionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: colors.accent,
+  },
+  downloadActionBtnText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.accent,
+  },
+  downloadedActionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  deleteTranslationIconBtn: {
+    padding: 6,
+    borderRadius: 6,
   },
 
   // ── Daily Exegesis ──────────────────────────────────────────────────────────
