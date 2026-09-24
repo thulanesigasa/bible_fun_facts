@@ -10,7 +10,7 @@ import { colors } from '../theme/colors';
 import { spacing } from '../theme';
 import { Text } from '../components/Typography';
 import { useUser } from '../context/UserContext';
-import { DAILY_MESSAGES, DailyMessage, getDayOfYear } from '../data/dailyMessages';
+import { DAILY_MESSAGES, DailyMessage } from '../data/dailyMessages';
 import { BookOpenSvg, ScrollSvg, StrongsIconSvg } from '../components/SvgIcons';
 
 interface UnfoldedScreenProps {
@@ -18,21 +18,18 @@ interface UnfoldedScreenProps {
 }
 
 export default function UnfoldedScreen({ navigation }: UnfoldedScreenProps) {
-  useUser(); // keeps context subscription alive for realtime streak sync
-  const dayOfYear = useMemo(() => getDayOfYear(), []);
+  const { readFactIds } = useUser();
 
-  // Today's day-of-year is the authoritative ceiling — every day from Day 1
-  // up to and including today has been "unfolded". factsViewedCount from
-  // Supabase is a stale engagement counter, NOT the calendar window.
-  const unlockedCount = useMemo(() => {
-    return Math.max(1, Math.min(365, dayOfYear));
-  }, [dayOfYear]);
+  // Build a Set for O(1) lookup, then filter DAILY_MESSAGES to only those the
+  // user has explicitly marked read via the Done button in FactDetailsScreen.
+  // Reverse so the most recently read entry appears at the top.
+  const readSet = useMemo(() => new Set(readFactIds), [readFactIds]);
 
-  // Slice DAILY_MESSAGES[0..unlockedCount-1] (Day 1 → today), then reverse
-  // so today's entry appears at the top of the list.
   const unfoldedFacts: DailyMessage[] = useMemo(() => {
-    return DAILY_MESSAGES.slice(0, unlockedCount).reverse();
-  }, [unlockedCount]);
+    return DAILY_MESSAGES
+      .filter(m => readSet.has(m.id))
+      .reverse();
+  }, [readSet]);
 
   const handleOpenFact = (fact: DailyMessage) => {
     navigation.navigate('FactDetails', { fact });
@@ -120,10 +117,10 @@ export default function UnfoldedScreen({ navigation }: UnfoldedScreenProps) {
               <ScrollSvg size={36} color={colors.accent} strokeWidth={1.5} />
             </View>
             <Text variant="h3" style={styles.emptyTitle}>
-              No Exegeses Unfolded Yet
+              No Exegeses Read Yet
             </Text>
             <Text variant="body" color={colors.textSecondary} style={styles.emptyMessage}>
-              Each day of your scripture journey unlocks a deep historical and cultural exegesis.
+              Open any daily exegesis on the Discover tab and tap Done — it will appear here as part of your personal reading archive.
             </Text>
             <TouchableOpacity
               style={styles.exploreBtn}
