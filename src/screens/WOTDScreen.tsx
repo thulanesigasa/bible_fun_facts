@@ -58,7 +58,7 @@ type LensKey = 'original_intent' | 'theological_truth' | 'modern_walk' | 'prayer
 type ActiveTab = 'bible' | 'exegesis';
 type BibleTranslation = string;
 type ReaderTheme = 'light' | 'sepia' | 'dark';
-type NavStep = 'books' | 'chapters' | 'verses';
+type NavStep = 'books' | 'chapters';
 
 // ─── YouVersion Highlight Colors ─────────────────────────────────────────────
 const HIGHLIGHT_COLORS = [
@@ -163,7 +163,6 @@ export default function WOTDScreen({ route, navigation }: any) {
   const [navStep, setNavStep] = useState<NavStep>('books');
   const [navTestament, setNavTestament] = useState<'OT' | 'NT'>('NT');
   const [navBook, setNavBook] = useState<BibleBook | null>(null);
-  const [navChapter, setNavChapter] = useState<number | null>(null);
   const [bookSearchText, setBookSearchText] = useState('');
 
   // ── Translation picker & Offline Download State ─────────────────────
@@ -460,7 +459,6 @@ export default function WOTDScreen({ route, navigation }: any) {
   const openNav = () => {
     setNavStep('books');
     setNavBook(selectedBook);
-    setNavChapter(null);
     setBookSearchText('');
     setIsNavOpen(true);
   };
@@ -468,19 +466,6 @@ export default function WOTDScreen({ route, navigation }: any) {
   const onNavBookTap = (book: BibleBook) => {
     setNavBook(book);
     setNavStep('chapters');
-  };
-
-  const onNavChapterTap = (ch: number) => {
-    setNavChapter(ch);
-    setNavStep('verses');
-  };
-
-  const onNavVerseTap = (v: number) => {
-    if (navBook && navChapter) {
-      setSelectedBook(navBook);
-      setSelectedChapter(navChapter);
-      setIsNavOpen(false);
-    }
   };
 
   const onNavChapterConfirm = (ch: number) => {
@@ -741,7 +726,7 @@ export default function WOTDScreen({ route, navigation }: any) {
             </Animated.View>
           )}
 
-          {/* ── 3-Step Canonical Navigator Modal ── */}
+          {/* ── 2-Step Canonical Navigator Modal ── */}
           <Modal visible={isNavOpen} animationType="slide" transparent={false} onRequestClose={() => setIsNavOpen(false)}>
             <SafeAreaView style={[styles.navModal, { backgroundColor: theme.bg }]}>
               {/* Nav modal header */}
@@ -749,16 +734,15 @@ export default function WOTDScreen({ route, navigation }: any) {
                 <TouchableOpacity onPress={() => setIsNavOpen(false)} style={styles.navModalClose}>
                   <XCloseSvg size={22} color={theme.textSecondary} />
                 </TouchableOpacity>
-                {/* 3 step tabs */}
+                {/* 2 step tabs */}
                 <View style={styles.navStepRow}>
-                  {(['books', 'chapters', 'verses'] as NavStep[]).map(step => (
+                  {(['books', 'chapters'] as NavStep[]).map(step => (
                     <TouchableOpacity
                       key={step}
                       style={[styles.navStepTab, navStep === step && styles.navStepTabActive]}
                       onPress={() => {
                         if (step === 'chapters' && navBook) setNavStep('chapters');
                         else if (step === 'books') setNavStep('books');
-                        else if (step === 'verses' && navBook && navChapter) setNavStep('verses');
                       }}
                     >
                       <Text style={[styles.navStepLabel, { color: navStep === step ? colors.accent : theme.textSecondary }]}>
@@ -843,28 +827,7 @@ export default function WOTDScreen({ route, navigation }: any) {
                 </View>
               )}
 
-              {/* VERSES step */}
-              {navStep === 'verses' && navBook && navChapter && (
-                <View style={styles.flex1}>
-                  <TouchableOpacity style={styles.navBackRow} onPress={() => setNavStep('chapters')}>
-                    <ChevronLeftSvg size={18} color={colors.accent} />
-                    <Text style={{ color: colors.accent, fontWeight: '700', fontSize: 14 }}>Chapters</Text>
-                  </TouchableOpacity>
-                  <Text style={[styles.navBookTitle, { color: theme.text }]}>{navBook.name} {navChapter}</Text>
-                  <ScrollView contentContainerStyle={styles.navChapterGrid} showsVerticalScrollIndicator={false}>
-                    {Array.from({ length: 50 }, (_, i) => i + 1).map(v => (
-                      <TouchableOpacity
-                        key={v}
-                        style={styles.navChTile}
-                        onPress={() => onNavVerseTap(v)}
-                        activeOpacity={0.7}
-                      >
-                        <Text style={[styles.navChTileText, { color: theme.text }]}>{v}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
-              )}
+
             </SafeAreaView>
           </Modal>
 
