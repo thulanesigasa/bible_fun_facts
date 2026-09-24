@@ -344,14 +344,7 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
               </Svg>
 
               <View style={styles.shareCardInner} collapsable={false}>
-                {/* 1. Amber Shield Tier Badge / Pill at the top */}
-                <View style={styles.shareCardTierWrap}>
-                  <Text variant="caption" weight="800" style={[styles.shareCardTierLabel, { color: tierInfo.color }]}>
-                    {isCustom ? `${badgeLabel} MILESTONE` : tierInfo.badgeLabel}
-                  </Text>
-                </View>
-
-                {/* 2. 3D Multi-Shape Category Badge */}
+                {/* 1. 3D Multi-Shape Category Badge */}
                 <CategoryBadge
                   category={activeAchievement?.category || 'streak'}
                   shape={activeAchievement?.shape || 'hexagon'}
@@ -360,6 +353,15 @@ export const StreakMilestoneModal: React.FC<StreakMilestoneModalProps> = ({
                   size={200}
                   label={badgeLabel}
                 />
+
+                {/* 2. Amber Shield Tier Header — pure clean body text (zero badge pill, zero div) */}
+                <Text
+                  variant="caption"
+                  weight="800"
+                  style={[styles.shareCardTierText, { color: tierInfo.color }]}
+                >
+                  {isCustom ? `${badgeLabel} MILESTONE` : tierInfo.badgeLabel}
+                </Text>
 
                 {/* 3. First Step Title */}
                 <Text variant="h2" style={styles.shareCardTitle}>
@@ -614,27 +616,19 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 18,
   },
-  shareCardTierWrap: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.85)',
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    marginBottom: 14,
-  },
-  shareCardTierLabel: {
+  shareCardTierText: {
     fontSize: 11,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
     textAlign: 'center',
+    marginTop: 14,
+    marginBottom: 4,
   },
   shareCardTitle: {
     fontSize: 26,
     fontWeight: '800',
     color: '#0F172A',
     textAlign: 'center',
-    marginTop: 12,
     marginBottom: 6,
     letterSpacing: -0.4,
   },
@@ -651,12 +645,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 12,
     paddingHorizontal: 14,
-    paddingVertical: 8,
-    backgroundColor: 'rgba(15, 23, 42, 0.03)',
-    borderRadius: 12,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
   },
   shareCardVerseQuote: {
     fontStyle: 'italic',
