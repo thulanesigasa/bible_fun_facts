@@ -12,6 +12,7 @@ import {
   Animated,
   Clipboard,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
@@ -216,8 +217,13 @@ export default function WOTDScreen({ route, navigation }: any) {
         setDownloadProgress((prev) => ({ ...prev, [key]: pct }));
       });
       setDownloadedTranslations((prev) => [...new Set([...prev, key])]);
-    } catch (e) {
+    } catch (e: any) {
       console.warn('Failed to download translation:', e);
+      Alert.alert(
+        'Download Incomplete',
+        `Unable to complete download for ${TRANSLATION_LABELS[key] || key.toUpperCase()}. Please check your connection and tap Download to retry.`,
+        [{ text: 'OK' }]
+      );
     } finally {
       setDownloadingId(null);
       setDownloadProgress((prev) => {

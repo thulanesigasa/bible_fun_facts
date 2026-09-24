@@ -891,6 +891,8 @@ Native compilation runs automatically on push to `main` directly on GitHub Actio
 
 <p align="left">
   <img src="https://img.shields.io/badge/Offline%20Engine-expo--file--system-000000?style=for-the-badge&logo=expo&logoColor=white" alt="expo-file-system" />
+  <img src="https://img.shields.io/badge/CDN%20Redundancy-jsDelivr%20%7C%20GitHub%20%7C%20Fastly-10B981?style=for-the-badge" alt="Multi-CDN Redundancy" />
+  <img src="https://img.shields.io/badge/BOM%20Protection-UTF--8%20Byte%20Order%20Mark%20Strip-FDD223?style=for-the-badge" alt="BOM Protection" />
   <img src="https://img.shields.io/badge/Translations-10%20Public%20Domain%20Versions-FDD223?style=for-the-badge" alt="10 Public Domain Versions" />
   <img src="https://img.shields.io/badge/Cache%20Latency-0ms%20Instant-10B981?style=for-the-badge" alt="0ms Instant" />
   <img src="https://img.shields.io/badge/Storage%20Path-offline__bibles%2F-2563EB?style=for-the-badge" alt="Storage Path" />
@@ -900,18 +902,35 @@ exégeomai includes a resilient, high-speed offline Bible translation download a
 
 ### 1. Supported Public Domain Translations
 Users can download full 66-book canonical translations with a single tap directly inside the Bible Reader:
-- **WEB (World English Bible)**: Modern English, complete 66 books (~4.1 MB)
-- **KJV (King James Version)**: Classic 1611 authorized text, complete 66 books (~4.2 MB)
-- **ASV (American Standard Version)**: Literal 1901 scholarly text, complete 66 books (~4.2 MB)
-- **BBE (Bible in Basic English)**: Simple 1,000-word vocabulary, complete 66 books (~4.0 MB)
-- **DARBY (Darby Bible)**: Precise 1890 translation, complete 66 books (~4.2 MB)
-- **DRA (Douay-Rheims 1899)**: Catholic public domain text, complete 66 books (~4.3 MB)
-- **YLT (Young's Literal Translation)**: Strict literal rendering, complete 66 books (~4.2 MB)
-- **WEBBE (World English Bible - British)**: British spelling edition, complete 66 books (~4.1 MB)
-- **OEB-US (Open English Bible - US)**: Modern open-license American English (~4.1 MB)
-- **OEB-CW (Open English Bible - Commonwealth)**: Modern open-license UK English (~4.1 MB)
+- **WEB (World English Bible)**: Modern English, complete 66 books (~4.0 MB)
+- **KJV (King James Version)**: Classic 1611 authorized text, complete 66 books (~4.1 MB)
+- **ASV (American Standard Version)**: Literal 1901 scholarly text, complete 66 books (~4.1 MB)
+- **BBE (Bible in Basic English)**: Simple 1,000-word vocabulary, complete 66 books (~4.1 MB)
+- **DARBY (Darby Bible)**: Precise 1890 translation, complete 66 books (~4.0 MB)
+- **DRA (Douay-Rheims 1899)**: Catholic public domain text, complete 66 books (~4.0 MB)
+- **YLT (Young's Literal Translation)**: Strict literal rendering, complete 66 books (~4.1 MB)
+- **WEBBE (World English Bible - British)**: British spelling edition, complete 66 books (~4.0 MB)
+- **OEB-US (Open English Bible - US)**: Modern open-license American English (~3.9 MB)
+- **OEB-CW (Open English Bible - Commonwealth)**: Modern open-license UK English (~4.0 MB)
 
-### 2. Multi-Tier Resolution Pipeline
+### 2. Multi-CDN Mirror Architecture & Download Resilience
+To guarantee 100% download reliability regardless of regional network throttling, ISP blocklists, or GitHub raw IP rate limits, `offlineBibleService.ts` incorporates a multi-tier mirror failover pipeline:
+1. **Primary Mirror**: jsDelivr Global Edge CDN (`https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/${file}`) — high-speed Anycast edge routing with zero IP rate limits.
+2. **Secondary Mirror**: Direct GitHub Raw Source (`https://raw.githubusercontent.com/thiagobodruk/bible/master/json/${file}`).
+3. **Tertiary Mirror**: Fastly POPs Mirror (`https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/${file}`).
+
+### 3. UTF-8 Byte Order Mark (BOM) Sanitization Engine
+Certain public-domain Bible JSON distributions (notably `en_bbe.json` for the Bible in Basic English) contain a leading UTF-8 Byte Order Mark (`\uFEFF` / `0xFEFF`) at byte offset 0. Standard JavaScript `JSON.parse()` throws a `SyntaxError: Unexpected token` when encountering a BOM header.
+- **`sanitizeJsonText(text)`**: Automatically detects and strips leading `\uFEFF` before JSON validation.
+- **Disk Rewrite**: When a downloaded translation contains a BOM, the engine rewrites the local storage file with sanitized UTF-8 text so subsequent disk reads in `loadTranslationIntoMemory()` execute with zero overhead and zero parse errors.
+
+### 4. Dual-Strategy Downloader & Progress Interpolation
+- **Resumable Downloader**: Uses `FileSystem.createDownloadResumable` with strict HTTP status validation (`result.status === 200`). Non-200 responses (such as 403 or 429 rate limits) trigger automatic cleanup and instant mirror failover.
+- **Chunked Progress Interpolation**: For CDN edge servers utilizing chunked transfer encoding (where `Content-Length` is omitted), download progress is dynamically interpolated against estimated translation sizes (~4.2 MB) to provide smooth, continuous UI progress bars.
+- **Direct `fetch()` Fallback**: If native resumable streaming fails on any mirror, the engine seamlessly fails over to React Native's native `fetch()` HTTP engine and writes the verified payload directly to disk via `FileSystem.writeAsStringAsync()`.
+- **User-Friendly Error Dialogs**: In the event that all network mirrors fail, `WOTDScreen.tsx` presents a clear, actionable dialog informing the user and allowing instant retry.
+
+### 5. Multi-Tier Resolution Pipeline
 When any chapter is requested in the Bible Reader (`fetchChapter(book, chapter, translation)`), the engine resolves content across five deterministic tiers:
 1. **Tier 0 — Offline Downloaded Package (0ms)**: Direct file read from local device storage (`FileSystem.documentDirectory + 'offline_bibles/' + translation + '.json'`) with an in-memory fast book index.
 2. **Tier 1 — In-Memory Chapter Cache (0ms)**: Fast `Map<string, BibleChapterData>` storing recently accessed chapters in RAM.
@@ -919,7 +938,7 @@ When any chapter is requested in the Bible Reader (`fetchChapter(book, chapter, 
 4. **Tier 3 — Network API Fetch (bible-api.com)**: Dynamic fetch and persistent chapter cache when connected to the internet.
 5. **Tier 4 — Prebundled Canon Fallback**: Embedded foundational chapters (`Genesis 1`, `John 3`, `Psalms 23`) ensuring the reader never crashes even on fresh installations with no internet.
 
-### 3. Translation Management & Disk Space Control
+### 6. Translation Management & Disk Space Control
 - **In-Reader Translation Sheet**: Each translation row displays version name, scholarly tag, estimated download size, real-time downloading progress percentage bar, and clean "Offline Ready" continuous plain text typography (zero status pill badges per Rule 16). The sheet header displays a clean minimalist "{count} offline" plain text indicator.
 - **Profile Screen Management**: A dedicated "OFFLINE BIBLES & TRANSLATIONS" section in the Profile body provides an aggregated storage breakdown and 1-tap delete controls to reclaim disk space, rendering all translation labels as clean continuous text.
 
