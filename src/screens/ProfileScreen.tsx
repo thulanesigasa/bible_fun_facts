@@ -26,7 +26,6 @@ import {
   ChevronRightSvg,
   DownloadSvg,
   TrashSvg,
-  CheckCircleSvg,
 } from '../components/SvgIcons';
 import {
   getDownloadedTranslations,
@@ -824,17 +823,11 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
               <View style={styles.rowDivider} />
               <View style={styles.offlineTranslationRow}>
                 <View style={styles.rowTitleBox}>
-                  <View style={styles.offlineNameBadgeRow}>
-                    <Text variant="h3" style={styles.rowTitle}>
-                      {item.name}
-                    </Text>
-                    <View style={styles.offlineReadyPill}>
-                      <CheckCircleSvg size={12} color="#10B981" />
-                      <Text style={styles.offlineReadyPillText}>Ready</Text>
-                    </View>
-                  </View>
+                  <Text variant="h3" style={styles.rowTitle}>
+                    {item.name}
+                  </Text>
                   <Text variant="caption" color={colors.textSecondary}>
-                    {item.id.toUpperCase()} • {item.booksCount} Books • {item.sizeFormatted}
+                    {item.id.toUpperCase()} • {item.booksCount} Books • {item.sizeFormatted} • Offline Ready
                   </Text>
                 </View>
                 <TouchableOpacity
@@ -1161,26 +1154,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 10,
-  },
-  offlineNameBadgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 2,
-  },
-  offlineReadyPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 6,
-    paddingVertical: 1.5,
-    borderRadius: 6,
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-  },
-  offlineReadyPillText: {
-    fontSize: 9.5,
-    fontWeight: '700',
-    color: '#059669',
   },
   deleteTranslationBtn: {
     padding: 8,
