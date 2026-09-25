@@ -51,6 +51,7 @@ graph TD
     DiscoverStack --> DiscoverMain["DiscoverScreen (1 Deterministic Message/Day + Day X of 365)"]
     DiscoverStack --> FactDetails["FactDetailsScreen (PageSheet Full Exegesis)"]
     DiscoverStack --> NotificationsMain["NotificationsScreen (Notifications & Sacred Alerts Center)"]
+    DiscoverStack --> AchievementsNav["AchievementsScreen (Direct Milestone & Category Deep-Link)"]
     
     WOTDScreen --> BibleReader["Full 66-Book Holy Bible (WEB / KJV / BBE)"]
     WOTDScreen --> ExegesisLenses["4-Lens Daily Devotional (Original Intent, Theological Truth, Walk, Prayer)"]
@@ -149,6 +150,7 @@ The bottom navigation bar adheres strictly to the floating pill / curved rectang
   - Search & Explore: `SearchSvg` (believer community & scholar hub)
   - Profile & Settings: `ProfileSvg` (replaces Saved; Saved Collection & Bookmarks nested within Profile)
 - **Header Standard**: Flat clean white header (`backgroundColor: '#FFFFFF', shadowColor: 'transparent', elevation: 0, borderBottomWidth: 1, borderBottomColor: 'rgba(15, 23, 42, 0.08)'`), `fontFamily: 'SpaceMono', fontSize: 18`. Across all 5 tabs (Feed, Word, History, Search, Profile), the header persistently displays the `24x24` transparent brand logo and `exégeomai` brand title without changing text between tabs.
+- **Notification Indicators**: In-app unread notifications display a singular, focused counter badge positioned above the tab icon via `tabBarBadge` (`#FDD223` gold badge with `#0F172A` dark text), while the bottom text label maintains pure Rule 20 typography and focus dot styling without redundant duplicate counter badges.
 
 ### 3. App Icon, Launcher & In-App Logo Calibration (Rule 15 & Rule 19)
 - **Android Adaptive Launcher Icon**: `assets/android-icon-foreground.png` is centered on a `512x512` canvas with a target icon height of `96px` (bounding box ~`74x96px`), providing ~`72%` clean white breathing room so Samsung One UI squircle masks and standard Android launcher cutouts never crop or zoom into the icon. Background is solid `#FFFFFF`.
