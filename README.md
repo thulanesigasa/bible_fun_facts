@@ -1055,23 +1055,23 @@ To eliminate clutter and provide an effortless, intuitive chapter selection expe
 - **Elimination of Inactive Verses Step**: Removed the redundant `VERSES` tab and placeholder grid. Because the Bible reader renders full chapters with all verses simultaneously, chapter selection immediately dismisses the modal and renders the target scripture.
 - **Balanced 50/50 Navigation Header**: Navigation modal tabs now cleanly divide the header space with active amber indicators and seamless step transitions.
 
-### 6. Automated Smart Scripture & Streak Guardian Notifications (`notifications.ts` & `notificationVerses.ts`)
+### 6. Automated Smart Scripture & Fellowship with Christ Notifications (`notifications.ts` & `notificationVerses.ts`)
 
 <p align="left">
   <img src="https://img.shields.io/badge/Notifications-365--Day%20Non--Repeating%20Dataset-FDD223?style=for-the-badge" alt="365-Day Dataset" />
-  <img src="https://img.shields.io/badge/Scheduler-7--Day%20Rolling%20Offline%20Window-0F172A?style=for-the-badge" alt="Rolling Offline Window" />
+  <img src="https://img.shields.io/badge/Fellowship-Abiding%20in%20Christ%20%26%20Word%20of%20Life-0F172A?style=for-the-badge" alt="Abiding in Christ" />
   <img src="https://img.shields.io/badge/Offline%20Engine-Zero%20Data%20Required-3B82F6?style=for-the-badge" alt="Zero Data Required" />
 </p>
 
-An intelligent, non-intrusive local notification engine that runs completely offline without internet data, utilizing native OS alarms (`AlarmManager` on Android, `UNUserNotificationCenter` on iOS) to sustain daily spiritual fidelity:
-- **365 Unique Days / Zero Repetitions**: Every day of the calendar year (`Day 1` through `Day 365`) is mapped 1-to-1 to a distinct, non-repeating scripture across all categories (`MORNING_365_SCRIPTURES`, `DIVINE_LOVE_365_AFFIRMATIONS`, `NIGHTLY_PEACE_365_SCRIPTURES`, `EVENING_GUARDIAN_365_PROMPTS`).
+An intelligent, non-intrusive local notification engine that runs completely offline without internet data, utilizing native OS alarms (`AlarmManager` on Android, `UNUserNotificationCenter` on iOS) to nurture intimate fellowship with Jesus Christ and daily fidelity to God's living Word:
+- **365 Unique Days / Zero Repetitions**: Every day of the calendar year (`Day 1` through `Day 365`) is mapped 1-to-1 to a distinct, non-repeating scripture across all categories (`MORNING_365_SCRIPTURES`, `DIVINE_LOVE_365_AFFIRMATIONS`, `NIGHTLY_PEACE_365_SCRIPTURES`, `EVENING_FELLOWSHIP_365_PROMPTS`).
 - **7-Day Rolling Offline Window**: Automatically queues a 7-day rolling window into native device alarms (35 notifications total), guaranteeing offline delivery for an entire week while remaining safely within iOS's hard 64-notification limit.
 - **Zero Internet Data Required**: Alarms trigger locally from the device's internal clock even when completely offline, with mobile data off, or in airplane mode.
 - **Morning Word & Devotion (08:00 AM Daily)**: Delivers daily morning manna from curated scripture promises (`Psalm 119:105`, `Lamentations 3:22–23`, `Proverbs 3:5–6`), encouraging believers to start their day anchored in Scripture.
 - **Mid-Day God's Love & Identity in Christ (13:15 & 16:30 Daily)**: Cycles through high-conviction identity passages (`Psalm 139:14`, `Jeremiah 31:3`, `Ephesians 2:10`, `Isaiah 43:4`, `Zephaniah 3:17`, `Romans 8:38–39`, `1 John 3:1`), reminding believers how deeply loved, honored, and precious they are in God's sight.
-- **Evening Streak Guardian (20:30 / 8:30 PM Daily)**: Proactively alerts believers before the day concludes to complete their daily reading and preserve their sacred study streak.
+- **Evening Fellowship with Christ (20:30 / 8:30 PM Daily)**: Centered entirely on communion with Jesus and the living nourishment of Scripture rather than gamification or streaks. Draws believers to abide in the Vine (*John 15:4*), feed upon the Bread of Life (*Matthew 4:4*), sit at Jesus's feet (*Luke 10:42*), and listen to His voice.
 - **Nightly Scripture of Peace (22:00 / 10:00 PM Daily)**: Delivers calming rest scriptures (`Psalm 4:8`, `John 14:27`, `Proverbs 3:24`, `Philippians 4:6–7`, `Psalm 91:1–2`) to quiet anxious minds and anchor nighttime thoughts in divine peace.
-- **Native Android Notification Channels**: Full support for Android 8.0+ channel architecture (`morning-word`, `streak-guardian`, `divine-affirmations`, `nightly-peace`) with calibrated amber brand accent illumination (`#FDD223`).
+- **Native Android Notification Channels**: Full support for Android 8.0+ channel architecture (`morning-word`, `evening-fellowship`, `divine-affirmations`, `nightly-peace`) with calibrated amber brand accent illumination (`#FDD223`).
 - **Single Master Switch**: Controlled seamlessly by the existing single toggle in Profile Settings; automatically registers on app launch with zero configuration required.
 
 ---
