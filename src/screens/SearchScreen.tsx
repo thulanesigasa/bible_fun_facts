@@ -7,6 +7,7 @@ import {
   TextInput,
   Modal,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
@@ -15,6 +16,7 @@ import { Text } from '../components/Typography';
 import { useUser } from '../context/UserContext';
 import { CommunityUser } from '../data/mockUsers';
 import { supabase } from '../services/supabase';
+import { SafetyService } from '../services/safetyService';
 import {
   SearchSvg,
   UsersSvg,
@@ -24,6 +26,8 @@ import {
   BookOpenSvg,
   QuoteSvg,
   ChevronRightSvg,
+  FlagSvg,
+  BlockSvg,
 } from '../components/SvgIcons';
 
 type FilterCategory = 'All' | 'Scholars' | 'Pastors' | 'Exegesis' | 'Linguistics';
@@ -36,8 +40,10 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
   const [selectedUser, setSelectedUser] = useState<CommunityUser | null>(null);
   const [liveUsers, setLiveUsers] = useState<CommunityUser[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [reportingUser, setReportingUser] = useState<CommunityUser | null>(null);
+  const [selectedReportReason, setSelectedReportReason] = useState<'harassment' | 'inappropriate' | 'spam' | 'impersonation' | 'other'>('harassment');
 
-  const { userProfile, isUserFollowed, toggleFollowUser } = useUser();
+  const { userProfile, isUserFollowed, toggleFollowUser, blockedUserIds, blockUser } = useUser();
 
   const fetchLiveProfiles = async () => {
     setLoading(true);
@@ -88,8 +94,68 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
     fetchLiveProfiles();
   }, [userProfile?.username, userProfile?.email]);
 
+  const REPORT_REASONS = [
+    { key: 'harassment', label: 'Harassment or Bullying' },
+    { key: 'inappropriate', label: 'Inappropriate Content' },
+    { key: 'spam', label: 'Spam or Commercial Solicitation' },
+    { key: 'impersonation', label: 'Doctrinal Misrepresentation / Impersonation' },
+    { key: 'other', label: 'Other Safety Concern' },
+  ];
+
+  const handleBlockUser = (user: CommunityUser) => {
+    Alert.alert(
+      'Block Scholar',
+      `Are you sure you want to block ${user.name} (@${user.username})? They will be hidden from your search, fellowship, and study reflections.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Block',
+          style: 'destructive',
+          onPress: async () => {
+            await blockUser(user.id);
+            setSelectedUser(null);
+            Alert.alert('Scholar Blocked', `${user.name} has been blocked and removed from your fellowship view.`);
+          },
+        },
+      ]
+    );
+  };
+
+  const handleOpenReport = (user: CommunityUser) => {
+    setReportingUser(user);
+    setSelectedReportReason('harassment');
+  };
+
+  const handleSubmitReport = async () => {
+    if (!reportingUser) return;
+    await SafetyService.submitReport(
+      reportingUser.id,
+      'scholar',
+      selectedReportReason,
+      reportingUser.name
+    );
+    const target = reportingUser;
+    setReportingUser(null);
+    Alert.alert(
+      'Report Submitted',
+      `Thank you for helping keep the exégeomai fellowship safe and edifying. We will review @${target.username}'s contributions. Would you also like to block this account?`,
+      [
+        { text: 'No, Keep Visible', style: 'cancel' },
+        {
+          text: 'Block Account',
+          style: 'destructive',
+          onPress: async () => {
+            await blockUser(target.id);
+            setSelectedUser(null);
+          },
+        },
+      ]
+    );
+  };
+
   const filteredUsers = useMemo(() => {
     return liveUsers.filter((user) => {
+      if (blockedUserIds.includes(user.id)) return false;
       const q = searchText.toLowerCase().trim();
       const matchesSearch =
         q === '' ||
@@ -110,7 +176,7 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
 
       return true;
     });
-  }, [liveUsers, searchText, activeCategory]);
+  }, [liveUsers, searchText, activeCategory, blockedUserIds]);
 
   const getInitials = (name: string) => {
     const parts = name.replace(/^(Dr\.|Prof\.|Pastor)\s+/i, '').split(' ');
@@ -464,9 +530,100 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
                   </Text>
                 </View>
               </View>
+
+              {/* Community Safety & Moderation Actions */}
+              <View style={styles.safetyFooter}>
+                <View style={styles.safetyActionsRow}>
+                  <TouchableOpacity
+                    style={styles.safetyBtn}
+                    onPress={() => handleOpenReport(selectedUser)}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel="Report this scholar account"
+                  >
+                    <FlagSvg size={14} color="#64748B" strokeWidth={2} />
+                    <Text variant="caption" weight="600" color="#64748B">
+                      Report Account
+                    </Text>
+                  </TouchableOpacity>
+
+                  <View style={styles.safetyVerticalDivider} />
+
+                  <TouchableOpacity
+                    style={styles.safetyBtn}
+                    onPress={() => handleBlockUser(selectedUser)}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel="Block this scholar"
+                  >
+                    <BlockSvg size={14} color="#64748B" strokeWidth={2} />
+                    <Text variant="caption" weight="600" color="#64748B">
+                      Block Scholar
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
             </ScrollView>
           </SafeAreaView>
         )}
+      </Modal>
+
+      {/* Report Account Safety Modal */}
+      <Modal
+        visible={reportingUser !== null}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setReportingUser(null)}
+      >
+        <View style={styles.reportModalOverlay}>
+          <View style={styles.reportModalCard}>
+            <View style={styles.reportModalHeader}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <FlagSvg size={18} color="#0F172A" strokeWidth={2.2} />
+                <Text variant="h3" weight="800" color="#0F172A">
+                  Report Account
+                </Text>
+              </View>
+              <TouchableOpacity onPress={() => setReportingUser(null)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <XCloseSvg size={20} color="#64748B" />
+              </TouchableOpacity>
+            </View>
+
+            <Text variant="caption" color="#64748B" style={{ marginBottom: 14, lineHeight: 18 }}>
+              {`Select a reason for reporting @${reportingUser?.username}. Reports protect fellowship integrity and are reviewed with reverence.`}
+            </Text>
+
+            {REPORT_REASONS.map((r) => (
+              <TouchableOpacity
+                key={r.key}
+                style={[
+                  styles.reportOptionBtn,
+                  selectedReportReason === r.key && styles.reportOptionBtnSelected,
+                ]}
+                onPress={() => setSelectedReportReason(r.key as any)}
+                activeOpacity={0.8}
+              >
+                <Text
+                  variant="body"
+                  weight={selectedReportReason === r.key ? '700' : '500'}
+                  color={selectedReportReason === r.key ? '#0F172A' : '#64748B'}
+                >
+                  {r.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+
+            <TouchableOpacity
+              style={styles.submitReportBtn}
+              onPress={handleSubmitReport}
+              activeOpacity={0.85}
+            >
+              <Text variant="body" weight="800" color="#0F172A">
+                Submit Report
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </Modal>
     </SafeAreaView>
   );
@@ -809,5 +966,78 @@ const styles = StyleSheet.create({
   },
   reflectionNote: {
     lineHeight: 18,
+  },
+  safetyFooter: {
+    marginTop: 20,
+    marginBottom: 40,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(15, 23, 42, 0.06)',
+  },
+  safetyActionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingVertical: 8,
+  },
+  safetyBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  safetyVerticalDivider: {
+    width: 1,
+    height: 16,
+    backgroundColor: 'rgba(15, 23, 42, 0.08)',
+  },
+  reportModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  reportModalCard: {
+    width: '100%',
+    maxWidth: 340,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  reportModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  reportOptionBtn: {
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    backgroundColor: '#F8FAFC',
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  reportOptionBtnSelected: {
+    backgroundColor: 'rgba(253, 210, 35, 0.15)',
+    borderColor: '#FDD223',
+  },
+  submitReportBtn: {
+    marginTop: 10,
+    backgroundColor: '#FDD223',
+    height: 46,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

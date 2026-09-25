@@ -23,6 +23,11 @@ import {
   recordReceivedPushNotification,
   formatDeliveryLabel,
 } from '../services/inAppNotifications';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as Sharing from 'expo-sharing';
+import { SafetyService } from '../services/safetyService';
+import { BiometricService } from '../services/biometricService';
+import { SecureStoreAdapter } from '../services/secureStorage';
 
 export interface UserProfile {
   name: string;
@@ -118,6 +123,20 @@ interface AppContextType extends UserState {
   activeAchievementAlert: InAppNotificationItem | null;
   dismissAchievementAlert: () => void;
   refreshNotifications: () => void;
+  // Safety, Privacy & Security
+  blockedUserIds: string[];
+  blockUser: (userId: string) => Promise<void>;
+  unblockUser: (userId: string) => Promise<void>;
+  isUserBlocked: (userId: string) => boolean;
+  exportStudyJournal: () => Promise<{ success: boolean; filePath?: string; error?: string }>;
+  deleteAccountAndPurgeData: () => Promise<boolean>;
+  isBiometricSupported: boolean;
+  biometricType: string | null;
+  isBiometricLockEnabled: boolean;
+  setBiometricLockEnabled: (enabled: boolean) => Promise<{ success: boolean; error?: string }>;
+  isAppLocked: boolean;
+  setIsAppLocked: (locked: boolean) => void;
+  unlockApp: () => Promise<boolean>;
 }
 
 const UserContext = createContext<AppContextType | undefined>(undefined);
@@ -1141,6 +1160,179 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setNotificationsTick(prev => prev + 1);
   }, []);
 
+  // ----------------------------------------------------
+  // Community Safety: Blocked Users
+  // ----------------------------------------------------
+  const [blockedUserIds, setBlockedUserIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    SafetyService.getBlockedUserIds().then((ids) => {
+      setBlockedUserIds(ids);
+    });
+  }, []);
+
+  const blockUser = useCallback(async (userId: string) => {
+    const updated = await SafetyService.blockUser(userId);
+    setBlockedUserIds(updated);
+  }, []);
+
+  const unblockUser = useCallback(async (userId: string) => {
+    const updated = await SafetyService.unblockUser(userId);
+    setBlockedUserIds(updated);
+  }, []);
+
+  const isUserBlocked = useCallback((userId: string) => {
+    return blockedUserIds.includes(userId);
+  }, [blockedUserIds]);
+
+  // ----------------------------------------------------
+  // Biometric App Lock
+  // ----------------------------------------------------
+  const [isBiometricSupported, setIsBiometricSupported] = useState<boolean>(false);
+  const [biometricType, setBiometricType] = useState<string | null>(null);
+  const [isBiometricLockEnabled, setIsBiometricLockEnabledState] = useState<boolean>(false);
+  const [isAppLocked, setIsAppLocked] = useState<boolean>(false);
+
+  useEffect(() => {
+    BiometricService.checkSupport().then((status) => {
+      setIsBiometricSupported(status.isSupported && status.isEnrolled);
+      setBiometricType(status.biometricType);
+    });
+
+    BiometricService.isLockEnabled().then((enabled) => {
+      setIsBiometricLockEnabledState(enabled);
+      if (enabled) {
+        setIsAppLocked(true);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'background' || nextAppState === 'inactive') {
+        if (isBiometricLockEnabled) {
+          setIsAppLocked(true);
+        }
+      }
+    };
+    const sub = AppState.addEventListener('change', handleAppStateChange);
+    return () => sub.remove();
+  }, [isBiometricLockEnabled]);
+
+  const setBiometricLockEnabled = useCallback(async (enabled: boolean): Promise<{ success: boolean; error?: string }> => {
+    const success = await BiometricService.setLockEnabled(enabled);
+    if (success) {
+      setIsBiometricLockEnabledState(enabled);
+      if (!enabled) setIsAppLocked(false);
+      return { success: true };
+    }
+    return { success: false, error: 'Biometric verification cancelled or unavailable' };
+  }, []);
+
+  const unlockApp = useCallback(async (): Promise<boolean> => {
+    const res = await BiometricService.authenticate('Unlock exégeomai');
+    if (res.success) {
+      setIsAppLocked(false);
+      return true;
+    }
+    return false;
+  }, []);
+
+  // ----------------------------------------------------
+  // Data Portability & Account Purge (GDPR / POPIA / App Store)
+  // ----------------------------------------------------
+  const exportStudyJournal = useCallback(async (): Promise<{ success: boolean; filePath?: string; error?: string }> => {
+    try {
+      const exportPayload = {
+        exportVersion: '1.0.0',
+        exportedAt: new Date().toISOString(),
+        appName: 'exégeomai',
+        user: {
+          name: state.userProfile?.name || 'Fellow Disciple',
+          username: state.userProfile?.username || 'believer',
+          email: state.userProfile?.email || null,
+          joinedDate: state.userProfile?.joinedDate || null,
+          streak: state.streak,
+          factsViewedCount: state.factsViewedCount,
+          sharesCount: state.sharesCount,
+        },
+        bookmarkedScriptures: state.favoritesScriptures,
+        favoriteFacts: state.favoritesFacts,
+        completedWordOfTheDay: state.completedWOTDs,
+        verseHighlights: state.bibleHighlights,
+        lastReadingPosition: state.lastReadBible,
+      };
+
+      const jsonString = JSON.stringify(exportPayload, null, 2);
+      const fileName = `exegeomai-study-journal-${new Date().toISOString().split('T')[0]}.json`;
+      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+
+      await FileSystem.writeAsStringAsync(fileUri, jsonString, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+
+      const isAvailable = await Sharing.isAvailableAsync();
+      if (isAvailable) {
+        await Sharing.shareAsync(fileUri, {
+          mimeType: 'application/json',
+          dialogTitle: 'Export exégeomai Study Journal',
+          UTI: 'public.json',
+        });
+      }
+
+      return { success: true, filePath: fileUri };
+    } catch (err: any) {
+      console.warn('[UserContext] Export error:', err);
+      return { success: false, error: err?.message || 'Failed to export study journal' };
+    }
+  }, [state]);
+
+  const deleteAccountAndPurgeData = useCallback(async (): Promise<boolean> => {
+    try {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          try {
+            await supabase.from('profiles').delete().eq('id', session.user.id);
+          } catch (delErr) {
+            console.warn('Profile delete warning:', delErr);
+          }
+        }
+      } catch (err) {
+        console.warn('Remote profile cleanup exception:', err);
+      }
+
+      await supabase.auth.signOut().catch(() => {});
+      await AsyncStorage.clear().catch(() => {});
+      await SecureStoreAdapter.removeItem('@exegeomai_biometric_lock_enabled_v1').catch(() => {});
+      await cancelAllAutomatedNotifications().catch(() => {});
+
+      setState({
+        userProfile: null,
+        favoritesFacts: [],
+        favoritesScriptures: [],
+        completedWOTDs: [],
+        streak: 1,
+        factsViewedCount: 0,
+        readFactIds: [],
+        sharesCount: 0,
+        lastLoginDate: null,
+        followedUserIds: [],
+        lastReadBible: { book: 'John', chapter: 1, translation: 'WEB' },
+        bibleHighlights: {},
+        readerTheme: 'light',
+      });
+      setBlockedUserIds([]);
+      setIsBiometricLockEnabledState(false);
+      setIsAppLocked(false);
+
+      return true;
+    } catch (e) {
+      console.warn('Purge data error:', e);
+      return false;
+    }
+  }, []);
+
   return (
     <UserContext.Provider value={{
       ...state,
@@ -1179,6 +1371,20 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       activeAchievementAlert,
       dismissAchievementAlert,
       refreshNotifications,
+      // Safety, Privacy & Security
+      blockedUserIds,
+      blockUser,
+      unblockUser,
+      isUserBlocked,
+      exportStudyJournal,
+      deleteAccountAndPurgeData,
+      isBiometricSupported,
+      biometricType,
+      isBiometricLockEnabled,
+      setBiometricLockEnabled,
+      isAppLocked,
+      setIsAppLocked,
+      unlockApp,
     }}>
 
       {children}

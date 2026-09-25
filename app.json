@@ -57,6 +57,9 @@
         "watchedDirectories": []
       }
     },
-    "owner": "thulanesigasa0"
+    "owner": "thulanesigasa0",
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }

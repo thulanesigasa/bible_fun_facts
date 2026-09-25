@@ -18,6 +18,9 @@
   <img src="https://img.shields.io/badge/Achievements-Streak%20%7C%20Bookmarks%20%7C%20Highlights%20%7C%20Shares-FDD223?style=for-the-badge" alt="Multi-Category Achievements" />
   <img src="https://img.shields.io/badge/Offline%20Bibles-24%20Full%20Translations%20%7C%20isiZulu%20%7C%20isiXhosa%20%7C%20Sepedi%20%7C%20Afrikaans-10B981?style=for-the-badge" alt="Offline Bible Translations" />
   <img src="https://img.shields.io/badge/Share%20Engine-Zero%20Blank%20%7C%20High--Fidelity%20PNG-10B981?style=for-the-badge" alt="Zero Blank Share Engine" />
+  <img src="https://img.shields.io/badge/Security-Android%20Keystore%20%7C%20iOS%20Keychain-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Keystore and Keychain" />
+  <img src="https://img.shields.io/badge/Biometrics-Face%20ID%20%7C%20Fingerprint-FDD223?style=for-the-badge" alt="Biometric Lock" />
+  <img src="https://img.shields.io/badge/Privacy-GDPR%20%7C%20POPIA%20%7C%20Data%20Export-3B82F6?style=for-the-badge" alt="Data Portability and Purge" />
   <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
   <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License MIT" />
@@ -65,12 +68,16 @@ graph TD
     ProfileStack --> BookmarksMain["BookmarksScreen (Continuous Body Bookmarks Hub)"]
     BookmarksMain -.->|One-Tap Jump| BibleReader
     ProfileStack --> AchievementsMain["AchievementsScreen (48 Milestones, 4 Distinct Geometric Shapes, 3-per-Row Grid)"]
+    ProfileStack --> BlockedUsersMain["BlockedUsersScreen (Fellowship Moderation & Unblock Hub)"]
     ProfileStack --> Terms
     ProfileStack --> Privacy
     
     subgraph DataUpdates["Data, State, Canon and Caching"]
         BibleService["bibleService.ts & offlineBibleService.ts"] <--> OfflineFS[("expo-file-system (offline_bibles/)")]
         BibleService <--> AsyncStorage[("AsyncStorage Cache (@bible_chapter_cache_)")]
+        SecureStorage["SecureStoreAdapter (Android Keystore / iOS Keychain)"] <--> Supabase
+        BiometricService["biometricService.ts (Face ID / Fingerprint Auth)"] --> BiometricLock["BiometricLockOverlay"]
+        SafetyService["safetyService.ts (Block & Report Content)"] --> SearchMain
         BibleCanon["bibleCanon.ts (66 Books & Fallback)"] --> BibleReader
         MockUsers["mockUsers.ts (8 Theological Scholars)"] --> SearchMain
         AsyncStorage <--> UserContext["UserContext (useApp / useUser)"]
@@ -765,7 +772,18 @@ bible_fun_facts/
 - **Dynamic Scoping & Restoration**: Window security flags are scoped strictly to password interaction and are immediately released upon leaving password fields or unmounting.
 - **App Switcher Privacy Overlay**: Optionally integrates privacy blur protection when the application transitions to the background or app switcher.
 
-### 4. Dedicated Legal Screens with Uniform Clickable Text & Zero-Duplication Architecture
+### 4. Enterprise Safety, Privacy & Security Standard
+- **Hardware Token Encryption (`SecureStoreAdapter.ts`)**: Supabase session tokens, user credentials, and biometric authorization keys are backed by Android Keystore (`EncryptedSharedPreferences`) and iOS Keychain via `expo-secure-store`. Features seamless size-limit handling and graceful fallback to on-device storage on unrooted environments.
+- **Biometric App Lock (`BiometricService.ts` & `BiometricLockOverlay.tsx`)**: Optional Face ID, Touch ID, or Android Biometric prompt gating access to the application and personal study journal. Locks automatically whenever the application transitions to background or inactive state.
+- **Community Safety & Content Moderation (`SafetyService.ts` & `SearchScreen.tsx`)**:
+  - **Account Blocking**: Users can block any scholar or fellowship participant directly from their profile modal. Blocked accounts are immediately purged from search results, discovery feeds, and reflection threads.
+  - **Report Queue**: Structured reporting interface for harassment, inappropriate content, spam, and doctrinal misrepresentation, persisting moderation records for review.
+  - **Blocked Accounts Management (`BlockedUsersScreen.tsx`)**: Dedicated hub in Profile settings allowing users to inspect and unblock accounts at any time.
+- **Data Portability & Account Purge (GDPR Art. 20 / POPIA / App Store Guideline 5.1.1(v))**:
+  - **Export Study Journal**: 1-tap download generating an encrypted or structured JSON export of all personal study notes, bookmarks, verse highlights, and streak history.
+  - **Delete Account & Purge Data**: Self-service deletion flow that cleanses remote Supabase profile records, purges local SQLite/AsyncStorage caches, revokes authentication keys, and resets state to a clean offline guest.
+
+### 5. Dedicated Legal Screens with Uniform Clickable Text & Zero-Duplication Architecture
 - **Uniform Legal Disclaimers**: To preserve typographical balance, clickable Terms of Service and Privacy Policy text links match the surrounding caption typography exactly (no underline, no color deviation, no bold font) while retaining touch navigation to dedicated screens.
 - **Zero-Duplication Guarantee**: Disclaimers render exactly once per active view (directly beneath Login actions, and directly beneath the active step's bottom action button), eliminating redundant outer scroll fallbacks.
 - **Dedicated Standalone Legal Screens**:

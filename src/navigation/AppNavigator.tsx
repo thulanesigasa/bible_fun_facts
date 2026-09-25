@@ -34,6 +34,8 @@ import ProfileScreen from '../screens/ProfileScreen';
 import FactDetailsScreen from '../screens/FactDetailsScreen';
 import ScriptureDetailsScreen from '../screens/ScriptureDetailsScreen';
 import WOTDDetailsScreen from '../screens/WOTDDetailsScreen';
+import BlockedUsersScreen from '../screens/BlockedUsersScreen';
+import BiometricLockOverlay from '../components/BiometricLockOverlay';
 import { Fact, Scripture, WOTDEntry } from '../data/mockDatabase';
 import { BiblicalWriter } from '../data/biblicalWriters';
 import { colors } from '../theme/colors';
@@ -69,6 +71,7 @@ export type RootStackParamList = {
   Notifications: undefined;
   TermsOfService: undefined;
   PrivacyPolicy: undefined;
+  BlockedUsers: undefined;
 };
 
 const Tab = createBottomTabNavigator();
@@ -414,6 +417,25 @@ function ProfileStack() {
           contentStyle: { backgroundColor: colors.background },
         }}
       />
+      <Stack.Screen
+        name="BlockedUsers"
+        component={BlockedUsersScreen}
+        options={{
+          headerShown: true,
+          title: 'Blocked Accounts',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -431,12 +453,17 @@ const navTheme = {
 };
 
 export default function AppNavigator() {
-  const { userProfile, hideTabBar, accent, unreadNotificationsCount } = useApp();
+  const { userProfile, hideTabBar, accent, unreadNotificationsCount, isAppLocked, biometricType, unlockApp } = useApp();
   const { width } = useWindowDimensions();
   const horizontalPadding = (width - 280) / 2;
 
   return (
     <NavigationContainer theme={navTheme}>
+      <BiometricLockOverlay
+        visible={isAppLocked}
+        biometricType={biometricType}
+        onUnlock={unlockApp}
+      />
       {!userProfile ? (
         <AuthStack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
           <AuthStack.Screen name="Welcome" component={WelcomeScreen} />
