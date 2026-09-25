@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   ScrollView,
@@ -20,6 +20,7 @@ import {
   getCategorySubtitle,
   getCategoryUnit,
   getTotalAchievementsProgress,
+  ALL_ACHIEVEMENTS,
 } from '../data/achievements';
 
 const CATEGORIES: { key: AchievementCategory; label: string }[] = [
@@ -29,7 +30,17 @@ const CATEGORIES: { key: AchievementCategory; label: string }[] = [
   { key: 'share', label: 'Shares' },
 ];
 
-export default function AchievementsScreen() {
+interface AchievementsScreenProps {
+  route?: {
+    params?: {
+      category?: AchievementCategory;
+      milestoneId?: string;
+    };
+  };
+  navigation?: any;
+}
+
+export default function AchievementsScreen({ route }: AchievementsScreenProps) {
   const { width } = useWindowDimensions();
   const {
     streak,
@@ -38,9 +49,26 @@ export default function AchievementsScreen() {
     sharesCount,
   } = useUser();
 
-  const [activeCategory, setActiveCategory] = useState<AchievementCategory>('streak');
+  const initialCategory: AchievementCategory = route?.params?.category || 'streak';
+  const [activeCategory, setActiveCategory] = useState<AchievementCategory>(initialCategory);
   const [selectedMilestone, setSelectedMilestone] = useState<AchievementMilestone | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  // Automatically activate unlocked category and open milestone modal when deep-linked from notification
+  useEffect(() => {
+    if (route?.params?.category) {
+      setActiveCategory(route.params.category);
+    }
+    if (route?.params?.milestoneId) {
+      const cat = route.params.category || activeCategory;
+      const list = ALL_ACHIEVEMENTS[cat] || [];
+      const found = list.find((m) => m.id === route.params?.milestoneId);
+      if (found) {
+        setSelectedMilestone(found);
+        setIsModalVisible(true);
+      }
+    }
+  }, [route?.params?.category, route?.params?.milestoneId]);
 
   // Compute live user stats
   const bookmarksCount = favoritesScriptures?.length || 0;

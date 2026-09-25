@@ -1178,6 +1178,11 @@ bible_fun_facts/
    - **Sacred Dotted Underlines**: Formats biblical quotations and devotional reflections with `textDecorationStyle: 'dotted'` accented by `#FDD223`.
    - **Iconless Flat Empty State**: Completely removes circular icons from the empty state, presenting clean, natural body typography: `"No notifications to display"`.
 
+3. **Feed Tab Badge & Achievement Deep-Linking Architecture**:
+   - **Bottom Navigation Tab Badge**: Dynamically integrates the active unread notification/achievement count directly into the "Feed" tab label and tab icon via an accent pill badge (`#FDD223` on `#0F172A`), alerting believers to newly earned milestones immediately.
+   - **Distinct Achievement Card Rendering**: Clarifies achievement notifications by displaying milestone titles (`item.title`), milestone descriptions (`item.body`), category badge tags, and biblical anchor quotes with scripture references, preventing achievements from being confused with plain scripture bookmarks.
+   - **Zero-Friction Milestone Modal Deep-Linking**: Registers `AchievementsScreen` inside `DiscoverStack` and implements route parameter passing (`category`, `milestoneId`) so tapping `"View in Achievements ›"` instantly activates the matching category tab (e.g., Bookmarks) and pops up the 3D milestone modal.
+
 ---
 
 ### Type Checking & Validation
