@@ -833,6 +833,44 @@ export const CheckDoubleSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#64
   </Svg>
 );
 
+// 8. Safety, Privacy & Security SVGs strictly per Rule 2 & 4
+export const ShieldSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const FingerprintSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M2 12C2 6.5 6.5 2 12 2a10 10 0 0 1 8 4" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+    <Path d="M5 19.5C5.5 18 6 15 6 12c0-.7.1-1.4.3-2" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+    <Path d="M8.6 22c.1-.5.2-1.1.2-1.8 0-2.8.5-4.4.9-5.8.4-1.3.9-2.2 1.8-3.2A5.99 5.99 0 0 1 16 10c1.8 0 3.3.8 4.3 2" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+    <Path d="M12 14c-.6.8-1 1.7-1 2.8 0 1.2.2 2.3.5 3.2" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+  </Svg>
+);
+
+export const BlockSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#64748B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Circle cx="12" cy="12" r="10" stroke={color} strokeWidth={strokeWidth} />
+    <Path d="M4.93 4.93l14.14 14.14" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+  </Svg>
+);
+
+export const FlagSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#64748B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M4 22v-7" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const ExportJournalSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M7 10l5-5 5 5" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M12 5v12" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
 
 
 

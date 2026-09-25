@@ -74,7 +74,50 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     followedUserIds,
     toggleFavoriteScripture,
     unreadNotificationsCount,
+    isBiometricSupported,
+    biometricType,
+    isBiometricLockEnabled,
+    setBiometricLockEnabled,
+    blockedUserIds,
+    exportStudyJournal,
+    deleteAccountAndPurgeData,
   } = useUser();
+
+  const handleToggleBiometricLock = async (val: boolean) => {
+    const res = await setBiometricLockEnabled(val);
+    if (!res.success && res.error) {
+      Alert.alert('Biometric App Lock', res.error);
+    }
+  };
+
+  const handleExportJournal = async () => {
+    const res = await exportStudyJournal();
+    if (res.success) {
+      Alert.alert('Journal Exported', 'Your sacred study reflections, bookmarks, highlights, and streak data have been prepared.');
+    } else {
+      Alert.alert('Export Notice', res.error || 'Unable to export study journal at this time.');
+    }
+  };
+
+  const handleConfirmDeleteAccount = () => {
+    Alert.alert(
+      'Delete Account & Purge Data',
+      'This will permanently delete your account, saved bookmarks, scripture highlights, and study streak records from this device and our servers. This action is irreversible.\n\nAre you sure you wish to proceed?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete & Purge',
+          style: 'destructive',
+          onPress: async () => {
+            const success = await deleteAccountAndPurgeData();
+            if (success) {
+              Alert.alert('Account Purged', 'Your account and all personal study data have been completely removed.');
+            }
+          },
+        },
+      ]
+    );
+  };
 
   const [isUploading, setIsUploading] = useState(false);
   const [showStreakModal, setShowStreakModal] = useState<boolean>(false);
@@ -862,7 +905,102 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           </TouchableOpacity>
         </View>
 
-        {/* 5. LEGAL & POLICIES (ZERO ICONS) */}
+        {/* 5. PRIVACY, SAFETY & SECURITY */}
+        <View style={styles.bodySection}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+            PRIVACY, SAFETY & SECURITY
+          </Text>
+
+          {/* Biometric App Lock */}
+          {isBiometricSupported && (
+            <>
+              <View style={styles.actionRow}>
+                <View style={styles.rowTitleBox}>
+                  <Text variant="h3" style={styles.rowTitle}>
+                    {`Biometric App Lock (${biometricType || 'Face ID / Fingerprint'})`}
+                  </Text>
+                  <Text variant="caption" color={colors.textSecondary}>
+                    Require biometric verification whenever exégeomai opens
+                  </Text>
+                </View>
+                <UiverseSwitch
+                  value={isBiometricLockEnabled}
+                  onValueChange={handleToggleBiometricLock}
+                />
+              </View>
+              <View style={styles.rowDivider} />
+            </>
+          )}
+
+          {/* Blocked Accounts */}
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={() => navigation.navigate('BlockedUsers')}
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel="Manage blocked accounts"
+          >
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Blocked Accounts
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                {blockedUserIds.length > 0
+                  ? `${blockedUserIds.length} ${blockedUserIds.length === 1 ? 'account' : 'accounts'} blocked from fellowship`
+                  : 'Zero accounts blocked'}
+              </Text>
+            </View>
+            <Text style={styles.rowDisclosureArrow}>›</Text>
+          </TouchableOpacity>
+
+          <View style={styles.rowDivider} />
+
+          {/* Export Study Journal */}
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={handleExportJournal}
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel="Export study journal to JSON"
+          >
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Export Study Journal
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                Download your bookmarks, highlights, reflections, and streak (JSON)
+              </Text>
+            </View>
+            <Text variant="caption" weight="700" color={colors.accent}>
+              Export ›
+            </Text>
+          </TouchableOpacity>
+
+          <View style={styles.rowDivider} />
+
+          {/* Delete Account & Purge Data */}
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={handleConfirmDeleteAccount}
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel="Delete account and purge all data"
+          >
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={[styles.rowTitle, { color: '#0F172A' }]}>
+                Delete Account & Purge Data
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                Permanently erase your account, preferences, and all local study data
+              </Text>
+            </View>
+            <Text variant="caption" weight="700" color="#64748B">
+              Purge ›
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* 6. LEGAL & POLICIES (ZERO ICONS) */}
         <View style={styles.bodySection}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             LEGAL & POLICIES

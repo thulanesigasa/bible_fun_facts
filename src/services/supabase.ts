@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SecureStoreAdapter } from './secureStorage';
 
 // Project Ref: ibwooiejzxhbzplnldcz
 export const SUPABASE_URL =
@@ -13,7 +13,7 @@ const createSafeClient = () => {
   try {
     return createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
-        storage: AsyncStorage,
+        storage: SecureStoreAdapter,
         autoRefreshToken: true,
         persistSession: true,
         detectSessionInUrl: false,
@@ -23,7 +23,7 @@ const createSafeClient = () => {
     console.warn('[Supabase] Client init exception handled:', error);
     return createClient(SUPABASE_URL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.placeholder', {
       auth: {
-        storage: AsyncStorage,
+        storage: SecureStoreAdapter,
         autoRefreshToken: false,
         persistSession: false,
         detectSessionInUrl: false,
