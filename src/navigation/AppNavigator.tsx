@@ -65,7 +65,7 @@ export type RootStackParamList = {
   Bookmarks: undefined;
   Unfolded: undefined;
   DownloadedVerses: undefined;
-  Achievements: undefined;
+  Achievements: { category?: 'streak' | 'bookmark' | 'highlight' | 'share'; milestoneId?: string } | undefined;
   Notifications: undefined;
   TermsOfService: undefined;
   PrivacyPolicy: undefined;
@@ -162,6 +162,24 @@ function DiscoverStack() {
         options={{
           headerShown: true,
           title: 'Notifications',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+        }}
+      />
+      <Stack.Screen
+        name="Achievements"
+        component={AchievementsScreen}
+        options={{
+          headerShown: true,
+          title: 'Study Achievements',
           headerStyle: {
             backgroundColor: '#FFFFFF',
           },
@@ -413,7 +431,7 @@ const navTheme = {
 };
 
 export default function AppNavigator() {
-  const { userProfile, hideTabBar, accent } = useApp();
+  const { userProfile, hideTabBar, accent, unreadNotificationsCount } = useApp();
   const { width } = useWindowDimensions();
   const horizontalPadding = (width - 280) / 2;
 
@@ -518,31 +536,62 @@ export default function AppNavigator() {
               fontSize: 18,
               fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
             },
-            tabBarLabel: ({ focused, children }) => (
-              <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                <Text
-                  style={{
-                    fontSize: 8.5,
-                    fontWeight: focused ? '700' : '500',
-                    color: focused ? accent : '#64748B',
-                    marginTop: 1,
-                  }}
-                >
-                  {children}
-                </Text>
-                {focused && (
-                  <View
-                    style={{
-                      width: 4,
-                      height: 4,
-                      borderRadius: 2,
-                      backgroundColor: accent,
-                      marginTop: 2,
-                    }}
-                  />
-                )}
-              </View>
-            ),
+            tabBarLabel: ({ focused, children }) => {
+              const isFeed = children === 'Feed' || route.name === 'Discover';
+              const showBadge = isFeed && unreadNotificationsCount > 0;
+              return (
+                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text
+                      style={{
+                        fontSize: 8.5,
+                        fontWeight: focused ? '700' : '500',
+                        color: focused ? accent : '#64748B',
+                        marginTop: 1,
+                      }}
+                    >
+                      {children}
+                    </Text>
+                    {showBadge && (
+                      <View
+                        style={{
+                          backgroundColor: accent,
+                          minWidth: 12,
+                          height: 12,
+                          borderRadius: 6,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          marginLeft: 3,
+                          paddingHorizontal: 2,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 7.5,
+                            fontWeight: '800',
+                            color: '#0F172A',
+                            lineHeight: 9,
+                          }}
+                        >
+                          {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                  {focused && (
+                    <View
+                      style={{
+                        width: 4,
+                        height: 4,
+                        borderRadius: 2,
+                        backgroundColor: accent,
+                        marginTop: 2,
+                      }}
+                    />
+                  )}
+                </View>
+              );
+            },
           })}
         >
           <Tab.Screen
@@ -551,6 +600,17 @@ export default function AppNavigator() {
             options={({ navigation }) => ({
               title: 'Feed',
               tabBarIcon: ({ color }) => <DiscoverSvg size={16} color={color} strokeWidth={2} />,
+              tabBarBadge: unreadNotificationsCount > 0 ? (unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount) : undefined,
+              tabBarBadgeStyle: {
+                backgroundColor: accent,
+                color: '#0F172A',
+                fontSize: 8,
+                fontWeight: '800',
+                minWidth: 14,
+                height: 14,
+                lineHeight: 14,
+                borderRadius: 7,
+              },
               headerRight: () => <HeaderBellButton navigation={navigation} />,
             })}
           />

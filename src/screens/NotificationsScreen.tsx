@@ -36,7 +36,10 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
     markNotificationAsRead(item.id);
 
     if (item.type === 'achievement') {
-      navigation.navigate('Achievements');
+      navigation.navigate('Achievements', {
+        category: item.achievementCategory || 'bookmark',
+        milestoneId: item.achievementId,
+      });
       return;
     }
 
@@ -78,7 +81,7 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
           <View style={styles.headerLeftWrap}>
             {!item.isRead && <View style={styles.unreadDot} />}
             <Text variant="h3" style={styles.itemTitle}>
-              {item.scriptureRef || item.title}
+              {isAchievement ? item.title : (item.scriptureRef || item.title)}
             </Text>
             {item.deliveredAtLabel ? (
               <Text variant="caption" color={colors.textTertiary} style={styles.deliveredAtText}>
@@ -101,16 +104,32 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
           </TouchableOpacity>
         </View>
 
-        {/* Verse Body Text with Sacred Dotted Underline (matching BookmarksScreen) */}
-        <Text style={styles.verseBodyText}>
-          {item.verseQuote ? `"${item.verseQuote.trim()}"` : `"${item.body.replace(/^"|"$/g, '').trim()}"`}
-        </Text>
+        {/* Achievement Description or Devotion Body Text */}
+        {isAchievement ? (
+          <>
+            <Text style={styles.achievementDescText}>
+              {item.body}
+            </Text>
+            {item.verseQuote && (
+              <Text style={styles.verseBodyText}>
+                {`"${item.verseQuote.trim()}" — ${item.scriptureRef || 'Sacred Scripture'}`}
+              </Text>
+            )}
+          </>
+        ) : (
+          <>
+            {/* Verse Body Text with Sacred Dotted Underline (matching BookmarksScreen) */}
+            <Text style={styles.verseBodyText}>
+              {item.verseQuote ? `"${item.verseQuote.trim()}"` : `"${item.body.replace(/^"|"$/g, '').trim()}"`}
+            </Text>
 
-        {/* Context Note (if verseQuote is distinct from reflection prompt) */}
-        {item.verseQuote && item.body && item.body.trim() !== item.verseQuote.trim() && (
-          <Text variant="caption" color={colors.textSecondary} style={styles.contextNoteText}>
-            {item.body.replace(/^"|"$/g, '').trim()}
-          </Text>
+            {/* Context Note (if verseQuote is distinct from reflection prompt) */}
+            {item.verseQuote && item.body && item.body.trim() !== item.verseQuote.trim() && (
+              <Text variant="caption" color={colors.textSecondary} style={styles.contextNoteText}>
+                {item.body.replace(/^"|"$/g, '').trim()}
+              </Text>
+            )}
+          </>
         )}
 
         {/* Action Cue (matching BookmarksScreen) */}
@@ -126,7 +145,9 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
             </Text>
           </View>
           <Text variant="caption" color={colors.textTertiary}>
-            {isAchievement ? 'Milestone' : (item.scriptureRef || 'Sacred Scripture')}
+            {isAchievement
+              ? `${(item.achievementCategory || 'milestone').toUpperCase()} MILESTONE`
+              : (item.scriptureRef || 'Sacred Scripture')}
           </Text>
         </View>
       </TouchableOpacity>
@@ -243,6 +264,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(15, 23, 42, 0.04)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  // Achievement description text
+  achievementDescText: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.textPrimary,
+    marginTop: 2,
+    marginBottom: 4,
   },
 
   // Verse quotation with sacred dotted underline (matching BookmarksScreen)
