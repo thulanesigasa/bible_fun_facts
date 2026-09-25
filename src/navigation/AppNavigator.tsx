@@ -537,47 +537,18 @@ export default function AppNavigator() {
               fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
             },
             tabBarLabel: ({ focused, children }) => {
-              const isFeed = children === 'Feed' || route.name === 'Discover';
-              const showBadge = isFeed && unreadNotificationsCount > 0;
               return (
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text
-                      style={{
-                        fontSize: 8.5,
-                        fontWeight: focused ? '700' : '500',
-                        color: focused ? accent : '#64748B',
-                        marginTop: 1,
-                      }}
-                    >
-                      {children}
-                    </Text>
-                    {showBadge && (
-                      <View
-                        style={{
-                          backgroundColor: accent,
-                          minWidth: 12,
-                          height: 12,
-                          borderRadius: 6,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          marginLeft: 3,
-                          paddingHorizontal: 2,
-                        }}
-                      >
-                        <Text
-                          style={{
-                            fontSize: 7.5,
-                            fontWeight: '800',
-                            color: '#0F172A',
-                            lineHeight: 9,
-                          }}
-                        >
-                          {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
-                        </Text>
-                      </View>
-                    )}
-                  </View>
+                  <Text
+                    style={{
+                      fontSize: 8.5,
+                      fontWeight: focused ? '700' : '500',
+                      color: focused ? accent : '#64748B',
+                      marginTop: 1,
+                    }}
+                  >
+                    {children}
+                  </Text>
                   {focused && (
                     <View
                       style={{
