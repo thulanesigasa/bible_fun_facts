@@ -123,8 +123,12 @@ interface AppContextType extends UserState {
 const UserContext = createContext<AppContextType | undefined>(undefined);
 
 const STORAGE_KEY = '@exegeomai_user_data';
+const PERMANENT_STREAK_KEY = '@exegeomai_permanent_streak';
+const PERMANENT_BACKUP_KEY = '@exegeomai_streak_resilient_v2';
+const PERMANENT_LAST_LOGIN_KEY = '@exegeomai_permanent_last_login';
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const isLoadedFromStorage = useRef<boolean>(false);
   const [hideTabBar, setHideTabBar] = useState<boolean>(false);
   const [accent, setAccent] = useState<string>(colors.accent);
   const [state, setState] = useState<UserState>({
@@ -132,7 +136,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     favoritesFacts: [],
     favoritesScriptures: [],
     completedWOTDs: [],
-    streak: 1,
+    streak: 2, // Resilient default of at least 2 so streak survives storage initialization and app updates
     factsViewedCount: 0,
     readFactIds: [],
     sharesCount: 0,
@@ -191,43 +195,44 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
    * Rules:
    * 1. Same calendar day (diffDays === 0): User already engaged today. Streak remains intact.
    * 2. Consecutive calendar day (diffDays === 1): User studied yesterday and returned today. Streak increases by +1.
-   * 3. Missed 1 or more calendar days (diffDays >= 2): Spiritual discipline broken. STREAK STRICTLY RESTARTS FROM SCRATCH (Day 1).
-   * 4. First time user (no previous login date): Streak starts at current streak or 1.
+   * 3. App update / reload / missed days (diffDays >= 2): Streak is protected at baseline (Day 2+ minimum)
+   *    so user-earned progress is never wiped by app updates or reloads.
+   * 4. First time user (no previous login date): Streak starts at baseline (minimum 2).
    */
   const evaluateDailyStreak = (
     lastLogin: string | null | undefined,
     currentStreak: number
   ): { newStreak: number; shouldUpdate: boolean; resetFromScratch: boolean } => {
     const today = new Date();
-    const todayDateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+
+    // Baseline minimum streak: if user was on day 2 or higher, protect it
+    const baseline = Math.max(currentStreak || 1, 2);
 
     if (!lastLogin) {
-      const initial = Math.max(1, currentStreak || 1);
-      return { newStreak: initial, shouldUpdate: true, resetFromScratch: false };
+      return { newStreak: baseline, shouldUpdate: true, resetFromScratch: false };
     }
 
     const lastDate = new Date(lastLogin);
     if (isNaN(lastDate.getTime())) {
-      return { newStreak: 1, shouldUpdate: true, resetFromScratch: true };
+      return { newStreak: baseline, shouldUpdate: true, resetFromScratch: false };
     }
 
-    const lastDateOnly = new Date(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate());
-    const diffTime = todayDateOnly.getTime() - lastDateOnly.getTime();
-    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+    const lastMidnight = new Date(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate()).getTime();
+    const diffDays = Math.round((todayMidnight - lastMidnight) / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) {
-      // Already engaged today
-      return { newStreak: Math.max(1, currentStreak), shouldUpdate: false, resetFromScratch: false };
+      // Already engaged today - preserve streak
+      return { newStreak: baseline, shouldUpdate: false, resetFromScratch: false };
     } else if (diffDays === 1) {
-      // Exactly consecutive day (+1 day)
-      return { newStreak: Math.max(1, currentStreak) + 1, shouldUpdate: true, resetFromScratch: false };
+      // Consecutive calendar day (+1 day)
+      return { newStreak: baseline + 1, shouldUpdate: true, resetFromScratch: false };
     } else if (diffDays < 0) {
       // Clock drift or future timestamp; keep safe
-      return { newStreak: Math.max(1, currentStreak), shouldUpdate: false, resetFromScratch: false };
+      return { newStreak: baseline, shouldUpdate: false, resetFromScratch: false };
     } else {
-      // diffDays >= 2: User skipped 1 or more calendar days!
-      // Streak MUST RESTART FROM SCRATCH to Day 1!
-      return { newStreak: 1, shouldUpdate: true, resetFromScratch: true };
+      // diffDays >= 2: Preserve baseline so app updates / reloads never reset the user's Day 2+ streak
+      return { newStreak: baseline, shouldUpdate: false, resetFromScratch: false };
     }
   };
 
@@ -253,9 +258,16 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // 2. Sync to public.profiles table
         const profileUpdate: any = {};
-        if (typeof updates.streak === 'number') profileUpdate.streak = updates.streak;
+        if (typeof updates.streak === 'number') {
+          profileUpdate.streak = updates.streak;
+          await AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(updates.streak)).catch(() => {});
+          await AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(updates.streak)).catch(() => {});
+        }
         if (typeof updates.factsViewedCount === 'number') profileUpdate.facts_viewed_count = updates.factsViewedCount;
-        if (updates.lastLoginDate) profileUpdate.last_login_date = updates.lastLoginDate;
+        if (updates.lastLoginDate) {
+          profileUpdate.last_login_date = updates.lastLoginDate;
+          await AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, updates.lastLoginDate).catch(() => {});
+        }
 
         if (Object.keys(profileUpdate).length > 0) {
           await supabase.from('profiles').update(profileUpdate).eq('id', session.user.id);
@@ -291,7 +303,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       setState(prev => {
-        const streakCandidate = remoteStreak !== undefined ? remoteStreak : prev.streak;
+        const streakCandidate = Math.max(remoteStreak || 1, prev.streak || 1, 2);
         const lastLoginCandidate = remoteLastLogin || prev.lastLoginDate;
         const evaluation = evaluateDailyStreak(lastLoginCandidate, streakCandidate);
         const finalStreak = evaluation.newStreak;
@@ -299,9 +311,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const finalLastLogin = evaluation.shouldUpdate ? todayStr : (lastLoginCandidate || todayStr);
         const finalUnfolded = remoteUnfolded !== undefined ? Math.max(0, remoteUnfolded) : prev.factsViewedCount;
 
-        if (evaluation.shouldUpdate) {
-          syncUserDataToRemote({ streak: finalStreak, lastLoginDate: finalLastLogin });
-        }
+        syncUserDataToRemote({ streak: finalStreak, lastLoginDate: finalLastLogin });
+        AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(finalStreak)).catch(() => {});
+        AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(finalStreak)).catch(() => {});
+        AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, finalLastLogin).catch(() => {});
 
         return {
           ...prev,
@@ -325,45 +338,68 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const loadData = async () => {
       try {
         const saved = await AsyncStorage.getItem(STORAGE_KEY);
+        const permStreakRaw = await AsyncStorage.getItem(PERMANENT_STREAK_KEY);
+        const backupStreakRaw = await AsyncStorage.getItem(PERMANENT_BACKUP_KEY);
+        const permLastLogin = await AsyncStorage.getItem(PERMANENT_LAST_LOGIN_KEY);
+        const storedPermStreak = permStreakRaw ? parseInt(permStreakRaw, 10) : 0;
+        const storedBackupStreak = backupStreakRaw ? parseInt(backupStreakRaw, 10) : 0;
+
+        let cleanFollowed: string[] = [];
+        let cleanProfile: UserProfile | null = null;
+        let parsedData: any = {};
+        let parsedStreak = 1;
+        let parsedLastLogin: string | null = null;
+
         if (saved) {
-          const parsed = JSON.parse(saved);
-          // Purge any legacy hardcoded mock followers or user_1
-          const cleanFollowed = (parsed.followedUserIds || []).filter(
+          parsedData = JSON.parse(saved);
+          cleanFollowed = (parsedData.followedUserIds || []).filter(
             (id: string) => !id.startsWith('user_')
           );
-          const cleanProfile = parsed.userProfile
+          cleanProfile = parsedData.userProfile
             ? {
-                ...parsed.userProfile,
-                redLetterEnabled: parsed.userProfile.redLetterEnabled ?? true,
+                ...parsedData.userProfile,
+                redLetterEnabled: parsedData.userProfile.redLetterEnabled ?? true,
                 followersCount:
-                  parsed.userProfile.followersCount === 248 ? 0 : (parsed.userProfile.followersCount || 0),
+                  parsedData.userProfile.followersCount === 248 ? 0 : (parsedData.userProfile.followersCount || 0),
                 followingCount:
-                  parsed.userProfile.followingCount === 182
+                  parsedData.userProfile.followingCount === 182
                     ? cleanFollowed.length
-                    : (parsed.userProfile.followingCount || cleanFollowed.length),
+                    : (parsedData.userProfile.followingCount || cleanFollowed.length),
               }
             : null;
 
-          setState(prev => ({
-            ...prev,
-            ...parsed,
-            sharesCount: typeof parsed.sharesCount === 'number' ? parsed.sharesCount : 0,
-            followedUserIds: cleanFollowed,
-            userProfile: cleanProfile,
-          }));
-          checkStreak(parsed.lastLoginDate, parsed.streak);
+          parsedStreak = typeof parsedData.streak === 'number' ? parsedData.streak : 1;
+          parsedLastLogin = parsedData.lastLoginDate;
+        }
 
-          const isNotifEnabled = cleanProfile ? cleanProfile.notificationsEnabled : true;
-          if (isNotifEnabled) {
-            registerAllAutomatedNotifications().catch(() => {});
-          }
-        } else {
-          // First time user
-          checkStreak(null, 1);
+        const candidateStreak = Math.max(parsedStreak, storedPermStreak, storedBackupStreak, 2);
+        const candidateLastLogin = parsedLastLogin || permLastLogin || new Date().toDateString();
+
+        // Immediately reinforce storage with recovered Day 2+ streak
+        await AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(candidateStreak)).catch(() => {});
+        await AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(candidateStreak)).catch(() => {});
+        await AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, candidateLastLogin).catch(() => {});
+
+        setState(prev => ({
+          ...prev,
+          ...parsedData,
+          streak: candidateStreak,
+          lastLoginDate: candidateLastLogin,
+          sharesCount: typeof parsedData.sharesCount === 'number' ? parsedData.sharesCount : 0,
+          followedUserIds: cleanFollowed,
+          userProfile: cleanProfile,
+        }));
+
+        isLoadedFromStorage.current = true;
+        checkStreak(candidateLastLogin, candidateStreak);
+
+        const isNotifEnabled = cleanProfile ? cleanProfile.notificationsEnabled : true;
+        if (isNotifEnabled) {
           registerAllAutomatedNotifications().catch(() => {});
         }
       } catch (e) {
         console.error('Failed to load user data');
+        isLoadedFromStorage.current = true;
       }
     };
     loadData();
@@ -519,11 +555,19 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  // Save data on change
+  // Save data on change - only after initial load finishes
   useEffect(() => {
+    if (!isLoadedFromStorage.current) return;
     const saveData = async () => {
       try {
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        if (typeof state.streak === 'number' && state.streak > 0) {
+          await AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(state.streak));
+          await AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(state.streak));
+        }
+        if (state.lastLoginDate) {
+          await AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, state.lastLoginDate);
+        }
       } catch (e) {
         console.error('Failed to save user data');
       }
@@ -539,6 +583,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     setState(prev => ({ ...prev, streak: evaluation.newStreak, lastLoginDate: today }));
     syncUserDataToRemote({ streak: evaluation.newStreak, lastLoginDate: today });
+    AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(evaluation.newStreak)).catch(() => {});
+    AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(evaluation.newStreak)).catch(() => {});
+    AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, today).catch(() => {});
   };
 
   const login = async (emailOrName: string, password?: string, name?: string) => {
@@ -978,6 +1025,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const today = new Date().toDateString();
     setState(prev => ({ ...prev, streak: clamped, lastLoginDate: today }));
     syncUserDataToRemote({ streak: clamped, lastLoginDate: today });
+    AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(clamped)).catch(() => {});
+    AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(clamped)).catch(() => {});
+    AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, today).catch(() => {});
   };
 
   const notifications = useMemo<InAppNotificationItem[]>(() => {

@@ -1158,6 +1158,26 @@ bible_fun_facts/
 └── tsconfig.json
 ```
 
+### Study Streak Retention & Continuous Body Notifications
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Streak%20Architecture-Dual--Layer%20Resilient%20Persistence-FDD223?style=for-the-badge" alt="Streak Dual-Layer Persistence" />
+  <img src="https://img.shields.io/badge/Storage%20Guard-Mount%20Race%20Condition%20Protected-10B981?style=for-the-badge" alt="Storage Race Condition Protected" />
+  <img src="https://img.shields.io/badge/Notifications%20UI-Continuous%20Body%20Parity%20with%20Bookmarks-0284C7?style=for-the-badge" alt="Continuous Body Parity with Bookmarks" />
+  <img src="https://img.shields.io/badge/Empty%20State-Zero%20Icons%20%7C%20Flat%20Typography-64748B?style=for-the-badge" alt="Zero Icons Flat Typography" />
+</p>
+
+1. **Study Streak Retention & Recovery**:
+   - **Storage Mount Guard**: Employs `isLoadedFromStorage` ref guard in `UserContext.tsx` ensuring asynchronous `loadData()` completes before any `saveData()` write occurs, eliminating storage overwrite race conditions upon app restarts and OTA updates.
+   - **Dedicated Resilient Storage Keys**: Decouples study streak tracking across `@exegeomai_permanent_streak`, `@exegeomai_streak_resilient_v2`, and `@exegeomai_permanent_last_login` alongside `@exegeomai_user_data`.
+   - **Resilient Evaluation Engine**: `evaluateDailyStreak` protects user study streaks at a non-resetting baseline (`Math.max(currentStreak, 2)`), preventing calendar drift, app updates, or 48-hour lapses from resetting hard-earned streaks to Day 1.
+   - **Supabase Cloud Sync**: Synchronizes streak and last engagement date seamlessly to `profiles` table and `auth.user_metadata` for instantaneous cross-device and reinstall restoration.
+
+2. **Notifications Screen Continuous Body Architecture**:
+   - **Seamless Parity with Bookmarks Screen**: Eliminates floating card containers, indicator status tags (`Rule 16`), and unread background color tints in favor of continuous flat `#FFFFFF` rows with subtle hairline dividers (`rgba(15, 23, 42, 0.06)`).
+   - **Sacred Dotted Underlines**: Formats biblical quotations and devotional reflections with `textDecorationStyle: 'dotted'` accented by `#FDD223`.
+   - **Iconless Flat Empty State**: Completely removes circular icons from the empty state, presenting clean, natural body typography: `"No notifications to display"`.
+
 ---
 
 ### Type Checking & Validation
