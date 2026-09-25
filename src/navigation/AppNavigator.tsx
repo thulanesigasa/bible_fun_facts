@@ -5,6 +5,7 @@ import {
   Platform,
   useWindowDimensions,
   Image,
+  TouchableOpacity,
 } from 'react-native';
 import { NavigationContainer, DefaultTheme, getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -15,6 +16,7 @@ import {
   HistorySvg,
   SearchSvg,
   ProfileSvg,
+  BellSvg,
 } from '../components/SvgIcons';
 
 import DiscoverScreen from '../screens/DiscoverScreen';
@@ -27,6 +29,7 @@ import BookmarksScreen from '../screens/BookmarksScreen';
 import UnfoldedScreen from '../screens/UnfoldedScreen';
 import DownloadedVersesScreen from '../screens/DownloadedVersesScreen';
 import AchievementsScreen from '../screens/AchievementsScreen';
+import NotificationsScreen from '../screens/NotificationsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import FactDetailsScreen from '../screens/FactDetailsScreen';
 import ScriptureDetailsScreen from '../screens/ScriptureDetailsScreen';
@@ -63,6 +66,7 @@ export type RootStackParamList = {
   Unfolded: undefined;
   DownloadedVerses: undefined;
   Achievements: undefined;
+  Notifications: undefined;
   TermsOfService: undefined;
   PrivacyPolicy: undefined;
 };
@@ -70,6 +74,49 @@ export type RootStackParamList = {
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
+
+function HeaderBellButton({ navigation }: any) {
+  const { unreadNotificationsCount } = useApp();
+  return (
+    <TouchableOpacity
+      onPress={() => navigation.navigate('Discover', { screen: 'Notifications' })}
+      style={{ paddingLeft: 16, paddingRight: 8, paddingVertical: 4, position: 'relative' }}
+      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+      accessibilityRole="button"
+      accessibilityLabel={`Notifications. ${unreadNotificationsCount} unread.`}
+    >
+      <BellSvg size={20} color="#0F172A" />
+      {unreadNotificationsCount > 0 && (
+        <View
+          style={{
+            position: 'absolute',
+            top: 2,
+            right: 4,
+            minWidth: 15,
+            height: 15,
+            borderRadius: 7.5,
+            backgroundColor: '#FDD223',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 2,
+            borderWidth: 1.5,
+            borderColor: '#FFFFFF',
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 8.5,
+              fontWeight: '800',
+              color: '#0F172A',
+            }}
+          >
+            {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+          </Text>
+        </View>
+      )}
+    </TouchableOpacity>
+  );
+}
 
 function shouldShowTabHeader(route: any): boolean {
   const routeName = getFocusedRouteNameFromRoute(route);
@@ -80,6 +127,7 @@ function shouldShowTabHeader(route: any): boolean {
     'Unfolded',
     'DownloadedVerses',
     'Achievements',
+    'Notifications',
     'TermsOfService',
     'PrivacyPolicy',
     'FactDetails',
@@ -96,7 +144,8 @@ function getTabBarVisibility(route: any, hideTabBar: boolean): 'none' | 'flex' {
   if (
     routeName === 'TermsOfService' ||
     routeName === 'PrivacyPolicy' ||
-    routeName === 'Achievements'
+    routeName === 'Achievements' ||
+    routeName === 'Notifications'
   ) {
     return 'none';
   }
@@ -107,6 +156,24 @@ function DiscoverStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="DiscoverMain" component={DiscoverScreen} />
+      <Stack.Screen
+        name="Notifications"
+        component={NotificationsScreen}
+        options={{
+          headerShown: true,
+          title: 'Notifications',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+        }}
+      />
       <Stack.Screen
         name="FactDetails"
         component={FactDetailsScreen}
@@ -234,6 +301,24 @@ function ProfileStack() {
         options={{
           headerShown: true,
           title: 'Study Achievements',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+        }}
+      />
+      <Stack.Screen
+        name="Notifications"
+        component={NotificationsScreen}
+        options={{
+          headerShown: true,
+          title: 'Notifications',
           headerStyle: {
             backgroundColor: '#FFFFFF',
           },
@@ -463,10 +548,11 @@ export default function AppNavigator() {
           <Tab.Screen
             name="Discover"
             component={DiscoverStack}
-            options={{
+            options={({ navigation }) => ({
               title: 'Feed',
               tabBarIcon: ({ color }) => <DiscoverSvg size={16} color={color} strokeWidth={2} />,
-            }}
+              headerLeft: () => <HeaderBellButton navigation={navigation} />,
+            })}
           />
           <Tab.Screen
             name="WOTD"

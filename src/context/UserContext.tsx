@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Alert, AppState, AppStateStatus } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Notifications from 'expo-notifications';
 import { Fact, Scripture, WOTDEntry } from '../data/mockDatabase';
 import { colors } from '../theme/colors';
 import { supabase, SUPABASE_ANON_KEY } from '../services/supabase';
@@ -8,6 +9,15 @@ import {
   registerAllAutomatedNotifications,
   cancelAllAutomatedNotifications,
 } from '../services/notifications';
+import { InAppNotificationItem } from '../types/inAppNotifications';
+import {
+  getDispatchedScheduledNotifications,
+  getUnlockedAchievementNotifications,
+  getReadNotificationIds,
+  saveReadNotificationIds,
+  getDismissedNotificationIds,
+  saveDismissedNotificationIds,
+} from '../services/inAppNotifications';
 
 export interface UserProfile {
   name: string;
@@ -95,6 +105,14 @@ interface AppContextType extends UserState {
   setVerseHighlight: (verseKey: string, color?: string) => void;
   setReaderTheme: (theme: 'light' | 'sepia' | 'dark') => void;
   setStreak: (days: number) => void;
+  notifications: InAppNotificationItem[];
+  unreadNotificationsCount: number;
+  markNotificationAsRead: (id: string) => void;
+  markAllNotificationsAsRead: () => void;
+  deleteNotification: (id: string) => void;
+  activeAchievementAlert: InAppNotificationItem | null;
+  dismissAchievementAlert: () => void;
+  refreshNotifications: () => void;
 }
 
 const UserContext = createContext<AppContextType | undefined>(undefined);
@@ -119,6 +137,27 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     bibleHighlights: {},
     readerTheme: 'light',
   });
+
+  const [readNotificationIds, setReadNotificationIds] = useState<string[]>([]);
+  const [dismissedNotificationIds, setDismissedNotificationIds] = useState<string[]>([]);
+  const [activeAchievementAlert, setActiveAchievementAlert] = useState<InAppNotificationItem | null>(null);
+  const previousUnlockedMilestoneIds = useRef<Set<string>>(new Set());
+  const isInitialAchievementCheck = useRef<boolean>(true);
+  const [notificationsTick, setNotificationsTick] = useState<number>(0);
+
+  // Load read & dismissed notification IDs from storage
+  useEffect(() => {
+    getReadNotificationIds().then(setReadNotificationIds).catch(() => {});
+    getDismissedNotificationIds().then(setDismissedNotificationIds).catch(() => {});
+  }, []);
+
+  // Listen to foreground notifications
+  useEffect(() => {
+    const sub = Notifications.addNotificationReceivedListener(() => {
+      setNotificationsTick(prev => prev + 1);
+    });
+    return () => sub.remove();
+  }, []);
 
   /**
    * Computes study streak progression based on calendar days elapsed.
@@ -915,6 +954,97 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     syncUserDataToRemote({ streak: clamped, lastLoginDate: today });
   };
 
+  const notifications = useMemo<InAppNotificationItem[]>(() => {
+    const scheduled = getDispatchedScheduledNotifications();
+    const achievements = getUnlockedAchievementNotifications({
+      streak: state.streak || 1,
+      bookmarksCount: state.favoritesScriptures?.length || 0,
+      highlightsCount: Object.keys(state.bibleHighlights || {}).length,
+      sharesCount: state.sharesCount || 0,
+    });
+
+    const combined = [...achievements, ...scheduled];
+    const filtered = combined.filter(item => !dismissedNotificationIds.includes(item.id));
+
+    return filtered
+      .map(item => ({
+        ...item,
+        isRead: readNotificationIds.includes(item.id),
+      }))
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [
+    state.streak,
+    state.favoritesScriptures,
+    state.bibleHighlights,
+    state.sharesCount,
+    readNotificationIds,
+    dismissedNotificationIds,
+    notificationsTick,
+  ]);
+
+  const unreadNotificationsCount = useMemo(() => {
+    return notifications.filter(n => !n.isRead).length;
+  }, [notifications]);
+
+  // Real-time achievement unlock detection while in-app
+  useEffect(() => {
+    const unlockedAchievements = getUnlockedAchievementNotifications({
+      streak: state.streak || 1,
+      bookmarksCount: state.favoritesScriptures?.length || 0,
+      highlightsCount: Object.keys(state.bibleHighlights || {}).length,
+      sharesCount: state.sharesCount || 0,
+    });
+
+    const currentIds = new Set(unlockedAchievements.map(a => a.id));
+
+    if (isInitialAchievementCheck.current) {
+      previousUnlockedMilestoneIds.current = currentIds;
+      isInitialAchievementCheck.current = false;
+      return;
+    }
+
+    for (const ach of unlockedAchievements) {
+      if (!previousUnlockedMilestoneIds.current.has(ach.id)) {
+        setActiveAchievementAlert(ach);
+        break;
+      }
+    }
+
+    previousUnlockedMilestoneIds.current = currentIds;
+  }, [state.streak, state.favoritesScriptures, state.bibleHighlights, state.sharesCount]);
+
+  const markNotificationAsRead = useCallback((id: string) => {
+    setReadNotificationIds(prev => {
+      if (prev.includes(id)) return prev;
+      const next = [...prev, id];
+      saveReadNotificationIds(next);
+      return next;
+    });
+  }, []);
+
+  const markAllNotificationsAsRead = useCallback(() => {
+    const allIds = notifications.map(n => n.id);
+    setReadNotificationIds(allIds);
+    saveReadNotificationIds(allIds);
+  }, [notifications]);
+
+  const deleteNotification = useCallback((id: string) => {
+    setDismissedNotificationIds(prev => {
+      if (prev.includes(id)) return prev;
+      const next = [...prev, id];
+      saveDismissedNotificationIds(next);
+      return next;
+    });
+  }, []);
+
+  const dismissAchievementAlert = useCallback(() => {
+    setActiveAchievementAlert(null);
+  }, []);
+
+  const refreshNotifications = useCallback(() => {
+    setNotificationsTick(prev => prev + 1);
+  }, []);
+
   return (
     <UserContext.Provider value={{
       ...state,
@@ -945,6 +1075,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setVerseHighlight,
       setReaderTheme,
       setStreak,
+      notifications,
+      unreadNotificationsCount,
+      markNotificationAsRead,
+      markAllNotificationsAsRead,
+      deleteNotification,
+      activeAchievementAlert,
+      dismissAchievementAlert,
+      refreshNotifications,
     }}>
 
       {children}
