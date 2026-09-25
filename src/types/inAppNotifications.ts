@@ -15,6 +15,10 @@ export interface InAppNotificationItem {
   body: string;
   scriptureRef?: string;
   verseQuote?: string;
+  book?: string;
+  chapter?: number;
+  verse?: number;
+  deliveredAtLabel?: string;
   achievementId?: string;
   achievementCategory?: 'streak' | 'bookmark' | 'highlight' | 'share';
   achievementTarget?: number;

@@ -11,139 +11,159 @@ import { ALL_ACHIEVEMENTS } from '../data/achievements';
 
 const READ_NOTIFICATION_IDS_KEY = '@exegeomai_read_notification_ids';
 const DISMISSED_NOTIFICATION_IDS_KEY = '@exegeomai_dismissed_notification_ids';
+const RECEIVED_PUSH_NOTIFICATIONS_KEY = '@exegeomai_received_push_notifications';
+const ACHIEVEMENT_TIMESTAMPS_KEY = '@exegeomai_achievement_unlock_timestamps';
 
 /**
- * Builds the list of scheduled devotions dispatched by the automated push system
- * up to the current time, so the user can review them inside the app.
+ * Parses canonical book name, chapter number, and verse number from a reference string
+ * such as "Psalm 119:105", "1 John 4:19", "Romans 8:38-39", or "Lamentations 3:22-23".
  */
-export function getDispatchedScheduledNotifications(dayOfYearOverride?: number): InAppNotificationItem[] {
-  const now = new Date();
-  const currentDay = dayOfYearOverride ?? getDayOfYear();
-  const currentHour = now.getHours();
-  const currentMinute = now.getMinutes();
+export function parseScriptureCoordinates(ref?: string): { book: string; chapter: number; verse: number } | null {
+  if (!ref) return null;
+  const cleaned = ref.trim();
+  const match = cleaned.match(/^([\d\s]*[A-Za-z]+(?:\s+[A-Za-z]+)?)\s+(\d+)[:\.](\d+)/);
+  if (!match) return null;
 
+  let book = match[1].trim();
+  if (book === 'Psalm') book = 'Psalms';
+  const chapter = parseInt(match[2], 10) || 1;
+  const verse = parseInt(match[3], 10) || 1;
+  return { book, chapter, verse };
+}
+
+/**
+ * Formats a real-life human-readable delivery label such as "Today at 08:00 AM" or "Yesterday at 22:00".
+ */
+export function formatDeliveryLabel(date: Date): string {
+  const now = new Date();
+  const isToday = date.toDateString() === now.toDateString();
+  const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const isYesterday = date.toDateString() === yesterday.toDateString();
+
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const timeStr = `${hours}:${minutes}`;
+
+  if (isToday) {
+    return `Today at ${timeStr}`;
+  }
+  if (isYesterday) {
+    return `Yesterday at ${timeStr}`;
+  }
+
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${date.getDate()} ${months[date.getMonth()]} at ${timeStr}`;
+}
+
+/**
+ * Builds the real-life list of scheduled devotions dispatched by the automated push system
+ * over the past rolling 7 days up to the current moment.
+ */
+export function getDispatchedScheduledNotifications(daysBack: number = 7): InAppNotificationItem[] {
+  const now = new Date();
   const items: InAppNotificationItem[] = [];
 
-  // 1. Morning Word (Dispatched at 08:00 AM)
-  if (currentHour >= 8) {
-    const morning = MORNING_365_SCRIPTURES[(currentDay - 1 + 365) % MORNING_365_SCRIPTURES.length];
-    const morningDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0);
-    items.push({
-      id: `scheduled_morning_${currentDay}_${now.getFullYear()}`,
-      type: 'morning_word',
-      title: 'Morning Word & Devotion',
-      subtitle: `Dispatched Today at 08:00 AM • ${morning.theme}`,
-      body: `"${morning.text}"`,
-      scriptureRef: morning.ref,
-      verseQuote: morning.text,
-      createdAt: morningDate.toISOString(),
-      isRead: false,
-      actionRoute: 'WOTD',
-    });
-  }
+  for (let offset = 0; offset < daysBack; offset++) {
+    const dayDate = new Date(now.getTime() - offset * 24 * 60 * 60 * 1000);
+    const dayYear = dayDate.getFullYear();
+    const calDayOfYear = getDayOfYear(dayDate);
 
-  // 2. Midday God's Love & Identity Affirmation (Dispatched at 13:15 / 1:15 PM)
-  if (currentHour > 13 || (currentHour === 13 && currentMinute >= 15)) {
-    const midday = DIVINE_LOVE_365_AFFIRMATIONS[(currentDay - 1 + 365) % DIVINE_LOVE_365_AFFIRMATIONS.length];
-    const middayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 13, 15, 0);
-    items.push({
-      id: `scheduled_midday_${currentDay}_${now.getFullYear()}`,
-      type: 'midday_affirmation',
-      title: "God's Love & Identity Affirmation",
-      subtitle: `Dispatched Today at 13:15 • ${midday.title}`,
-      body: `"${midday.body}"`,
-      scriptureRef: midday.reference,
-      verseQuote: midday.body,
-      createdAt: middayDate.toISOString(),
-      isRead: false,
-      actionRoute: 'WOTD',
-    });
-  }
+    const morningData = MORNING_365_SCRIPTURES[(calDayOfYear - 1 + 365) % MORNING_365_SCRIPTURES.length];
+    const middayData = DIVINE_LOVE_365_AFFIRMATIONS[(calDayOfYear - 1 + 365) % DIVINE_LOVE_365_AFFIRMATIONS.length];
+    const afternoonIdx = (calDayOfYear - 1 + 182) % DIVINE_LOVE_365_AFFIRMATIONS.length;
+    const afternoonData = DIVINE_LOVE_365_AFFIRMATIONS[afternoonIdx];
+    const eveningData = EVENING_FELLOWSHIP_365_PROMPTS[(calDayOfYear - 1 + 365) % EVENING_FELLOWSHIP_365_PROMPTS.length];
+    const nightlyData = NIGHTLY_PEACE_365_SCRIPTURES[(calDayOfYear - 1 + 365) % NIGHTLY_PEACE_365_SCRIPTURES.length];
 
-  // 3. Afternoon Motivation & Strength (Dispatched at 16:30 / 4:30 PM)
-  if (currentHour > 16 || (currentHour === 16 && currentMinute >= 30)) {
-    const afternoonIdx = (currentDay - 1 + 182) % DIVINE_LOVE_365_AFFIRMATIONS.length;
-    const afternoon = DIVINE_LOVE_365_AFFIRMATIONS[afternoonIdx];
-    const afternoonDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 16, 30, 0);
-    items.push({
-      id: `scheduled_afternoon_${currentDay}_${now.getFullYear()}`,
-      type: 'afternoon_strength',
-      title: 'Afternoon Strength & Encouragement',
-      subtitle: `Dispatched Today at 16:30 • ${afternoon.title}`,
-      body: `"${afternoon.body}"`,
-      scriptureRef: afternoon.reference,
-      verseQuote: afternoon.body,
-      createdAt: afternoonDate.toISOString(),
-      isRead: false,
-      actionRoute: 'WOTD',
-    });
-  }
+    const slots = [
+      {
+        hour: 8,
+        minute: 0,
+        type: 'morning_word' as const,
+        title: `Morning Word: ${morningData.theme}`,
+        ref: morningData.ref,
+        text: morningData.text,
+      },
+      {
+        hour: 13,
+        minute: 15,
+        type: 'midday_affirmation' as const,
+        title: `God's Love: ${middayData.title}`,
+        ref: middayData.reference,
+        text: middayData.body,
+      },
+      {
+        hour: 16,
+        minute: 30,
+        type: 'afternoon_strength' as const,
+        title: `Afternoon Strength: ${afternoonData.title}`,
+        ref: afternoonData.reference,
+        text: afternoonData.body,
+      },
+      {
+        hour: 20,
+        minute: 30,
+        type: 'evening_fellowship' as const,
+        title: `Fellowship with Christ: ${eveningData.title}`,
+        ref: eveningData.title,
+        text: eveningData.body,
+      },
+      {
+        hour: 22,
+        minute: 0,
+        type: 'nightly_peace' as const,
+        title: `Nightly Peace: ${nightlyData.theme}`,
+        ref: nightlyData.ref,
+        text: nightlyData.text,
+      },
+    ];
 
-  // 4. Evening Fellowship with Christ (Dispatched at 20:30 / 8:30 PM)
-  if (currentHour > 20 || (currentHour === 20 && currentMinute >= 30)) {
-    const evening = EVENING_FELLOWSHIP_365_PROMPTS[(currentDay - 1 + 365) % EVENING_FELLOWSHIP_365_PROMPTS.length];
-    const eveningDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 20, 30, 0);
-    items.push({
-      id: `scheduled_evening_${currentDay}_${now.getFullYear()}`,
-      type: 'evening_fellowship',
-      title: 'Evening Fellowship with Christ',
-      subtitle: `Dispatched Today at 20:30 • ${evening.title}`,
-      body: `"${evening.body}"`,
-      scriptureRef: evening.title,
-      createdAt: eveningDate.toISOString(),
-      isRead: false,
-      actionRoute: 'DiscoverMain',
-    });
-  }
+    for (const slot of slots) {
+      const slotDate = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate(), slot.hour, slot.minute, 0);
 
-  // 5. Nightly Scripture of Peace (Dispatched at 22:00 / 10:00 PM)
-  if (currentHour >= 22) {
-    const nightly = NIGHTLY_PEACE_365_SCRIPTURES[(currentDay - 1 + 365) % NIGHTLY_PEACE_365_SCRIPTURES.length];
-    const nightlyDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 22, 0, 0);
-    items.push({
-      id: `scheduled_nightly_${currentDay}_${now.getFullYear()}`,
-      type: 'nightly_peace',
-      title: 'Nightly Scripture of Peace',
-      subtitle: `Dispatched Tonight at 22:00 • ${nightly.theme}`,
-      body: `"${nightly.text}"`,
-      scriptureRef: nightly.ref,
-      verseQuote: nightly.text,
-      createdAt: nightlyDate.toISOString(),
-      isRead: false,
-      actionRoute: 'WOTD',
-    });
-  }
+      // Skip slots that are in the future
+      if (slotDate.getTime() > now.getTime()) {
+        continue;
+      }
 
-  // Also include yesterday's evening fellowship & nightly peace if morning has started
-  if (currentHour < 12) {
-    const yesterday = (currentDay - 2 + 365) % 365;
-    const yEvening = EVENING_FELLOWSHIP_365_PROMPTS[yesterday % EVENING_FELLOWSHIP_365_PROMPTS.length];
-    const yEveningDate = new Date(now.getTime() - 14 * 60 * 60 * 1000);
-    items.push({
-      id: `scheduled_evening_${yesterday}_yesterday`,
-      type: 'evening_fellowship',
-      title: 'Evening Fellowship with Christ',
-      subtitle: `Dispatched Yesterday at 20:30 • ${yEvening.title}`,
-      body: `"${yEvening.body}"`,
-      scriptureRef: yEvening.title,
-      createdAt: yEveningDate.toISOString(),
-      isRead: false,
-      actionRoute: 'DiscoverMain',
-    });
+      const coords = parseScriptureCoordinates(slot.ref);
+      const deliveryLabel = formatDeliveryLabel(slotDate);
+
+      items.push({
+        id: `scheduled_${slot.type}_${calDayOfYear}_${dayYear}`,
+        type: slot.type,
+        title: slot.title,
+        subtitle: `${deliveryLabel} • ${slot.ref}`,
+        body: `"${slot.text.trim()}"`,
+        scriptureRef: slot.ref,
+        verseQuote: slot.text.trim(),
+        book: coords?.book,
+        chapter: coords?.chapter,
+        verse: coords?.verse,
+        deliveredAtLabel: deliveryLabel,
+        createdAt: slotDate.toISOString(),
+        isRead: false,
+        actionRoute: 'WOTD',
+        actionParams: coords ? { book: coords.book, chapter: coords.chapter, verse: coords.verse } : undefined,
+      });
+    }
   }
 
   return items;
 }
 
 /**
- * Builds unlocked achievement notification items based on user statistics.
+ * Builds unlocked achievement notification items with persistent unlock timestamps.
  */
-export function getUnlockedAchievementNotifications(stats: {
-  streak: number;
-  bookmarksCount: number;
-  highlightsCount: number;
-  sharesCount: number;
-}): InAppNotificationItem[] {
+export function getUnlockedAchievementNotifications(
+  stats: {
+    streak: number;
+    bookmarksCount: number;
+    highlightsCount: number;
+    sharesCount: number;
+  },
+  storedTimestamps: Record<string, string> = {}
+): InAppNotificationItem[] {
   const notifications: InAppNotificationItem[] = [];
 
   const checkCategory = (
@@ -153,18 +173,26 @@ export function getUnlockedAchievementNotifications(stats: {
     const milestones = ALL_ACHIEVEMENTS[category] || [];
     milestones.forEach((m) => {
       if (count >= m.target) {
+        const coords = parseScriptureCoordinates(m.verseRef);
+        const unlockDateIso = storedTimestamps[m.id] || new Date().toISOString();
+        const deliveryLabel = formatDeliveryLabel(new Date(unlockDateIso));
+
         notifications.push({
           id: `achievement_${m.id}`,
           type: 'achievement',
-          title: `Achievement Unlocked: ${m.title}`,
-          subtitle: `${m.badgeLabel} Milestone (${m.target} ${m.target === 1 ? 'target' : 'targets'}) • ${m.tier.toUpperCase()}`,
+          title: `Milestone Unlocked: ${m.title}`,
+          subtitle: `${deliveryLabel} • ${m.badgeLabel} (${m.target} ${m.target === 1 ? 'day' : 'milestones'})`,
           body: m.subtitle,
           scriptureRef: m.verseRef,
           verseQuote: m.verseQuote,
+          book: coords?.book,
+          chapter: coords?.chapter,
+          verse: coords?.verse,
+          deliveredAtLabel: deliveryLabel,
           achievementId: m.id,
           achievementCategory: m.category,
           achievementTarget: m.target,
-          createdAt: new Date().toISOString(),
+          createdAt: unlockDateIso,
           isRead: false,
           actionRoute: 'Achievements',
         });
@@ -178,6 +206,52 @@ export function getUnlockedAchievementNotifications(stats: {
   checkCategory('share', stats.sharesCount || 0);
 
   return notifications;
+}
+
+/**
+ * Stored Achievement Unlock Timestamps
+ */
+export async function getAchievementUnlockTimestamps(): Promise<Record<string, string>> {
+  try {
+    const raw = await AsyncStorage.getItem(ACHIEVEMENT_TIMESTAMPS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export async function saveAchievementUnlockTimestamp(id: string, isoString: string): Promise<void> {
+  try {
+    const existing = await getAchievementUnlockTimestamps();
+    if (!existing[id]) {
+      existing[id] = isoString;
+      await AsyncStorage.setItem(ACHIEVEMENT_TIMESTAMPS_KEY, JSON.stringify(existing));
+    }
+  } catch (err) {
+    console.warn('[Notifications] Failed to save achievement timestamp:', err);
+  }
+}
+
+/**
+ * Real Received Push Notifications Persistence
+ */
+export async function getReceivedPushNotifications(): Promise<InAppNotificationItem[]> {
+  try {
+    const raw = await AsyncStorage.getItem(RECEIVED_PUSH_NOTIFICATIONS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function recordReceivedPushNotification(item: InAppNotificationItem): Promise<void> {
+  try {
+    const existing = await getReceivedPushNotifications();
+    const updated = [item, ...existing.filter((e) => e.id !== item.id)].slice(0, 50);
+    await AsyncStorage.setItem(RECEIVED_PUSH_NOTIFICATIONS_KEY, JSON.stringify(updated));
+  } catch (err) {
+    console.warn('[Notifications] Failed to record received push notification:', err);
+  }
 }
 
 /**

@@ -228,7 +228,7 @@ exegeomai/
 │   │   ├── FavoritesScreen.tsx           # Saved collection (Facts, Scriptures, WOTD)
 │   │   ├── HistoryScreen.tsx             # Sacred History catalog of biblical authors with search & categories
 │   │   ├── HomeScreen.tsx                # Alternate home showcase
-│   │   ├── NotificationsScreen.tsx       # Dedicated Notifications center with filter tabs and mark-all-read
+│   │   ├── NotificationsScreen.tsx       # Continuous flat body notifications center (zero card divs, dotted underlines, Word Reader deep linking)
 │   │   ├── PrivacyPolicyScreen.tsx       # 11-section privacy policy modal screen
 │   │   ├── ProfileScreen.tsx             # Profile tab (Bookmarks, Red-letter toggle, Reader font size)
 │   │   ├── ScriptureDetailsScreen.tsx    # In-depth modal sheet for scripture texts

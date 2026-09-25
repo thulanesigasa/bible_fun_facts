@@ -17,6 +17,11 @@ import {
   saveReadNotificationIds,
   getDismissedNotificationIds,
   saveDismissedNotificationIds,
+  getAchievementUnlockTimestamps,
+  saveAchievementUnlockTimestamp,
+  getReceivedPushNotifications,
+  recordReceivedPushNotification,
+  formatDeliveryLabel,
 } from '../services/inAppNotifications';
 
 export interface UserProfile {
@@ -140,20 +145,41 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [readNotificationIds, setReadNotificationIds] = useState<string[]>([]);
   const [dismissedNotificationIds, setDismissedNotificationIds] = useState<string[]>([]);
+  const [achievementTimestamps, setAchievementTimestamps] = useState<Record<string, string>>({});
+  const [receivedPushes, setReceivedPushes] = useState<InAppNotificationItem[]>([]);
   const [activeAchievementAlert, setActiveAchievementAlert] = useState<InAppNotificationItem | null>(null);
   const previousUnlockedMilestoneIds = useRef<Set<string>>(new Set());
   const isInitialAchievementCheck = useRef<boolean>(true);
   const [notificationsTick, setNotificationsTick] = useState<number>(0);
 
-  // Load read & dismissed notification IDs from storage
+  // Load read & dismissed notification IDs, achievement timestamps, and received pushes
   useEffect(() => {
     getReadNotificationIds().then(setReadNotificationIds).catch(() => {});
     getDismissedNotificationIds().then(setDismissedNotificationIds).catch(() => {});
+    getAchievementUnlockTimestamps().then(setAchievementTimestamps).catch(() => {});
+    getReceivedPushNotifications().then(setReceivedPushes).catch(() => {});
   }, []);
 
-  // Listen to foreground notifications
+  // Listen to foreground notifications in real life
   useEffect(() => {
-    const sub = Notifications.addNotificationReceivedListener(() => {
+    const sub = Notifications.addNotificationReceivedListener((notification) => {
+      const content = notification.request.content;
+      const deliveryLabel = formatDeliveryLabel(new Date());
+      const item: InAppNotificationItem = {
+        id: `push_${notification.request.identifier || Date.now()}`,
+        type: (content.data?.type as any) || 'morning_word',
+        title: content.title || 'Sacred Scripture Notification',
+        subtitle: `${deliveryLabel} • ${String(content.data?.reference || 'Daily Devotion')}`,
+        body: `"${content.body || ''}"`,
+        scriptureRef: content.data?.reference ? String(content.data.reference) : undefined,
+        verseQuote: content.body || undefined,
+        createdAt: new Date().toISOString(),
+        deliveredAtLabel: deliveryLabel,
+        isRead: false,
+        actionRoute: 'WOTD',
+      };
+      recordReceivedPushNotification(item);
+      setReceivedPushes(prev => [item, ...prev]);
       setNotificationsTick(prev => prev + 1);
     });
     return () => sub.remove();
@@ -955,19 +981,29 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const notifications = useMemo<InAppNotificationItem[]>(() => {
-    const scheduled = getDispatchedScheduledNotifications();
-    const achievements = getUnlockedAchievementNotifications({
-      streak: state.streak || 1,
-      bookmarksCount: state.favoritesScriptures?.length || 0,
-      highlightsCount: Object.keys(state.bibleHighlights || {}).length,
-      sharesCount: state.sharesCount || 0,
+    const scheduled = getDispatchedScheduledNotifications(7);
+    const achievements = getUnlockedAchievementNotifications(
+      {
+        streak: state.streak || 1,
+        bookmarksCount: state.favoritesScriptures?.length || 0,
+        highlightsCount: Object.keys(state.bibleHighlights || {}).length,
+        sharesCount: state.sharesCount || 0,
+      },
+      achievementTimestamps
+    );
+
+    const idMap = new Map<string, InAppNotificationItem>();
+    [...achievements, ...receivedPushes, ...scheduled].forEach((item) => {
+      if (!idMap.has(item.id)) {
+        idMap.set(item.id, item);
+      }
     });
 
-    const combined = [...achievements, ...scheduled];
-    const filtered = combined.filter(item => !dismissedNotificationIds.includes(item.id));
+    const combined = Array.from(idMap.values());
+    const filtered = combined.filter((item) => !dismissedNotificationIds.includes(item.id));
 
     return filtered
-      .map(item => ({
+      .map((item) => ({
         ...item,
         isRead: readNotificationIds.includes(item.id),
       }))
@@ -980,6 +1016,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     readNotificationIds,
     dismissedNotificationIds,
     notificationsTick,
+    achievementTimestamps,
+    receivedPushes,
   ]);
 
   const unreadNotificationsCount = useMemo(() => {
@@ -988,12 +1026,15 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Real-time achievement unlock detection while in-app
   useEffect(() => {
-    const unlockedAchievements = getUnlockedAchievementNotifications({
-      streak: state.streak || 1,
-      bookmarksCount: state.favoritesScriptures?.length || 0,
-      highlightsCount: Object.keys(state.bibleHighlights || {}).length,
-      sharesCount: state.sharesCount || 0,
-    });
+    const unlockedAchievements = getUnlockedAchievementNotifications(
+      {
+        streak: state.streak || 1,
+        bookmarksCount: state.favoritesScriptures?.length || 0,
+        highlightsCount: Object.keys(state.bibleHighlights || {}).length,
+        sharesCount: state.sharesCount || 0,
+      },
+      achievementTimestamps
+    );
 
     const currentIds = new Set(unlockedAchievements.map(a => a.id));
 
@@ -1005,13 +1046,18 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     for (const ach of unlockedAchievements) {
       if (!previousUnlockedMilestoneIds.current.has(ach.id)) {
+        const nowIso = new Date().toISOString();
+        if (ach.achievementId) {
+          saveAchievementUnlockTimestamp(ach.achievementId, nowIso);
+          setAchievementTimestamps((prev) => ({ ...prev, [ach.achievementId!]: nowIso }));
+        }
         setActiveAchievementAlert(ach);
         break;
       }
     }
 
     previousUnlockedMilestoneIds.current = currentIds;
-  }, [state.streak, state.favoritesScriptures, state.bibleHighlights, state.sharesCount]);
+  }, [state.streak, state.favoritesScriptures, state.bibleHighlights, state.sharesCount, achievementTimestamps]);
 
   const markNotificationAsRead = useCallback((id: string) => {
     setReadNotificationIds(prev => {
