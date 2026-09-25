@@ -748,7 +748,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                 Daily Word & Devotional Reminders
               </Text>
               <Text variant="caption" color={colors.textSecondary}>
-                Morning Word (08:00 AM), Midday Affirmations & Evening Streak Guardian
+                Morning Word (08:00 AM), Midday Affirmations & Evening Fellowship with Christ
               </Text>
             </View>
             <UiverseSwitch

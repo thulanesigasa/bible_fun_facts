@@ -5,7 +5,7 @@
  * 1. Morning Word (08:00 AM) - Dawn, praise, direction, wisdom, renewal
  * 2. Divine Love & Identity Affirmations (13:15 & 16:30) - God's love, value, identity in Christ
  * 3. Nightly Peace (22:00) - Quietness, rest, safety, restful sleep
- * 4. Evening Streak Guardian (20:30) - Daily fidelity, streak preservation, reading prompts
+ * 4. Evening Fellowship with Christ (20:30) - Communion with Jesus, spiritual nourishment, reading the Bible
  *
  * Indexed by calendar day of the year (Day 1 through Day 365).
  */
@@ -34,12 +34,14 @@ export interface DailyNightlyPeace {
   theme: string;
 }
 
-export interface DailyStreakPrompt {
+export interface DailyFellowshipPrompt {
   dayOfYear: number;
   calendarDate: string;
   title: string;
   body: string;
 }
+
+export type DailyStreakPrompt = DailyFellowshipPrompt;
 
 /**
  * Returns the calendar day of the year (1 - 365) for a given date.
@@ -7726,2195 +7728,2197 @@ export const NIGHTLY_PEACE_365_SCRIPTURES: DailyNightlyPeace[] = [
   }
 ];
 
-export const EVENING_GUARDIAN_365_PROMPTS: DailyStreakPrompt[] = [
+export const EVENING_FELLOWSHIP_365_PROMPTS: DailyFellowshipPrompt[] = [
   {
     "dayOfYear": 1,
     "calendarDate": "January 1",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of January 1 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Abide in Christ • Evening Fellowship",
+    "body": "Jesus said, 'Remain in me, as I also remain in you.' (John 15:4) Draw near to Him in His Word tonight."
   },
   {
     "dayOfYear": 2,
     "calendarDate": "January 2",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of January 2 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Bread of Life • Nourish Your Spirit",
+    "body": "'Man shall not live on bread alone, but on every word of God.' (Matthew 4:4) Feed your heart on Scripture tonight."
   },
   {
     "dayOfYear": 3,
     "calendarDate": "January 3",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of January 3 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "At the Feet of Jesus • Quiet Communion",
+    "body": "Like Mary, choose what is better and cannot be taken away. Spend unhurried moments listening to Jesus tonight."
   },
   {
     "dayOfYear": 4,
     "calendarDate": "January 4",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of January 4 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Draw Near to God • Intimate Communion",
+    "body": "'Come near to God and he will come near to you.' (James 4:8) Conclude your day in prayerful fellowship with Christ."
   },
   {
     "dayOfYear": 5,
     "calendarDate": "January 5",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of January 5 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living and Active • God's Holy Word",
+    "body": "God's Word is alive and active, speaking truth directly to your soul. Open Scripture tonight before resting."
   },
   {
     "dayOfYear": 6,
     "calendarDate": "January 6",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of January 6 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Lamp to Your Feet • Evening Guidance",
+    "body": "'Your word is a lamp to my feet and a light to my path.' (Psalm 119:105) Let Jesus illuminate your thoughts tonight."
   },
   {
     "dayOfYear": 7,
     "calendarDate": "January 7",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of January 7 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living Water • Thirst for Christ",
+    "body": "Jesus calls all who thirst to come to Him. (John 7:37) Drink deeply from the living waters of Scripture this evening."
   },
   {
     "dayOfYear": 8,
     "calendarDate": "January 8",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of January 8 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Words of Eternal Life • Truth in Christ",
+    "body": "'Lord, to whom shall we go? You have the words of eternal life.' (John 6:68) Spend a few moments in God's Word tonight."
   },
   {
     "dayOfYear": 9,
     "calendarDate": "January 9",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of January 9 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "His Voice in the Stillness • Evening Walk",
+    "body": "'My sheep listen to my voice; I know them, and they follow me.' (John 10:27) Listen to Christ speaking in His Word tonight."
   },
   {
     "dayOfYear": 10,
     "calendarDate": "January 10",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of January 10 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rooted in Christ • Faith in the Word",
+    "body": "Be deeply rooted and built up in Jesus. (Colossians 2:7) Let His Word anchor your faith and give you peace."
   },
   {
     "dayOfYear": 11,
     "calendarDate": "January 11",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of January 11 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Sanctified in Truth • Evening Meditation",
+    "body": "Jesus prayed, 'Sanctify them by the truth; your word is truth.' (John 17:17) Let Scripture wash over your heart tonight."
   },
   {
     "dayOfYear": 12,
     "calendarDate": "January 12",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of January 12 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Dwell in Christ's Word • Sacred Rest",
+    "body": "'Let the message of Christ dwell among you richly.' (Colossians 3:16) Rest in the presence and promises of your Savior."
   },
   {
     "dayOfYear": 13,
     "calendarDate": "January 13",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of January 13 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Fellowship with the Father & Son",
+    "body": "'Our fellowship is with the Father and with his Son, Jesus Christ.' (1 John 1:3) Meet Him in Scripture before you sleep."
   },
   {
     "dayOfYear": 14,
     "calendarDate": "January 14",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of January 14 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rest in His Love • Evening Reflection",
+    "body": "Find quiet rest in God alone. (Psalm 62:1) Open your Bible tonight to abide in the loving embrace of Jesus Christ."
   },
   {
     "dayOfYear": 15,
     "calendarDate": "January 15",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of January 15 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Treasuring the Word • Heart of Worship",
+    "body": "'I have hidden your word in my heart.' (Psalm 119:11) Plant God's eternal truth deep within your spirit tonight."
   },
   {
     "dayOfYear": 16,
     "calendarDate": "January 16",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of January 16 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Beholding His Glory • Transformed in Him",
+    "body": "As we gaze upon Christ in the Scriptures, we are transformed into His image from glory to glory. (2 Corinthians 3:18)"
   },
   {
     "dayOfYear": 17,
     "calendarDate": "January 17",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of January 17 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Good Shepherd • Restoring Your Soul",
+    "body": "Jesus, your Shepherd, leads you beside quiet waters. (Psalm 23:2) Come to His Word and receive divine renewal."
   },
   {
     "dayOfYear": 18,
     "calendarDate": "January 18",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of January 18 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Delight in the Lord • Holy Evening",
+    "body": "Delight yourself in the Lord. (Psalm 37:4) Let communion with Jesus in Scripture be your sweetest joy tonight."
   },
   {
     "dayOfYear": 19,
     "calendarDate": "January 19",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of January 19 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "An Anchor for the Soul • Steadfast Word",
+    "body": "We have this hope as an anchor for the soul, firm and secure. (Hebrews 6:19) Ground yourself in Scripture this evening."
   },
   {
     "dayOfYear": 20,
     "calendarDate": "January 20",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of January 20 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Full of Grace and Truth • Meeting Jesus",
+    "body": "Christ came full of grace and truth. (John 1:14) Encounter His loving presence in the sacred pages tonight."
   },
   {
     "dayOfYear": 21,
     "calendarDate": "January 21",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of January 21 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Abide in Christ • Evening Fellowship",
+    "body": "Jesus said, 'Remain in me, as I also remain in you.' (John 15:4) Draw near to Him in His Word tonight."
   },
   {
     "dayOfYear": 22,
     "calendarDate": "January 22",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of January 22 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Bread of Life • Nourish Your Spirit",
+    "body": "'Man shall not live on bread alone, but on every word of God.' (Matthew 4:4) Feed your heart on Scripture tonight."
   },
   {
     "dayOfYear": 23,
     "calendarDate": "January 23",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of January 23 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "At the Feet of Jesus • Quiet Communion",
+    "body": "Like Mary, choose what is better and cannot be taken away. Spend unhurried moments listening to Jesus tonight."
   },
   {
     "dayOfYear": 24,
     "calendarDate": "January 24",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of January 24 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Draw Near to God • Intimate Communion",
+    "body": "'Come near to God and he will come near to you.' (James 4:8) Conclude your day in prayerful fellowship with Christ."
   },
   {
     "dayOfYear": 25,
     "calendarDate": "January 25",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of January 25 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living and Active • God's Holy Word",
+    "body": "God's Word is alive and active, speaking truth directly to your soul. Open Scripture tonight before resting."
   },
   {
     "dayOfYear": 26,
     "calendarDate": "January 26",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of January 26 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Lamp to Your Feet • Evening Guidance",
+    "body": "'Your word is a lamp to my feet and a light to my path.' (Psalm 119:105) Let Jesus illuminate your thoughts tonight."
   },
   {
     "dayOfYear": 27,
     "calendarDate": "January 27",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of January 27 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living Water • Thirst for Christ",
+    "body": "Jesus calls all who thirst to come to Him. (John 7:37) Drink deeply from the living waters of Scripture this evening."
   },
   {
     "dayOfYear": 28,
     "calendarDate": "January 28",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of January 28 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Words of Eternal Life • Truth in Christ",
+    "body": "'Lord, to whom shall we go? You have the words of eternal life.' (John 6:68) Spend a few moments in God's Word tonight."
   },
   {
     "dayOfYear": 29,
     "calendarDate": "January 29",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of January 29 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "His Voice in the Stillness • Evening Walk",
+    "body": "'My sheep listen to my voice; I know them, and they follow me.' (John 10:27) Listen to Christ speaking in His Word tonight."
   },
   {
     "dayOfYear": 30,
     "calendarDate": "January 30",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of January 30 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rooted in Christ • Faith in the Word",
+    "body": "Be deeply rooted and built up in Jesus. (Colossians 2:7) Let His Word anchor your faith and give you peace."
   },
   {
     "dayOfYear": 31,
     "calendarDate": "January 31",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of January 31 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Sanctified in Truth • Evening Meditation",
+    "body": "Jesus prayed, 'Sanctify them by the truth; your word is truth.' (John 17:17) Let Scripture wash over your heart tonight."
   },
   {
     "dayOfYear": 32,
     "calendarDate": "February 1",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of February 1 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Dwell in Christ's Word • Sacred Rest",
+    "body": "'Let the message of Christ dwell among you richly.' (Colossians 3:16) Rest in the presence and promises of your Savior."
   },
   {
     "dayOfYear": 33,
     "calendarDate": "February 2",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of February 2 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Fellowship with the Father & Son",
+    "body": "'Our fellowship is with the Father and with his Son, Jesus Christ.' (1 John 1:3) Meet Him in Scripture before you sleep."
   },
   {
     "dayOfYear": 34,
     "calendarDate": "February 3",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of February 3 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rest in His Love • Evening Reflection",
+    "body": "Find quiet rest in God alone. (Psalm 62:1) Open your Bible tonight to abide in the loving embrace of Jesus Christ."
   },
   {
     "dayOfYear": 35,
     "calendarDate": "February 4",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of February 4 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Treasuring the Word • Heart of Worship",
+    "body": "'I have hidden your word in my heart.' (Psalm 119:11) Plant God's eternal truth deep within your spirit tonight."
   },
   {
     "dayOfYear": 36,
     "calendarDate": "February 5",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of February 5 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Beholding His Glory • Transformed in Him",
+    "body": "As we gaze upon Christ in the Scriptures, we are transformed into His image from glory to glory. (2 Corinthians 3:18)"
   },
   {
     "dayOfYear": 37,
     "calendarDate": "February 6",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of February 6 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Good Shepherd • Restoring Your Soul",
+    "body": "Jesus, your Shepherd, leads you beside quiet waters. (Psalm 23:2) Come to His Word and receive divine renewal."
   },
   {
     "dayOfYear": 38,
     "calendarDate": "February 7",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of February 7 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Delight in the Lord • Holy Evening",
+    "body": "Delight yourself in the Lord. (Psalm 37:4) Let communion with Jesus in Scripture be your sweetest joy tonight."
   },
   {
     "dayOfYear": 39,
     "calendarDate": "February 8",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of February 8 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "An Anchor for the Soul • Steadfast Word",
+    "body": "We have this hope as an anchor for the soul, firm and secure. (Hebrews 6:19) Ground yourself in Scripture this evening."
   },
   {
     "dayOfYear": 40,
     "calendarDate": "February 9",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of February 9 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Full of Grace and Truth • Meeting Jesus",
+    "body": "Christ came full of grace and truth. (John 1:14) Encounter His loving presence in the sacred pages tonight."
   },
   {
     "dayOfYear": 41,
     "calendarDate": "February 10",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of February 10 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Abide in Christ • Evening Fellowship",
+    "body": "Jesus said, 'Remain in me, as I also remain in you.' (John 15:4) Draw near to Him in His Word tonight."
   },
   {
     "dayOfYear": 42,
     "calendarDate": "February 11",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of February 11 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Bread of Life • Nourish Your Spirit",
+    "body": "'Man shall not live on bread alone, but on every word of God.' (Matthew 4:4) Feed your heart on Scripture tonight."
   },
   {
     "dayOfYear": 43,
     "calendarDate": "February 12",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of February 12 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "At the Feet of Jesus • Quiet Communion",
+    "body": "Like Mary, choose what is better and cannot be taken away. Spend unhurried moments listening to Jesus tonight."
   },
   {
     "dayOfYear": 44,
     "calendarDate": "February 13",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of February 13 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Draw Near to God • Intimate Communion",
+    "body": "'Come near to God and he will come near to you.' (James 4:8) Conclude your day in prayerful fellowship with Christ."
   },
   {
     "dayOfYear": 45,
     "calendarDate": "February 14",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of February 14 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living and Active • God's Holy Word",
+    "body": "God's Word is alive and active, speaking truth directly to your soul. Open Scripture tonight before resting."
   },
   {
     "dayOfYear": 46,
     "calendarDate": "February 15",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of February 15 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Lamp to Your Feet • Evening Guidance",
+    "body": "'Your word is a lamp to my feet and a light to my path.' (Psalm 119:105) Let Jesus illuminate your thoughts tonight."
   },
   {
     "dayOfYear": 47,
     "calendarDate": "February 16",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of February 16 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living Water • Thirst for Christ",
+    "body": "Jesus calls all who thirst to come to Him. (John 7:37) Drink deeply from the living waters of Scripture this evening."
   },
   {
     "dayOfYear": 48,
     "calendarDate": "February 17",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of February 17 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Words of Eternal Life • Truth in Christ",
+    "body": "'Lord, to whom shall we go? You have the words of eternal life.' (John 6:68) Spend a few moments in God's Word tonight."
   },
   {
     "dayOfYear": 49,
     "calendarDate": "February 18",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of February 18 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "His Voice in the Stillness • Evening Walk",
+    "body": "'My sheep listen to my voice; I know them, and they follow me.' (John 10:27) Listen to Christ speaking in His Word tonight."
   },
   {
     "dayOfYear": 50,
     "calendarDate": "February 19",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of February 19 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rooted in Christ • Faith in the Word",
+    "body": "Be deeply rooted and built up in Jesus. (Colossians 2:7) Let His Word anchor your faith and give you peace."
   },
   {
     "dayOfYear": 51,
     "calendarDate": "February 20",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of February 20 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Sanctified in Truth • Evening Meditation",
+    "body": "Jesus prayed, 'Sanctify them by the truth; your word is truth.' (John 17:17) Let Scripture wash over your heart tonight."
   },
   {
     "dayOfYear": 52,
     "calendarDate": "February 21",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of February 21 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Dwell in Christ's Word • Sacred Rest",
+    "body": "'Let the message of Christ dwell among you richly.' (Colossians 3:16) Rest in the presence and promises of your Savior."
   },
   {
     "dayOfYear": 53,
     "calendarDate": "February 22",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of February 22 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Fellowship with the Father & Son",
+    "body": "'Our fellowship is with the Father and with his Son, Jesus Christ.' (1 John 1:3) Meet Him in Scripture before you sleep."
   },
   {
     "dayOfYear": 54,
     "calendarDate": "February 23",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of February 23 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rest in His Love • Evening Reflection",
+    "body": "Find quiet rest in God alone. (Psalm 62:1) Open your Bible tonight to abide in the loving embrace of Jesus Christ."
   },
   {
     "dayOfYear": 55,
     "calendarDate": "February 24",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of February 24 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Treasuring the Word • Heart of Worship",
+    "body": "'I have hidden your word in my heart.' (Psalm 119:11) Plant God's eternal truth deep within your spirit tonight."
   },
   {
     "dayOfYear": 56,
     "calendarDate": "February 25",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of February 25 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Beholding His Glory • Transformed in Him",
+    "body": "As we gaze upon Christ in the Scriptures, we are transformed into His image from glory to glory. (2 Corinthians 3:18)"
   },
   {
     "dayOfYear": 57,
     "calendarDate": "February 26",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of February 26 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Good Shepherd • Restoring Your Soul",
+    "body": "Jesus, your Shepherd, leads you beside quiet waters. (Psalm 23:2) Come to His Word and receive divine renewal."
   },
   {
     "dayOfYear": 58,
     "calendarDate": "February 27",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of February 27 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Delight in the Lord • Holy Evening",
+    "body": "Delight yourself in the Lord. (Psalm 37:4) Let communion with Jesus in Scripture be your sweetest joy tonight."
   },
   {
     "dayOfYear": 59,
     "calendarDate": "February 28",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of February 28 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "An Anchor for the Soul • Steadfast Word",
+    "body": "We have this hope as an anchor for the soul, firm and secure. (Hebrews 6:19) Ground yourself in Scripture this evening."
   },
   {
     "dayOfYear": 60,
     "calendarDate": "March 1",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of March 1 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Full of Grace and Truth • Meeting Jesus",
+    "body": "Christ came full of grace and truth. (John 1:14) Encounter His loving presence in the sacred pages tonight."
   },
   {
     "dayOfYear": 61,
     "calendarDate": "March 2",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of March 2 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Abide in Christ • Evening Fellowship",
+    "body": "Jesus said, 'Remain in me, as I also remain in you.' (John 15:4) Draw near to Him in His Word tonight."
   },
   {
     "dayOfYear": 62,
     "calendarDate": "March 3",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of March 3 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Bread of Life • Nourish Your Spirit",
+    "body": "'Man shall not live on bread alone, but on every word of God.' (Matthew 4:4) Feed your heart on Scripture tonight."
   },
   {
     "dayOfYear": 63,
     "calendarDate": "March 4",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of March 4 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "At the Feet of Jesus • Quiet Communion",
+    "body": "Like Mary, choose what is better and cannot be taken away. Spend unhurried moments listening to Jesus tonight."
   },
   {
     "dayOfYear": 64,
     "calendarDate": "March 5",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of March 5 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Draw Near to God • Intimate Communion",
+    "body": "'Come near to God and he will come near to you.' (James 4:8) Conclude your day in prayerful fellowship with Christ."
   },
   {
     "dayOfYear": 65,
     "calendarDate": "March 6",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of March 6 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living and Active • God's Holy Word",
+    "body": "God's Word is alive and active, speaking truth directly to your soul. Open Scripture tonight before resting."
   },
   {
     "dayOfYear": 66,
     "calendarDate": "March 7",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of March 7 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Lamp to Your Feet • Evening Guidance",
+    "body": "'Your word is a lamp to my feet and a light to my path.' (Psalm 119:105) Let Jesus illuminate your thoughts tonight."
   },
   {
     "dayOfYear": 67,
     "calendarDate": "March 8",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of March 8 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living Water • Thirst for Christ",
+    "body": "Jesus calls all who thirst to come to Him. (John 7:37) Drink deeply from the living waters of Scripture this evening."
   },
   {
     "dayOfYear": 68,
     "calendarDate": "March 9",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of March 9 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Words of Eternal Life • Truth in Christ",
+    "body": "'Lord, to whom shall we go? You have the words of eternal life.' (John 6:68) Spend a few moments in God's Word tonight."
   },
   {
     "dayOfYear": 69,
     "calendarDate": "March 10",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of March 10 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "His Voice in the Stillness • Evening Walk",
+    "body": "'My sheep listen to my voice; I know them, and they follow me.' (John 10:27) Listen to Christ speaking in His Word tonight."
   },
   {
     "dayOfYear": 70,
     "calendarDate": "March 11",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of March 11 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rooted in Christ • Faith in the Word",
+    "body": "Be deeply rooted and built up in Jesus. (Colossians 2:7) Let His Word anchor your faith and give you peace."
   },
   {
     "dayOfYear": 71,
     "calendarDate": "March 12",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of March 12 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Sanctified in Truth • Evening Meditation",
+    "body": "Jesus prayed, 'Sanctify them by the truth; your word is truth.' (John 17:17) Let Scripture wash over your heart tonight."
   },
   {
     "dayOfYear": 72,
     "calendarDate": "March 13",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of March 13 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Dwell in Christ's Word • Sacred Rest",
+    "body": "'Let the message of Christ dwell among you richly.' (Colossians 3:16) Rest in the presence and promises of your Savior."
   },
   {
     "dayOfYear": 73,
     "calendarDate": "March 14",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of March 14 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Fellowship with the Father & Son",
+    "body": "'Our fellowship is with the Father and with his Son, Jesus Christ.' (1 John 1:3) Meet Him in Scripture before you sleep."
   },
   {
     "dayOfYear": 74,
     "calendarDate": "March 15",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of March 15 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rest in His Love • Evening Reflection",
+    "body": "Find quiet rest in God alone. (Psalm 62:1) Open your Bible tonight to abide in the loving embrace of Jesus Christ."
   },
   {
     "dayOfYear": 75,
     "calendarDate": "March 16",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of March 16 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Treasuring the Word • Heart of Worship",
+    "body": "'I have hidden your word in my heart.' (Psalm 119:11) Plant God's eternal truth deep within your spirit tonight."
   },
   {
     "dayOfYear": 76,
     "calendarDate": "March 17",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of March 17 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Beholding His Glory • Transformed in Him",
+    "body": "As we gaze upon Christ in the Scriptures, we are transformed into His image from glory to glory. (2 Corinthians 3:18)"
   },
   {
     "dayOfYear": 77,
     "calendarDate": "March 18",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of March 18 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Good Shepherd • Restoring Your Soul",
+    "body": "Jesus, your Shepherd, leads you beside quiet waters. (Psalm 23:2) Come to His Word and receive divine renewal."
   },
   {
     "dayOfYear": 78,
     "calendarDate": "March 19",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of March 19 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Delight in the Lord • Holy Evening",
+    "body": "Delight yourself in the Lord. (Psalm 37:4) Let communion with Jesus in Scripture be your sweetest joy tonight."
   },
   {
     "dayOfYear": 79,
     "calendarDate": "March 20",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of March 20 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "An Anchor for the Soul • Steadfast Word",
+    "body": "We have this hope as an anchor for the soul, firm and secure. (Hebrews 6:19) Ground yourself in Scripture this evening."
   },
   {
     "dayOfYear": 80,
     "calendarDate": "March 21",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of March 21 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Full of Grace and Truth • Meeting Jesus",
+    "body": "Christ came full of grace and truth. (John 1:14) Encounter His loving presence in the sacred pages tonight."
   },
   {
     "dayOfYear": 81,
     "calendarDate": "March 22",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of March 22 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Abide in Christ • Evening Fellowship",
+    "body": "Jesus said, 'Remain in me, as I also remain in you.' (John 15:4) Draw near to Him in His Word tonight."
   },
   {
     "dayOfYear": 82,
     "calendarDate": "March 23",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of March 23 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Bread of Life • Nourish Your Spirit",
+    "body": "'Man shall not live on bread alone, but on every word of God.' (Matthew 4:4) Feed your heart on Scripture tonight."
   },
   {
     "dayOfYear": 83,
     "calendarDate": "March 24",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of March 24 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "At the Feet of Jesus • Quiet Communion",
+    "body": "Like Mary, choose what is better and cannot be taken away. Spend unhurried moments listening to Jesus tonight."
   },
   {
     "dayOfYear": 84,
     "calendarDate": "March 25",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of March 25 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Draw Near to God • Intimate Communion",
+    "body": "'Come near to God and he will come near to you.' (James 4:8) Conclude your day in prayerful fellowship with Christ."
   },
   {
     "dayOfYear": 85,
     "calendarDate": "March 26",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of March 26 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living and Active • God's Holy Word",
+    "body": "God's Word is alive and active, speaking truth directly to your soul. Open Scripture tonight before resting."
   },
   {
     "dayOfYear": 86,
     "calendarDate": "March 27",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of March 27 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Lamp to Your Feet • Evening Guidance",
+    "body": "'Your word is a lamp to my feet and a light to my path.' (Psalm 119:105) Let Jesus illuminate your thoughts tonight."
   },
   {
     "dayOfYear": 87,
     "calendarDate": "March 28",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of March 28 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living Water • Thirst for Christ",
+    "body": "Jesus calls all who thirst to come to Him. (John 7:37) Drink deeply from the living waters of Scripture this evening."
   },
   {
     "dayOfYear": 88,
     "calendarDate": "March 29",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of March 29 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Words of Eternal Life • Truth in Christ",
+    "body": "'Lord, to whom shall we go? You have the words of eternal life.' (John 6:68) Spend a few moments in God's Word tonight."
   },
   {
     "dayOfYear": 89,
     "calendarDate": "March 30",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of March 30 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "His Voice in the Stillness • Evening Walk",
+    "body": "'My sheep listen to my voice; I know them, and they follow me.' (John 10:27) Listen to Christ speaking in His Word tonight."
   },
   {
     "dayOfYear": 90,
     "calendarDate": "March 31",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of March 31 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rooted in Christ • Faith in the Word",
+    "body": "Be deeply rooted and built up in Jesus. (Colossians 2:7) Let His Word anchor your faith and give you peace."
   },
   {
     "dayOfYear": 91,
     "calendarDate": "April 1",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of April 1 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Sanctified in Truth • Evening Meditation",
+    "body": "Jesus prayed, 'Sanctify them by the truth; your word is truth.' (John 17:17) Let Scripture wash over your heart tonight."
   },
   {
     "dayOfYear": 92,
     "calendarDate": "April 2",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of April 2 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Dwell in Christ's Word • Sacred Rest",
+    "body": "'Let the message of Christ dwell among you richly.' (Colossians 3:16) Rest in the presence and promises of your Savior."
   },
   {
     "dayOfYear": 93,
     "calendarDate": "April 3",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of April 3 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Fellowship with the Father & Son",
+    "body": "'Our fellowship is with the Father and with his Son, Jesus Christ.' (1 John 1:3) Meet Him in Scripture before you sleep."
   },
   {
     "dayOfYear": 94,
     "calendarDate": "April 4",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of April 4 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rest in His Love • Evening Reflection",
+    "body": "Find quiet rest in God alone. (Psalm 62:1) Open your Bible tonight to abide in the loving embrace of Jesus Christ."
   },
   {
     "dayOfYear": 95,
     "calendarDate": "April 5",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of April 5 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Treasuring the Word • Heart of Worship",
+    "body": "'I have hidden your word in my heart.' (Psalm 119:11) Plant God's eternal truth deep within your spirit tonight."
   },
   {
     "dayOfYear": 96,
     "calendarDate": "April 6",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of April 6 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Beholding His Glory • Transformed in Him",
+    "body": "As we gaze upon Christ in the Scriptures, we are transformed into His image from glory to glory. (2 Corinthians 3:18)"
   },
   {
     "dayOfYear": 97,
     "calendarDate": "April 7",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of April 7 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Good Shepherd • Restoring Your Soul",
+    "body": "Jesus, your Shepherd, leads you beside quiet waters. (Psalm 23:2) Come to His Word and receive divine renewal."
   },
   {
     "dayOfYear": 98,
     "calendarDate": "April 8",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of April 8 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Delight in the Lord • Holy Evening",
+    "body": "Delight yourself in the Lord. (Psalm 37:4) Let communion with Jesus in Scripture be your sweetest joy tonight."
   },
   {
     "dayOfYear": 99,
     "calendarDate": "April 9",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of April 9 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "An Anchor for the Soul • Steadfast Word",
+    "body": "We have this hope as an anchor for the soul, firm and secure. (Hebrews 6:19) Ground yourself in Scripture this evening."
   },
   {
     "dayOfYear": 100,
     "calendarDate": "April 10",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of April 10 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Full of Grace and Truth • Meeting Jesus",
+    "body": "Christ came full of grace and truth. (John 1:14) Encounter His loving presence in the sacred pages tonight."
   },
   {
     "dayOfYear": 101,
     "calendarDate": "April 11",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of April 11 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Abide in Christ • Evening Fellowship",
+    "body": "Jesus said, 'Remain in me, as I also remain in you.' (John 15:4) Draw near to Him in His Word tonight."
   },
   {
     "dayOfYear": 102,
     "calendarDate": "April 12",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of April 12 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Bread of Life • Nourish Your Spirit",
+    "body": "'Man shall not live on bread alone, but on every word of God.' (Matthew 4:4) Feed your heart on Scripture tonight."
   },
   {
     "dayOfYear": 103,
     "calendarDate": "April 13",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of April 13 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "At the Feet of Jesus • Quiet Communion",
+    "body": "Like Mary, choose what is better and cannot be taken away. Spend unhurried moments listening to Jesus tonight."
   },
   {
     "dayOfYear": 104,
     "calendarDate": "April 14",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of April 14 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Draw Near to God • Intimate Communion",
+    "body": "'Come near to God and he will come near to you.' (James 4:8) Conclude your day in prayerful fellowship with Christ."
   },
   {
     "dayOfYear": 105,
     "calendarDate": "April 15",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of April 15 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living and Active • God's Holy Word",
+    "body": "God's Word is alive and active, speaking truth directly to your soul. Open Scripture tonight before resting."
   },
   {
     "dayOfYear": 106,
     "calendarDate": "April 16",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of April 16 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Lamp to Your Feet • Evening Guidance",
+    "body": "'Your word is a lamp to my feet and a light to my path.' (Psalm 119:105) Let Jesus illuminate your thoughts tonight."
   },
   {
     "dayOfYear": 107,
     "calendarDate": "April 17",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of April 17 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living Water • Thirst for Christ",
+    "body": "Jesus calls all who thirst to come to Him. (John 7:37) Drink deeply from the living waters of Scripture this evening."
   },
   {
     "dayOfYear": 108,
     "calendarDate": "April 18",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of April 18 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Words of Eternal Life • Truth in Christ",
+    "body": "'Lord, to whom shall we go? You have the words of eternal life.' (John 6:68) Spend a few moments in God's Word tonight."
   },
   {
     "dayOfYear": 109,
     "calendarDate": "April 19",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of April 19 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "His Voice in the Stillness • Evening Walk",
+    "body": "'My sheep listen to my voice; I know them, and they follow me.' (John 10:27) Listen to Christ speaking in His Word tonight."
   },
   {
     "dayOfYear": 110,
     "calendarDate": "April 20",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of April 20 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rooted in Christ • Faith in the Word",
+    "body": "Be deeply rooted and built up in Jesus. (Colossians 2:7) Let His Word anchor your faith and give you peace."
   },
   {
     "dayOfYear": 111,
     "calendarDate": "April 21",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of April 21 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Sanctified in Truth • Evening Meditation",
+    "body": "Jesus prayed, 'Sanctify them by the truth; your word is truth.' (John 17:17) Let Scripture wash over your heart tonight."
   },
   {
     "dayOfYear": 112,
     "calendarDate": "April 22",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of April 22 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Dwell in Christ's Word • Sacred Rest",
+    "body": "'Let the message of Christ dwell among you richly.' (Colossians 3:16) Rest in the presence and promises of your Savior."
   },
   {
     "dayOfYear": 113,
     "calendarDate": "April 23",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of April 23 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Fellowship with the Father & Son",
+    "body": "'Our fellowship is with the Father and with his Son, Jesus Christ.' (1 John 1:3) Meet Him in Scripture before you sleep."
   },
   {
     "dayOfYear": 114,
     "calendarDate": "April 24",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of April 24 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rest in His Love • Evening Reflection",
+    "body": "Find quiet rest in God alone. (Psalm 62:1) Open your Bible tonight to abide in the loving embrace of Jesus Christ."
   },
   {
     "dayOfYear": 115,
     "calendarDate": "April 25",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of April 25 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Treasuring the Word • Heart of Worship",
+    "body": "'I have hidden your word in my heart.' (Psalm 119:11) Plant God's eternal truth deep within your spirit tonight."
   },
   {
     "dayOfYear": 116,
     "calendarDate": "April 26",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of April 26 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Beholding His Glory • Transformed in Him",
+    "body": "As we gaze upon Christ in the Scriptures, we are transformed into His image from glory to glory. (2 Corinthians 3:18)"
   },
   {
     "dayOfYear": 117,
     "calendarDate": "April 27",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of April 27 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Good Shepherd • Restoring Your Soul",
+    "body": "Jesus, your Shepherd, leads you beside quiet waters. (Psalm 23:2) Come to His Word and receive divine renewal."
   },
   {
     "dayOfYear": 118,
     "calendarDate": "April 28",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of April 28 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Delight in the Lord • Holy Evening",
+    "body": "Delight yourself in the Lord. (Psalm 37:4) Let communion with Jesus in Scripture be your sweetest joy tonight."
   },
   {
     "dayOfYear": 119,
     "calendarDate": "April 29",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of April 29 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "An Anchor for the Soul • Steadfast Word",
+    "body": "We have this hope as an anchor for the soul, firm and secure. (Hebrews 6:19) Ground yourself in Scripture this evening."
   },
   {
     "dayOfYear": 120,
     "calendarDate": "April 30",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of April 30 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Full of Grace and Truth • Meeting Jesus",
+    "body": "Christ came full of grace and truth. (John 1:14) Encounter His loving presence in the sacred pages tonight."
   },
   {
     "dayOfYear": 121,
     "calendarDate": "May 1",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of May 1 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Abide in Christ • Evening Fellowship",
+    "body": "Jesus said, 'Remain in me, as I also remain in you.' (John 15:4) Draw near to Him in His Word tonight."
   },
   {
     "dayOfYear": 122,
     "calendarDate": "May 2",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of May 2 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Bread of Life • Nourish Your Spirit",
+    "body": "'Man shall not live on bread alone, but on every word of God.' (Matthew 4:4) Feed your heart on Scripture tonight."
   },
   {
     "dayOfYear": 123,
     "calendarDate": "May 3",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of May 3 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "At the Feet of Jesus • Quiet Communion",
+    "body": "Like Mary, choose what is better and cannot be taken away. Spend unhurried moments listening to Jesus tonight."
   },
   {
     "dayOfYear": 124,
     "calendarDate": "May 4",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of May 4 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Draw Near to God • Intimate Communion",
+    "body": "'Come near to God and he will come near to you.' (James 4:8) Conclude your day in prayerful fellowship with Christ."
   },
   {
     "dayOfYear": 125,
     "calendarDate": "May 5",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of May 5 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living and Active • God's Holy Word",
+    "body": "God's Word is alive and active, speaking truth directly to your soul. Open Scripture tonight before resting."
   },
   {
     "dayOfYear": 126,
     "calendarDate": "May 6",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of May 6 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Lamp to Your Feet • Evening Guidance",
+    "body": "'Your word is a lamp to my feet and a light to my path.' (Psalm 119:105) Let Jesus illuminate your thoughts tonight."
   },
   {
     "dayOfYear": 127,
     "calendarDate": "May 7",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of May 7 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living Water • Thirst for Christ",
+    "body": "Jesus calls all who thirst to come to Him. (John 7:37) Drink deeply from the living waters of Scripture this evening."
   },
   {
     "dayOfYear": 128,
     "calendarDate": "May 8",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of May 8 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Words of Eternal Life • Truth in Christ",
+    "body": "'Lord, to whom shall we go? You have the words of eternal life.' (John 6:68) Spend a few moments in God's Word tonight."
   },
   {
     "dayOfYear": 129,
     "calendarDate": "May 9",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of May 9 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "His Voice in the Stillness • Evening Walk",
+    "body": "'My sheep listen to my voice; I know them, and they follow me.' (John 10:27) Listen to Christ speaking in His Word tonight."
   },
   {
     "dayOfYear": 130,
     "calendarDate": "May 10",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of May 10 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rooted in Christ • Faith in the Word",
+    "body": "Be deeply rooted and built up in Jesus. (Colossians 2:7) Let His Word anchor your faith and give you peace."
   },
   {
     "dayOfYear": 131,
     "calendarDate": "May 11",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of May 11 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Sanctified in Truth • Evening Meditation",
+    "body": "Jesus prayed, 'Sanctify them by the truth; your word is truth.' (John 17:17) Let Scripture wash over your heart tonight."
   },
   {
     "dayOfYear": 132,
     "calendarDate": "May 12",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of May 12 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Dwell in Christ's Word • Sacred Rest",
+    "body": "'Let the message of Christ dwell among you richly.' (Colossians 3:16) Rest in the presence and promises of your Savior."
   },
   {
     "dayOfYear": 133,
     "calendarDate": "May 13",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of May 13 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Fellowship with the Father & Son",
+    "body": "'Our fellowship is with the Father and with his Son, Jesus Christ.' (1 John 1:3) Meet Him in Scripture before you sleep."
   },
   {
     "dayOfYear": 134,
     "calendarDate": "May 14",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of May 14 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rest in His Love • Evening Reflection",
+    "body": "Find quiet rest in God alone. (Psalm 62:1) Open your Bible tonight to abide in the loving embrace of Jesus Christ."
   },
   {
     "dayOfYear": 135,
     "calendarDate": "May 15",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of May 15 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Treasuring the Word • Heart of Worship",
+    "body": "'I have hidden your word in my heart.' (Psalm 119:11) Plant God's eternal truth deep within your spirit tonight."
   },
   {
     "dayOfYear": 136,
     "calendarDate": "May 16",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of May 16 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Beholding His Glory • Transformed in Him",
+    "body": "As we gaze upon Christ in the Scriptures, we are transformed into His image from glory to glory. (2 Corinthians 3:18)"
   },
   {
     "dayOfYear": 137,
     "calendarDate": "May 17",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of May 17 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Good Shepherd • Restoring Your Soul",
+    "body": "Jesus, your Shepherd, leads you beside quiet waters. (Psalm 23:2) Come to His Word and receive divine renewal."
   },
   {
     "dayOfYear": 138,
     "calendarDate": "May 18",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of May 18 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Delight in the Lord • Holy Evening",
+    "body": "Delight yourself in the Lord. (Psalm 37:4) Let communion with Jesus in Scripture be your sweetest joy tonight."
   },
   {
     "dayOfYear": 139,
     "calendarDate": "May 19",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of May 19 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "An Anchor for the Soul • Steadfast Word",
+    "body": "We have this hope as an anchor for the soul, firm and secure. (Hebrews 6:19) Ground yourself in Scripture this evening."
   },
   {
     "dayOfYear": 140,
     "calendarDate": "May 20",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of May 20 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Full of Grace and Truth • Meeting Jesus",
+    "body": "Christ came full of grace and truth. (John 1:14) Encounter His loving presence in the sacred pages tonight."
   },
   {
     "dayOfYear": 141,
     "calendarDate": "May 21",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of May 21 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Abide in Christ • Evening Fellowship",
+    "body": "Jesus said, 'Remain in me, as I also remain in you.' (John 15:4) Draw near to Him in His Word tonight."
   },
   {
     "dayOfYear": 142,
     "calendarDate": "May 22",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of May 22 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Bread of Life • Nourish Your Spirit",
+    "body": "'Man shall not live on bread alone, but on every word of God.' (Matthew 4:4) Feed your heart on Scripture tonight."
   },
   {
     "dayOfYear": 143,
     "calendarDate": "May 23",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of May 23 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "At the Feet of Jesus • Quiet Communion",
+    "body": "Like Mary, choose what is better and cannot be taken away. Spend unhurried moments listening to Jesus tonight."
   },
   {
     "dayOfYear": 144,
     "calendarDate": "May 24",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of May 24 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Draw Near to God • Intimate Communion",
+    "body": "'Come near to God and he will come near to you.' (James 4:8) Conclude your day in prayerful fellowship with Christ."
   },
   {
     "dayOfYear": 145,
     "calendarDate": "May 25",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of May 25 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living and Active • God's Holy Word",
+    "body": "God's Word is alive and active, speaking truth directly to your soul. Open Scripture tonight before resting."
   },
   {
     "dayOfYear": 146,
     "calendarDate": "May 26",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of May 26 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Lamp to Your Feet • Evening Guidance",
+    "body": "'Your word is a lamp to my feet and a light to my path.' (Psalm 119:105) Let Jesus illuminate your thoughts tonight."
   },
   {
     "dayOfYear": 147,
     "calendarDate": "May 27",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of May 27 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living Water • Thirst for Christ",
+    "body": "Jesus calls all who thirst to come to Him. (John 7:37) Drink deeply from the living waters of Scripture this evening."
   },
   {
     "dayOfYear": 148,
     "calendarDate": "May 28",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of May 28 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Words of Eternal Life • Truth in Christ",
+    "body": "'Lord, to whom shall we go? You have the words of eternal life.' (John 6:68) Spend a few moments in God's Word tonight."
   },
   {
     "dayOfYear": 149,
     "calendarDate": "May 29",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of May 29 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "His Voice in the Stillness • Evening Walk",
+    "body": "'My sheep listen to my voice; I know them, and they follow me.' (John 10:27) Listen to Christ speaking in His Word tonight."
   },
   {
     "dayOfYear": 150,
     "calendarDate": "May 30",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of May 30 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rooted in Christ • Faith in the Word",
+    "body": "Be deeply rooted and built up in Jesus. (Colossians 2:7) Let His Word anchor your faith and give you peace."
   },
   {
     "dayOfYear": 151,
     "calendarDate": "May 31",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of May 31 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Sanctified in Truth • Evening Meditation",
+    "body": "Jesus prayed, 'Sanctify them by the truth; your word is truth.' (John 17:17) Let Scripture wash over your heart tonight."
   },
   {
     "dayOfYear": 152,
     "calendarDate": "June 1",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of June 1 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Dwell in Christ's Word • Sacred Rest",
+    "body": "'Let the message of Christ dwell among you richly.' (Colossians 3:16) Rest in the presence and promises of your Savior."
   },
   {
     "dayOfYear": 153,
     "calendarDate": "June 2",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of June 2 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Fellowship with the Father & Son",
+    "body": "'Our fellowship is with the Father and with his Son, Jesus Christ.' (1 John 1:3) Meet Him in Scripture before you sleep."
   },
   {
     "dayOfYear": 154,
     "calendarDate": "June 3",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of June 3 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rest in His Love • Evening Reflection",
+    "body": "Find quiet rest in God alone. (Psalm 62:1) Open your Bible tonight to abide in the loving embrace of Jesus Christ."
   },
   {
     "dayOfYear": 155,
     "calendarDate": "June 4",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of June 4 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Treasuring the Word • Heart of Worship",
+    "body": "'I have hidden your word in my heart.' (Psalm 119:11) Plant God's eternal truth deep within your spirit tonight."
   },
   {
     "dayOfYear": 156,
     "calendarDate": "June 5",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of June 5 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Beholding His Glory • Transformed in Him",
+    "body": "As we gaze upon Christ in the Scriptures, we are transformed into His image from glory to glory. (2 Corinthians 3:18)"
   },
   {
     "dayOfYear": 157,
     "calendarDate": "June 6",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of June 6 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Good Shepherd • Restoring Your Soul",
+    "body": "Jesus, your Shepherd, leads you beside quiet waters. (Psalm 23:2) Come to His Word and receive divine renewal."
   },
   {
     "dayOfYear": 158,
     "calendarDate": "June 7",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of June 7 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Delight in the Lord • Holy Evening",
+    "body": "Delight yourself in the Lord. (Psalm 37:4) Let communion with Jesus in Scripture be your sweetest joy tonight."
   },
   {
     "dayOfYear": 159,
     "calendarDate": "June 8",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of June 8 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "An Anchor for the Soul • Steadfast Word",
+    "body": "We have this hope as an anchor for the soul, firm and secure. (Hebrews 6:19) Ground yourself in Scripture this evening."
   },
   {
     "dayOfYear": 160,
     "calendarDate": "June 9",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of June 9 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Full of Grace and Truth • Meeting Jesus",
+    "body": "Christ came full of grace and truth. (John 1:14) Encounter His loving presence in the sacred pages tonight."
   },
   {
     "dayOfYear": 161,
     "calendarDate": "June 10",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of June 10 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Abide in Christ • Evening Fellowship",
+    "body": "Jesus said, 'Remain in me, as I also remain in you.' (John 15:4) Draw near to Him in His Word tonight."
   },
   {
     "dayOfYear": 162,
     "calendarDate": "June 11",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of June 11 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Bread of Life • Nourish Your Spirit",
+    "body": "'Man shall not live on bread alone, but on every word of God.' (Matthew 4:4) Feed your heart on Scripture tonight."
   },
   {
     "dayOfYear": 163,
     "calendarDate": "June 12",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of June 12 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "At the Feet of Jesus • Quiet Communion",
+    "body": "Like Mary, choose what is better and cannot be taken away. Spend unhurried moments listening to Jesus tonight."
   },
   {
     "dayOfYear": 164,
     "calendarDate": "June 13",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of June 13 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Draw Near to God • Intimate Communion",
+    "body": "'Come near to God and he will come near to you.' (James 4:8) Conclude your day in prayerful fellowship with Christ."
   },
   {
     "dayOfYear": 165,
     "calendarDate": "June 14",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of June 14 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living and Active • God's Holy Word",
+    "body": "God's Word is alive and active, speaking truth directly to your soul. Open Scripture tonight before resting."
   },
   {
     "dayOfYear": 166,
     "calendarDate": "June 15",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of June 15 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Lamp to Your Feet • Evening Guidance",
+    "body": "'Your word is a lamp to my feet and a light to my path.' (Psalm 119:105) Let Jesus illuminate your thoughts tonight."
   },
   {
     "dayOfYear": 167,
     "calendarDate": "June 16",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of June 16 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living Water • Thirst for Christ",
+    "body": "Jesus calls all who thirst to come to Him. (John 7:37) Drink deeply from the living waters of Scripture this evening."
   },
   {
     "dayOfYear": 168,
     "calendarDate": "June 17",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of June 17 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Words of Eternal Life • Truth in Christ",
+    "body": "'Lord, to whom shall we go? You have the words of eternal life.' (John 6:68) Spend a few moments in God's Word tonight."
   },
   {
     "dayOfYear": 169,
     "calendarDate": "June 18",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of June 18 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "His Voice in the Stillness • Evening Walk",
+    "body": "'My sheep listen to my voice; I know them, and they follow me.' (John 10:27) Listen to Christ speaking in His Word tonight."
   },
   {
     "dayOfYear": 170,
     "calendarDate": "June 19",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of June 19 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rooted in Christ • Faith in the Word",
+    "body": "Be deeply rooted and built up in Jesus. (Colossians 2:7) Let His Word anchor your faith and give you peace."
   },
   {
     "dayOfYear": 171,
     "calendarDate": "June 20",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of June 20 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Sanctified in Truth • Evening Meditation",
+    "body": "Jesus prayed, 'Sanctify them by the truth; your word is truth.' (John 17:17) Let Scripture wash over your heart tonight."
   },
   {
     "dayOfYear": 172,
     "calendarDate": "June 21",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of June 21 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Dwell in Christ's Word • Sacred Rest",
+    "body": "'Let the message of Christ dwell among you richly.' (Colossians 3:16) Rest in the presence and promises of your Savior."
   },
   {
     "dayOfYear": 173,
     "calendarDate": "June 22",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of June 22 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Fellowship with the Father & Son",
+    "body": "'Our fellowship is with the Father and with his Son, Jesus Christ.' (1 John 1:3) Meet Him in Scripture before you sleep."
   },
   {
     "dayOfYear": 174,
     "calendarDate": "June 23",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of June 23 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rest in His Love • Evening Reflection",
+    "body": "Find quiet rest in God alone. (Psalm 62:1) Open your Bible tonight to abide in the loving embrace of Jesus Christ."
   },
   {
     "dayOfYear": 175,
     "calendarDate": "June 24",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of June 24 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Treasuring the Word • Heart of Worship",
+    "body": "'I have hidden your word in my heart.' (Psalm 119:11) Plant God's eternal truth deep within your spirit tonight."
   },
   {
     "dayOfYear": 176,
     "calendarDate": "June 25",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of June 25 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Beholding His Glory • Transformed in Him",
+    "body": "As we gaze upon Christ in the Scriptures, we are transformed into His image from glory to glory. (2 Corinthians 3:18)"
   },
   {
     "dayOfYear": 177,
     "calendarDate": "June 26",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of June 26 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Good Shepherd • Restoring Your Soul",
+    "body": "Jesus, your Shepherd, leads you beside quiet waters. (Psalm 23:2) Come to His Word and receive divine renewal."
   },
   {
     "dayOfYear": 178,
     "calendarDate": "June 27",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of June 27 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Delight in the Lord • Holy Evening",
+    "body": "Delight yourself in the Lord. (Psalm 37:4) Let communion with Jesus in Scripture be your sweetest joy tonight."
   },
   {
     "dayOfYear": 179,
     "calendarDate": "June 28",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of June 28 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "An Anchor for the Soul • Steadfast Word",
+    "body": "We have this hope as an anchor for the soul, firm and secure. (Hebrews 6:19) Ground yourself in Scripture this evening."
   },
   {
     "dayOfYear": 180,
     "calendarDate": "June 29",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of June 29 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Full of Grace and Truth • Meeting Jesus",
+    "body": "Christ came full of grace and truth. (John 1:14) Encounter His loving presence in the sacred pages tonight."
   },
   {
     "dayOfYear": 181,
     "calendarDate": "June 30",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of June 30 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Abide in Christ • Evening Fellowship",
+    "body": "Jesus said, 'Remain in me, as I also remain in you.' (John 15:4) Draw near to Him in His Word tonight."
   },
   {
     "dayOfYear": 182,
     "calendarDate": "July 1",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of July 1 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Bread of Life • Nourish Your Spirit",
+    "body": "'Man shall not live on bread alone, but on every word of God.' (Matthew 4:4) Feed your heart on Scripture tonight."
   },
   {
     "dayOfYear": 183,
     "calendarDate": "July 2",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of July 2 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "At the Feet of Jesus • Quiet Communion",
+    "body": "Like Mary, choose what is better and cannot be taken away. Spend unhurried moments listening to Jesus tonight."
   },
   {
     "dayOfYear": 184,
     "calendarDate": "July 3",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of July 3 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Draw Near to God • Intimate Communion",
+    "body": "'Come near to God and he will come near to you.' (James 4:8) Conclude your day in prayerful fellowship with Christ."
   },
   {
     "dayOfYear": 185,
     "calendarDate": "July 4",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of July 4 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living and Active • God's Holy Word",
+    "body": "God's Word is alive and active, speaking truth directly to your soul. Open Scripture tonight before resting."
   },
   {
     "dayOfYear": 186,
     "calendarDate": "July 5",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of July 5 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Lamp to Your Feet • Evening Guidance",
+    "body": "'Your word is a lamp to my feet and a light to my path.' (Psalm 119:105) Let Jesus illuminate your thoughts tonight."
   },
   {
     "dayOfYear": 187,
     "calendarDate": "July 6",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of July 6 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living Water • Thirst for Christ",
+    "body": "Jesus calls all who thirst to come to Him. (John 7:37) Drink deeply from the living waters of Scripture this evening."
   },
   {
     "dayOfYear": 188,
     "calendarDate": "July 7",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of July 7 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Words of Eternal Life • Truth in Christ",
+    "body": "'Lord, to whom shall we go? You have the words of eternal life.' (John 6:68) Spend a few moments in God's Word tonight."
   },
   {
     "dayOfYear": 189,
     "calendarDate": "July 8",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of July 8 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "His Voice in the Stillness • Evening Walk",
+    "body": "'My sheep listen to my voice; I know them, and they follow me.' (John 10:27) Listen to Christ speaking in His Word tonight."
   },
   {
     "dayOfYear": 190,
     "calendarDate": "July 9",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of July 9 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rooted in Christ • Faith in the Word",
+    "body": "Be deeply rooted and built up in Jesus. (Colossians 2:7) Let His Word anchor your faith and give you peace."
   },
   {
     "dayOfYear": 191,
     "calendarDate": "July 10",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of July 10 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Sanctified in Truth • Evening Meditation",
+    "body": "Jesus prayed, 'Sanctify them by the truth; your word is truth.' (John 17:17) Let Scripture wash over your heart tonight."
   },
   {
     "dayOfYear": 192,
     "calendarDate": "July 11",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of July 11 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Dwell in Christ's Word • Sacred Rest",
+    "body": "'Let the message of Christ dwell among you richly.' (Colossians 3:16) Rest in the presence and promises of your Savior."
   },
   {
     "dayOfYear": 193,
     "calendarDate": "July 12",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of July 12 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Fellowship with the Father & Son",
+    "body": "'Our fellowship is with the Father and with his Son, Jesus Christ.' (1 John 1:3) Meet Him in Scripture before you sleep."
   },
   {
     "dayOfYear": 194,
     "calendarDate": "July 13",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of July 13 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rest in His Love • Evening Reflection",
+    "body": "Find quiet rest in God alone. (Psalm 62:1) Open your Bible tonight to abide in the loving embrace of Jesus Christ."
   },
   {
     "dayOfYear": 195,
     "calendarDate": "July 14",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of July 14 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Treasuring the Word • Heart of Worship",
+    "body": "'I have hidden your word in my heart.' (Psalm 119:11) Plant God's eternal truth deep within your spirit tonight."
   },
   {
     "dayOfYear": 196,
     "calendarDate": "July 15",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of July 15 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Beholding His Glory • Transformed in Him",
+    "body": "As we gaze upon Christ in the Scriptures, we are transformed into His image from glory to glory. (2 Corinthians 3:18)"
   },
   {
     "dayOfYear": 197,
     "calendarDate": "July 16",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of July 16 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Good Shepherd • Restoring Your Soul",
+    "body": "Jesus, your Shepherd, leads you beside quiet waters. (Psalm 23:2) Come to His Word and receive divine renewal."
   },
   {
     "dayOfYear": 198,
     "calendarDate": "July 17",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of July 17 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Delight in the Lord • Holy Evening",
+    "body": "Delight yourself in the Lord. (Psalm 37:4) Let communion with Jesus in Scripture be your sweetest joy tonight."
   },
   {
     "dayOfYear": 199,
     "calendarDate": "July 18",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of July 18 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "An Anchor for the Soul • Steadfast Word",
+    "body": "We have this hope as an anchor for the soul, firm and secure. (Hebrews 6:19) Ground yourself in Scripture this evening."
   },
   {
     "dayOfYear": 200,
     "calendarDate": "July 19",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of July 19 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Full of Grace and Truth • Meeting Jesus",
+    "body": "Christ came full of grace and truth. (John 1:14) Encounter His loving presence in the sacred pages tonight."
   },
   {
     "dayOfYear": 201,
     "calendarDate": "July 20",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of July 20 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Abide in Christ • Evening Fellowship",
+    "body": "Jesus said, 'Remain in me, as I also remain in you.' (John 15:4) Draw near to Him in His Word tonight."
   },
   {
     "dayOfYear": 202,
     "calendarDate": "July 21",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of July 21 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Bread of Life • Nourish Your Spirit",
+    "body": "'Man shall not live on bread alone, but on every word of God.' (Matthew 4:4) Feed your heart on Scripture tonight."
   },
   {
     "dayOfYear": 203,
     "calendarDate": "July 22",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of July 22 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "At the Feet of Jesus • Quiet Communion",
+    "body": "Like Mary, choose what is better and cannot be taken away. Spend unhurried moments listening to Jesus tonight."
   },
   {
     "dayOfYear": 204,
     "calendarDate": "July 23",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of July 23 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Draw Near to God • Intimate Communion",
+    "body": "'Come near to God and he will come near to you.' (James 4:8) Conclude your day in prayerful fellowship with Christ."
   },
   {
     "dayOfYear": 205,
     "calendarDate": "July 24",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of July 24 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living and Active • God's Holy Word",
+    "body": "God's Word is alive and active, speaking truth directly to your soul. Open Scripture tonight before resting."
   },
   {
     "dayOfYear": 206,
     "calendarDate": "July 25",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of July 25 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Lamp to Your Feet • Evening Guidance",
+    "body": "'Your word is a lamp to my feet and a light to my path.' (Psalm 119:105) Let Jesus illuminate your thoughts tonight."
   },
   {
     "dayOfYear": 207,
     "calendarDate": "July 26",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of July 26 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living Water • Thirst for Christ",
+    "body": "Jesus calls all who thirst to come to Him. (John 7:37) Drink deeply from the living waters of Scripture this evening."
   },
   {
     "dayOfYear": 208,
     "calendarDate": "July 27",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of July 27 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Words of Eternal Life • Truth in Christ",
+    "body": "'Lord, to whom shall we go? You have the words of eternal life.' (John 6:68) Spend a few moments in God's Word tonight."
   },
   {
     "dayOfYear": 209,
     "calendarDate": "July 28",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of July 28 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "His Voice in the Stillness • Evening Walk",
+    "body": "'My sheep listen to my voice; I know them, and they follow me.' (John 10:27) Listen to Christ speaking in His Word tonight."
   },
   {
     "dayOfYear": 210,
     "calendarDate": "July 29",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of July 29 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rooted in Christ • Faith in the Word",
+    "body": "Be deeply rooted and built up in Jesus. (Colossians 2:7) Let His Word anchor your faith and give you peace."
   },
   {
     "dayOfYear": 211,
     "calendarDate": "July 30",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of July 30 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Sanctified in Truth • Evening Meditation",
+    "body": "Jesus prayed, 'Sanctify them by the truth; your word is truth.' (John 17:17) Let Scripture wash over your heart tonight."
   },
   {
     "dayOfYear": 212,
     "calendarDate": "July 31",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of July 31 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Dwell in Christ's Word • Sacred Rest",
+    "body": "'Let the message of Christ dwell among you richly.' (Colossians 3:16) Rest in the presence and promises of your Savior."
   },
   {
     "dayOfYear": 213,
     "calendarDate": "August 1",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of August 1 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Fellowship with the Father & Son",
+    "body": "'Our fellowship is with the Father and with his Son, Jesus Christ.' (1 John 1:3) Meet Him in Scripture before you sleep."
   },
   {
     "dayOfYear": 214,
     "calendarDate": "August 2",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of August 2 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rest in His Love • Evening Reflection",
+    "body": "Find quiet rest in God alone. (Psalm 62:1) Open your Bible tonight to abide in the loving embrace of Jesus Christ."
   },
   {
     "dayOfYear": 215,
     "calendarDate": "August 3",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of August 3 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Treasuring the Word • Heart of Worship",
+    "body": "'I have hidden your word in my heart.' (Psalm 119:11) Plant God's eternal truth deep within your spirit tonight."
   },
   {
     "dayOfYear": 216,
     "calendarDate": "August 4",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of August 4 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Beholding His Glory • Transformed in Him",
+    "body": "As we gaze upon Christ in the Scriptures, we are transformed into His image from glory to glory. (2 Corinthians 3:18)"
   },
   {
     "dayOfYear": 217,
     "calendarDate": "August 5",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of August 5 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Good Shepherd • Restoring Your Soul",
+    "body": "Jesus, your Shepherd, leads you beside quiet waters. (Psalm 23:2) Come to His Word and receive divine renewal."
   },
   {
     "dayOfYear": 218,
     "calendarDate": "August 6",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of August 6 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Delight in the Lord • Holy Evening",
+    "body": "Delight yourself in the Lord. (Psalm 37:4) Let communion with Jesus in Scripture be your sweetest joy tonight."
   },
   {
     "dayOfYear": 219,
     "calendarDate": "August 7",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of August 7 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "An Anchor for the Soul • Steadfast Word",
+    "body": "We have this hope as an anchor for the soul, firm and secure. (Hebrews 6:19) Ground yourself in Scripture this evening."
   },
   {
     "dayOfYear": 220,
     "calendarDate": "August 8",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of August 8 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Full of Grace and Truth • Meeting Jesus",
+    "body": "Christ came full of grace and truth. (John 1:14) Encounter His loving presence in the sacred pages tonight."
   },
   {
     "dayOfYear": 221,
     "calendarDate": "August 9",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of August 9 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Abide in Christ • Evening Fellowship",
+    "body": "Jesus said, 'Remain in me, as I also remain in you.' (John 15:4) Draw near to Him in His Word tonight."
   },
   {
     "dayOfYear": 222,
     "calendarDate": "August 10",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of August 10 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Bread of Life • Nourish Your Spirit",
+    "body": "'Man shall not live on bread alone, but on every word of God.' (Matthew 4:4) Feed your heart on Scripture tonight."
   },
   {
     "dayOfYear": 223,
     "calendarDate": "August 11",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of August 11 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "At the Feet of Jesus • Quiet Communion",
+    "body": "Like Mary, choose what is better and cannot be taken away. Spend unhurried moments listening to Jesus tonight."
   },
   {
     "dayOfYear": 224,
     "calendarDate": "August 12",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of August 12 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Draw Near to God • Intimate Communion",
+    "body": "'Come near to God and he will come near to you.' (James 4:8) Conclude your day in prayerful fellowship with Christ."
   },
   {
     "dayOfYear": 225,
     "calendarDate": "August 13",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of August 13 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living and Active • God's Holy Word",
+    "body": "God's Word is alive and active, speaking truth directly to your soul. Open Scripture tonight before resting."
   },
   {
     "dayOfYear": 226,
     "calendarDate": "August 14",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of August 14 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Lamp to Your Feet • Evening Guidance",
+    "body": "'Your word is a lamp to my feet and a light to my path.' (Psalm 119:105) Let Jesus illuminate your thoughts tonight."
   },
   {
     "dayOfYear": 227,
     "calendarDate": "August 15",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of August 15 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living Water • Thirst for Christ",
+    "body": "Jesus calls all who thirst to come to Him. (John 7:37) Drink deeply from the living waters of Scripture this evening."
   },
   {
     "dayOfYear": 228,
     "calendarDate": "August 16",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of August 16 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Words of Eternal Life • Truth in Christ",
+    "body": "'Lord, to whom shall we go? You have the words of eternal life.' (John 6:68) Spend a few moments in God's Word tonight."
   },
   {
     "dayOfYear": 229,
     "calendarDate": "August 17",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of August 17 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "His Voice in the Stillness • Evening Walk",
+    "body": "'My sheep listen to my voice; I know them, and they follow me.' (John 10:27) Listen to Christ speaking in His Word tonight."
   },
   {
     "dayOfYear": 230,
     "calendarDate": "August 18",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of August 18 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rooted in Christ • Faith in the Word",
+    "body": "Be deeply rooted and built up in Jesus. (Colossians 2:7) Let His Word anchor your faith and give you peace."
   },
   {
     "dayOfYear": 231,
     "calendarDate": "August 19",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of August 19 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Sanctified in Truth • Evening Meditation",
+    "body": "Jesus prayed, 'Sanctify them by the truth; your word is truth.' (John 17:17) Let Scripture wash over your heart tonight."
   },
   {
     "dayOfYear": 232,
     "calendarDate": "August 20",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of August 20 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Dwell in Christ's Word • Sacred Rest",
+    "body": "'Let the message of Christ dwell among you richly.' (Colossians 3:16) Rest in the presence and promises of your Savior."
   },
   {
     "dayOfYear": 233,
     "calendarDate": "August 21",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of August 21 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Fellowship with the Father & Son",
+    "body": "'Our fellowship is with the Father and with his Son, Jesus Christ.' (1 John 1:3) Meet Him in Scripture before you sleep."
   },
   {
     "dayOfYear": 234,
     "calendarDate": "August 22",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of August 22 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rest in His Love • Evening Reflection",
+    "body": "Find quiet rest in God alone. (Psalm 62:1) Open your Bible tonight to abide in the loving embrace of Jesus Christ."
   },
   {
     "dayOfYear": 235,
     "calendarDate": "August 23",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of August 23 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Treasuring the Word • Heart of Worship",
+    "body": "'I have hidden your word in my heart.' (Psalm 119:11) Plant God's eternal truth deep within your spirit tonight."
   },
   {
     "dayOfYear": 236,
     "calendarDate": "August 24",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of August 24 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Beholding His Glory • Transformed in Him",
+    "body": "As we gaze upon Christ in the Scriptures, we are transformed into His image from glory to glory. (2 Corinthians 3:18)"
   },
   {
     "dayOfYear": 237,
     "calendarDate": "August 25",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of August 25 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Good Shepherd • Restoring Your Soul",
+    "body": "Jesus, your Shepherd, leads you beside quiet waters. (Psalm 23:2) Come to His Word and receive divine renewal."
   },
   {
     "dayOfYear": 238,
     "calendarDate": "August 26",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of August 26 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Delight in the Lord • Holy Evening",
+    "body": "Delight yourself in the Lord. (Psalm 37:4) Let communion with Jesus in Scripture be your sweetest joy tonight."
   },
   {
     "dayOfYear": 239,
     "calendarDate": "August 27",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of August 27 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "An Anchor for the Soul • Steadfast Word",
+    "body": "We have this hope as an anchor for the soul, firm and secure. (Hebrews 6:19) Ground yourself in Scripture this evening."
   },
   {
     "dayOfYear": 240,
     "calendarDate": "August 28",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of August 28 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Full of Grace and Truth • Meeting Jesus",
+    "body": "Christ came full of grace and truth. (John 1:14) Encounter His loving presence in the sacred pages tonight."
   },
   {
     "dayOfYear": 241,
     "calendarDate": "August 29",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of August 29 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Abide in Christ • Evening Fellowship",
+    "body": "Jesus said, 'Remain in me, as I also remain in you.' (John 15:4) Draw near to Him in His Word tonight."
   },
   {
     "dayOfYear": 242,
     "calendarDate": "August 30",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of August 30 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Bread of Life • Nourish Your Spirit",
+    "body": "'Man shall not live on bread alone, but on every word of God.' (Matthew 4:4) Feed your heart on Scripture tonight."
   },
   {
     "dayOfYear": 243,
     "calendarDate": "August 31",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of August 31 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "At the Feet of Jesus • Quiet Communion",
+    "body": "Like Mary, choose what is better and cannot be taken away. Spend unhurried moments listening to Jesus tonight."
   },
   {
     "dayOfYear": 244,
     "calendarDate": "September 1",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of September 1 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Draw Near to God • Intimate Communion",
+    "body": "'Come near to God and he will come near to you.' (James 4:8) Conclude your day in prayerful fellowship with Christ."
   },
   {
     "dayOfYear": 245,
     "calendarDate": "September 2",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of September 2 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living and Active • God's Holy Word",
+    "body": "God's Word is alive and active, speaking truth directly to your soul. Open Scripture tonight before resting."
   },
   {
     "dayOfYear": 246,
     "calendarDate": "September 3",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of September 3 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Lamp to Your Feet • Evening Guidance",
+    "body": "'Your word is a lamp to my feet and a light to my path.' (Psalm 119:105) Let Jesus illuminate your thoughts tonight."
   },
   {
     "dayOfYear": 247,
     "calendarDate": "September 4",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of September 4 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living Water • Thirst for Christ",
+    "body": "Jesus calls all who thirst to come to Him. (John 7:37) Drink deeply from the living waters of Scripture this evening."
   },
   {
     "dayOfYear": 248,
     "calendarDate": "September 5",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of September 5 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Words of Eternal Life • Truth in Christ",
+    "body": "'Lord, to whom shall we go? You have the words of eternal life.' (John 6:68) Spend a few moments in God's Word tonight."
   },
   {
     "dayOfYear": 249,
     "calendarDate": "September 6",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of September 6 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "His Voice in the Stillness • Evening Walk",
+    "body": "'My sheep listen to my voice; I know them, and they follow me.' (John 10:27) Listen to Christ speaking in His Word tonight."
   },
   {
     "dayOfYear": 250,
     "calendarDate": "September 7",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of September 7 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rooted in Christ • Faith in the Word",
+    "body": "Be deeply rooted and built up in Jesus. (Colossians 2:7) Let His Word anchor your faith and give you peace."
   },
   {
     "dayOfYear": 251,
     "calendarDate": "September 8",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of September 8 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Sanctified in Truth • Evening Meditation",
+    "body": "Jesus prayed, 'Sanctify them by the truth; your word is truth.' (John 17:17) Let Scripture wash over your heart tonight."
   },
   {
     "dayOfYear": 252,
     "calendarDate": "September 9",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of September 9 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Dwell in Christ's Word • Sacred Rest",
+    "body": "'Let the message of Christ dwell among you richly.' (Colossians 3:16) Rest in the presence and promises of your Savior."
   },
   {
     "dayOfYear": 253,
     "calendarDate": "September 10",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of September 10 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Fellowship with the Father & Son",
+    "body": "'Our fellowship is with the Father and with his Son, Jesus Christ.' (1 John 1:3) Meet Him in Scripture before you sleep."
   },
   {
     "dayOfYear": 254,
     "calendarDate": "September 11",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of September 11 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rest in His Love • Evening Reflection",
+    "body": "Find quiet rest in God alone. (Psalm 62:1) Open your Bible tonight to abide in the loving embrace of Jesus Christ."
   },
   {
     "dayOfYear": 255,
     "calendarDate": "September 12",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of September 12 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Treasuring the Word • Heart of Worship",
+    "body": "'I have hidden your word in my heart.' (Psalm 119:11) Plant God's eternal truth deep within your spirit tonight."
   },
   {
     "dayOfYear": 256,
     "calendarDate": "September 13",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of September 13 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Beholding His Glory • Transformed in Him",
+    "body": "As we gaze upon Christ in the Scriptures, we are transformed into His image from glory to glory. (2 Corinthians 3:18)"
   },
   {
     "dayOfYear": 257,
     "calendarDate": "September 14",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of September 14 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Good Shepherd • Restoring Your Soul",
+    "body": "Jesus, your Shepherd, leads you beside quiet waters. (Psalm 23:2) Come to His Word and receive divine renewal."
   },
   {
     "dayOfYear": 258,
     "calendarDate": "September 15",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of September 15 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Delight in the Lord • Holy Evening",
+    "body": "Delight yourself in the Lord. (Psalm 37:4) Let communion with Jesus in Scripture be your sweetest joy tonight."
   },
   {
     "dayOfYear": 259,
     "calendarDate": "September 16",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of September 16 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "An Anchor for the Soul • Steadfast Word",
+    "body": "We have this hope as an anchor for the soul, firm and secure. (Hebrews 6:19) Ground yourself in Scripture this evening."
   },
   {
     "dayOfYear": 260,
     "calendarDate": "September 17",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of September 17 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Full of Grace and Truth • Meeting Jesus",
+    "body": "Christ came full of grace and truth. (John 1:14) Encounter His loving presence in the sacred pages tonight."
   },
   {
     "dayOfYear": 261,
     "calendarDate": "September 18",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of September 18 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Abide in Christ • Evening Fellowship",
+    "body": "Jesus said, 'Remain in me, as I also remain in you.' (John 15:4) Draw near to Him in His Word tonight."
   },
   {
     "dayOfYear": 262,
     "calendarDate": "September 19",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of September 19 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Bread of Life • Nourish Your Spirit",
+    "body": "'Man shall not live on bread alone, but on every word of God.' (Matthew 4:4) Feed your heart on Scripture tonight."
   },
   {
     "dayOfYear": 263,
     "calendarDate": "September 20",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of September 20 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "At the Feet of Jesus • Quiet Communion",
+    "body": "Like Mary, choose what is better and cannot be taken away. Spend unhurried moments listening to Jesus tonight."
   },
   {
     "dayOfYear": 264,
     "calendarDate": "September 21",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of September 21 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Draw Near to God • Intimate Communion",
+    "body": "'Come near to God and he will come near to you.' (James 4:8) Conclude your day in prayerful fellowship with Christ."
   },
   {
     "dayOfYear": 265,
     "calendarDate": "September 22",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of September 22 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living and Active • God's Holy Word",
+    "body": "God's Word is alive and active, speaking truth directly to your soul. Open Scripture tonight before resting."
   },
   {
     "dayOfYear": 266,
     "calendarDate": "September 23",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of September 23 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Lamp to Your Feet • Evening Guidance",
+    "body": "'Your word is a lamp to my feet and a light to my path.' (Psalm 119:105) Let Jesus illuminate your thoughts tonight."
   },
   {
     "dayOfYear": 267,
     "calendarDate": "September 24",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of September 24 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living Water • Thirst for Christ",
+    "body": "Jesus calls all who thirst to come to Him. (John 7:37) Drink deeply from the living waters of Scripture this evening."
   },
   {
     "dayOfYear": 268,
     "calendarDate": "September 25",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of September 25 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Words of Eternal Life • Truth in Christ",
+    "body": "'Lord, to whom shall we go? You have the words of eternal life.' (John 6:68) Spend a few moments in God's Word tonight."
   },
   {
     "dayOfYear": 269,
     "calendarDate": "September 26",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of September 26 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "His Voice in the Stillness • Evening Walk",
+    "body": "'My sheep listen to my voice; I know them, and they follow me.' (John 10:27) Listen to Christ speaking in His Word tonight."
   },
   {
     "dayOfYear": 270,
     "calendarDate": "September 27",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of September 27 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rooted in Christ • Faith in the Word",
+    "body": "Be deeply rooted and built up in Jesus. (Colossians 2:7) Let His Word anchor your faith and give you peace."
   },
   {
     "dayOfYear": 271,
     "calendarDate": "September 28",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of September 28 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Sanctified in Truth • Evening Meditation",
+    "body": "Jesus prayed, 'Sanctify them by the truth; your word is truth.' (John 17:17) Let Scripture wash over your heart tonight."
   },
   {
     "dayOfYear": 272,
     "calendarDate": "September 29",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of September 29 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Dwell in Christ's Word • Sacred Rest",
+    "body": "'Let the message of Christ dwell among you richly.' (Colossians 3:16) Rest in the presence and promises of your Savior."
   },
   {
     "dayOfYear": 273,
     "calendarDate": "September 30",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of September 30 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Fellowship with the Father & Son",
+    "body": "'Our fellowship is with the Father and with his Son, Jesus Christ.' (1 John 1:3) Meet Him in Scripture before you sleep."
   },
   {
     "dayOfYear": 274,
     "calendarDate": "October 1",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of October 1 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rest in His Love • Evening Reflection",
+    "body": "Find quiet rest in God alone. (Psalm 62:1) Open your Bible tonight to abide in the loving embrace of Jesus Christ."
   },
   {
     "dayOfYear": 275,
     "calendarDate": "October 2",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of October 2 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Treasuring the Word • Heart of Worship",
+    "body": "'I have hidden your word in my heart.' (Psalm 119:11) Plant God's eternal truth deep within your spirit tonight."
   },
   {
     "dayOfYear": 276,
     "calendarDate": "October 3",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of October 3 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Beholding His Glory • Transformed in Him",
+    "body": "As we gaze upon Christ in the Scriptures, we are transformed into His image from glory to glory. (2 Corinthians 3:18)"
   },
   {
     "dayOfYear": 277,
     "calendarDate": "October 4",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of October 4 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Good Shepherd • Restoring Your Soul",
+    "body": "Jesus, your Shepherd, leads you beside quiet waters. (Psalm 23:2) Come to His Word and receive divine renewal."
   },
   {
     "dayOfYear": 278,
     "calendarDate": "October 5",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of October 5 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Delight in the Lord • Holy Evening",
+    "body": "Delight yourself in the Lord. (Psalm 37:4) Let communion with Jesus in Scripture be your sweetest joy tonight."
   },
   {
     "dayOfYear": 279,
     "calendarDate": "October 6",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of October 6 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "An Anchor for the Soul • Steadfast Word",
+    "body": "We have this hope as an anchor for the soul, firm and secure. (Hebrews 6:19) Ground yourself in Scripture this evening."
   },
   {
     "dayOfYear": 280,
     "calendarDate": "October 7",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of October 7 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Full of Grace and Truth • Meeting Jesus",
+    "body": "Christ came full of grace and truth. (John 1:14) Encounter His loving presence in the sacred pages tonight."
   },
   {
     "dayOfYear": 281,
     "calendarDate": "October 8",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of October 8 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Abide in Christ • Evening Fellowship",
+    "body": "Jesus said, 'Remain in me, as I also remain in you.' (John 15:4) Draw near to Him in His Word tonight."
   },
   {
     "dayOfYear": 282,
     "calendarDate": "October 9",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of October 9 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Bread of Life • Nourish Your Spirit",
+    "body": "'Man shall not live on bread alone, but on every word of God.' (Matthew 4:4) Feed your heart on Scripture tonight."
   },
   {
     "dayOfYear": 283,
     "calendarDate": "October 10",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of October 10 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "At the Feet of Jesus • Quiet Communion",
+    "body": "Like Mary, choose what is better and cannot be taken away. Spend unhurried moments listening to Jesus tonight."
   },
   {
     "dayOfYear": 284,
     "calendarDate": "October 11",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of October 11 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Draw Near to God • Intimate Communion",
+    "body": "'Come near to God and he will come near to you.' (James 4:8) Conclude your day in prayerful fellowship with Christ."
   },
   {
     "dayOfYear": 285,
     "calendarDate": "October 12",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of October 12 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living and Active • God's Holy Word",
+    "body": "God's Word is alive and active, speaking truth directly to your soul. Open Scripture tonight before resting."
   },
   {
     "dayOfYear": 286,
     "calendarDate": "October 13",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of October 13 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Lamp to Your Feet • Evening Guidance",
+    "body": "'Your word is a lamp to my feet and a light to my path.' (Psalm 119:105) Let Jesus illuminate your thoughts tonight."
   },
   {
     "dayOfYear": 287,
     "calendarDate": "October 14",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of October 14 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living Water • Thirst for Christ",
+    "body": "Jesus calls all who thirst to come to Him. (John 7:37) Drink deeply from the living waters of Scripture this evening."
   },
   {
     "dayOfYear": 288,
     "calendarDate": "October 15",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of October 15 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Words of Eternal Life • Truth in Christ",
+    "body": "'Lord, to whom shall we go? You have the words of eternal life.' (John 6:68) Spend a few moments in God's Word tonight."
   },
   {
     "dayOfYear": 289,
     "calendarDate": "October 16",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of October 16 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "His Voice in the Stillness • Evening Walk",
+    "body": "'My sheep listen to my voice; I know them, and they follow me.' (John 10:27) Listen to Christ speaking in His Word tonight."
   },
   {
     "dayOfYear": 290,
     "calendarDate": "October 17",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of October 17 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rooted in Christ • Faith in the Word",
+    "body": "Be deeply rooted and built up in Jesus. (Colossians 2:7) Let His Word anchor your faith and give you peace."
   },
   {
     "dayOfYear": 291,
     "calendarDate": "October 18",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of October 18 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Sanctified in Truth • Evening Meditation",
+    "body": "Jesus prayed, 'Sanctify them by the truth; your word is truth.' (John 17:17) Let Scripture wash over your heart tonight."
   },
   {
     "dayOfYear": 292,
     "calendarDate": "October 19",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of October 19 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Dwell in Christ's Word • Sacred Rest",
+    "body": "'Let the message of Christ dwell among you richly.' (Colossians 3:16) Rest in the presence and promises of your Savior."
   },
   {
     "dayOfYear": 293,
     "calendarDate": "October 20",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of October 20 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Fellowship with the Father & Son",
+    "body": "'Our fellowship is with the Father and with his Son, Jesus Christ.' (1 John 1:3) Meet Him in Scripture before you sleep."
   },
   {
     "dayOfYear": 294,
     "calendarDate": "October 21",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of October 21 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rest in His Love • Evening Reflection",
+    "body": "Find quiet rest in God alone. (Psalm 62:1) Open your Bible tonight to abide in the loving embrace of Jesus Christ."
   },
   {
     "dayOfYear": 295,
     "calendarDate": "October 22",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of October 22 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Treasuring the Word • Heart of Worship",
+    "body": "'I have hidden your word in my heart.' (Psalm 119:11) Plant God's eternal truth deep within your spirit tonight."
   },
   {
     "dayOfYear": 296,
     "calendarDate": "October 23",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of October 23 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Beholding His Glory • Transformed in Him",
+    "body": "As we gaze upon Christ in the Scriptures, we are transformed into His image from glory to glory. (2 Corinthians 3:18)"
   },
   {
     "dayOfYear": 297,
     "calendarDate": "October 24",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of October 24 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Good Shepherd • Restoring Your Soul",
+    "body": "Jesus, your Shepherd, leads you beside quiet waters. (Psalm 23:2) Come to His Word and receive divine renewal."
   },
   {
     "dayOfYear": 298,
     "calendarDate": "October 25",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of October 25 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Delight in the Lord • Holy Evening",
+    "body": "Delight yourself in the Lord. (Psalm 37:4) Let communion with Jesus in Scripture be your sweetest joy tonight."
   },
   {
     "dayOfYear": 299,
     "calendarDate": "October 26",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of October 26 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "An Anchor for the Soul • Steadfast Word",
+    "body": "We have this hope as an anchor for the soul, firm and secure. (Hebrews 6:19) Ground yourself in Scripture this evening."
   },
   {
     "dayOfYear": 300,
     "calendarDate": "October 27",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of October 27 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Full of Grace and Truth • Meeting Jesus",
+    "body": "Christ came full of grace and truth. (John 1:14) Encounter His loving presence in the sacred pages tonight."
   },
   {
     "dayOfYear": 301,
     "calendarDate": "October 28",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of October 28 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Abide in Christ • Evening Fellowship",
+    "body": "Jesus said, 'Remain in me, as I also remain in you.' (John 15:4) Draw near to Him in His Word tonight."
   },
   {
     "dayOfYear": 302,
     "calendarDate": "October 29",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of October 29 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Bread of Life • Nourish Your Spirit",
+    "body": "'Man shall not live on bread alone, but on every word of God.' (Matthew 4:4) Feed your heart on Scripture tonight."
   },
   {
     "dayOfYear": 303,
     "calendarDate": "October 30",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of October 30 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "At the Feet of Jesus • Quiet Communion",
+    "body": "Like Mary, choose what is better and cannot be taken away. Spend unhurried moments listening to Jesus tonight."
   },
   {
     "dayOfYear": 304,
     "calendarDate": "October 31",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of October 31 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Draw Near to God • Intimate Communion",
+    "body": "'Come near to God and he will come near to you.' (James 4:8) Conclude your day in prayerful fellowship with Christ."
   },
   {
     "dayOfYear": 305,
     "calendarDate": "November 1",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of November 1 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living and Active • God's Holy Word",
+    "body": "God's Word is alive and active, speaking truth directly to your soul. Open Scripture tonight before resting."
   },
   {
     "dayOfYear": 306,
     "calendarDate": "November 2",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of November 2 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Lamp to Your Feet • Evening Guidance",
+    "body": "'Your word is a lamp to my feet and a light to my path.' (Psalm 119:105) Let Jesus illuminate your thoughts tonight."
   },
   {
     "dayOfYear": 307,
     "calendarDate": "November 3",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of November 3 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living Water • Thirst for Christ",
+    "body": "Jesus calls all who thirst to come to Him. (John 7:37) Drink deeply from the living waters of Scripture this evening."
   },
   {
     "dayOfYear": 308,
     "calendarDate": "November 4",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of November 4 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Words of Eternal Life • Truth in Christ",
+    "body": "'Lord, to whom shall we go? You have the words of eternal life.' (John 6:68) Spend a few moments in God's Word tonight."
   },
   {
     "dayOfYear": 309,
     "calendarDate": "November 5",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of November 5 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "His Voice in the Stillness • Evening Walk",
+    "body": "'My sheep listen to my voice; I know them, and they follow me.' (John 10:27) Listen to Christ speaking in His Word tonight."
   },
   {
     "dayOfYear": 310,
     "calendarDate": "November 6",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of November 6 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rooted in Christ • Faith in the Word",
+    "body": "Be deeply rooted and built up in Jesus. (Colossians 2:7) Let His Word anchor your faith and give you peace."
   },
   {
     "dayOfYear": 311,
     "calendarDate": "November 7",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of November 7 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Sanctified in Truth • Evening Meditation",
+    "body": "Jesus prayed, 'Sanctify them by the truth; your word is truth.' (John 17:17) Let Scripture wash over your heart tonight."
   },
   {
     "dayOfYear": 312,
     "calendarDate": "November 8",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of November 8 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Dwell in Christ's Word • Sacred Rest",
+    "body": "'Let the message of Christ dwell among you richly.' (Colossians 3:16) Rest in the presence and promises of your Savior."
   },
   {
     "dayOfYear": 313,
     "calendarDate": "November 9",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of November 9 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Fellowship with the Father & Son",
+    "body": "'Our fellowship is with the Father and with his Son, Jesus Christ.' (1 John 1:3) Meet Him in Scripture before you sleep."
   },
   {
     "dayOfYear": 314,
     "calendarDate": "November 10",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of November 10 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rest in His Love • Evening Reflection",
+    "body": "Find quiet rest in God alone. (Psalm 62:1) Open your Bible tonight to abide in the loving embrace of Jesus Christ."
   },
   {
     "dayOfYear": 315,
     "calendarDate": "November 11",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of November 11 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Treasuring the Word • Heart of Worship",
+    "body": "'I have hidden your word in my heart.' (Psalm 119:11) Plant God's eternal truth deep within your spirit tonight."
   },
   {
     "dayOfYear": 316,
     "calendarDate": "November 12",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of November 12 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Beholding His Glory • Transformed in Him",
+    "body": "As we gaze upon Christ in the Scriptures, we are transformed into His image from glory to glory. (2 Corinthians 3:18)"
   },
   {
     "dayOfYear": 317,
     "calendarDate": "November 13",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of November 13 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Good Shepherd • Restoring Your Soul",
+    "body": "Jesus, your Shepherd, leads you beside quiet waters. (Psalm 23:2) Come to His Word and receive divine renewal."
   },
   {
     "dayOfYear": 318,
     "calendarDate": "November 14",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of November 14 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Delight in the Lord • Holy Evening",
+    "body": "Delight yourself in the Lord. (Psalm 37:4) Let communion with Jesus in Scripture be your sweetest joy tonight."
   },
   {
     "dayOfYear": 319,
     "calendarDate": "November 15",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of November 15 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "An Anchor for the Soul • Steadfast Word",
+    "body": "We have this hope as an anchor for the soul, firm and secure. (Hebrews 6:19) Ground yourself in Scripture this evening."
   },
   {
     "dayOfYear": 320,
     "calendarDate": "November 16",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of November 16 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Full of Grace and Truth • Meeting Jesus",
+    "body": "Christ came full of grace and truth. (John 1:14) Encounter His loving presence in the sacred pages tonight."
   },
   {
     "dayOfYear": 321,
     "calendarDate": "November 17",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of November 17 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Abide in Christ • Evening Fellowship",
+    "body": "Jesus said, 'Remain in me, as I also remain in you.' (John 15:4) Draw near to Him in His Word tonight."
   },
   {
     "dayOfYear": 322,
     "calendarDate": "November 18",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of November 18 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Bread of Life • Nourish Your Spirit",
+    "body": "'Man shall not live on bread alone, but on every word of God.' (Matthew 4:4) Feed your heart on Scripture tonight."
   },
   {
     "dayOfYear": 323,
     "calendarDate": "November 19",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of November 19 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "At the Feet of Jesus • Quiet Communion",
+    "body": "Like Mary, choose what is better and cannot be taken away. Spend unhurried moments listening to Jesus tonight."
   },
   {
     "dayOfYear": 324,
     "calendarDate": "November 20",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of November 20 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Draw Near to God • Intimate Communion",
+    "body": "'Come near to God and he will come near to you.' (James 4:8) Conclude your day in prayerful fellowship with Christ."
   },
   {
     "dayOfYear": 325,
     "calendarDate": "November 21",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of November 21 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living and Active • God's Holy Word",
+    "body": "God's Word is alive and active, speaking truth directly to your soul. Open Scripture tonight before resting."
   },
   {
     "dayOfYear": 326,
     "calendarDate": "November 22",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of November 22 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Lamp to Your Feet • Evening Guidance",
+    "body": "'Your word is a lamp to my feet and a light to my path.' (Psalm 119:105) Let Jesus illuminate your thoughts tonight."
   },
   {
     "dayOfYear": 327,
     "calendarDate": "November 23",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of November 23 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living Water • Thirst for Christ",
+    "body": "Jesus calls all who thirst to come to Him. (John 7:37) Drink deeply from the living waters of Scripture this evening."
   },
   {
     "dayOfYear": 328,
     "calendarDate": "November 24",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of November 24 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Words of Eternal Life • Truth in Christ",
+    "body": "'Lord, to whom shall we go? You have the words of eternal life.' (John 6:68) Spend a few moments in God's Word tonight."
   },
   {
     "dayOfYear": 329,
     "calendarDate": "November 25",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of November 25 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "His Voice in the Stillness • Evening Walk",
+    "body": "'My sheep listen to my voice; I know them, and they follow me.' (John 10:27) Listen to Christ speaking in His Word tonight."
   },
   {
     "dayOfYear": 330,
     "calendarDate": "November 26",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of November 26 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rooted in Christ • Faith in the Word",
+    "body": "Be deeply rooted and built up in Jesus. (Colossians 2:7) Let His Word anchor your faith and give you peace."
   },
   {
     "dayOfYear": 331,
     "calendarDate": "November 27",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of November 27 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Sanctified in Truth • Evening Meditation",
+    "body": "Jesus prayed, 'Sanctify them by the truth; your word is truth.' (John 17:17) Let Scripture wash over your heart tonight."
   },
   {
     "dayOfYear": 332,
     "calendarDate": "November 28",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of November 28 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Dwell in Christ's Word • Sacred Rest",
+    "body": "'Let the message of Christ dwell among you richly.' (Colossians 3:16) Rest in the presence and promises of your Savior."
   },
   {
     "dayOfYear": 333,
     "calendarDate": "November 29",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of November 29 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Fellowship with the Father & Son",
+    "body": "'Our fellowship is with the Father and with his Son, Jesus Christ.' (1 John 1:3) Meet Him in Scripture before you sleep."
   },
   {
     "dayOfYear": 334,
     "calendarDate": "November 30",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of November 30 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rest in His Love • Evening Reflection",
+    "body": "Find quiet rest in God alone. (Psalm 62:1) Open your Bible tonight to abide in the loving embrace of Jesus Christ."
   },
   {
     "dayOfYear": 335,
     "calendarDate": "December 1",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of December 1 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Treasuring the Word • Heart of Worship",
+    "body": "'I have hidden your word in my heart.' (Psalm 119:11) Plant God's eternal truth deep within your spirit tonight."
   },
   {
     "dayOfYear": 336,
     "calendarDate": "December 2",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of December 2 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Beholding His Glory • Transformed in Him",
+    "body": "As we gaze upon Christ in the Scriptures, we are transformed into His image from glory to glory. (2 Corinthians 3:18)"
   },
   {
     "dayOfYear": 337,
     "calendarDate": "December 3",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of December 3 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Good Shepherd • Restoring Your Soul",
+    "body": "Jesus, your Shepherd, leads you beside quiet waters. (Psalm 23:2) Come to His Word and receive divine renewal."
   },
   {
     "dayOfYear": 338,
     "calendarDate": "December 4",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of December 4 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Delight in the Lord • Holy Evening",
+    "body": "Delight yourself in the Lord. (Psalm 37:4) Let communion with Jesus in Scripture be your sweetest joy tonight."
   },
   {
     "dayOfYear": 339,
     "calendarDate": "December 5",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of December 5 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "An Anchor for the Soul • Steadfast Word",
+    "body": "We have this hope as an anchor for the soul, firm and secure. (Hebrews 6:19) Ground yourself in Scripture this evening."
   },
   {
     "dayOfYear": 340,
     "calendarDate": "December 6",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of December 6 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Full of Grace and Truth • Meeting Jesus",
+    "body": "Christ came full of grace and truth. (John 1:14) Encounter His loving presence in the sacred pages tonight."
   },
   {
     "dayOfYear": 341,
     "calendarDate": "December 7",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of December 7 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Abide in Christ • Evening Fellowship",
+    "body": "Jesus said, 'Remain in me, as I also remain in you.' (John 15:4) Draw near to Him in His Word tonight."
   },
   {
     "dayOfYear": 342,
     "calendarDate": "December 8",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of December 8 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Bread of Life • Nourish Your Spirit",
+    "body": "'Man shall not live on bread alone, but on every word of God.' (Matthew 4:4) Feed your heart on Scripture tonight."
   },
   {
     "dayOfYear": 343,
     "calendarDate": "December 9",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of December 9 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "At the Feet of Jesus • Quiet Communion",
+    "body": "Like Mary, choose what is better and cannot be taken away. Spend unhurried moments listening to Jesus tonight."
   },
   {
     "dayOfYear": 344,
     "calendarDate": "December 10",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of December 10 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Draw Near to God • Intimate Communion",
+    "body": "'Come near to God and he will come near to you.' (James 4:8) Conclude your day in prayerful fellowship with Christ."
   },
   {
     "dayOfYear": 345,
     "calendarDate": "December 11",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of December 11 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living and Active • God's Holy Word",
+    "body": "God's Word is alive and active, speaking truth directly to your soul. Open Scripture tonight before resting."
   },
   {
     "dayOfYear": 346,
     "calendarDate": "December 12",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of December 12 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Lamp to Your Feet • Evening Guidance",
+    "body": "'Your word is a lamp to my feet and a light to my path.' (Psalm 119:105) Let Jesus illuminate your thoughts tonight."
   },
   {
     "dayOfYear": 347,
     "calendarDate": "December 13",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of December 13 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living Water • Thirst for Christ",
+    "body": "Jesus calls all who thirst to come to Him. (John 7:37) Drink deeply from the living waters of Scripture this evening."
   },
   {
     "dayOfYear": 348,
     "calendarDate": "December 14",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of December 14 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Words of Eternal Life • Truth in Christ",
+    "body": "'Lord, to whom shall we go? You have the words of eternal life.' (John 6:68) Spend a few moments in God's Word tonight."
   },
   {
     "dayOfYear": 349,
     "calendarDate": "December 15",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of December 15 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "His Voice in the Stillness • Evening Walk",
+    "body": "'My sheep listen to my voice; I know them, and they follow me.' (John 10:27) Listen to Christ speaking in His Word tonight."
   },
   {
     "dayOfYear": 350,
     "calendarDate": "December 16",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of December 16 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rooted in Christ • Faith in the Word",
+    "body": "Be deeply rooted and built up in Jesus. (Colossians 2:7) Let His Word anchor your faith and give you peace."
   },
   {
     "dayOfYear": 351,
     "calendarDate": "December 17",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of December 17 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Sanctified in Truth • Evening Meditation",
+    "body": "Jesus prayed, 'Sanctify them by the truth; your word is truth.' (John 17:17) Let Scripture wash over your heart tonight."
   },
   {
     "dayOfYear": 352,
     "calendarDate": "December 18",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of December 18 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Dwell in Christ's Word • Sacred Rest",
+    "body": "'Let the message of Christ dwell among you richly.' (Colossians 3:16) Rest in the presence and promises of your Savior."
   },
   {
     "dayOfYear": 353,
     "calendarDate": "December 19",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of December 19 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Fellowship with the Father & Son",
+    "body": "'Our fellowship is with the Father and with his Son, Jesus Christ.' (1 John 1:3) Meet Him in Scripture before you sleep."
   },
   {
     "dayOfYear": 354,
     "calendarDate": "December 20",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of December 20 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Rest in His Love • Evening Reflection",
+    "body": "Find quiet rest in God alone. (Psalm 62:1) Open your Bible tonight to abide in the loving embrace of Jesus Christ."
   },
   {
     "dayOfYear": 355,
     "calendarDate": "December 21",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of December 21 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Treasuring the Word • Heart of Worship",
+    "body": "'I have hidden your word in my heart.' (Psalm 119:11) Plant God's eternal truth deep within your spirit tonight."
   },
   {
     "dayOfYear": 356,
     "calendarDate": "December 22",
-    "title": "Fidelity in the Small Moments",
-    "body": "The day of December 22 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Beholding His Glory • Transformed in Him",
+    "body": "As we gaze upon Christ in the Scriptures, we are transformed into His image from glory to glory. (2 Corinthians 3:18)"
   },
   {
     "dayOfYear": 357,
     "calendarDate": "December 23",
-    "title": "Nightfall Study • Unbroken Streak",
-    "body": "The day of December 23 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Good Shepherd • Restoring Your Soul",
+    "body": "Jesus, your Shepherd, leads you beside quiet waters. (Psalm 23:2) Come to His Word and receive divine renewal."
   },
   {
     "dayOfYear": 358,
     "calendarDate": "December 24",
-    "title": "A Heart Anchored in Truth",
-    "body": "The day of December 24 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Delight in the Lord • Holy Evening",
+    "body": "Delight yourself in the Lord. (Psalm 37:4) Let communion with Jesus in Scripture be your sweetest joy tonight."
   },
   {
     "dayOfYear": 359,
     "calendarDate": "December 25",
-    "title": "Keep Your Lamp Burning",
-    "body": "The day of December 25 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "An Anchor for the Soul • Steadfast Word",
+    "body": "We have this hope as an anchor for the soul, firm and secure. (Hebrews 6:19) Ground yourself in Scripture this evening."
   },
   {
     "dayOfYear": 360,
     "calendarDate": "December 26",
-    "title": "Your Sacred Daily Rhythm",
-    "body": "The day of December 26 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Full of Grace and Truth • Meeting Jesus",
+    "body": "Christ came full of grace and truth. (John 1:14) Encounter His loving presence in the sacred pages tonight."
   },
   {
     "dayOfYear": 361,
     "calendarDate": "December 27",
-    "title": "Protect Your Daily Streak • The Word Awaits",
-    "body": "The day of December 27 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Abide in Christ • Evening Fellowship",
+    "body": "Jesus said, 'Remain in me, as I also remain in you.' (John 15:4) Draw near to Him in His Word tonight."
   },
   {
     "dayOfYear": 362,
     "calendarDate": "December 28",
-    "title": "Keep Your Sacred Walk Alive • Today's Word",
-    "body": "The day of December 28 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "The Bread of Life • Nourish Your Spirit",
+    "body": "'Man shall not live on bread alone, but on every word of God.' (Matthew 4:4) Feed your heart on Scripture tonight."
   },
   {
     "dayOfYear": 363,
     "calendarDate": "December 29",
-    "title": "Evening Reflection • Nourish Your Spirit",
-    "body": "The day of December 29 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "At the Feet of Jesus • Quiet Communion",
+    "body": "Like Mary, choose what is better and cannot be taken away. Spend unhurried moments listening to Jesus tonight."
   },
   {
     "dayOfYear": 364,
     "calendarDate": "December 30",
-    "title": "Close the Day in Peace • Daily Reading",
-    "body": "The day of December 30 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Draw Near to God • Intimate Communion",
+    "body": "'Come near to God and he will come near to you.' (James 4:8) Conclude your day in prayerful fellowship with Christ."
   },
   {
     "dayOfYear": 365,
     "calendarDate": "December 31",
-    "title": "A Lamp for Your Night • Read Today's Word",
-    "body": "The day of December 31 is winding down. Take 2 minutes tonight to read your daily chapter and protect your streak."
+    "title": "Living and Active • God's Holy Word",
+    "body": "God's Word is alive and active, speaking truth directly to your soul. Open Scripture tonight before resting."
   }
 ];
+
+export const EVENING_GUARDIAN_365_PROMPTS = EVENING_FELLOWSHIP_365_PROMPTS;

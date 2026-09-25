@@ -5,7 +5,7 @@ import {
   MORNING_365_SCRIPTURES,
   DIVINE_LOVE_365_AFFIRMATIONS,
   NIGHTLY_PEACE_365_SCRIPTURES,
-  EVENING_GUARDIAN_365_PROMPTS,
+  EVENING_FELLOWSHIP_365_PROMPTS,
 } from '../data/notificationVerses';
 
 // ─── Foreground Notification Handler ──────────────────────────────────────────
@@ -48,8 +48,8 @@ export async function setupAndroidNotificationChannels(): Promise<void> {
       lightColor: '#FDD223',
     });
 
-    await Notifications.setNotificationChannelAsync('streak-guardian', {
-      name: 'Streak Guardian & Evening Reading',
+    await Notifications.setNotificationChannelAsync('evening-fellowship', {
+      name: 'Evening Fellowship with Christ',
       importance: Notifications.AndroidImportance.HIGH,
       sound: 'default',
       vibrationPattern: [0, 250, 250, 250],
@@ -119,8 +119,8 @@ export async function registerAllAutomatedNotifications(): Promise<boolean> {
         (targetDayOfYear - 1 + 182) % DIVINE_LOVE_365_AFFIRMATIONS.length;
       const afternoonItem = DIVINE_LOVE_365_AFFIRMATIONS[afternoonIndex];
       const eveningItem =
-        EVENING_GUARDIAN_365_PROMPTS[targetDayOfYear - 1] ||
-        EVENING_GUARDIAN_365_PROMPTS[0];
+        EVENING_FELLOWSHIP_365_PROMPTS[targetDayOfYear - 1] ||
+        EVENING_FELLOWSHIP_365_PROMPTS[0];
       const peaceItem =
         NIGHTLY_PEACE_365_SCRIPTURES[targetDayOfYear - 1] ||
         NIGHTLY_PEACE_365_SCRIPTURES[0];
@@ -182,12 +182,12 @@ export async function registerAllAutomatedNotifications(): Promise<boolean> {
         });
       }
 
-      // 4. Evening Streak Guardian at 20:30 (8:30 PM)
+      // 4. Evening Fellowship with Christ at 20:30 (8:30 PM)
       const eveningTrigger = new Date(targetDate);
       eveningTrigger.setHours(20, 30, 0, 0);
       if (eveningTrigger.getTime() > now.getTime()) {
         await Notifications.scheduleNotificationAsync({
-          identifier: `streak-guardian-day-${targetDayOfYear}`,
+          identifier: `evening-fellowship-day-${targetDayOfYear}`,
           content: {
             title: eveningItem.title,
             body: eveningItem.body,
@@ -196,7 +196,7 @@ export async function registerAllAutomatedNotifications(): Promise<boolean> {
           trigger: {
             type: Notifications.SchedulableTriggerInputTypes.DATE,
             date: eveningTrigger,
-            channelId: 'streak-guardian',
+            channelId: 'evening-fellowship',
           },
         });
       }
