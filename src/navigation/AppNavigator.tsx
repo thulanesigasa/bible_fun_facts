@@ -80,7 +80,7 @@ function HeaderBellButton({ navigation }: any) {
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate('Discover', { screen: 'Notifications' })}
-      style={{ paddingLeft: 16, paddingRight: 8, paddingVertical: 4, position: 'relative' }}
+      style={{ paddingRight: 16, paddingLeft: 8, paddingVertical: 4, position: 'relative' }}
       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       accessibilityRole="button"
       accessibilityLabel={`Notifications. ${unreadNotificationsCount} unread.`}
@@ -91,7 +91,7 @@ function HeaderBellButton({ navigation }: any) {
           style={{
             position: 'absolute',
             top: 2,
-            right: 4,
+            right: 10,
             minWidth: 15,
             height: 15,
             borderRadius: 7.5,
@@ -551,7 +551,7 @@ export default function AppNavigator() {
             options={({ navigation }) => ({
               title: 'Feed',
               tabBarIcon: ({ color }) => <DiscoverSvg size={16} color={color} strokeWidth={2} />,
-              headerLeft: () => <HeaderBellButton navigation={navigation} />,
+              headerRight: () => <HeaderBellButton navigation={navigation} />,
             })}
           />
           <Tab.Screen

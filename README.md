@@ -197,6 +197,8 @@ exegeomai/
 │   │   ├── Card.tsx                      # Surface-contained cards with 8px spacing
 │   │   ├── CustomTabBar.tsx              # Rule 20 floating pill tab navigation component
 │   │   ├── FactCard.tsx                  # Biblical fact card with Strong's deep dive
+│   │   ├── InAppNotificationBanner.tsx   # Real-time slide-in alert banner for in-app achievement unlocks
+│   │   ├── NotificationQuickSheet.tsx    # Interactive quick modal for notifications and devotions preview
 │   │   ├── ScriptureCard.tsx             # Scripture card with genre vector badges
 │   │   ├── SearchBar.tsx                 # Search input with clear button and chips
 │   │   ├── SvgIcons.tsx                  # Pure vector SVG library (zero emojis)
@@ -212,17 +214,21 @@ exegeomai/
 │   │   ├── dailyMessages.ts              # 365 calendar-synchronized daily exegesis dataset
 │   │   ├── mockDatabase.ts               # Curated scriptures, facts, and Strong's database
 │   │   ├── mockUsers.ts                  # 8 theological scholars, pastors, and exegetes with follower tracking
+│   │   ├── notificationVerses.ts         # 365 distinct daily scriptures (Morning, Identity, Strength, Fellowship, Peace)
 │   │   └── redLetterVerses.ts            # Canonical dataset of Jesus Christ's spoken words across NT books
 │   ├── navigation/
-│   │   └── AppNavigator.tsx              # Rule 20 floating pill tab navigation & stack navigators
+│   │   └── AppNavigator.tsx              # Rule 20 floating pill tab navigation & top-right bell header
 │   ├── screens/                          # Application views
+│   │   ├── AchievementsScreen.tsx        # 48 milestones, 4 distinct geometric tier shapes, 3-per-row grid
 │   │   ├── AuthScreen.tsx                # Dedicated Login & Sign Up with 28x28 calibrated logo
 │   │   ├── BookmarksScreen.tsx           # Dedicated Bookmarks continuous body view (flat rows, dotted underlines)
-│   │   ├── DiscoverScreen.tsx            # Daily 1-message calendar exegesis view (paddingBottom: 96)
+│   │   ├── DiscoverScreen.tsx            # Daily 1-message calendar exegesis view with top-right bell header
+│   │   ├── DownloadedVersesScreen.tsx    # Offline translations and verses view
 │   │   ├── FactDetailsScreen.tsx         # In-depth modal sheet for biblical facts
 │   │   ├── FavoritesScreen.tsx           # Saved collection (Facts, Scriptures, WOTD)
 │   │   ├── HistoryScreen.tsx             # Sacred History catalog of biblical authors with search & categories
 │   │   ├── HomeScreen.tsx                # Alternate home showcase
+│   │   ├── NotificationsScreen.tsx       # Dedicated Notifications center with filter tabs and mark-all-read
 │   │   ├── PrivacyPolicyScreen.tsx       # 11-section privacy policy modal screen
 │   │   ├── ProfileScreen.tsx             # Profile tab (Bookmarks, Red-letter toggle, Reader font size)
 │   │   ├── ScriptureDetailsScreen.tsx    # In-depth modal sheet for scripture texts
@@ -235,10 +241,13 @@ exegeomai/
 │   │   └── WriterDetailsScreen.tsx       # In-depth modal sheet for biblical author biography & manuscripts
 │   ├── services/
 │   │   ├── bibleService.ts               # Multi-tier Bible reading and chapter caching engine
-│   │   ├── notifications.ts              # Expo notifications handler and scheduler
+│   │   ├── inAppNotifications.ts         # In-app notification aggregator for sent push devotions and achievements
+│   │   ├── notifications.ts              # 365-day automated calendar push scheduler engine
 │   │   ├── offlineBibleService.ts        # Offline full-translation download, filesystem storage, and 0ms reader
 │   │   ├── supabase.ts                   # Supabase client SDK with AsyncStorage persistence
 │   │   └── updates.ts                    # Expo OTA updates check, download, and reload service
+│   ├── types/
+│   │   └── inAppNotifications.ts         # Data models and interfaces for in-app notification center
 │   └── theme/
 │       ├── colors.ts                     # Strict 60-30-10 light theme tokens
 │       └── index.ts                      # Spacing (8px grid), pillTabBar specs, and soft shadows

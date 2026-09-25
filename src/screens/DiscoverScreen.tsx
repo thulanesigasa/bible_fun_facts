@@ -22,11 +22,9 @@ import {
   ShareSvg,
   ScrollSvg,
   ShieldCheckSvg,
-  BellSvg,
 } from '../components/SvgIcons';
 import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
 import { StreakHexagonBadge } from '../components/StreakHexagonBadge';
-import { NotificationQuickSheet } from '../components/NotificationQuickSheet';
 import { InAppNotificationBanner } from '../components/InAppNotificationBanner';
 import { getTierInfoForDays } from '../data/streakMilestones';
 import { registerAllAutomatedNotifications } from '../services/notifications';
@@ -38,7 +36,6 @@ interface DiscoverScreenProps {
 export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
   const [refreshing, setRefreshing] = useState(false);
   const [showStreakModal, setShowStreakModal] = useState(false);
-  const [showNotificationsSheet, setShowNotificationsSheet] = useState(false);
 
   const {
     streak,
@@ -48,10 +45,6 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
     toggleFavoriteFact,
     isFactFavorited,
     lastReadBible,
-    notifications,
-    unreadNotificationsCount,
-    markNotificationAsRead,
-    markAllNotificationsAsRead,
     activeAchievementAlert,
     dismissAchievementAlert,
   } = useUser();
@@ -109,46 +102,7 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
           />
         }
       >
-        {/* Top Header Row: Bell on Top-Left, Streak on Top-Right */}
-        <View style={styles.topBarRow}>
-          <TouchableOpacity
-            style={styles.feedBellBtn}
-            onPress={() => setShowNotificationsSheet(true)}
-            activeOpacity={0.8}
-            accessibilityRole="button"
-            accessibilityLabel={`Notifications. ${unreadNotificationsCount} unread. Tap to view.`}
-          >
-            <View style={styles.bellIconBox}>
-              <BellSvg size={20} color={colors.textPrimary} />
-              {unreadNotificationsCount > 0 && (
-                <View style={styles.bellBadgeBubble}>
-                  <Text style={styles.bellBadgeText}>
-                    {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
-                  </Text>
-                </View>
-              )}
-            </View>
-            {unreadNotificationsCount > 0 && (
-              <View style={styles.alertPill}>
-                <Text variant="caption" weight="800" color="#0F172A" style={styles.alertPillText}>
-                  {`${unreadNotificationsCount} NEW`}
-                </Text>
-              </View>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.headerStreakBadgeOnlyBtn}
-            onPress={() => setShowStreakModal(true)}
-            activeOpacity={0.8}
-            accessibilityRole="button"
-            accessibilityLabel={`Streak ${streak || 1}. Tap to open streak badge.`}
-          >
-            <StreakHexagonBadge days={streak || 1} size={44} />
-          </TouchableOpacity>
-        </View>
-
-        {/* Header Greeting & Day Progress */}
+        {/* Header Greeting & Day Progress with Streak Hexagon Badge */}
         <View style={styles.headerRow}>
           <View style={styles.headerTextWrap}>
             <Text variant="h2" style={styles.headerTitle}>
@@ -158,6 +112,16 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
               Day {dayOfYear} of 365 • {todayMessage.calendarDate}
             </Text>
           </View>
+
+          <TouchableOpacity
+            style={styles.headerStreakBadgeOnlyBtn}
+            onPress={() => setShowStreakModal(true)}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel={`Streak ${streak || 1}. Tap to open streak badge.`}
+          >
+            <StreakHexagonBadge days={streak || 1} size={46} />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.hairlineDivider} />
@@ -318,7 +282,7 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
         alert={activeAchievementAlert}
         onPress={() => {
           dismissAchievementAlert();
-          setShowNotificationsSheet(true);
+          navigation.navigate('Notifications');
         }}
         onDismiss={dismissAchievementAlert}
       />
@@ -328,28 +292,6 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
         visible={showStreakModal}
         streak={streak}
         onClose={() => setShowStreakModal(false)}
-      />
-
-      {/* Notification & Achievement Quick Sheet */}
-      <NotificationQuickSheet
-        visible={showNotificationsSheet}
-        onClose={() => setShowNotificationsSheet(false)}
-        notifications={notifications}
-        unreadCount={unreadNotificationsCount}
-        onMarkAllRead={markAllNotificationsAsRead}
-        onNotificationPress={(item) => {
-          setShowNotificationsSheet(false);
-          markNotificationAsRead(item.id);
-          if (item.type === 'achievement') {
-            navigation.navigate('Achievements');
-          } else if (item.actionRoute) {
-            navigation.navigate(item.actionRoute, item.actionParams);
-          }
-        }}
-        onOpenNotificationsScreen={() => {
-          setShowNotificationsSheet(false);
-          navigation.navigate('Notifications');
-        }}
       />
     </SafeAreaView>
   );
@@ -370,65 +312,11 @@ const styles = StyleSheet.create({
     paddingBottom: 96,
     backgroundColor: '#FFFFFF',
   },
-  topBarRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingBottom: 8,
-  },
-  feedBellBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingVertical: 4,
-    paddingHorizontal: 2,
-  },
-  bellIconBox: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(15, 23, 42, 0.04)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
-    position: 'relative',
-  },
-  bellBadgeBubble: {
-    position: 'absolute',
-    top: -2,
-    right: -2,
-    minWidth: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: colors.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 3,
-    borderWidth: 1.5,
-    borderColor: '#FFFFFF',
-  },
-  bellBadgeText: {
-    fontSize: 8.5,
-    fontWeight: '800',
-    color: '#0F172A',
-  },
-  alertPill: {
-    backgroundColor: 'rgba(253, 210, 35, 0.18)',
-    borderWidth: 1,
-    borderColor: 'rgba(253, 210, 35, 0.4)',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: radius.full,
-  },
-  alertPillText: {
-    fontSize: 9.5,
-  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: 4,
+    paddingBottom: spacing.sm,
   },
   headerTextWrap: {
     flex: 1,
