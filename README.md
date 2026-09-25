@@ -50,6 +50,7 @@ graph TD
     
     DiscoverStack --> DiscoverMain["DiscoverScreen (1 Deterministic Message/Day + Day X of 365)"]
     DiscoverStack --> FactDetails["FactDetailsScreen (PageSheet Full Exegesis)"]
+    DiscoverStack --> NotificationsMain["NotificationsScreen (Notifications & Sacred Alerts Center)"]
     
     WOTDScreen --> BibleReader["Full 66-Book Holy Bible (WEB / KJV / BBE)"]
     WOTDScreen --> ExegesisLenses["4-Lens Daily Devotional (Original Intent, Theological Truth, Walk, Prayer)"]
@@ -1074,12 +1075,87 @@ An intelligent, non-intrusive local notification engine that runs completely off
 - **Native Android Notification Channels**: Full support for Android 8.0+ channel architecture (`morning-word`, `evening-fellowship`, `divine-affirmations`, `nightly-peace`) with calibrated amber brand accent illumination (`#FDD223`).
 - **Single Master Switch**: Controlled seamlessly by the existing single toggle in Profile Settings; automatically registers on app launch with zero configuration required.
 
+### 7. Feed Top-Left Notification Bell & Achievement Notification Center (`NotificationsScreen.tsx`, `NotificationQuickSheet.tsx`, `inAppNotifications.ts`)
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Feed%20Bell-Top--Left%20Dynamic%20Counter-FDD223?style=for-the-badge" alt="Feed Top-Left Bell" />
+  <img src="https://img.shields.io/badge/Real--Time-In--App%20Achievement%20Alerts-0F172A?style=for-the-badge" alt="Real-time In-App Achievement Alerts" />
+  <img src="https://img.shields.io/badge/Notification%20Center-Filters%20%26%20History-3B82F6?style=for-the-badge" alt="Notification Center" />
+</p>
+
+A seamless, real-time in-app notification center and Feed alert hub that bridges dispatched device push notifications with in-app study milestones:
+- **Top-Left Feed Bell Icon (`DiscoverScreen.tsx`)**: Prominently positioned on the top left of the Feed view, equipped with an interactive unread counter badge that dynamically displays unread counts (`1`, `2`, `9+`).
+- **Real-Time In-App Achievement Detection**: Automatically tracks study progress in real-time. When a user reaches an achievement milestone (e.g. streaks, bookmarks saved, verses highlighted, or messages shared) while actively inside the app, the unread count instantly increments to `1` (or more) and an animated in-app alert banner (`InAppNotificationBanner.tsx`) glides in from the top of the viewport.
+- **Interactive Quick Preview Sheet (`NotificationQuickSheet.tsx`)**: Tapping the Feed bell icon opens an elegant bottom sheet displaying:
+  - Total unread / unopened notifications indicated by a prominent number pill (`1 UNREAD`).
+  - What notification was sent: Displays the dispatched Morning Word, Midday Affirmation, Evening Fellowship with Christ, or Nightly Peace devotion for that day.
+  - What achievement was received: Highlights the unlocked milestone with badge tier, category, and target.
+  - One-tap "Mark all read" action.
+  - Prominent "View All Notifications ›" button navigating directly to the dedicated notification screen.
+- **Dedicated Notifications Screen (`NotificationsScreen.tsx`)**: Full stack screen featuring:
+  - Top summary with unread indicator badges.
+  - Category filter tabs: `All`, `Achievements`, and `Devotions`.
+  - Individual action cards with unread dot indicators, scriptural excerpts, and direct deep-links to the full Holy Bible reader (`WOTDScreen`) or the Study Achievements center (`AchievementsScreen`).
+  - Dismissal and read state persistence via `@exegeomai_read_notification_ids` and `@exegeomai_dismissed_notification_ids`.
+
+---
+
+## Directory Structure
+
+```text
+bible_fun_facts/
+├── assets/                          # Static branding, logos, onboarding images
+│   ├── logo-transparent.png
+│   └── onboarding/
+├── src/
+│   ├── components/                  # Reusable UI primitives and design system elements
+│   │   ├── Card.tsx
+│   │   ├── CategoryBadge.tsx
+│   │   ├── InAppNotificationBanner.tsx # Real-time achievement alert banner
+│   │   ├── NotificationQuickSheet.tsx  # Feed bell bottom sheet modal
+│   │   ├── StreakHexagonBadge.tsx   # 3D calibrated achievement & streak badges
+│   │   ├── StreakMilestoneModal.tsx # Full achievement milestone detail modal
+│   │   ├── SvgIcons.tsx             # Pure SVG icons (BellSvg, AwardSvg, BookOpenSvg, etc.)
+│   │   ├── Typography.tsx           # Scaled design system typography
+│   │   └── UpdateModal.tsx          # Dual-action OTA update prompt modal
+│   ├── context/
+│   │   └── UserContext.tsx          # Global user state, study tracking & notification state
+│   ├── data/
+│   │   ├── achievements.ts          # 48 study milestones across 4 categories
+│   │   ├── biblicalWriters.ts       # 26 canonical biblical author profiles
+│   │   ├── dailyMessages.ts         # 365 daily exegesis feed messages
+│   │   └── notificationVerses.ts    # 365-day canonical scripture notification datasets
+│   ├── navigation/
+│   │   └── AppNavigator.tsx         # Bottom tab, auth stack, and screen navigation
+│   ├── screens/                     # Primary application screens
+│   │   ├── AchievementsScreen.tsx   # 48-milestone study achievements showcase
+│   │   ├── DiscoverScreen.tsx       # Daily feed with top-left bell and streak badge
+│   │   ├── FactDetailsScreen.tsx    # Comprehensive scholarly exegesis details
+│   │   ├── HistoryScreen.tsx        # Canonical authors & manuscript history
+│   │   ├── NotificationsScreen.tsx  # Full notification & achievement center
+│   │   ├── ProfileScreen.tsx        # Settings, reading preferences & saved collection
+│   │   ├── SearchScreen.tsx         # Believer community discovery & scholar profiles
+│   │   └── WOTDScreen.tsx           # Full 66-book Holy Bible reader & daily exegesis
+│   ├── services/
+│   │   ├── inAppNotifications.ts    # In-app notifications & achievement state service
+│   │   ├── notifications.ts         # Native OS background notification alarms
+│   │   └── supabase.ts              # Supabase authentication and remote persistence
+│   └── theme/                       # 60-30-10 color tokens, spacing & radius
+├── .gitignore
+├── .npmrc                           # legacy-peer-deps=true
+├── app.json                         # Expo configuration, plugins & runtime version
+├── package.json
+├── README.md
+└── tsconfig.json
+```
+
 ---
 
 ### Type Checking & Validation
 ```bash
 npx tsc --noEmit
 ```
+
 
 ---
 

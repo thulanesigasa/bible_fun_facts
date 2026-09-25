@@ -73,6 +73,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     completedWOTDs,
     followedUserIds,
     toggleFavoriteScripture,
+    unreadNotificationsCount,
   } = useUser();
 
   const [isUploading, setIsUploading] = useState(false);
@@ -756,6 +757,42 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
               onValueChange={handleToggleNotifications}
             />
           </View>
+
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={() => navigation.navigate('Notifications')}
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel="Open Notification Center"
+          >
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Notification Center
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                Review past sent devotions and unlocked achievements
+              </Text>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              {unreadNotificationsCount > 0 && (
+                <View
+                  style={{
+                    backgroundColor: colors.accent,
+                    paddingHorizontal: 8,
+                    paddingVertical: 2,
+                    borderRadius: 10,
+                  }}
+                >
+                  <Text style={{ fontSize: 9.5, fontWeight: '800', color: '#0F172A' }}>
+                    {`${unreadNotificationsCount} NEW`}
+                  </Text>
+                </View>
+              )}
+              <Text variant="caption" weight="700" color={colors.accent}>
+                Open ›
+              </Text>
+            </View>
+          </TouchableOpacity>
         </View>
 
         {/* 3. SAVED CONTENT (ZERO ICONS, CONTINUOUS BODY) */}
