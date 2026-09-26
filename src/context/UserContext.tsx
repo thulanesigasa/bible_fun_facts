@@ -141,6 +141,7 @@ interface AppContextType extends UserState {
   isAppLocked: boolean;
   setIsAppLocked: (locked: boolean) => void;
   unlockApp: () => Promise<boolean>;
+  unlockDirectly: () => void;
   lockTimeoutSeconds: number;
   setLockTimeoutSeconds: (seconds: number) => Promise<void>;
   isPrivacyShieldEnabled: boolean;
@@ -1446,6 +1447,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return false;
   }, []);
 
+  const unlockDirectly = useCallback(() => {
+    setIsAppLocked(false);
+  }, []);
+
   // ----------------------------------------------------
   // Data Portability & Account Purge (GDPR / POPIA / App Store)
   // ----------------------------------------------------
@@ -1599,6 +1604,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isAppLocked,
       setIsAppLocked,
       unlockApp,
+      unlockDirectly,
       lockTimeoutSeconds,
       setLockTimeoutSeconds,
       isPrivacyShieldEnabled,

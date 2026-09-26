@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -15,22 +15,92 @@ import { PinSecurityService } from '../services/pinSecurityService';
 interface BiometricLockOverlayProps {
   visible: boolean;
   biometricType?: string | null;
-  onUnlock: () => void;
+  onUnlock?: () => void;
+  onUnlockBiometric?: () => Promise<boolean>;
+  onUnlockDirectly?: () => void;
 }
 
 export const BiometricLockOverlay: React.FC<BiometricLockOverlayProps> = ({
   visible,
   biometricType = 'Fingerprint',
   onUnlock,
+  onUnlockBiometric,
+  onUnlockDirectly,
 }) => {
-  const [showPinModal, setShowPinModal] = React.useState<boolean>(false);
-  const [hasPin, setHasPin] = React.useState<boolean>(false);
+  const [showPinModal, setShowPinModal] = useState<boolean>(false);
+  const [hasPin, setHasPin] = useState<boolean>(false);
+  const [biometricFailures, setBiometricFailures] = useState<number>(0);
+  const [biometricErrorNotice, setBiometricErrorNotice] = useState<string | null>(null);
+  const [pinNoticeMessage, setPinNoticeMessage] = useState<string | null>(null);
 
-  React.useEffect(() => {
+  const directUnlock = onUnlockDirectly || onUnlock || (() => {});
+  const hasAutoPromptedRef = useRef<boolean>(false);
+
+  useEffect(() => {
     if (visible) {
       PinSecurityService.isPinSet().then(setHasPin);
+      setBiometricFailures(0);
+      setBiometricErrorNotice(null);
+      setPinNoticeMessage(null);
+
+      // Auto-trigger biometric on initial lock appearance once if available
+      if (onUnlockBiometric && !hasAutoPromptedRef.current) {
+        hasAutoPromptedRef.current = true;
+        // Small delay to ensure smooth transition
+        const timer = setTimeout(() => {
+          handleBiometricAuth();
+        }, 200);
+        return () => clearTimeout(timer);
+      }
+    } else {
+      setShowPinModal(false);
+      hasAutoPromptedRef.current = false;
     }
   }, [visible]);
+
+  const handleBiometricAuth = async () => {
+    if (!onUnlockBiometric) return;
+    setBiometricErrorNotice(null);
+
+    const success = await onUnlockBiometric();
+    if (success) {
+      setBiometricFailures(0);
+      setBiometricErrorNotice(null);
+      // App unlocked via UserContext.isAppLocked = false
+    } else {
+      const nextFailures = biometricFailures + 1;
+      setBiometricFailures(nextFailures);
+
+      if (nextFailures >= 5) {
+        // Fingerprint failed 5 times -> automatically taken to PIN!
+        setBiometricFailures(0);
+        setBiometricErrorNotice(null);
+        setPinNoticeMessage('Fingerprint failed 5 times. Enter PIN to unlock.');
+        setShowPinModal(true);
+      } else {
+        const remaining = 5 - nextFailures;
+        setBiometricErrorNotice(
+          `${biometricType || 'Fingerprint'} failed. ${remaining} ${remaining === 1 ? 'attempt' : 'attempts'} remaining before PIN fallback.`
+        );
+      }
+    }
+  };
+
+  const handlePinSuccess = () => {
+    // When PIN is entered correctly, immediately unlock the app with zero biometric prompt
+    setShowPinModal(false);
+    setBiometricFailures(0);
+    setBiometricErrorNotice(null);
+    setPinNoticeMessage(null);
+    directUnlock();
+  };
+
+  const handlePinFallbackToBiometric = () => {
+    // Vice versa: when PIN fails 5 times, automatically take the user to biometric/fingerprint
+    setShowPinModal(false);
+    setPinNoticeMessage(null);
+    handleBiometricAuth();
+  };
 
   if (!visible) return null;
 
@@ -46,7 +116,7 @@ export const BiometricLockOverlay: React.FC<BiometricLockOverlayProps> = ({
             resizeMode="contain"
           />
 
-          {/* App Name Only (Secured text removed per user instruction) */}
+          {/* App Name Only */}
           <Text variant="h2" weight="800" color="#0F172A" style={styles.title}>
             exégeomai
           </Text>
@@ -55,24 +125,36 @@ export const BiometricLockOverlay: React.FC<BiometricLockOverlayProps> = ({
             Your sacred study journal, bookmarks, and reflections are locked.
           </Text>
 
-          {/* Aesthetic Text-Styled Actions (Chunky buttons removed per user instruction) */}
+          {/* Optional notice text when biometric attempts fail */}
+          {biometricErrorNotice && (
+            <View style={styles.noticeBox}>
+              <Text variant="caption" weight="700" color="#DC2626" style={styles.noticeText}>
+                {biometricErrorNotice}
+              </Text>
+            </View>
+          )}
+
+          {/* Aesthetic Text-Styled Actions */}
           <View style={styles.actionsContainer}>
             <TouchableOpacity
               style={styles.textActionButton}
-              onPress={onUnlock}
+              onPress={handleBiometricAuth}
               activeOpacity={0.7}
               accessibilityRole="button"
-              accessibilityLabel="Unlock with Fingerprint"
+              accessibilityLabel={`Unlock with ${biometricType || 'Fingerprint'}`}
             >
               <Text variant="body" weight="700" color="#0F172A" style={styles.actionText}>
-                Unlock with Fingerprint
+                Unlock with {biometricType || 'Fingerprint'}
               </Text>
             </TouchableOpacity>
 
             {hasPin && (
               <TouchableOpacity
                 style={styles.secondaryTextActionButton}
-                onPress={() => setShowPinModal(true)}
+                onPress={() => {
+                  setPinNoticeMessage(null);
+                  setShowPinModal(true);
+                }}
                 activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityLabel="Use Security PIN"
@@ -90,8 +172,10 @@ export const BiometricLockOverlay: React.FC<BiometricLockOverlayProps> = ({
       <SecurityPinModal
         visible={showPinModal}
         mode="verify"
-        onSuccess={onUnlock}
+        initialNotice={pinNoticeMessage}
+        onSuccess={handlePinSuccess}
         onClose={() => setShowPinModal(false)}
+        onFallbackToBiometric={handlePinFallbackToBiometric}
       />
     </>
   );
@@ -132,7 +216,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 19,
     color: '#64748B',
-    marginBottom: 36,
+    marginBottom: 24,
+  },
+  noticeBox: {
+    marginBottom: 16,
+    paddingHorizontal: 12,
+  },
+  noticeText: {
+    fontSize: 12,
+    textAlign: 'center',
   },
   actionsContainer: {
     alignItems: 'center',

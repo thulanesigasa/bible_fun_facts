@@ -240,7 +240,14 @@ The application replaces all native OS alert dialogs with a unified, custom Reac
     - Disallows identical new PIN to existing current PIN in change flow (`newPin !== currentPin`).
     - Prohibits consecutive identical digits (e.g. `00`, `11`, `22`, etc. via `/(.)\1/`).
     - Dispatches instant animated shake feedback and clear descriptive error messaging on invalid input.
-  - **Brand Logo Alert Dialogs**: When PIN is successfully created or updated, `ThemedAlertModal` displays the 50x50 brand app logo (`logo-transparent.png`) centered inside a 68x68 container per Rule 15 & 19, replacing generic green checkmark tick icons.
+  - **Brand Logo Alert Dialogs & Logo Alone**:
+    - When PIN is successfully created or updated, `ThemedAlertModal` displays the brand app logo (`logo-transparent.png`) alone without container frames or border radiuses.
+    - In `SecurityPinModal`, all outer container boxes, backgrounds, and image border radiuses have been eliminated, rendering the master logo cleanly alone.
+- **Bi-Directional Unlock Lifecycle & Fallback (`BiometricLockOverlay.tsx` & `UserContext.tsx`)**:
+  - **Direct PIN Unlock (`unlockDirectly`)**: When a valid 4-digit PIN is entered in `SecurityPinModal`, the app unlocks immediately into the reading canvas without redundant secondary biometric prompts.
+  - **Bi-Directional 5-Failure Fallback**:
+    - If biometric/fingerprint authentication fails 5 consecutive times, `BiometricLockOverlay` automatically opens `SecurityPinModal` with an informative notice.
+    - Vice versa: if PIN verification fails 5 times, `SecurityPinModal` automatically hands off execution back to biometric/fingerprint authentication.
 - **Pure Body Canvas & Zero Extraneous Iconography / Div Policy**:
   - Screens across the security and settings hierarchy completely eliminate bulky card/box container divs and decorative icons:
     - **`ExportJournalScreen.tsx`**: Removed top logo header and card wrapper divs (`formatCard`, `manifestCard`). Export formats and archive manifest metrics integrate directly into the body canvas.

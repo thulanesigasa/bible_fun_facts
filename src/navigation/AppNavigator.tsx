@@ -712,6 +712,7 @@ export default function AppNavigator() {
     isAppLocked,
     biometricType,
     unlockApp,
+    unlockDirectly,
     isPrivacyShieldEnabled,
   } = useApp();
   const { width } = useWindowDimensions();
@@ -723,7 +724,9 @@ export default function AppNavigator() {
       <BiometricLockOverlay
         visible={isAppLocked}
         biometricType={biometricType}
-        onUnlock={unlockApp}
+        onUnlock={unlockDirectly}
+        onUnlockBiometric={unlockApp}
+        onUnlockDirectly={unlockDirectly}
       />
       {!userProfile ? (
         <AuthStack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
