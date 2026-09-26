@@ -13,7 +13,6 @@ import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
 import { useUser } from '../context/UserContext';
-import { TypefaceSvg } from '../components/SvgIcons';
 import { UiverseSwitch } from '../components/UiverseSwitch';
 
 interface FontTypeOption {
@@ -120,36 +119,29 @@ export default function ReadingSettingsScreen() {
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header Hero Card */}
-        <View style={[styles.heroCard, shadow.sm]}>
-          <View style={styles.heroIconContainer}>
-            <TypefaceSvg size={28} color="#0F172A" />
-          </View>
-          <View style={styles.heroContent}>
-            <Text variant="h3" style={styles.heroTitle}>
-              Reading & Typography
-            </Text>
-            <Text variant="body" color={colors.textSecondary} style={styles.heroDescription}>
-              Customize Scripture readability, typography scales, and Christological emphasis.
-            </Text>
-          </View>
-        </View>
-
-        {/* 1. FONT SIZE SECTION */}
-        <View style={styles.sectionHeaderBox}>
-          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
-            FONT SCALE & SLIDER
+        {/* Intro Typography - Part of the Seamless Body Canvas (Zero Icons, Zero Divs) */}
+        <View style={styles.headerBlock}>
+          <Text variant="h2" weight="800" color={colors.textPrimary} style={styles.title}>
+            Reading & Typography
+          </Text>
+          <Text variant="body" color={colors.textSecondary} style={styles.subtitle}>
+            Customize Scripture readability, typography scales, and Christological emphasis across all canon chapters.
           </Text>
         </View>
 
-        <View style={styles.settingCard}>
+        {/* 1. FONT SCALE & SLIDER */}
+        <View style={styles.sectionBlock}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+            FONT SCALE & SLIDER
+          </Text>
+
           <View style={styles.rowHeader}>
             <View style={styles.rowTitleBox}>
               <Text variant="h3" style={styles.rowTitle}>
                 Reading Font Size
               </Text>
               <Text variant="caption" color={colors.textSecondary}>
-                Scroll 1px–24px or enter number
+                Slide 1px–24px or tap to enter exact value
               </Text>
             </View>
 
@@ -236,14 +228,14 @@ export default function ReadingSettingsScreen() {
             </Text>
           </View>
 
-          {/* Scripture Real-Time Live Preview Box */}
+          {/* Scripture Real-Time Live Preview */}
           <View style={styles.previewBox}>
             <Text
               style={[
                 styles.previewText,
                 {
                   fontSize: currentFontSize,
-                  lineHeight: Math.max(14, currentFontSize * 1.5),
+                  lineHeight: Math.max(16, currentFontSize * 1.55),
                   fontFamily: selectedFamily,
                   color: redLetter ? '#DC2626' : colors.textPrimary,
                 },
@@ -258,13 +250,11 @@ export default function ReadingSettingsScreen() {
         </View>
 
         {/* 2. TYPOGRAPHY PRESETS */}
-        <View style={[styles.sectionHeaderBox, { marginTop: spacing.lg }]}>
+        <View style={styles.sectionBlock}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             PRIMARY READER TYPEFACE
           </Text>
-        </View>
 
-        <View style={styles.settingCard}>
           <View style={styles.fontTypePillsRow}>
             {FONT_TYPE_OPTIONS.map((opt) => {
               const isSelected = currentFontType === opt.key;
@@ -296,20 +286,18 @@ export default function ReadingSettingsScreen() {
         </View>
 
         {/* 3. CHRISTOLOGICAL RED-LETTER EMPHASIS */}
-        <View style={[styles.sectionHeaderBox, { marginTop: spacing.lg }]}>
+        <View style={[styles.sectionBlock, { borderBottomWidth: 0 }]}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             DEVOTIONAL HIGHLIGHTS
           </Text>
-        </View>
 
-        <View style={styles.settingCard}>
           <View style={styles.actionRow}>
             <View style={styles.rowTitleBox}>
               <Text variant="h3" style={styles.rowTitle}>
                 Words of Jesus in Red
               </Text>
-              <Text variant="caption" color={colors.textSecondary}>
-                Highlight the spoken words of Christ in red throughout Scripture
+              <Text variant="caption" color={colors.textSecondary} style={styles.rowDescription}>
+                Highlight the spoken words of Christ in red throughout all Scripture
               </Text>
             </View>
             <UiverseSwitch
@@ -333,59 +321,35 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
+    paddingHorizontal: spacing.md, // 16px
+    paddingTop: spacing.lg,        // 24px
     paddingBottom: 48,
   },
-  heroCard: {
-    backgroundColor: colors.surface, // 30% Panel #FFFFFF
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+  headerBlock: {
     marginBottom: spacing.lg,
   },
-  heroIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: radius.md,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.md,
+  title: {
+    marginBottom: 6,
   },
-  heroContent: {
-    flex: 1,
-  },
-  heroTitle: {
-    color: colors.textPrimary,
-    marginBottom: 4,
-  },
-  heroDescription: {
+  subtitle: {
     fontSize: 13,
-    lineHeight: 18,
+    lineHeight: 19,
   },
-  sectionHeaderBox: {
-    marginBottom: 4,
-    paddingHorizontal: 4,
+  sectionBlock: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
+    paddingBottom: spacing.lg,
+    marginBottom: spacing.lg,
   },
   sectionHeader: {
     letterSpacing: 1.2,
-  },
-  settingCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
+    marginBottom: spacing.md,
   },
   rowHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
   rowTitleBox: {
     flex: 1,
@@ -393,23 +357,26 @@ const styles = StyleSheet.create({
   },
   rowTitle: {
     color: colors.textPrimary,
-    marginBottom: 2,
+    marginBottom: 3,
+  },
+  rowDescription: {
+    fontSize: 12,
+    lineHeight: 17,
   },
   fontSizeInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.background,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: radius.md,
+    borderColor: 'rgba(15, 23, 42, 0.12)',
+    borderRadius: radius.sm,
     paddingHorizontal: 8,
     height: 38,
     minWidth: 58,
     justifyContent: 'center',
   },
   fontSizeInputContainerFocused: {
-    borderColor: colors.accent,
-    backgroundColor: colors.surface,
+    borderColor: '#0F172A',
   },
   fontSizeInputField: {
     fontSize: 15,
@@ -426,7 +393,7 @@ const styles = StyleSheet.create({
   sliderRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 4,
+    marginVertical: spacing.sm,
   },
   sliderBoundLabel: {
     minWidth: 32,
@@ -451,7 +418,7 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: colors.border,
+    backgroundColor: 'rgba(15, 23, 42, 0.1)',
     borderRadius: 3,
   },
   sliderFill: {
@@ -459,7 +426,7 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: colors.accent,
+    backgroundColor: '#0F172A',
     borderRadius: 3,
   },
   sliderThumb: {
@@ -468,18 +435,18 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: colors.surface,
+    backgroundColor: '#FFFFFF',
     borderWidth: 2.5,
-    borderColor: colors.accent,
+    borderColor: '#0F172A',
     marginLeft: -12,
   },
   previewBox: {
     marginTop: spacing.md,
     padding: spacing.md,
-    backgroundColor: colors.background,
+    backgroundColor: '#FFFFFF',
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
   },
   previewText: {
     marginBottom: spacing.sm,
@@ -494,26 +461,27 @@ const styles = StyleSheet.create({
   },
   fontTypePill: {
     paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: radius.md,
-    backgroundColor: colors.background,
+    paddingHorizontal: 14,
+    borderRadius: radius.sm,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(15, 23, 42, 0.12)',
   },
   fontTypePillActive: {
-    backgroundColor: colors.accent,
-    borderColor: colors.accent,
+    backgroundColor: '#0F172A',
+    borderColor: '#0F172A',
   },
   fontTypePillText: {
     color: colors.textPrimary,
   },
   fontTypePillTextActive: {
-    color: '#0F172A',
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   actionRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingVertical: 4,
   },
 });

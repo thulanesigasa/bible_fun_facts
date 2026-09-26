@@ -74,27 +74,6 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     followedUserIds,
     toggleFavoriteScripture,
     unreadNotificationsCount,
-    isBiometricSupported,
-    biometricType,
-    isBiometricLockEnabled,
-    setBiometricLockEnabled,
-    lockTimeoutSeconds,
-    setLockTimeoutSeconds,
-    isPrivacyShieldEnabled,
-    setPrivacyShieldEnabled,
-    isPinSet,
-    refreshPinStatus,
-    isPrivateStudyMode,
-    setPrivateStudyMode,
-    isDiscoverableInSearch,
-    setDiscoverableInSearch,
-    showStreaksPublicly,
-    setShowStreaksPublicly,
-    privateStudyNotes,
-    setPrivateStudyNotes,
-    blockedUserIds,
-    exportStudyJournal,
-    deleteAccountAndPurgeData,
   } = useUser();
   const { showAlert } = useThemedAlert();
 
@@ -543,26 +522,12 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                 Notification Center
               </Text>
               <Text variant="caption" color={colors.textSecondary}>
-                Review past sent devotions and unlocked achievements
+                {unreadNotificationsCount > 0
+                  ? `${unreadNotificationsCount} unread • Review past sent devotions`
+                  : 'Review past sent devotions and unlocked achievements'}
               </Text>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              {unreadNotificationsCount > 0 && (
-                <View
-                  style={{
-                    backgroundColor: colors.accent,
-                    paddingHorizontal: 8,
-                    paddingVertical: 2,
-                    borderRadius: 10,
-                  }}
-                >
-                  <Text style={{ fontSize: 9.5, fontWeight: '800', color: '#0F172A' }}>
-                    {`${unreadNotificationsCount} NEW`}
-                  </Text>
-                </View>
-              )}
-              <Text style={styles.rowDisclosureArrow}>›</Text>
-            </View>
+            <Text style={styles.rowDisclosureArrow}>›</Text>
           </TouchableOpacity>
         </View>
 

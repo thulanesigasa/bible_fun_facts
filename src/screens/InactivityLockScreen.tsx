@@ -7,14 +7,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
-import { spacing, radius, shadow } from '../theme';
+import { spacing } from '../theme';
 import { Text } from '../components/Typography';
 import { useUser } from '../context/UserContext';
-import {
-  ClockSvg,
-  CheckCircleSvg,
-  ShieldLockSvg,
-} from '../components/SvgIcons';
+import { CheckCircleSvg } from '../components/SvgIcons';
 import { LOCK_TIMEOUT_OPTIONS } from '../services/biometricService';
 
 export default function InactivityLockScreen() {
@@ -27,29 +23,22 @@ export default function InactivityLockScreen() {
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        {/* Informational Header Card */}
-        <View style={[styles.infoCard, shadow.sm]}>
-          <View style={styles.infoIconContainer}>
-            <ClockSvg size={24} color="#0F172A" />
-          </View>
-          <View style={styles.infoContent}>
-            <Text variant="h3" style={styles.infoTitle}>
-              Inactivity Auto-Lock
-            </Text>
-            <Text variant="body" color={colors.textSecondary} style={styles.infoDescription}>
-              Select how quickly exégeomai locks after being minimized or left unattended. Once locked, biometric authentication or your 4-digit PIN is required to resume study.
-            </Text>
-          </View>
-        </View>
-
-        {/* Options Section */}
-        <View style={styles.sectionHeaderBox}>
-          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
-            LOCK TIMEOUT DURATION
+        {/* Intro Typography - Part of the Seamless Body Canvas (Zero Icons, Zero Divs) */}
+        <View style={styles.headerBlock}>
+          <Text variant="h2" weight="800" color={colors.textPrimary} style={styles.title}>
+            Inactivity Auto-Lock
+          </Text>
+          <Text variant="body" color={colors.textSecondary} style={styles.subtitle}>
+            Select how quickly exégeomai locks after being minimized or left unattended. Once locked, biometric authentication or your 4-digit PIN is required to resume study.
           </Text>
         </View>
 
-        <View style={styles.optionsList}>
+        {/* Options Section - Direct Body List */}
+        <View style={styles.sectionBlock}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+            LOCK TIMEOUT DURATION
+          </Text>
+
           {LOCK_TIMEOUT_OPTIONS.map((option, index) => {
             const isSelected = lockTimeoutSeconds === option.seconds;
             return (
@@ -81,7 +70,7 @@ export default function InactivityLockScreen() {
                   </View>
                   <View style={styles.indicatorContainer}>
                     {isSelected ? (
-                      <CheckCircleSvg size={22} color="#0F172A" strokeWidth={2.5} />
+                      <CheckCircleSvg size={20} color="#0F172A" strokeWidth={2.5} />
                     ) : (
                       <View style={styles.unselectedRadio} />
                     )}
@@ -92,10 +81,9 @@ export default function InactivityLockScreen() {
           })}
         </View>
 
-        {/* Security Note */}
-        <View style={styles.securityFooterNote}>
-          <ShieldLockSvg size={16} color={colors.textTertiary} />
-          <Text variant="caption" color={colors.textTertiary} style={styles.securityFooterText}>
+        {/* Security Note - Clean Body Text */}
+        <View style={styles.footerNote}>
+          <Text variant="caption" color={colors.textTertiary} style={styles.footerText}>
             Protected by hardware-level AES-256 Android Keystore & iOS Keychain
           </Text>
         </View>
@@ -114,63 +102,39 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: spacing.md, // 16px
-    paddingTop: spacing.md,        // 16px
+    paddingTop: spacing.lg,        // 24px
     paddingBottom: 48,
   },
-  infoCard: {
-    backgroundColor: colors.surface, // 30% Panel #FFFFFF
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: spacing.lg, // 24px
+  headerBlock: {
+    marginBottom: spacing.lg,
   },
-  infoIconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.md,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.md,
+  title: {
+    marginBottom: 6,
   },
-  infoContent: {
-    flex: 1,
-  },
-  infoTitle: {
-    color: colors.textPrimary,
-    marginBottom: 4,
-  },
-  infoDescription: {
+  subtitle: {
     fontSize: 13,
-    lineHeight: 18,
+    lineHeight: 19,
   },
-  sectionHeaderBox: {
-    marginBottom: spacing.sm,
-    paddingHorizontal: 4,
+  sectionBlock: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
+    paddingBottom: spacing.lg,
+    marginBottom: spacing.lg,
   },
   sectionHeader: {
     letterSpacing: 1.2,
-  },
-  optionsList: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: 'hidden',
+    marginBottom: spacing.md,
   },
   optionRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 14,
-    paddingHorizontal: spacing.md,
-    backgroundColor: colors.surface,
+    paddingHorizontal: 4,
   },
   optionRowActive: {
-    backgroundColor: 'rgba(253, 210, 35, 0.08)', // subtle brand tint
+    backgroundColor: 'rgba(253, 210, 35, 0.06)',
+    borderRadius: 8,
   },
   optionContent: {
     flex: 1,
@@ -178,15 +142,15 @@ const styles = StyleSheet.create({
   },
   optionTitle: {
     color: colors.textPrimary,
-    marginBottom: 2,
+    marginBottom: 3,
   },
   optionTitleActive: {
     color: colors.accent,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   optionDescription: {
     fontSize: 12,
-    lineHeight: 16,
+    lineHeight: 17,
   },
   indicatorContainer: {
     width: 24,
@@ -195,26 +159,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   unselectedRadio: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: 'rgba(15, 23, 42, 0.2)',
   },
   divider: {
     height: 1,
-    backgroundColor: colors.border,
+    backgroundColor: 'rgba(15, 23, 42, 0.05)',
   },
-  securityFooterNote: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: spacing.xl, // 32px
-    paddingHorizontal: spacing.sm,
+  footerNote: {
+    marginTop: spacing.md,
+    paddingHorizontal: 4,
   },
-  securityFooterText: {
+  footerText: {
     fontSize: 11,
+    lineHeight: 16,
     textAlign: 'center',
   },
 });
