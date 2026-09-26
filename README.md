@@ -31,6 +31,9 @@
   <img src="https://img.shields.io/badge/Digital%20Sabbath-Quiet%20Hours%20%7C%20Rest%20Windows-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Digital Sabbath Quiet Hours" />
   <img src="https://img.shields.io/badge/Device%20Security-Audit%20Log%20%7C%20Session%20Revocation-FDD223?style=for-the-badge&logo=shield&logoColor=white" alt="Device Security and Audit Log" />
   <img src="https://img.shields.io/badge/Content%20Filter-Fellowship%20Moderation%20%7C%20Eph%204%3A29-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Fellowship Content Moderation" />
+  <img src="https://img.shields.io/badge/Auth-Username%20%7C%20Email%20Login-10B981?style=for-the-badge&logo=supabase&logoColor=white" alt="Username and Email Login" />
+  <img src="https://img.shields.io/badge/Unfolded%20Metric-Verified%20Read%20Facts%20Only-FDD223?style=for-the-badge" alt="Truthful Unfolded Count" />
+  <img src="https://img.shields.io/badge/Notifications-Zero%20Phantom%20Backlog-10B981?style=for-the-badge" alt="Zero Phantom Notifications" />
   <img src="https://img.shields.io/badge/Privacy-GDPR%20%7C%20POPIA%20%7C%20Data%20Export-3B82F6?style=for-the-badge" alt="Data Portability and Purge" />
   <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
@@ -303,7 +306,9 @@ exegeomai/
 │   ├── seed.sql                          # Production seed dataset (categories, facts, scriptures, WOTD)
 │   ├── migrations/                       # Database schema and RLS policies
 │   │   ├── 20260920000000_create_profiles_and_avatars.sql # profiles table, trigger, and avatars bucket
-│   │   └── 20260920000001_create_production_schema.sql   # Complete 8-table relational production schema
+│   │   ├── 20260920000001_create_production_schema.sql   # Complete 8-table relational production schema
+│   │   ├── 20260923000000_add_streak_and_unfolded_to_profiles.sql # streak, facts_viewed_count, last_login_date
+│   │   └── 20260926000000_add_email_to_profiles.sql      # email column, username resolution RPC, facts reset
 │   └── .gitignore                        # Supabase ignore rules
 ├── .env.example                          # Environment template for all Supabase connections
 ├── .gitignore                            # Standard git exclusion rules (includes .env and .agents)
