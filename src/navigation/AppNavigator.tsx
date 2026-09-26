@@ -50,6 +50,11 @@ import QuietHoursScreen from '../screens/QuietHoursScreen';
 import DeviceSessionsScreen from '../screens/DeviceSessionsScreen';
 import ExportJournalScreen from '../screens/ExportJournalScreen';
 import DeleteAccountScreen from '../screens/DeleteAccountScreen';
+import SecurityScreen from '../screens/SecurityScreen';
+import InactivityLockScreen from '../screens/InactivityLockScreen';
+import ReadingSettingsScreen from '../screens/ReadingSettingsScreen';
+import PrivacyScreen from '../screens/PrivacyScreen';
+import SecurityPinScreen from '../screens/SecurityPinScreen';
 
 export type AuthStackParamList = {
   Welcome: undefined;
@@ -83,6 +88,11 @@ export type RootStackParamList = {
   DeviceSessions: undefined;
   ExportJournal: undefined;
   DeleteAccount: undefined;
+  Security: undefined;
+  InactivityLock: undefined;
+  ReadingSettings: undefined;
+  Privacy: undefined;
+  SecurityPin: undefined;
 };
 
 const Tab = createBottomTabNavigator();
@@ -154,6 +164,11 @@ function shouldShowTabHeader(route: any): boolean {
     'DeviceSessions',
     'ExportJournal',
     'DeleteAccount',
+    'Security',
+    'InactivityLock',
+    'ReadingSettings',
+    'Privacy',
+    'SecurityPin',
   ];
   return !childScreens.includes(routeName);
 }
@@ -170,7 +185,12 @@ function getTabBarVisibility(route: any, hideTabBar: boolean): 'none' | 'flex' {
     routeName === 'QuietHours' ||
     routeName === 'DeviceSessions' ||
     routeName === 'ExportJournal' ||
-    routeName === 'DeleteAccount'
+    routeName === 'DeleteAccount' ||
+    routeName === 'Security' ||
+    routeName === 'InactivityLock' ||
+    routeName === 'ReadingSettings' ||
+    routeName === 'Privacy' ||
+    routeName === 'SecurityPin'
   ) {
     return 'none';
   }
@@ -559,6 +579,101 @@ function ProfileStack() {
         options={{
           headerShown: true,
           title: 'Delete Account & Purge',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="Security"
+        component={SecurityScreen}
+        options={{
+          headerShown: true,
+          title: 'Safety & Security',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="Privacy"
+        component={PrivacyScreen}
+        options={{
+          headerShown: true,
+          title: 'Privacy',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="SecurityPin"
+        component={SecurityPinScreen}
+        options={{
+          headerShown: true,
+          title: '4-Digit Security PIN',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="InactivityLock"
+        component={InactivityLockScreen}
+        options={{
+          headerShown: true,
+          title: 'Inactivity Auto-Lock',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="ReadingSettings"
+        component={ReadingSettingsScreen}
+        options={{
+          headerShown: true,
+          title: 'Reading & Typography',
           headerStyle: {
             backgroundColor: '#FFFFFF',
           },

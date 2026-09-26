@@ -976,6 +976,14 @@ export const InfoCircleSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#028
 );
 
 
+export const TypefaceSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#0F172A', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M4 7V4h16v3M9 20h6M12 4v16" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+
+
 
 
 

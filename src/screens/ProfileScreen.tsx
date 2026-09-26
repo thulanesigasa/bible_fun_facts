@@ -36,9 +36,6 @@ import {
 } from '../services/bibleService';
 import { UiverseSwitch } from '../components/UiverseSwitch';
 import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
-import { LockTimeoutModal } from '../components/LockTimeoutModal';
-import { SecurityPinModal, PinModalMode } from '../components/SecurityPinModal';
-import { LOCK_TIMEOUT_OPTIONS } from '../services/biometricService';
 import {
   AchievementMilestone,
   getTotalAchievementsProgress,
@@ -101,28 +98,10 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
   } = useUser();
   const { showAlert } = useThemedAlert();
 
-  const handleToggleBiometricLock = async (val: boolean) => {
-    const res = await setBiometricLockEnabled(val);
-    if (!res.success && res.error) {
-      showAlert({
-        title: 'Biometric App Lock',
-        message: res.error,
-        icon: 'warning',
-      });
-    }
-  };
-
   const [isUploading, setIsUploading] = useState(false);
   const [showStreakModal, setShowStreakModal] = useState<boolean>(false);
-  const [showTimeoutModal, setShowTimeoutModal] = useState<boolean>(false);
-  const [showPinModal, setShowPinModal] = useState<boolean>(false);
-  const [pinModalMode, setPinModalMode] = useState<PinModalMode>('setup');
   const [inspectedAchievement, setInspectedAchievement] =
     useState<AchievementMilestone | null>(null);
-
-  const currentTimeoutOption =
-    LOCK_TIMEOUT_OPTIONS.find((o) => o.seconds === lockTimeoutSeconds) ||
-    LOCK_TIMEOUT_OPTIONS[0];
 
   const bookmarksCount = favoritesScriptures?.length || 0;
   const highlightsCount = Object.keys(bibleHighlights || {}).length;
@@ -137,20 +116,6 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
   const [notifications, setNotifications] = useState<boolean>(
     userProfile?.notificationsEnabled ?? true
   );
-  const [redLetter, setRedLetter] = useState<boolean>(
-    userProfile?.redLetterEnabled ?? true
-  );
-
-  useEffect(() => {
-    if (userProfile?.redLetterEnabled !== undefined) {
-      setRedLetter(userProfile.redLetterEnabled);
-    }
-  }, [userProfile?.redLetterEnabled]);
-
-  const handleToggleRedLetter = (val: boolean) => {
-    setRedLetter(val);
-    updateProfile({ redLetterEnabled: val });
-  };
 
   // Offline Downloaded Bibles State
   const [downloadedTranslations, setDownloadedTranslations] = useState<DownloadedTranslationMeta[]>([]);
@@ -199,94 +164,12 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     });
   };
 
-  // Reader Settings State: 1px to 24px
-  const currentFontSize = userProfile?.fontSize ?? 16;
-  const currentFontType = userProfile?.fontType || 'serif';
-  const [fontSizeInputText, setFontSizeInputText] = useState(currentFontSize.toString());
-  const [isEditingFontSize, setIsEditingFontSize] = useState(false);
-  const fontSizeInputRef = useRef<TextInput>(null);
-
-  useEffect(() => {
-    if (!isEditingFontSize) {
-      setFontSizeInputText(currentFontSize.toString());
-    }
-  }, [currentFontSize, isEditingFontSize]);
-
   const totalSaved =
     favoritesFacts.length + favoritesScriptures.length + completedWOTDs.length;
 
   const handleToggleNotifications = (val: boolean) => {
     setNotifications(val);
     updateProfile({ notificationsEnabled: val });
-  };
-
-  const handleSelectFontSize = (size: number) => {
-    const clamped = Math.max(1, Math.min(24, Math.round(size)));
-    updateProfile({ fontSize: clamped });
-    setFontSizeInputText(clamped.toString());
-  };
-
-  const handleFontSizeInputChange = (text: string) => {
-    const digits = text.replace(/[^\d]/g, '');
-    setFontSizeInputText(digits);
-    if (digits.length > 0) {
-      const num = parseInt(digits, 10);
-      if (!isNaN(num)) {
-        const clamped = Math.max(1, Math.min(24, num));
-        updateProfile({ fontSize: clamped });
-      }
-    }
-  };
-
-  const handleFontSizeInputCommit = () => {
-    const num = parseInt(fontSizeInputText, 10);
-    if (isNaN(num) || num < 1) {
-      handleSelectFontSize(1);
-    } else if (num > 24) {
-      handleSelectFontSize(24);
-    } else {
-      handleSelectFontSize(num);
-    }
-  };
-
-  // Continuous Left-to-Right Pan/Touch Scroller (1px to 24px)
-  const [scrollEnabled, setScrollEnabled] = useState(true);
-  const sliderWidthRef = useRef(240);
-  const [sliderWidth, setSliderWidth] = useState(240);
-  const startXRef = useRef(0);
-
-  const updateFontSizeFromX = (x: number) => {
-    const width = sliderWidthRef.current;
-    if (width <= 0) return;
-    const ratio = Math.max(0, Math.min(1, x / width));
-    const size = Math.round(1 + ratio * 23); // 1px to 24px
-    handleSelectFontSize(size);
-  };
-
-  const sliderPanResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: (evt) => {
-        setScrollEnabled(false);
-        startXRef.current = evt.nativeEvent.locationX;
-        updateFontSizeFromX(evt.nativeEvent.locationX);
-      },
-      onPanResponderMove: (evt, gestureState) => {
-        const currentX = startXRef.current + gestureState.dx;
-        updateFontSizeFromX(currentX);
-      },
-      onPanResponderRelease: () => {
-        setScrollEnabled(true);
-      },
-      onPanResponderTerminate: () => {
-        setScrollEnabled(true);
-      },
-    })
-  ).current;
-
-  const handleSelectFontType = (type: 'serif' | 'sans' | 'system' | 'mono') => {
-    updateProfile({ fontType: type });
   };
 
   // Avatar Photo Picker
@@ -431,14 +314,10 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
   const followersCount = userProfile?.followersCount ?? 0;
   const followingCount = userProfile?.followingCount ?? (followedUserIds?.length || 0);
 
-  // Selected Font Family helper
-  const selectedFamily = FONT_TYPE_OPTIONS.find(o => o.key === currentFontType)?.fontFamily;
-
   return (
     <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
       <ScrollView
         style={styles.scroll}
-        scrollEnabled={scrollEnabled}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
@@ -606,192 +485,29 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
         {/* ALL SETTINGS DIRECTLY IN THE SCREEN BODY (ZERO ENCLOSING DIVS)    */}
         {/* ================================================================ */}
 
-        {/* 1. READING & TYPOGRAPHY SETTINGS (ZERO ICONS IN SETTINGS) */}
+        {/* 1. READING & TYPOGRAPHY SETTINGS */}
         <View style={styles.bodySection}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             READING & TYPOGRAPHY
           </Text>
 
-          {/* Font Size Row: Left-to-Right 1px-24px Scroller + Text Input Format */}
-          <View style={styles.settingRowBlock}>
-            <View style={styles.rowHeader}>
-              <View style={styles.rowTitleBox}>
-                <Text variant="h3" style={styles.rowTitle}>
-                  Reading Font Size
-                </Text>
-                <Text variant="caption" color={colors.textSecondary}>
-                  Scroll 1px–24px or enter number
-                </Text>
-              </View>
-
-              {/* Text Input Format for Font Size */}
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => fontSizeInputRef.current?.focus()}
-                style={[
-                  styles.fontSizeInputContainer,
-                  isEditingFontSize && styles.fontSizeInputContainerFocused,
-                ]}
-              >
-                <TextInput
-                  ref={fontSizeInputRef}
-                  style={styles.fontSizeInputField}
-                  value={fontSizeInputText}
-                  onChangeText={handleFontSizeInputChange}
-                  onFocus={() => setIsEditingFontSize(true)}
-                  onBlur={() => {
-                    setIsEditingFontSize(false);
-                    handleFontSizeInputCommit();
-                  }}
-                  onSubmitEditing={() => {
-                    setIsEditingFontSize(false);
-                    handleFontSizeInputCommit();
-                  }}
-                  keyboardType="number-pad"
-                  maxLength={2}
-                  selectTextOnFocus
-                  returnKeyType="done"
-                  selectionColor={colors.accent}
-                  placeholder="16"
-                  placeholderTextColor={colors.textTertiary}
-                />
-                <Text
-                  variant="caption"
-                  weight="700"
-                  color={colors.textSecondary}
-                  style={styles.pxUnitLabel}
-                  pointerEvents="none"
-                >
-                  px
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Smooth Left-to-Right Horizontal Scroller Track (1px to 24px) */}
-            <View style={styles.sliderRow}>
-              <Text variant="caption" weight="700" color={colors.textTertiary} style={styles.sliderBoundLabel}>
-                1px
-              </Text>
-              <View
-                style={styles.sliderTrack}
-                onLayout={(e) => {
-                  const w = e.nativeEvent.layout.width;
-                  sliderWidthRef.current = w;
-                  setSliderWidth(w);
-                }}
-                {...sliderPanResponder.panHandlers}
-              >
-                {/* Visual Track Rail, Fill, and Thumb with pointerEvents="none" */}
-                <View pointerEvents="none" style={styles.sliderInnerTrack}>
-                  <View style={styles.sliderRail} />
-                  <View
-                    style={[
-                      styles.sliderFill,
-                      {
-                        width: `${Math.max(0, Math.min(100, ((currentFontSize - 1) / 23) * 100))}%`,
-                      },
-                    ]}
-                  />
-                  <View
-                    style={[
-                      styles.sliderThumb,
-                      shadow.sm,
-                      {
-                        left: `${Math.max(0, Math.min(100, ((currentFontSize - 1) / 23) * 100))}%`,
-                      },
-                    ]}
-                  />
-                </View>
-              </View>
-              <Text variant="caption" weight="800" color={colors.textPrimary} style={styles.sliderBoundLabel}>
-                24px
-              </Text>
-            </View>
-
-            {/* Real-time Scripture Preview Box */}
-            <View style={styles.previewBox}>
-              <Text
-                style={[
-                  styles.previewText,
-                  {
-                    fontSize: currentFontSize,
-                    lineHeight: Math.max(14, currentFontSize * 1.5),
-                    fontFamily: selectedFamily,
-                    color: redLetter ? '#DC2626' : colors.textPrimary,
-                  },
-                ]}
-              >
-                “For God so loved the world, that He gave His only begotten Son, that whoever believes in Him should not perish but have everlasting life.”
-              </Text>
-              <Text variant="caption" color={colors.accent} weight="700" style={styles.previewCite}>
-                John 3:16 • {currentFontSize}px {FONT_TYPE_OPTIONS.find(o => o.key === currentFontType)?.label}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.rowDivider} />
-
-          {/* Typography Style Row (Zero Icons) */}
-          <View style={styles.settingRowBlock}>
-            <View style={styles.rowHeader}>
-              <View style={styles.rowTitleBox}>
-                <Text variant="h3" style={styles.rowTitle}>
-                  Typography Style
-                </Text>
-                <Text variant="caption" color={colors.textSecondary}>
-                  Choose primary reader typeface
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.fontTypePillsRow}>
-              {FONT_TYPE_OPTIONS.map((opt) => {
-                const isSelected = currentFontType === opt.key;
-                return (
-                  <TouchableOpacity
-                    key={opt.key}
-                    style={[
-                      styles.fontTypePill,
-                      isSelected && styles.fontTypePillActive,
-                    ]}
-                    onPress={() => handleSelectFontType(opt.key)}
-                    activeOpacity={0.8}
-                  >
-                    <Text
-                      variant="caption"
-                      weight={isSelected ? '700' : '500'}
-                      style={[
-                        styles.fontTypePillText,
-                        isSelected && styles.fontTypePillTextActive,
-                        opt.fontFamily ? { fontFamily: opt.fontFamily } : undefined,
-                      ]}
-                    >
-                      {opt.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-
-          <View style={styles.rowDivider} />
-
-          {/* Words of Jesus in Red (Zero Icons) */}
-          <View style={styles.actionRow}>
+          <TouchableOpacity
+            style={styles.actionRow}
+            activeOpacity={0.75}
+            onPress={() => navigation.navigate('ReadingSettings')}
+            accessibilityRole="button"
+            accessibilityLabel="Reading and typography settings"
+          >
             <View style={styles.rowTitleBox}>
               <Text variant="h3" style={styles.rowTitle}>
-                Words of Jesus in Red
+                Reading & Typography
               </Text>
               <Text variant="caption" color={colors.textSecondary}>
-                Highlight the spoken words of Christ in red
+                {userProfile?.fontSize ?? 16}px • {FONT_TYPE_OPTIONS.find((o) => o.key === (userProfile?.fontType || 'serif'))?.label || 'Classic Serif'}
               </Text>
             </View>
-            <UiverseSwitch
-              value={redLetter}
-              onValueChange={handleToggleRedLetter}
-              accessibilityLabel="Words of Jesus in Red switch"
-            />
-          </View>
+            <Text style={styles.rowDisclosureArrow}>›</Text>
+          </TouchableOpacity>
         </View>
 
         {/* 2. NOTIFICATIONS (ZERO ICONS) */}
@@ -917,216 +633,47 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           </TouchableOpacity>
         </View>
 
-        {/* 5. PRIVACY, SAFETY & SECURITY */}
+        {/* 5. PRIVACY & SAFETY */}
         <View style={styles.bodySection}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
-            PRIVACY, SAFETY & SECURITY
+            PRIVACY & SAFETY
           </Text>
 
-          {/* Biometric App Lock */}
-          {isBiometricSupported && (
-            <>
-              <View style={styles.actionRow}>
-                <View style={styles.rowTitleBox}>
-                  <Text variant="h3" style={styles.rowTitle}>
-                    {`Biometric App Lock (${biometricType || 'Face ID / Fingerprint'})`}
-                  </Text>
-                  <Text variant="caption" color={colors.textSecondary}>
-                    Require biometric verification whenever exégeomai opens
-                  </Text>
-                </View>
-                <UiverseSwitch
-                  value={isBiometricLockEnabled}
-                  onValueChange={handleToggleBiometricLock}
-                />
-              </View>
-              <View style={styles.rowDivider} />
-
-              {isBiometricLockEnabled && (
-                <>
-                  <TouchableOpacity
-                    style={styles.actionRow}
-                    onPress={() => setShowTimeoutModal(true)}
-                    activeOpacity={0.75}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Inactivity auto-lock timeout. Currently set to ${currentTimeoutOption.label}. Tap to change.`}
-                  >
-                    <View style={styles.rowTitleBox}>
-                      <Text variant="h3" style={styles.rowTitle}>
-                        Inactivity Auto-Lock
-                      </Text>
-                      <Text variant="caption" color={colors.textSecondary}>
-                        {`Locks ${currentTimeoutOption.label.toLowerCase()} • Tap to change`}
-                      </Text>
-                    </View>
-                    <Text style={styles.rowDisclosureArrow}>›</Text>
-                  </TouchableOpacity>
-                  <View style={styles.rowDivider} />
-                </>
-              )}
-            </>
-          )}
-
-          {/* App Switcher Privacy Shield */}
-          <View style={styles.actionRow}>
-            <View style={styles.rowTitleBox}>
-              <Text variant="h3" style={styles.rowTitle}>
-                App Switcher Privacy Shield
-              </Text>
-              <Text variant="caption" color={colors.textSecondary}>
-                Obfuscates screen when multitasking to protect notes & reflections
-              </Text>
-            </View>
-            <UiverseSwitch
-              value={isPrivacyShieldEnabled}
-              onValueChange={setPrivacyShieldEnabled}
-            />
-          </View>
-
-          <View style={styles.rowDivider} />
-
-          {/* 4-Digit Security PIN */}
+          {/* Privacy */}
           <TouchableOpacity
             style={styles.actionRow}
-            onPress={() => {
-              if (isPinSet) {
-                showAlert({
-                  title: 'Security PIN',
-                  message: 'Your sacred study journal and notes are protected by a 4-digit PIN.',
-                  icon: 'keypad',
-                  buttons: [
-                    { text: 'Cancel', style: 'cancel' },
-                    {
-                      text: 'Change PIN',
-                      onPress: () => {
-                        setPinModalMode('change');
-                        setShowPinModal(true);
-                      },
-                    },
-                    {
-                      text: 'Remove PIN',
-                      style: 'destructive',
-                      onPress: () => {
-                        setPinModalMode('remove');
-                        setShowPinModal(true);
-                      },
-                    },
-                  ],
-                });
-              } else {
-                setPinModalMode('setup');
-                setShowPinModal(true);
-              }
-            }}
+            onPress={() => navigation.navigate('Privacy')}
             activeOpacity={0.75}
             accessibilityRole="button"
-            accessibilityLabel={`4-Digit Security PIN. ${isPinSet ? 'Active. Tap to change or remove.' : 'Not configured. Tap to setup.'}`}
+            accessibilityLabel="Privacy settings. Private study mode, scholar directory, streak visibility, and private notes."
           >
             <View style={styles.rowTitleBox}>
               <Text variant="h3" style={styles.rowTitle}>
-                4-Digit Security PIN
+                Privacy
               </Text>
               <Text variant="caption" color={colors.textSecondary}>
-                {isPinSet
-                  ? 'Security PIN active • Tap to change or remove'
-                  : 'Passcode backup for opening exégeomai without biometrics'}
+                Private study mode, scholar directory, streaks & private notes
               </Text>
             </View>
-            <Text variant="caption" weight="700" color={colors.accent}>
-              {isPinSet ? 'Manage ›' : 'Set PIN ›'}
-            </Text>
+            <Text style={styles.rowDisclosureArrow}>›</Text>
           </TouchableOpacity>
 
           <View style={styles.rowDivider} />
 
-          {/* Private Study Mode (Incognito) */}
-          <View style={styles.actionRow}>
-            <View style={styles.rowTitleBox}>
-              <Text variant="h3" style={styles.rowTitle}>
-                Private Study Mode (Incognito)
-              </Text>
-              <Text variant="caption" color={colors.textSecondary}>
-                Pauses cloud streak sync & hides activity from community
-              </Text>
-            </View>
-            <UiverseSwitch
-              value={isPrivateStudyMode}
-              onValueChange={setPrivateStudyMode}
-            />
-          </View>
-
-          <View style={styles.rowDivider} />
-
-          {/* Public Scholar Directory */}
-          <View style={styles.actionRow}>
-            <View style={styles.rowTitleBox}>
-              <Text variant="h3" style={styles.rowTitle}>
-                Public Scholar Directory
-              </Text>
-              <Text variant="caption" color={colors.textSecondary}>
-                Allow other scholars to discover your profile in Search
-              </Text>
-            </View>
-            <UiverseSwitch
-              value={isDiscoverableInSearch}
-              onValueChange={setDiscoverableInSearch}
-            />
-          </View>
-
-          <View style={styles.rowDivider} />
-
-          {/* Show Study Streak to Peers */}
-          <View style={styles.actionRow}>
-            <View style={styles.rowTitleBox}>
-              <Text variant="h3" style={styles.rowTitle}>
-                Show Study Streak to Peers
-              </Text>
-              <Text variant="caption" color={colors.textSecondary}>
-                Display active study streaks & milestones on your scholar card
-              </Text>
-            </View>
-            <UiverseSwitch
-              value={showStreaksPublicly}
-              onValueChange={setShowStreaksPublicly}
-            />
-          </View>
-
-          <View style={styles.rowDivider} />
-
-          {/* Private Notes & Bookmarks */}
-          <View style={styles.actionRow}>
-            <View style={styles.rowTitleBox}>
-              <Text variant="h3" style={styles.rowTitle}>
-                Private Notes & Bookmarks
-              </Text>
-              <Text variant="caption" color={colors.textSecondary}>
-                Keep verse reflections strictly offline & unindexed
-              </Text>
-            </View>
-            <UiverseSwitch
-              value={privateStudyNotes}
-              onValueChange={setPrivateStudyNotes}
-            />
-          </View>
-
-          <View style={styles.rowDivider} />
-
-          {/* Blocked Accounts */}
+          {/* Safety & Security */}
           <TouchableOpacity
             style={styles.actionRow}
-            onPress={() => navigation.navigate('BlockedUsers')}
+            onPress={() => navigation.navigate('Security')}
             activeOpacity={0.75}
             accessibilityRole="button"
-            accessibilityLabel="Manage blocked accounts"
+            accessibilityLabel="Safety and security settings. Inactivity lock, 4-digit PIN, and biometrics."
           >
             <View style={styles.rowTitleBox}>
               <Text variant="h3" style={styles.rowTitle}>
-                Blocked Accounts
+                Safety & Security
               </Text>
               <Text variant="caption" color={colors.textSecondary}>
-                {blockedUserIds.length > 0
-                  ? `${blockedUserIds.length} ${blockedUserIds.length === 1 ? 'account' : 'accounts'} blocked from fellowship`
-                  : 'Zero accounts blocked'}
+                Inactivity lock, 4-digit PIN & biometrics
               </Text>
             </View>
             <Text style={styles.rowDisclosureArrow}>›</Text>
@@ -1144,10 +691,36 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           >
             <View style={styles.rowTitleBox}>
               <Text variant="h3" style={styles.rowTitle}>
-                Pastoral Care & Crisis Lifelines
+                Pastoral Care & Lifelines
               </Text>
               <Text variant="caption" color={colors.textSecondary}>
                 24/7 confidential helplines, SADAG, and comforting scriptures
+              </Text>
+            </View>
+            <Text style={styles.rowDisclosureArrow}>›</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* 6. DATA & ACCOUNT */}
+        <View style={styles.bodySection}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+            DATA & ACCOUNT
+          </Text>
+
+          {/* Export Study Journal */}
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={() => navigation.navigate('ExportJournal')}
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel="Export study journal to JSON or AES-256 encrypted file"
+          >
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Export Study Journal
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                Encrypted AES-256 backup or standard JSON format
               </Text>
             </View>
             <Text style={styles.rowDisclosureArrow}>›</Text>
@@ -1190,27 +763,6 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
               </Text>
               <Text variant="caption" color={colors.textSecondary}>
                 Active hardware sessions and security event trail
-              </Text>
-            </View>
-            <Text style={styles.rowDisclosureArrow}>›</Text>
-          </TouchableOpacity>
-
-          <View style={styles.rowDivider} />
-
-          {/* Export Study Journal */}
-          <TouchableOpacity
-            style={styles.actionRow}
-            onPress={() => navigation.navigate('ExportJournal')}
-            activeOpacity={0.75}
-            accessibilityRole="button"
-            accessibilityLabel="Export study journal to JSON or AES-256 encrypted file"
-          >
-            <View style={styles.rowTitleBox}>
-              <Text variant="h3" style={styles.rowTitle}>
-                Export Study Journal
-              </Text>
-              <Text variant="caption" color={colors.textSecondary}>
-                Encrypted AES-256 backup or standard JSON format
               </Text>
             </View>
             <Text style={styles.rowDisclosureArrow}>›</Text>
@@ -1344,24 +896,6 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
         }}
       />
 
-      {/* Inactivity Auto-Lock Selector Modal */}
-      <LockTimeoutModal
-        visible={showTimeoutModal}
-        currentTimeout={lockTimeoutSeconds}
-        onSelect={setLockTimeoutSeconds}
-        onClose={() => setShowTimeoutModal(false)}
-      />
-
-      {/* Security PIN Modal */}
-      <SecurityPinModal
-        visible={showPinModal}
-        mode={pinModalMode}
-        onSuccess={async () => {
-          await refreshPinStatus();
-          setShowPinModal(false);
-        }}
-        onClose={() => setShowPinModal(false)}
-      />
     </SafeAreaView>
   );
 }

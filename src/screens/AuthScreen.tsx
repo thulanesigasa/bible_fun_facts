@@ -1134,7 +1134,6 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     marginBottom: spacing.sm,
-    borderRadius: 6,
   },
   title: {
     fontSize: 26,
