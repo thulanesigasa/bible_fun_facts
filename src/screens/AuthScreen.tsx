@@ -251,7 +251,7 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
   const canProceedStep2 = isEmailValid(email) && emailsMatch && isPhoneValid;
   const canProceedStep3 = hasMinLen && passwordScore >= 3 && passwordsMatch;
 
-  const handleLoginSubmit = () => {
+  const handleLoginSubmit = async () => {
     const trimmed = loginEmail.trim();
     if (!trimmed) {
       Alert.alert('Required Field', 'Please enter your email address or username.');
@@ -261,7 +261,12 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
       Alert.alert('Required Field', 'Please enter your password.');
       return;
     }
-    login(trimmed, loginPassword);
+    setIsSubmitting(true);
+    try {
+      await login(trimmed, loginPassword);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleFinalSignUp = async () => {

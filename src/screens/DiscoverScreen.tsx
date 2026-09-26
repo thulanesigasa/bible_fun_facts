@@ -39,7 +39,6 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
 
   const {
     streak,
-    incrementFactsViewed,
     incrementSharesCount,
     userProfile,
     toggleFavoriteFact,
@@ -69,9 +68,8 @@ export default function DiscoverScreen({ navigation }: DiscoverScreenProps) {
     } catch (err) {
       console.warn('Sync notice:', err);
     }
-    incrementFactsViewed();
     setRefreshing(false);
-  }, [incrementFactsViewed]);
+  }, []);
 
   const onShareMessage = async (message: DailyMessage) => {
     try {

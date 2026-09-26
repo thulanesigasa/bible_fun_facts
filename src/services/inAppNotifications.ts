@@ -57,9 +57,9 @@ export function formatDeliveryLabel(date: Date): string {
 
 /**
  * Builds the real-life list of scheduled devotions dispatched by the automated push system
- * over the past rolling 7 days up to the current moment.
+ * for today up to the current moment. Eliminates phantom historical backlogs.
  */
-export function getDispatchedScheduledNotifications(daysBack: number = 7): InAppNotificationItem[] {
+export function getDispatchedScheduledNotifications(daysBack: number = 1): InAppNotificationItem[] {
   const now = new Date();
   const items: InAppNotificationItem[] = [];
 

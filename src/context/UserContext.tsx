@@ -195,10 +195,38 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Load read & dismissed notification IDs, achievement timestamps, and received pushes
   useEffect(() => {
-    getReadNotificationIds().then(setReadNotificationIds).catch(() => {});
-    getDismissedNotificationIds().then(setDismissedNotificationIds).catch(() => {});
-    getAchievementUnlockTimestamps().then(setAchievementTimestamps).catch(() => {});
-    getReceivedPushNotifications().then(setReceivedPushes).catch(() => {});
+    const initNotifications = async () => {
+      try {
+        const storedReadIds = await getReadNotificationIds();
+        const storedDismissed = await getDismissedNotificationIds();
+        const storedTimestamps = await getAchievementUnlockTimestamps();
+        const storedPushes = await getReceivedPushNotifications();
+
+        setDismissedNotificationIds(storedDismissed);
+        setAchievementTimestamps(storedTimestamps);
+        setReceivedPushes(storedPushes);
+
+        // Seed initial notifications as read on fresh launch so user never opens with a phantom unread badge
+        const isSeeded = await AsyncStorage.getItem('@exegeomai_initial_notifs_seeded');
+        if (!isSeeded) {
+          const initialScheduled = getDispatchedScheduledNotifications(1);
+          const initialAchievements = getUnlockedAchievementNotifications(
+            { streak: 1, bookmarksCount: 0, highlightsCount: 0, sharesCount: 0 },
+            storedTimestamps
+          );
+          const initialIds = [...initialScheduled, ...initialAchievements].map(i => i.id);
+          const mergedReadIds = Array.from(new Set([...storedReadIds, ...initialIds]));
+          await saveReadNotificationIds(mergedReadIds);
+          await AsyncStorage.setItem('@exegeomai_initial_notifs_seeded', 'true');
+          setReadNotificationIds(mergedReadIds);
+        } else {
+          setReadNotificationIds(storedReadIds);
+        }
+      } catch (err) {
+        console.warn('[UserContext] initNotifications notice:', err);
+      }
+    };
+    initNotifications();
   }, []);
 
   // Listen to foreground notifications in real life
@@ -346,9 +374,40 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const finalStreak = evaluation.newStreak;
         const todayStr = new Date().toDateString();
         const finalLastLogin = evaluation.shouldUpdate ? todayStr : (lastLoginCandidate || todayStr);
-        const finalUnfolded = remoteUnfolded !== undefined ? Math.max(0, remoteUnfolded) : prev.factsViewedCount;
 
-        syncUserDataToRemote({ streak: finalStreak, lastLoginDate: finalLastLogin });
+        // Merge readFactIds: facts explicitly marked Done by the user
+        const remoteReadFactIds: string[] = Array.isArray(meta?.readFactIds) ? meta.readFactIds : [];
+        const mergedReadFactIds = Array.from(new Set([...(prev.readFactIds || []), ...remoteReadFactIds]));
+        const finalUnfolded = mergedReadFactIds.length;
+
+        // Merge favorites facts
+        const remoteFavFacts: Fact[] = Array.isArray(meta?.favoritesFacts) ? meta.favoritesFacts : [];
+        const localFavFacts: Fact[] = prev.favoritesFacts || [];
+        const favFactsMap = new Map<string, Fact>();
+        [...localFavFacts, ...remoteFavFacts].forEach(f => { if (f?.id) favFactsMap.set(f.id, f); });
+        const mergedFavFacts = Array.from(favFactsMap.values());
+
+        // Merge favorites scriptures
+        const remoteFavScriptures: Scripture[] = Array.isArray(meta?.favoritesScriptures) ? meta.favoritesScriptures : [];
+        const localFavScriptures: Scripture[] = prev.favoritesScriptures || [];
+        const favScripturesMap = new Map<string, Scripture>();
+        [...localFavScriptures, ...remoteFavScriptures].forEach(s => { if (s?.id) favScripturesMap.set(s.id, s); });
+        const mergedFavScriptures = Array.from(favScripturesMap.values());
+
+        // Merge highlights
+        const remoteHighlights = meta?.bibleHighlights && typeof meta.bibleHighlights === 'object' ? meta.bibleHighlights : {};
+        const mergedHighlights = { ...(prev.bibleHighlights || {}), ...remoteHighlights };
+
+        syncUserDataToRemote({
+          streak: finalStreak,
+          lastLoginDate: finalLastLogin,
+          factsViewedCount: finalUnfolded,
+          readFactIds: mergedReadFactIds,
+          favoritesFacts: mergedFavFacts,
+          favoritesScriptures: mergedFavScriptures,
+          bibleHighlights: mergedHighlights,
+        });
+
         AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(finalStreak)).catch(() => {});
         AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(finalStreak)).catch(() => {});
         AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, finalLastLogin).catch(() => {});
@@ -358,10 +417,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           streak: finalStreak,
           factsViewedCount: finalUnfolded,
           lastLoginDate: finalLastLogin,
-          favoritesFacts: Array.isArray(meta?.favoritesFacts) ? meta.favoritesFacts : prev.favoritesFacts,
-          favoritesScriptures: Array.isArray(meta?.favoritesScriptures) ? meta.favoritesScriptures : prev.favoritesScriptures,
-          readFactIds: Array.isArray(meta?.readFactIds) ? meta.readFactIds : prev.readFactIds,
-          bibleHighlights: meta?.bibleHighlights && typeof meta.bibleHighlights === 'object' ? meta.bibleHighlights : prev.bibleHighlights,
+          favoritesFacts: mergedFavFacts,
+          favoritesScriptures: mergedFavScriptures,
+          readFactIds: mergedReadFactIds,
+          bibleHighlights: mergedHighlights,
           lastReadBible: meta?.lastReadBible || prev.lastReadBible,
         };
       });
@@ -626,26 +685,61 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const login = async (emailOrName: string, password?: string, name?: string) => {
-    const displayName = name || (emailOrName.includes('@') ? emailOrName.split('@')[0] : emailOrName);
-    const email = emailOrName.includes('@') ? emailOrName : `${emailOrName.toLowerCase().replace(/\s+/g, '')}@example.com`;
+    const rawInput = emailOrName.trim();
+    const displayName = name || (rawInput.includes('@') ? rawInput.split('@')[0] : rawInput);
     const formattedName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
 
-    if (SUPABASE_ANON_KEY && password && emailOrName.includes('@')) {
+    if (SUPABASE_ANON_KEY && password) {
       try {
+        let targetEmail = rawInput.toLowerCase();
+
+        // If the user typed their username instead of email, resolve their email from Supabase
+        if (!targetEmail.includes('@')) {
+          const { data: resolvedEmail } = await supabase.rpc('resolve_email_by_username', {
+            lookup_username: targetEmail,
+          });
+
+          if (resolvedEmail) {
+            targetEmail = String(resolvedEmail).toLowerCase();
+          } else {
+            // Also attempt direct query on profiles
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('email')
+              .eq('username', targetEmail)
+              .maybeSingle();
+
+            if (profile?.email) {
+              targetEmail = profile.email.toLowerCase();
+            } else {
+              Alert.alert(
+                'Account Not Found',
+                `No account was found with the username "@${rawInput}". Please check the spelling or enter your email address.`
+              );
+              return;
+            }
+          }
+        }
+
         const { data, error } = await supabase.auth.signInWithPassword({
-          email: emailOrName,
+          email: targetEmail,
           password,
         });
+
         if (error) {
           console.warn('Supabase login error:', error.message);
           Alert.alert('Sign In Failed', error.message);
           return;
         }
+
         if (data.user) {
           const meta = (data.user.user_metadata as any) || {};
           const metaName = meta.name || formattedName;
-          const metaUsername = meta.username || email.split('@')[0].toLowerCase().replace(/\s+/g, '_');
-          restoreRemoteUserData(data.user.id, meta);
+          const metaUsername = meta.username || targetEmail.split('@')[0].toLowerCase().replace(/\s+/g, '_');
+
+          // Await full remote user data restoration before rendering state
+          await restoreRemoteUserData(data.user.id, meta);
+
           setState(prev => ({
             ...prev,
             userProfile: {
@@ -654,7 +748,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
               lastName: meta.lastName || formattedName.split(' ').slice(1).join(' '),
               username: metaUsername,
               avatarUrl: meta.avatarUrl || prev.userProfile?.avatarUrl,
-              email: data.user!.email || email,
+              email: data.user!.email || targetEmail,
               joinedDate: new Date(data.user!.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
               preferredTranslation: meta.preferredTranslation || prev.userProfile?.preferredTranslation || 'ESV',
               notificationsEnabled: prev.userProfile?.notificationsEnabled ?? true,
@@ -677,15 +771,16 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
 
+    const fallbackEmail = rawInput.includes('@') ? rawInput : `${rawInput.toLowerCase().replace(/\s+/g, '')}@example.com`;
     setState(prev => ({
       ...prev,
       userProfile: {
         name: prev.userProfile?.name || formattedName,
         firstName: prev.userProfile?.firstName || formattedName.split(' ')[0],
         lastName: prev.userProfile?.lastName || formattedName.split(' ').slice(1).join(' '),
-        username: prev.userProfile?.username || emailOrName.split('@')[0].toLowerCase().replace(/\s+/g, '_'),
+        username: prev.userProfile?.username || rawInput.split('@')[0].toLowerCase().replace(/\s+/g, '_'),
         avatarUrl: prev.userProfile?.avatarUrl,
-        email: prev.userProfile?.email || email,
+        email: prev.userProfile?.email || fallbackEmail,
         joinedDate: prev.userProfile?.joinedDate || 'September 2026',
         preferredTranslation: prev.userProfile?.preferredTranslation || 'ESV',
         notificationsEnabled: prev.userProfile?.notificationsEnabled ?? true,
@@ -994,7 +1089,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const incrementFactsViewed = () => {
     setState(prev => {
-      const nextCount = prev.factsViewedCount + 1;
+      const nextCount = prev.readFactIds.length;
       syncUserDataToRemote({ factsViewedCount: nextCount });
       return { ...prev, factsViewedCount: nextCount };
     });
@@ -1068,7 +1163,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const notifications = useMemo<InAppNotificationItem[]>(() => {
-    const scheduled = getDispatchedScheduledNotifications(7);
+    const scheduled = getDispatchedScheduledNotifications(1);
     const achievements = getUnlockedAchievementNotifications(
       {
         streak: state.streak || 1,
