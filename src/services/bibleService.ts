@@ -1,9 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { BibleChapterData, PREBUNDLED_CHAPTERS } from '../data/bibleCanon';
+import { BibleChapterData, PREBUNDLED_CHAPTERS, BIBLE_BOOKS } from '../data/bibleCanon';
 import {
   getOfflineChapter,
   downloadTranslation,
   TRANSLATION_SOURCES,
+  findBookIndex,
 } from './offlineBibleService';
 
 export * from './offlineBibleService';
@@ -27,7 +28,7 @@ export interface LastReadPosition {
  * 0. Offline downloaded full Bible translation packages (instant 0ms)
  * 1. Memory cache
  * 2. AsyncStorage persistent local cache
- * 3. Network fetch via bible-api.com (free, public domain)
+ * 3. Network fetch via direct translation APIs or bible-api.com
  * 4. Fallback to prebundled chapters if network fails and cache is empty
  */
 export async function fetchChapter(
@@ -66,7 +67,45 @@ export async function fetchChapter(
     console.warn('Cache read notice:', e);
   }
 
-  // 3. If translation source is defined in TRANSLATION_SOURCES, auto-download full package for instant offline reading
+  // 3a. High-speed live single-chapter streaming for The Message (MSG)
+  if (translation === 'msg') {
+    try {
+      const bIdx = findBookIndex(normalizedBook);
+      if (bIdx !== -1) {
+        const bookNum = bIdx + 1;
+        const bollsRes = await fetch(`https://bolls.life/get-chapter/MSG/${bookNum}/${chapter}/`);
+        if (bollsRes.ok) {
+          const rawVerses: Array<{ verse: number; text: string }> = await bollsRes.json();
+          if (Array.isArray(rawVerses) && rawVerses.length > 0) {
+            const canonicalBook = BIBLE_BOOKS[bIdx];
+            const verses = rawVerses.map((v) => ({
+              book_id: canonicalBook.id,
+              book_name: canonicalBook.name,
+              chapter,
+              verse: v.verse,
+              text: (v.text || '').trim(),
+            }));
+            const chapterData: BibleChapterData = {
+              reference: `${canonicalBook.name} ${chapter}`,
+              book_name: canonicalBook.name,
+              chapter,
+              verses,
+              text: verses.map((v) => `${v.verse} ${v.text}`).join('\n\n'),
+              translation_id: 'msg',
+              translation_name: 'The Message',
+            };
+            memoryCache.set(cacheKey, chapterData);
+            AsyncStorage.setItem(CACHE_PREFIX + cacheKey, JSON.stringify(chapterData)).catch(() => {});
+            return chapterData;
+          }
+        }
+      }
+    } catch (msgErr) {
+      console.warn('Direct live MSG stream attempt notice:', msgErr);
+    }
+  }
+
+  // 3b. If translation source is defined in TRANSLATION_SOURCES, trigger auto-download full package for offline reading
   if (TRANSLATION_SOURCES[translation]) {
     try {
       await downloadTranslation(translation);
@@ -120,7 +159,13 @@ export async function fetchChapter(
   }
 
   // 4. Fallback to prebundled chapters or generate synthetic placeholder
+  const fallbackKeyWithTrans = `${normalizedBook.replace(/\s+/g, '_')}_${chapter}_${translation}`;
   const fallbackKey = `${normalizedBook.replace(/\s+/g, '_')}_${chapter}`;
+  if (PREBUNDLED_CHAPTERS[fallbackKeyWithTrans]) {
+    const fb = PREBUNDLED_CHAPTERS[fallbackKeyWithTrans];
+    memoryCache.set(cacheKey, fb);
+    return fb;
+  }
   if (PREBUNDLED_CHAPTERS[fallbackKey]) {
     const fb = PREBUNDLED_CHAPTERS[fallbackKey];
     memoryCache.set(cacheKey, fb);

@@ -114,6 +114,111 @@ export const TRANSLATION_SOURCES: Record<string, TranslationSourceConfig> = {
     ],
     sizeEstimate: '4.4 MB',
   },
+  shona: {
+    id: 'shona',
+    name: 'Bhaibheri Dzvene',
+    abbreviation: 'SNA',
+    description: 'ChiShona (Zimbabwe) - Full Bible',
+    language: 'ChiShona',
+    category: 'african',
+    url: 'https://cdn.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/shona.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/shona.json',
+      'https://fastly.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/shona.json',
+      'https://raw.githubusercontent.com/emilsharkov/Holy-Bible-JSON/master/bibles/shona.json',
+    ],
+    sizeEstimate: '5.2 MB',
+  },
+  sotho: {
+    id: 'sotho',
+    name: 'Bibele (Sesotho)',
+    abbreviation: 'SOT',
+    description: 'Sesotho (Southern Sotho) - Full Bible',
+    language: 'Sesotho',
+    category: 'african',
+    url: 'https://cdn.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/sotho.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/sotho.json',
+      'https://fastly.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/sotho.json',
+      'https://raw.githubusercontent.com/emilsharkov/Holy-Bible-JSON/master/bibles/sotho.json',
+    ],
+    sizeEstimate: '5.1 MB',
+  },
+  tswana: {
+    id: 'tswana',
+    name: 'Baebele e e Boitshepo',
+    abbreviation: 'TSN',
+    description: 'Setswana - Full Bible',
+    language: 'Setswana',
+    category: 'african',
+    url: 'https://cdn.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/tswana.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/tswana.json',
+      'https://fastly.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/tswana.json',
+      'https://raw.githubusercontent.com/emilsharkov/Holy-Bible-JSON/master/bibles/tswana.json',
+    ],
+    sizeEstimate: '5.2 MB',
+  },
+  tsonga: {
+    id: 'tsonga',
+    name: 'Bibele ya Xitsonga',
+    abbreviation: 'TSO',
+    description: 'Xitsonga - Full Bible',
+    language: 'Xitsonga',
+    category: 'african',
+    url: 'https://cdn.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/tsonga.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/tsonga.json',
+      'https://fastly.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/tsonga.json',
+      'https://raw.githubusercontent.com/emilsharkov/Holy-Bible-JSON/master/bibles/tsonga.json',
+    ],
+    sizeEstimate: '5.3 MB',
+  },
+  tshivenda: {
+    id: 'tshivenda',
+    name: 'Bivhili Ya Tshivenda',
+    abbreviation: 'VEN',
+    description: 'Tshivenda - Full Bible',
+    language: 'Tshivenda',
+    category: 'african',
+    url: 'https://cdn.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/tshivenda.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/tshivenda.json',
+      'https://fastly.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/tshivenda.json',
+      'https://raw.githubusercontent.com/emilsharkov/Holy-Bible-JSON/master/bibles/tshivenda.json',
+    ],
+    sizeEstimate: '5.1 MB',
+  },
+  siswati: {
+    id: 'siswati',
+    name: 'LiBhayibheli Lelingcwele',
+    abbreviation: 'SSW',
+    description: 'siSwati - Full Bible',
+    language: 'siSwati',
+    category: 'african',
+    url: 'https://cdn.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/siswati.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/siswati.json',
+      'https://fastly.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/siswati.json',
+      'https://raw.githubusercontent.com/emilsharkov/Holy-Bible-JSON/master/bibles/siswati.json',
+    ],
+    sizeEstimate: '5.2 MB',
+  },
+  ndebele: {
+    id: 'ndebele',
+    name: 'IBhayibhili Elingcwele',
+    abbreviation: 'NDE',
+    description: 'isiNdebele (South Africa & Zimbabwe) - Full Bible',
+    language: 'isiNdebele',
+    category: 'african',
+    url: 'https://cdn.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/ndebele.json',
+    urls: [
+      'https://cdn.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/ndebele.json',
+      'https://fastly.jsdelivr.net/gh/emilsharkov/Holy-Bible-JSON@master/bibles/ndebele.json',
+      'https://raw.githubusercontent.com/emilsharkov/Holy-Bible-JSON/master/bibles/ndebele.json',
+    ],
+    sizeEstimate: '5.2 MB',
+  },
 
   // ── 2. POPULAR MODERN TRANSLATIONS ───────────────────────────────────────
   niv: {
@@ -235,6 +340,19 @@ export const TRANSLATION_SOURCES: Record<string, TranslationSourceConfig> = {
       'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_csb.json',
     ],
     sizeEstimate: '4.2 MB',
+  },
+  msg: {
+    id: 'msg',
+    name: 'The Message',
+    abbreviation: 'MSG',
+    description: 'Eugene Peterson paraphrase in contemporary English - Full Bible',
+    language: 'English',
+    category: 'popular',
+    url: 'https://bolls.life/static/translations/MSG.json',
+    urls: [
+      'https://bolls.life/static/translations/MSG.json',
+    ],
+    sizeEstimate: '4.8 MB',
   },
 
   // ── 3. CLASSIC & HISTORIC TRANSLATIONS ────────────────────────────────────
@@ -407,14 +525,18 @@ export const TRANSLATION_SOURCES: Record<string, TranslationSourceConfig> = {
 
 /**
  * Normalize diverse Bible JSON structures into the unified RawBibleBook[] schema.
- * Handles both:
+ * Handles:
  * 1. Standard / thiagobodruk schema: RawBibleBook[]
  * 2. godlytalias/Bible-Database schema: { Book: [ { Chapter: [ { Verse: [ { Verse: string } ] } ] } ] }
+ * 3. Flat verse array schema (bolls.life, emilsharkov/Holy-Bible-JSON): Array<{ book: number, chapter: number, verse: number, text: string }>
  */
 export function normalizeBibleJson(rawParsed: any): RawBibleBook[] {
-  if (Array.isArray(rawParsed) && rawParsed.length >= 66) {
+  // 1. Canonical RawBibleBook array with chapters
+  if (Array.isArray(rawParsed) && rawParsed.length >= 66 && rawParsed[0]?.chapters) {
     return rawParsed;
   }
+
+  // 2. godlytalias/Bible-Database nested Book array
   if (rawParsed && Array.isArray(rawParsed.Book) && rawParsed.Book.length >= 66) {
     return rawParsed.Book.map((bookObj: any, bIdx: number) => {
       const canon = BIBLE_BOOKS[bIdx];
@@ -433,7 +555,53 @@ export function normalizeBibleJson(rawParsed: any): RawBibleBook[] {
       };
     });
   }
-  throw new Error('Unrecognized Bible JSON schema: expected canonical 66-book array or { Book: [...] }');
+
+  // 3. Flat verse array schema (e.g. bolls.life MSG, emilsharkov African bibles)
+  if (
+    Array.isArray(rawParsed) &&
+    rawParsed.length > 500 &&
+    rawParsed[0]?.book !== undefined &&
+    rawParsed[0]?.chapter !== undefined
+  ) {
+    const booksMap: string[][][] = [];
+    for (let b = 0; b < 66; b++) {
+      booksMap.push([]);
+    }
+
+    for (const v of rawParsed) {
+      const bNum = typeof v.book === 'number' ? v.book : parseInt(v.book, 10);
+      const cNum = typeof v.chapter === 'number' ? v.chapter : parseInt(v.chapter, 10);
+      const vNum = typeof v.verse === 'number' ? v.verse : parseInt(v.verse, 10);
+      if (!bNum || bNum < 1 || bNum > 66) continue;
+      if (!cNum || cNum < 1) continue;
+
+      const bookChapters = booksMap[bNum - 1];
+      while (bookChapters.length < cNum) {
+        bookChapters.push([]);
+      }
+      const chapterVerses = bookChapters[cNum - 1];
+      const text = typeof v.text === 'string' ? v.text.trim() : '';
+      if (vNum > 0) {
+        while (chapterVerses.length < vNum) {
+          chapterVerses.push('');
+        }
+        chapterVerses[vNum - 1] = text;
+      } else {
+        chapterVerses.push(text);
+      }
+    }
+
+    return booksMap.map((chapters, bIdx) => {
+      const canon = BIBLE_BOOKS[bIdx];
+      return {
+        abbrev: canon ? canon.id : `b${bIdx + 1}`,
+        name: canon ? canon.name : `Book ${bIdx + 1}`,
+        chapters,
+      };
+    });
+  }
+
+  throw new Error('Unrecognized Bible JSON schema: expected canonical 66-book array, { Book: [...] }, or verse list');
 }
 
 export function getAllAvailableTranslations(): TranslationSourceConfig[] {
@@ -765,13 +933,25 @@ export async function deleteDownloadedTranslation(translationId: string): Promis
 }
 
 /**
- * Find canonical book index in standard Protestant 66-book order
+ * Find canonical book index in standard Protestant 66-book order.
+ * Handles full name, 3-letter abbreviation, and common aliases.
  */
-function findBookIndex(bookName: string): number {
-  const norm = bookName.trim().toLowerCase();
-  return BIBLE_BOOKS.findIndex(
-    (b) => b.name.toLowerCase() === norm || b.id.toLowerCase() === norm
-  );
+export function findBookIndex(bookName: string): number {
+  const norm = bookName.trim().toLowerCase().replace(/^(\d+)\s+/, '$1');
+  const rawNorm = bookName.trim().toLowerCase();
+
+  return BIBLE_BOOKS.findIndex((b) => {
+    const bName = b.name.toLowerCase();
+    const bId = b.id.toLowerCase();
+    const bCompressed = bName.replace(/^(\d+)\s+/, '$1');
+    return (
+      bName === rawNorm ||
+      bId === rawNorm ||
+      bCompressed === norm ||
+      (rawNorm === 'psalm' && bId === 'psa') ||
+      (rawNorm === 'song of songs' && bId === 'sng')
+    );
+  });
 }
 
 /**
