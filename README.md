@@ -26,6 +26,8 @@
   <img src="https://img.shields.io/badge/Rate%20Limiting-Lockout%20Protection-FDD223?style=for-the-badge" alt="Rate Limiting Lockout Protection" />
   <img src="https://img.shields.io/badge/Private%20Study-Incognito%20Mode-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Private Study Incognito Mode" />
   <img src="https://img.shields.io/badge/Scholar%20Privacy-Directory%20%7C%20Streak%20Visibility%20%7C%20Private%20Notes-FDD223?style=for-the-badge" alt="Scholar Privacy Controls" />
+  <img src="https://img.shields.io/badge/Encryption-AES--256--CBC%20%7C%20Keystore%20Key-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Hardware-Backed AES-256 Encryption" />
+  <img src="https://img.shields.io/badge/Safety%20Net-Pastoral%20Care%20%7C%2024%2F7%20Lifelines-FDD223?style=for-the-badge&logo=heart&logoColor=white" alt="Pastoral Care Safety Net" />
   <img src="https://img.shields.io/badge/Privacy-GDPR%20%7C%20POPIA%20%7C%20Data%20Export-3B82F6?style=for-the-badge" alt="Data Portability and Purge" />
   <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
@@ -69,6 +71,7 @@ graph TD
     HistoryStack --> WriterDetails["WriterDetailsScreen (PageSheet Biography & Manuscripts)"]
     
     SearchStack --> SearchMain["SearchScreen (User Discovery, Follow/Unfollow, Scholar Modal)"]
+    SearchStack --> PastoralCareModal["PastoralCareModal (24/7 Lifelines, SADAG & Scriptures)"]
     ProfileStack --> ProfileMain["ProfileScreen (Preferences, Reader Typography, Bookmarks Section)"]
     ProfileStack --> FavoritesMain["FavoritesScreen (Saved Collection)"]
     ProfileStack --> BookmarksMain["BookmarksScreen (Continuous Body Bookmarks Hub)"]
@@ -77,6 +80,7 @@ graph TD
     ProfileStack --> BlockedUsersMain["BlockedUsersScreen (Fellowship Moderation & Unblock Hub)"]
     ProfileStack --> LockTimeoutModal["LockTimeoutModal (Inactivity Timeout: 0s / 60s / 300s / 900s)"]
     ProfileStack --> SecurityPinModal["SecurityPinModal (Setup, Change, Remove & Verify PIN)"]
+    ProfileStack --> PastoralCareModal
     ProfileStack --> Terms
     ProfileStack --> Privacy
     
@@ -88,6 +92,8 @@ graph TD
         PinSecurityService["pinSecurityService.ts (Salted SHA-256 + Rate Limiting)"] --> BiometricLock
         BiometricService --> AppSwitcherShield["AppSwitcherShield (OS Snapshot Mask)"]
         PrivacyService["privacyService.ts (Private Study & Scholar Privacy)"] <--> UserContext
+        EncryptionService["encryptionService.ts (Pure TS AES-256-CBC, Keystore Master Key)"] <--> UserContext
+        PastoralCareService["pastoralCareService.ts (Distress Detection & Crisis Contacts)"] --> PastoralCareModal
         PrivacyService --> SearchMain
         SafetyService["safetyService.ts (Block & Report Content)"] --> SearchMain
         BibleCanon["bibleCanon.ts (66 Books & Fallback)"] --> BibleReader
@@ -220,6 +226,7 @@ exegeomai/
 │   │   ├── FactCard.tsx                  # Biblical fact card with Strong's deep dive
 │   │   ├── InAppNotificationBanner.tsx   # Real-time slide-in alert banner for in-app achievement unlocks
 │   │   ├── NotificationQuickSheet.tsx    # Interactive quick modal for notifications and devotions preview
+│   │   ├── PastoralCareModal.tsx         # 60-30-10 compassionate pastoral care modal (24/7 Lifelines, SADAG, Scriptures)
 │   │   ├── ScriptureCard.tsx             # Scripture card with genre vector badges
 │   │   ├── SearchBar.tsx                 # Search input with clear button and chips
 │   │   ├── SvgIcons.tsx                  # Pure vector SVG library (zero emojis)
@@ -262,9 +269,11 @@ exegeomai/
 │   │   └── WriterDetailsScreen.tsx       # In-depth modal sheet for biblical author biography & manuscripts
 │   ├── services/
 │   │   ├── bibleService.ts               # Multi-tier Bible reading and chapter caching engine
+│   │   ├── encryptionService.ts          # FIPS 197 AES-256-CBC pure TS cipher with Keystore/Keychain master key
 │   │   ├── inAppNotifications.ts         # In-app notification aggregator for sent push devotions and achievements
 │   │   ├── notifications.ts              # 365-day automated calendar push scheduler engine
 │   │   ├── offlineBibleService.ts        # Offline full-translation download, filesystem storage, and 0ms reader
+│   │   ├── pastoralCareService.ts        # Distress keyword analysis, 24/7 crisis lines & comforting Scriptures
 │   │   ├── privacyService.ts             # Hardware-persisted Private Study Mode (Incognito) & scholar privacy
 │   │   ├── supabase.ts                   # Supabase client SDK with AsyncStorage persistence
 │   │   └── updates.ts                    # Expo OTA updates check, download, and reload service
@@ -808,6 +817,16 @@ bible_fun_facts/
   - **Granular Scholar Directory Visibility**: Scholars can toggle their appearance in the public search directory (`isDiscoverableInSearch`).
   - **Study Streak Privacy**: Scholars can hide their active streak numbers and milestone counts from peer cards (`showStreaksPublicly`), rendering as a protected discreet placeholder (`Streak hidden` / `Private`).
   - **Private Notes & Bookmarks**: Ensures verse highlights, marginalia reflections, and study bookmarks remain offline and unindexed on local hardware storage (`SecureStoreAdapter`).
+- **Hardware-Encrypted Study Journal (AES-256) (`encryptionService.ts`)**:
+  - **FIPS 197 AES-256-CBC Pure TypeScript Engine**: Complete 14-round, 60-word key expansion cipher operating in CBC mode with PKCS#7 padding and SHA-256 MAC cryptographic integrity verification.
+  - **Zero-Native-Compilation Architecture**: Requires zero external C++ native build toolchains or custom linking, running natively across Expo Go, native Android/iOS compilation runners, and Over-The-Air (OTA) updates.
+  - **Hardware-Backed Master Key Lifecycle**: 256-bit symmetric encryption key is persisted in Android Keystore (`EncryptedSharedPreferences`) and iOS Keychain via `SecureStoreAdapter` (`@exegeomai_journal_aes_key_v1`).
+  - **Encrypted Data Portability**: Scholars can choose between Standard JSON or Hardware-Encrypted (AES-256) backup formats when exporting their study journal, bookmarks, and personal reflections.
+- **Pastoral Care & Spiritual Distress Safety Net (`pastoralCareService.ts` & `PastoralCareModal.tsx`)**:
+  - **Compassionate Distress Detection**: Real-time keyword analysis intercepts search terms indicative of profound grief, despair, suicide, loneliness, or self-harm (e.g., "suicide", "end my life", "hopeless", "depression", "brokenhearted", "cant go on").
+  - **Immediate 24/7 Lifelines**: Direct 1-tap phone and SMS dialer links for verified professional lifelines including the 988 Suicide & Crisis Lifeline (US/Canada), SADAG 24/7 Suicide Helpline (`0800 567 567` / SMS `31393`) and Mental Health Helpline (`0800 456 789`) in South Africa, and Samaritans (`116 123`) in the UK.
+  - **Comforting Canonical Scripture Promises**: Rotating interactive promises of hope and divine nearness (Psalm 34:18, Matthew 11:28, Romans 8:38-39, Jeremiah 29:11, Psalm 42:11).
+  - **Universal On-Demand Availability**: Accessible directly through Search prompts or anytime on-demand from the Profile tab under "Pastoral Care & Crisis Lifelines".
 - **Hardware Token Encryption (`SecureStoreAdapter.ts`)**: Supabase session tokens, user credentials, and biometric authorization keys are backed by Android Keystore (`EncryptedSharedPreferences`) and iOS Keychain via `expo-secure-store`. Features seamless size-limit handling and graceful fallback to on-device storage on unrooted environments.
 - **Biometric App Lock (`BiometricService.ts` & `BiometricLockOverlay.tsx`)**: Optional Face ID, Touch ID, or Android Biometric prompt gating access to the application and personal study journal. Locks automatically whenever the configured inactivity timeout is exceeded.
 - **Community Safety & Content Moderation (`SafetyService.ts` & `SearchScreen.tsx`)**:

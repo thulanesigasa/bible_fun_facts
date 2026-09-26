@@ -10,7 +10,7 @@ export const PIN_LOCKOUT_UNTIL_KEY = '@exegeomai_pin_lockout_until_v1';
  * Standard pure TypeScript SHA-256 implementation (FIPS 180-4).
  * Fully self-contained, zero external dependency, 100% crash-safe across all React Native runtimes.
  */
-function sha256(ascii: string): string {
+export function sha256(ascii: string): string {
   function rightRotate(value: number, amount: number): number {
     return (value >>> amount) | (value << (32 - amount));
   }

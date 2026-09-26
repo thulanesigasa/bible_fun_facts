@@ -38,6 +38,7 @@ import { UiverseSwitch } from '../components/UiverseSwitch';
 import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
 import { LockTimeoutModal } from '../components/LockTimeoutModal';
 import { SecurityPinModal, PinModalMode } from '../components/SecurityPinModal';
+import { PastoralCareModal } from '../components/PastoralCareModal';
 import { LOCK_TIMEOUT_OPTIONS } from '../services/biometricService';
 import {
   AchievementMilestone,
@@ -107,13 +108,36 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     }
   };
 
-  const handleExportJournal = async () => {
-    const res = await exportStudyJournal();
-    if (res.success) {
-      Alert.alert('Journal Exported', 'Your sacred study reflections, bookmarks, highlights, and streak data have been prepared.');
-    } else {
-      Alert.alert('Export Notice', res.error || 'Unable to export study journal at this time.');
-    }
+  const handleExportJournal = () => {
+    Alert.alert(
+      'Export Study Journal',
+      'Choose how you would like to package your study journal, verse highlights, and bookmarks.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Encrypted (AES-256)',
+          onPress: async () => {
+            const res = await exportStudyJournal({ encrypted: true });
+            if (res.success) {
+              Alert.alert('Encrypted Journal Exported', 'Your reflections and study notes have been encrypted with your device AES-256 hardware key and shared.');
+            } else {
+              Alert.alert('Export Notice', res.error || 'Unable to export encrypted journal.');
+            }
+          },
+        },
+        {
+          text: 'Standard JSON',
+          onPress: async () => {
+            const res = await exportStudyJournal({ encrypted: false });
+            if (res.success) {
+              Alert.alert('Journal Exported', 'Your study reflections, bookmarks, highlights, and streak data have been prepared.');
+            } else {
+              Alert.alert('Export Notice', res.error || 'Unable to export study journal at this time.');
+            }
+          },
+        },
+      ]
+    );
   };
 
   const handleConfirmDeleteAccount = () => {
@@ -141,6 +165,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
   const [showTimeoutModal, setShowTimeoutModal] = useState<boolean>(false);
   const [showPinModal, setShowPinModal] = useState<boolean>(false);
   const [pinModalMode, setPinModalMode] = useState<PinModalMode>('setup');
+  const [showPastoralModal, setShowPastoralModal] = useState<boolean>(false);
   const [inspectedAchievement, setInspectedAchievement] =
     useState<AchievementMilestone | null>(null);
 
@@ -1145,20 +1170,43 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
 
           <View style={styles.rowDivider} />
 
+          {/* Pastoral Care & Crisis Lifelines */}
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={() => setShowPastoralModal(true)}
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel="Pastoral Care & 24/7 Crisis Lifelines. Tap to open support lines and comforting scriptures."
+          >
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Pastoral Care & Crisis Lifelines
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                24/7 confidential helplines, SADAG, and comforting scriptures
+              </Text>
+            </View>
+            <Text variant="caption" weight="700" color={colors.accent}>
+              Support ›
+            </Text>
+          </TouchableOpacity>
+
+          <View style={styles.rowDivider} />
+
           {/* Export Study Journal */}
           <TouchableOpacity
             style={styles.actionRow}
             onPress={handleExportJournal}
             activeOpacity={0.75}
             accessibilityRole="button"
-            accessibilityLabel="Export study journal to JSON"
+            accessibilityLabel="Export study journal to JSON or AES-256 encrypted file"
           >
             <View style={styles.rowTitleBox}>
               <Text variant="h3" style={styles.rowTitle}>
                 Export Study Journal
               </Text>
               <Text variant="caption" color={colors.textSecondary}>
-                Download your bookmarks, highlights, reflections, and streak (JSON)
+                Encrypted AES-256 backup or standard JSON format
               </Text>
             </View>
             <Text variant="caption" weight="700" color={colors.accent}>
@@ -1313,6 +1361,12 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           setShowPinModal(false);
         }}
         onClose={() => setShowPinModal(false)}
+      />
+
+      {/* Pastoral Care & Crisis Lifeline Modal */}
+      <PastoralCareModal
+        visible={showPastoralModal}
+        onClose={() => setShowPastoralModal(false)}
       />
     </SafeAreaView>
   );

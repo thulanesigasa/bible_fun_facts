@@ -29,7 +29,10 @@ import {
   FlagSvg,
   BlockSvg,
   IncognitoSvg,
+  HeartSvg,
 } from '../components/SvgIcons';
+import { PastoralCareModal } from '../components/PastoralCareModal';
+import { PastoralCareService } from '../services/pastoralCareService';
 
 type FilterCategory = 'All' | 'Scholars' | 'Pastors' | 'Exegesis' | 'Linguistics';
 
@@ -43,6 +46,11 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
   const [loading, setLoading] = useState<boolean>(true);
   const [reportingUser, setReportingUser] = useState<CommunityUser | null>(null);
   const [selectedReportReason, setSelectedReportReason] = useState<'harassment' | 'inappropriate' | 'spam' | 'impersonation' | 'other'>('harassment');
+  const [showPastoralModal, setShowPastoralModal] = useState<boolean>(false);
+
+  const distressAnalysis = useMemo(() => {
+    return PastoralCareService.checkQueryForDistress(searchText);
+  }, [searchText]);
 
   const {
     userProfile,
@@ -244,6 +252,32 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
             clearButtonMode="while-editing"
           />
         </View>
+
+        {/* Pastoral Care & Crisis Lifeline Distress Banner */}
+        {distressAnalysis.isTriggered && (
+          <TouchableOpacity
+            style={styles.pastoralCareBanner}
+            onPress={() => setShowPastoralModal(true)}
+            activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel="Pastoral Care & 24/7 Crisis Support Available. Tap to view resources."
+          >
+            <View style={styles.pastoralIconWrap}>
+              <HeartSvg size={18} color="#0F172A" />
+            </View>
+            <View style={styles.pastoralTextWrap}>
+              <Text variant="caption" weight="800" color="#0F172A">
+                Help & Hope Are Available 24/7
+              </Text>
+              <Text variant="caption" color={colors.textSecondary} style={{ fontSize: 11 }}>
+                Confidential crisis helplines, SADAG & comforting Scriptures.
+              </Text>
+            </View>
+            <Text variant="caption" weight="800" color="#0F172A">
+              View ›
+            </Text>
+          </TouchableOpacity>
+        )}
 
         {/* Filter Categories */}
         <ScrollView
@@ -653,6 +687,13 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
           </View>
         </View>
       </Modal>
+
+      {/* Pastoral Care & Crisis Lifeline Modal */}
+      <PastoralCareModal
+        visible={showPastoralModal}
+        onClose={() => setShowPastoralModal(false)}
+        triggeredKeyword={distressAnalysis.matchedKeyword}
+      />
     </SafeAreaView>
   );
 }
@@ -1089,6 +1130,36 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   incognitoBannerTextWrap: {
+    flex: 1,
+  },
+  pastoralCareBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(253, 210, 35, 0.4)',
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
+    gap: 12,
+  },
+  pastoralIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FEFCE8',
+    borderWidth: 1,
+    borderColor: 'rgba(253, 210, 35, 0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pastoralTextWrap: {
     flex: 1,
   },
 });
