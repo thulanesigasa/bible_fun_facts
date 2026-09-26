@@ -45,6 +45,11 @@ import AuthScreen from '../screens/AuthScreen';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import TermsOfServiceScreen from '../screens/TermsOfServiceScreen';
 import PrivacyPolicyScreen from '../screens/PrivacyPolicyScreen';
+import PastoralCareScreen from '../screens/PastoralCareScreen';
+import QuietHoursScreen from '../screens/QuietHoursScreen';
+import DeviceSessionsScreen from '../screens/DeviceSessionsScreen';
+import ExportJournalScreen from '../screens/ExportJournalScreen';
+import DeleteAccountScreen from '../screens/DeleteAccountScreen';
 
 export type AuthStackParamList = {
   Welcome: undefined;
@@ -73,6 +78,11 @@ export type RootStackParamList = {
   TermsOfService: undefined;
   PrivacyPolicy: undefined;
   BlockedUsers: undefined;
+  PastoralCare: undefined;
+  QuietHours: undefined;
+  DeviceSessions: undefined;
+  ExportJournal: undefined;
+  DeleteAccount: undefined;
 };
 
 const Tab = createBottomTabNavigator();
@@ -138,6 +148,12 @@ function shouldShowTabHeader(route: any): boolean {
     'WriterDetails',
     'ScriptureDetails',
     'WOTDDetails',
+    'BlockedUsers',
+    'PastoralCare',
+    'QuietHours',
+    'DeviceSessions',
+    'ExportJournal',
+    'DeleteAccount',
   ];
   return !childScreens.includes(routeName);
 }
@@ -149,7 +165,12 @@ function getTabBarVisibility(route: any, hideTabBar: boolean): 'none' | 'flex' {
     routeName === 'TermsOfService' ||
     routeName === 'PrivacyPolicy' ||
     routeName === 'Achievements' ||
-    routeName === 'Notifications'
+    routeName === 'Notifications' ||
+    routeName === 'PastoralCare' ||
+    routeName === 'QuietHours' ||
+    routeName === 'DeviceSessions' ||
+    routeName === 'ExportJournal' ||
+    routeName === 'DeleteAccount'
   ) {
     return 'none';
   }
@@ -236,6 +257,25 @@ function SearchStack() {
         options={{
           presentation: 'pageSheet',
           headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="PastoralCare"
+        component={PastoralCareScreen}
+        options={{
+          headerShown: true,
+          title: 'Pastoral Care & Lifelines',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
           contentStyle: { backgroundColor: colors.background },
         }}
       />
@@ -424,6 +464,101 @@ function ProfileStack() {
         options={{
           headerShown: true,
           title: 'Blocked Accounts',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="PastoralCare"
+        component={PastoralCareScreen}
+        options={{
+          headerShown: true,
+          title: 'Pastoral Care & Lifelines',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="QuietHours"
+        component={QuietHoursScreen}
+        options={{
+          headerShown: true,
+          title: 'Quiet Hours',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="DeviceSessions"
+        component={DeviceSessionsScreen}
+        options={{
+          headerShown: true,
+          title: 'Device Sessions & Audit',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="ExportJournal"
+        component={ExportJournalScreen}
+        options={{
+          headerShown: true,
+          title: 'Export Study Journal',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="DeleteAccount"
+        component={DeleteAccountScreen}
+        options={{
+          headerShown: true,
+          title: 'Delete Account & Purge',
           headerStyle: {
             backgroundColor: '#FFFFFF',
           },
