@@ -80,19 +80,22 @@ graph TD
     
     SearchStack --> SearchMain["SearchScreen (User Discovery, Follow/Unfollow, Scholar Modal)"]
     SearchStack --> PastoralCareScreen["PastoralCareScreen (24/7 Lifelines, SADAG & Scriptures)"]
-    ProfileStack --> ProfileMain["ProfileScreen (Preferences, Reader Typography, Bookmarks Section)"]
+    ProfileStack --> ProfileMain["ProfileScreen (Modular Hub, Saved Collection & Account)"]
+    ProfileStack --> ReadingSettingsScreen["ReadingSettingsScreen (Reader Typography & Red Letters)"]
+    ProfileStack --> PrivacyScreen["PrivacyScreen (Study Mode, Directory, Streaks, Notes & Blocked Accounts)"]
+    ProfileStack --> SecurityScreen["SecurityScreen (Inactivity Lock, PIN & Biometrics)"]
+    ProfileStack --> SecurityPinScreen["SecurityPinScreen (Dedicated PIN Management & In-Screen Keypad)"]
+    ProfileStack --> InactivityLockScreen["InactivityLockScreen (Auto-Lock Timeout: 0s / 60s / 300s / 900s)"]
+    ProfileStack --> PastoralCareScreen["PastoralCareScreen (Seamless Body Canvas, 24/7 Lifelines & SADAG)"]
+    ProfileStack --> QuietHoursScreen["QuietHoursScreen (Lord's Day, Sabbath, Quiet Hours & Days)"]
+    ProfileStack --> DeviceSessionsScreen["DeviceSessionsScreen (Hardware Info, Audit Log & Session Revoke)"]
+    ProfileStack --> ExportJournalScreen["ExportJournalScreen (Hardware AES-256 Encrypted & JSON Backup)"]
+    ProfileStack --> DeleteAccountScreen["DeleteAccountScreen (GDPR / POPIA Account & Data Purge)"]
     ProfileStack --> FavoritesMain["FavoritesScreen (Saved Collection)"]
     ProfileStack --> BookmarksMain["BookmarksScreen (Continuous Body Bookmarks Hub)"]
     BookmarksMain -.->|One-Tap Jump| BibleReader
     ProfileStack --> AchievementsMain["AchievementsScreen (48 Milestones, 4 Distinct Geometric Shapes, 3-per-Row Grid)"]
     ProfileStack --> BlockedUsersMain["BlockedUsersScreen (Fellowship Moderation & Unblock Hub)"]
-    ProfileStack --> LockTimeoutModal["LockTimeoutModal (Inactivity Timeout: 0s / 60s / 300s / 900s)"]
-    ProfileStack --> SecurityPinModal["SecurityPinModal (Setup, Change, Remove & Verify PIN)"]
-    ProfileStack --> PastoralCareScreen
-    ProfileStack --> QuietHoursScreen["QuietHoursScreen (Lord's Day, Sabbath, Quiet Hours & Days)"]
-    ProfileStack --> DeviceSessionsScreen["DeviceSessionsScreen (Hardware Info, Audit Log & Session Revoke)"]
-    ProfileStack --> ExportJournalScreen["ExportJournalScreen (Hardware AES-256 Encrypted & JSON Backup)"]
-    ProfileStack --> DeleteAccountScreen["DeleteAccountScreen (GDPR / POPIA Account & Data Purge)"]
     ProfileStack --> Terms
     ProfileStack --> Privacy
     
@@ -227,7 +230,13 @@ The application replaces all native OS alert dialogs with a unified, custom Reac
   - `Warning` (amber `#D97706` icon on soft amber `#FFFBEB` container) for study notes clearing, PIN removal, and reporting.
   - `Neutral / Security` (slate `#0F172A` icon on soft slate `#F8FAFC` container) for biometric, PIN, hardware info, and sign out confirmations.
   - `Success` (emerald `#16A34A` icon on soft green `#F0FDF4` container) for completed backups, exports, and profile updates.
-- **Universal Provider Hook**: `useThemedAlert()` delivers a simple imperative API (`showAlert({ title, message, icon, buttons, isDestructive })`) across all views without requiring local modal state boilerplate.
+### 7. Modular Privacy, Security & Body Canvas Architecture (Rule 1 & Rule 15/19)
+- **Divided Privacy vs. Safety & Security**: ProfileScreen replaces deeply nested toggle rows with clear, dedicated navigation destinations:
+  - **Privacy (`PrivacyScreen.tsx`)**: Controls Private Study Mode (Incognito), Public Scholar Directory discovery, Show Study Streak to Peers, Private Notes & Bookmarks, and grouped Blocked Accounts management with immediate persistent state updates.
+  - **Safety & Security (`SecurityScreen.tsx`)**: Centralizes Inactivity Auto-Lock (`InactivityLockScreen.tsx`), 4-Digit Security PIN (`SecurityPinScreen.tsx`), Biometrics (`Fingerprint`), and App Switcher Multitasking Privacy Shield.
+- **Dedicated 4-Digit Security PIN Screen (`SecurityPinScreen.tsx`)**: Decoupled from popup alert dialogs into a dedicated full management interface featuring in-screen numeric keypad input, animated shake feedback on error, salted SHA-256 cryptographic verification, PIN setup/change/removal workflows, and hardware Keystore specification audit.
+- **Seamless Body Canvas & Zero Iconography Policy**: Screens such as `PastoralCareScreen.tsx` and `DeleteAccountScreen.tsx` eliminate bulky card/box containers ("divs") and decorative icons (heart, trash, phone), allowing content—such as 24/7 crisis lines (SADAG, Samaritans), comforting scripture promises, and GDPR erasure summaries—to integrate directly into the body canvas.
+- **Minimalist Lock Overlay Aesthetics**: `BiometricLockOverlay.tsx` strips container borders and background radiuses from the logo, eliminates the redundant hardware encryption box, retains solely the clean application title `exégeomai`, and replaces oversized buttons with sleek text-styled action touchables.
 
 ---
 
@@ -279,19 +288,30 @@ exegeomai/
 │   ├── screens/                          # Application views
 │   │   ├── AchievementsScreen.tsx        # 48 milestones, 4 distinct geometric tier shapes, 3-per-row grid
 │   │   ├── AuthScreen.tsx                # Dedicated Login & Sign Up with 28x28 calibrated logo
+│   │   ├── BlockedUsersScreen.tsx        # Fellowship moderation and blocked scholars manager
 │   │   ├── BookmarksScreen.tsx           # Dedicated Bookmarks continuous body view (flat rows, dotted underlines)
+│   │   ├── DeleteAccountScreen.tsx       # GDPR / POPIA Account & Data Purge (direct-body canvas, zero card divs)
+│   │   ├── DeviceSessionsScreen.tsx      # Device hardware info, security audit log, and global session revocation
 │   │   ├── DiscoverScreen.tsx            # Daily 1-message calendar exegesis view with top-right bell header
 │   │   ├── DownloadedVersesScreen.tsx    # Offline translations and verses view
+│   │   ├── ExportJournalScreen.tsx       # Hardware AES-256 encrypted and standard JSON backup exporter
 │   │   ├── FactDetailsScreen.tsx         # In-depth modal sheet for biblical facts
 │   │   ├── FavoritesScreen.tsx           # Saved collection (Facts, Scriptures, WOTD)
 │   │   ├── HistoryScreen.tsx             # Sacred History catalog of biblical authors with search & categories
 │   │   ├── HomeScreen.tsx                # Alternate home showcase
-│   │   ├── NotificationsScreen.tsx       # Continuous flat body notifications center (zero card divs, dotted underlines, Word Reader deep linking)
+│   │   ├── InactivityLockScreen.tsx      # Dedicated auto-lock timeout selector (Immediately / 1m / 5m / 15m)
+│   │   ├── NotificationsScreen.tsx       # Continuous flat body notifications center (zero card divs, dotted underlines)
+│   │   ├── PastoralCareScreen.tsx        # 24/7 Lifelines, SADAG, and Scripture promises (seamless body canvas, zero icons)
 │   │   ├── PrivacyPolicyScreen.tsx       # 11-section privacy policy modal screen
-│   │   ├── ProfileScreen.tsx             # Profile tab (Bookmarks, Red-letter toggle, Reader font size)
+│   │   ├── PrivacyScreen.tsx             # Modular privacy settings (Study mode, directory, streak visibility, private notes)
+│   │   ├── ProfileScreen.tsx             # Profile tab (Modular hub, reading settings, privacy, and account security)
+│   │   ├── QuietHoursScreen.tsx          # Digital Sabbath and custom quiet hours scheduler
+│   │   ├── ReadingSettingsScreen.tsx     # Reader typography, font size slider, classical serif/sans, and red-letters
 │   │   ├── ScriptureDetailsScreen.tsx    # In-depth modal sheet for scripture texts
 │   │   ├── ScripturesScreen.tsx          # Scripture library
 │   │   ├── SearchScreen.tsx              # Unified search and community scholar interface
+│   │   ├── SecurityPinScreen.tsx         # Dedicated 4-digit Security PIN management screen with in-screen keypad
+│   │   ├── SecurityScreen.tsx            # Safety & Security hub (Inactivity lock, 4-digit PIN, biometrics & app shield)
 │   │   ├── TermsOfServiceScreen.tsx      # 13-section terms of service modal screen
 │   │   ├── WelcomeScreen.tsx             # 3-step onboarding flow with custom vector art & dual CTAs
 │   │   ├── WOTDDetailsScreen.tsx         # Deep-dive view for Word of the Day

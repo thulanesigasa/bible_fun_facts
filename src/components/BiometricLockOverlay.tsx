@@ -8,10 +8,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors } from '../theme/colors';
-import { spacing, radius, shadow } from '../theme';
 import { Text } from './Typography';
-import { LockSvg, FingerprintSvg, KeypadSvg } from './SvgIcons';
 import { SecurityPinModal } from './SecurityPinModal';
 import { PinSecurityService } from '../services/pinSecurityService';
 
@@ -23,7 +20,7 @@ interface BiometricLockOverlayProps {
 
 export const BiometricLockOverlay: React.FC<BiometricLockOverlayProps> = ({
   visible,
-  biometricType = 'Face ID / Fingerprint',
+  biometricType = 'Fingerprint',
   onUnlock,
 }) => {
   const [showPinModal, setShowPinModal] = React.useState<boolean>(false);
@@ -42,61 +39,50 @@ export const BiometricLockOverlay: React.FC<BiometricLockOverlayProps> = ({
       <SafeAreaView style={styles.container} edges={['top', 'bottom', 'left', 'right']}>
         <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
         <View style={styles.content}>
-          {/* Brand Container per Rule 15 / 19 */}
-          <View style={styles.logoOuter}>
-            <Image
-              source={require('../../assets/logo-transparent.png')}
-              style={styles.logoImage}
-              resizeMode="contain"
-            />
-          </View>
+          {/* Logo with Zero Border-Radius Container per User Instruction */}
+          <Image
+            source={require('../../assets/logo-transparent.png')}
+            style={styles.brandLogo}
+            resizeMode="contain"
+          />
 
+          {/* App Name Only (Secured text removed per user instruction) */}
           <Text variant="h2" weight="800" color="#0F172A" style={styles.title}>
-            exégeomai Secured
+            exégeomai
           </Text>
 
           <Text variant="body" color="#64748B" style={styles.subtitle}>
             Your sacred study journal, bookmarks, and reflections are locked.
           </Text>
 
-          <View style={styles.cardContainer}>
-            <View style={styles.iconCircle}>
-              <LockSvg size={28} color="#0F172A" strokeWidth={2.2} />
-            </View>
-            <Text variant="caption" color="#64748B" style={styles.cardText}>
-              Protected with hardware encryption & device credentials
-            </Text>
-          </View>
-
-          {/* Action Button: Biometrics */}
-          <TouchableOpacity
-            style={styles.unlockButton}
-            onPress={onUnlock}
-            activeOpacity={0.85}
-            accessibilityRole="button"
-            accessibilityLabel={`Unlock with ${biometricType || 'Biometrics'}`}
-          >
-            <FingerprintSvg size={20} color="#0F172A" strokeWidth={2.5} />
-            <Text variant="body" weight="800" color="#0F172A" style={styles.unlockButtonText}>
-              {`Unlock with ${biometricType || 'Biometrics'}`}
-            </Text>
-          </TouchableOpacity>
-
-          {/* Secondary Action: Security PIN Fallback */}
-          {hasPin && (
+          {/* Aesthetic Text-Styled Actions (Chunky buttons removed per user instruction) */}
+          <View style={styles.actionsContainer}>
             <TouchableOpacity
-              style={styles.pinFallbackButton}
-              onPress={() => setShowPinModal(true)}
-              activeOpacity={0.8}
+              style={styles.textActionButton}
+              onPress={onUnlock}
+              activeOpacity={0.7}
               accessibilityRole="button"
-              accessibilityLabel="Unlock with 4-Digit Security PIN"
+              accessibilityLabel="Unlock with Fingerprint"
             >
-              <KeypadSvg size={18} color="#0F172A" strokeWidth={2} />
-              <Text variant="body" weight="700" color="#0F172A" style={styles.pinFallbackText}>
-                Use Security PIN
+              <Text variant="body" weight="700" color="#0F172A" style={styles.actionText}>
+                Unlock with Fingerprint
               </Text>
             </TouchableOpacity>
-          )}
+
+            {hasPin && (
+              <TouchableOpacity
+                style={styles.secondaryTextActionButton}
+                onPress={() => setShowPinModal(true)}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel="Use Security PIN"
+              >
+                <Text variant="caption" weight="600" color="#64748B" style={styles.secondaryActionText}>
+                  Use Security PIN
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       </SafeAreaView>
 
@@ -130,30 +116,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     alignItems: 'center',
   },
-  // In-app update / lock logo sizing per Rule 15 / 19
-  logoOuter: {
-    width: 68,
-    height: 68,
-    borderRadius: 18,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 4,
-  },
-  logoImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 12,
+  brandLogo: {
+    width: 60,
+    height: 60,
+    marginBottom: 16,
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
     textAlign: 'center',
     marginBottom: 8,
@@ -161,78 +130,35 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 13,
     textAlign: 'center',
-    lineHeight: 18,
-    marginBottom: 28,
+    lineHeight: 19,
+    color: '#64748B',
+    marginBottom: 36,
   },
-  cardContainer: {
-    width: '100%',
-    backgroundColor: '#FFFFFF', // 30% Surface Panel
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    borderRadius: 16,
-    padding: 18,
+  actionsContainer: {
     alignItems: 'center',
-    marginBottom: 32,
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
+    gap: 16,
+    width: '100%',
   },
-  iconCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(253, 210, 35, 0.16)', // 10% Accent Tint
+  textActionButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
   },
-  cardText: {
-    fontSize: 12,
-    textAlign: 'center',
-    lineHeight: 16,
+  actionText: {
+    fontSize: 15,
+    letterSpacing: 0.2,
   },
-  unlockButton: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#FDD223', // 10% Accent
-    borderRadius: 14,
-    flexDirection: 'row',
+  secondaryTextActionButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    elevation: 3,
   },
-  unlockButtonText: {
-    fontSize: 14,
-  },
-  pinFallbackButton: {
-    width: '100%',
-    height: 48,
-    backgroundColor: '#FFFFFF', // 30% Surface Panel
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: 12,
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  pinFallbackText: {
+  secondaryActionText: {
     fontSize: 13,
+    letterSpacing: 0.2,
   },
 });
 
 export default BiometricLockOverlay;
-

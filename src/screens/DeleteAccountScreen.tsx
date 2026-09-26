@@ -9,14 +9,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
-import { spacing, radius, shadow } from '../theme';
+import { spacing, radius } from '../theme';
 import { Text } from '../components/Typography';
 import { useThemedAlert } from '../context/AlertContext';
-import {
-  TrashSvg,
-  CheckSvg,
-  ShieldLockSvg,
-} from '../components/SvgIcons';
+import { CheckSvg } from '../components/SvgIcons';
 import { useUser } from '../context/UserContext';
 
 export default function DeleteAccountScreen({ navigation }: { navigation?: any }) {
@@ -82,14 +78,7 @@ export default function DeleteAccountScreen({ navigation }: { navigation?: any }
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Rule 15/19 Logo Container: 50x50 icon inside 68x68 rounded container */}
-        <View style={styles.logoRow}>
-          <View style={[styles.logoContainer, shadow.sm]}>
-            <TrashSvg size={36} color="#0F172A" />
-          </View>
-        </View>
-
-        {/* Intro Header */}
+        {/* Intro Header - Clean Body Canvas (Zero Icons, Zero Outer Divs) */}
         <View style={styles.introHeader}>
           <Text variant="h2" weight="800" color={colors.textPrimary} style={styles.mainTitle}>
             Delete Account & Purge Data
@@ -99,50 +88,56 @@ export default function DeleteAccountScreen({ navigation }: { navigation?: any }
           </Text>
         </View>
 
-        {/* What Will Be Deleted Section */}
+        {/* What Will Be Permanently Erased - Part of the Body (No Container Divs) */}
         <View style={styles.bodySection}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             WHAT WILL BE PERMANENTLY ERASED
           </Text>
 
-          <View style={[styles.warningCard, shadow.sm]}>
-            <View style={styles.warningRow}>
-              <View style={styles.dotIndicator} />
-              <Text variant="caption" color={colors.textPrimary} style={styles.warningText}>
-                Your cloud profile (@{userProfile?.username || 'scholar'}), email, and credentials
-              </Text>
-            </View>
+          <View style={styles.eraseItem}>
+            <Text variant="caption" weight="700" color={colors.textPrimary} style={styles.eraseTitle}>
+              Cloud Profile & Credentials
+            </Text>
+            <Text variant="caption" color={colors.textSecondary} style={styles.eraseDescription}>
+              Your cloud profile (@{userProfile?.username || 'scholar'}), registered email, and hardware Keystore credentials
+            </Text>
+          </View>
 
-            <View style={styles.cardDivider} />
+          <View style={styles.itemDivider} />
 
-            <View style={styles.warningRow}>
-              <View style={styles.dotIndicator} />
-              <Text variant="caption" color={colors.textPrimary} style={styles.warningText}>
-                All saved bookmarks, study reflections, and verse highlights
-              </Text>
-            </View>
+          <View style={styles.eraseItem}>
+            <Text variant="caption" weight="700" color={colors.textPrimary} style={styles.eraseTitle}>
+              Study Journal & Reflections
+            </Text>
+            <Text variant="caption" color={colors.textSecondary} style={styles.eraseDescription}>
+              All saved bookmarks, study reflections, and verse highlights
+            </Text>
+          </View>
 
-            <View style={styles.cardDivider} />
+          <View style={styles.itemDivider} />
 
-            <View style={styles.warningRow}>
-              <View style={styles.dotIndicator} />
-              <Text variant="caption" color={colors.textPrimary} style={styles.warningText}>
-                Your daily exegesis study streak and unlocked achievements
-              </Text>
-            </View>
+          <View style={styles.eraseItem}>
+            <Text variant="caption" weight="700" color={colors.textPrimary} style={styles.eraseTitle}>
+              Streak & Unlocked Milestones
+            </Text>
+            <Text variant="caption" color={colors.textSecondary} style={styles.eraseDescription}>
+              Your daily exegesis study streak and unlocked achievements
+            </Text>
+          </View>
 
-            <View style={styles.cardDivider} />
+          <View style={styles.itemDivider} />
 
-            <View style={styles.warningRow}>
-              <View style={styles.dotIndicator} />
-              <Text variant="caption" color={colors.textPrimary} style={styles.warningText}>
-                All active device sessions and hardware Keystore keys
-              </Text>
-            </View>
+          <View style={styles.eraseItem}>
+            <Text variant="caption" weight="700" color={colors.textPrimary} style={styles.eraseTitle}>
+              Active Device Sessions
+            </Text>
+            <Text variant="caption" color={colors.textSecondary} style={styles.eraseDescription}>
+              All active hardware sessions and cryptographic keys
+            </Text>
           </View>
         </View>
 
-        {/* Dual Safeguard Confirmation Section */}
+        {/* Confirmation Safeguards - Part of the Body */}
         <View style={styles.bodySection}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             CONFIRMATION SAFEGUARDS
@@ -150,7 +145,7 @@ export default function DeleteAccountScreen({ navigation }: { navigation?: any }
 
           {/* Checkbox Acknowledgment */}
           <TouchableOpacity
-            style={[styles.checkboxRow, shadow.sm]}
+            style={styles.checkboxRow}
             onPress={() => setConfirmedCheck(!confirmedCheck)}
             activeOpacity={0.8}
             accessibilityRole="checkbox"
@@ -166,7 +161,7 @@ export default function DeleteAccountScreen({ navigation }: { navigation?: any }
           </TouchableOpacity>
 
           {/* Type DELETE Input */}
-          <View style={[styles.inputCard, shadow.sm]}>
+          <View style={styles.inputBlock}>
             <Text variant="caption" weight="700" color={colors.textTertiary} style={styles.inputPrompt}>
               Type <Text weight="800" color={colors.textPrimary}>DELETE</Text> to verify your intention:
             </Text>
@@ -187,7 +182,6 @@ export default function DeleteAccountScreen({ navigation }: { navigation?: any }
           <TouchableOpacity
             style={[
               styles.purgeBtn,
-              shadow.sm,
               !isConfirmed && styles.purgeBtnDisabled,
             ]}
             onPress={handleExecuteDelete}
@@ -230,38 +224,21 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background, // 60% Dominant Canvas #F8FAFC
   },
   scrollContent: {
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.lg,
+    paddingHorizontal: spacing.md, // 16px
+    paddingTop: spacing.lg,        // 24px
     paddingBottom: 48,
   },
-  logoRow: {
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  logoContainer: {
-    width: 68,
-    height: 68,
-    borderRadius: 18,
-    backgroundColor: colors.surface, // 30% Panel #FFFFFF
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   introHeader: {
-    alignItems: 'center',
     marginBottom: spacing.lg,
-    paddingHorizontal: spacing.sm,
   },
   mainTitle: {
-    fontSize: 20,
-    textAlign: 'center',
-    marginBottom: 4,
+    fontSize: 22,
+    lineHeight: 28,
+    marginBottom: 6,
   },
   leadParagraph: {
     fontSize: 13,
-    lineHeight: 19,
-    textAlign: 'center',
+    lineHeight: 20,
     color: colors.textSecondary,
   },
   bodySection: {
@@ -271,46 +248,29 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   sectionHeader: {
-    fontSize: 10,
-    letterSpacing: 0.6,
+    letterSpacing: 1.2,
     marginBottom: spacing.sm,
   },
-  warningCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
+  eraseItem: {
+    paddingVertical: 8,
   },
-  warningRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 7,
+  eraseTitle: {
+    fontSize: 13,
+    marginBottom: 2,
   },
-  dotIndicator: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#0F172A',
-    marginRight: spacing.sm,
-  },
-  warningText: {
+  eraseDescription: {
     fontSize: 12,
-    flex: 1,
     lineHeight: 17,
   },
-  cardDivider: {
+  itemDivider: {
     height: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.04)',
+    backgroundColor: 'rgba(15, 23, 42, 0.05)',
+    marginVertical: 4,
   },
   checkboxRow: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
     flexDirection: 'row',
     alignItems: 'center',
+    paddingVertical: 10,
     marginBottom: spacing.sm,
   },
   checkBoxSquare: {
@@ -322,6 +282,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.sm,
+    backgroundColor: '#FFFFFF',
   },
   checkBoxSquareChecked: {
     backgroundColor: '#0F172A',
@@ -330,32 +291,28 @@ const styles = StyleSheet.create({
   checkboxLabel: {
     fontSize: 12,
     flex: 1,
-    lineHeight: 16,
+    lineHeight: 17,
   },
-  inputCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
+  inputBlock: {
+    marginTop: 4,
   },
   inputPrompt: {
     fontSize: 11,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   textInput: {
-    backgroundColor: colors.background,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.12)',
     borderRadius: radius.sm,
     paddingHorizontal: spacing.sm,
-    paddingVertical: 9,
+    paddingVertical: 10,
     fontSize: 13,
     fontWeight: '700',
     color: colors.textPrimary,
   },
   purgeBtn: {
-    backgroundColor: '#0F172A',
+    backgroundColor: '#0F172A', // 10% Accent
     paddingVertical: 13,
     borderRadius: radius.sm,
     alignItems: 'center',
