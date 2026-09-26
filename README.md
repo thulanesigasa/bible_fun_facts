@@ -28,6 +28,9 @@
   <img src="https://img.shields.io/badge/Scholar%20Privacy-Directory%20%7C%20Streak%20Visibility%20%7C%20Private%20Notes-FDD223?style=for-the-badge" alt="Scholar Privacy Controls" />
   <img src="https://img.shields.io/badge/Encryption-AES--256--CBC%20%7C%20Keystore%20Key-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Hardware-Backed AES-256 Encryption" />
   <img src="https://img.shields.io/badge/Safety%20Net-Pastoral%20Care%20%7C%2024%2F7%20Lifelines-FDD223?style=for-the-badge&logo=heart&logoColor=white" alt="Pastoral Care Safety Net" />
+  <img src="https://img.shields.io/badge/Digital%20Sabbath-Quiet%20Hours%20%7C%20Rest%20Windows-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Digital Sabbath Quiet Hours" />
+  <img src="https://img.shields.io/badge/Device%20Security-Audit%20Log%20%7C%20Session%20Revocation-FDD223?style=for-the-badge&logo=shield&logoColor=white" alt="Device Security and Audit Log" />
+  <img src="https://img.shields.io/badge/Content%20Filter-Fellowship%20Moderation%20%7C%20Eph%204%3A29-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Fellowship Content Moderation" />
   <img src="https://img.shields.io/badge/Privacy-GDPR%20%7C%20POPIA%20%7C%20Data%20Export-3B82F6?style=for-the-badge" alt="Data Portability and Purge" />
   <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
@@ -81,6 +84,8 @@ graph TD
     ProfileStack --> LockTimeoutModal["LockTimeoutModal (Inactivity Timeout: 0s / 60s / 300s / 900s)"]
     ProfileStack --> SecurityPinModal["SecurityPinModal (Setup, Change, Remove & Verify PIN)"]
     ProfileStack --> PastoralCareModal
+    ProfileStack --> SabbathModal["SabbathModal (Lord's Day, Sabbath, Quiet Hours & Days)"]
+    ProfileStack --> DeviceSessionsModal["DeviceSessionsModal (Hardware Info, Audit Log & Session Revoke)"]
     ProfileStack --> Terms
     ProfileStack --> Privacy
     
@@ -94,6 +99,9 @@ graph TD
         PrivacyService["privacyService.ts (Private Study & Scholar Privacy)"] <--> UserContext
         EncryptionService["encryptionService.ts (Pure TS AES-256-CBC, Keystore Master Key)"] <--> UserContext
         PastoralCareService["pastoralCareService.ts (Distress Detection & Crisis Contacts)"] --> PastoralCareModal
+        SabbathService["sabbathService.ts (Sabbath Quiet Hours Suppression)"] --> NotificationsPipeline["notifications.ts (Push Scheduler)"]
+        SessionSecurityService["sessionSecurityService.ts (Audit Trail & Global Revoke)"] <--> DeviceSessionsModal
+        ContentModerationService["contentModerationService.ts (Ephesians 4:29 Filter)"] --> SearchMain
         PrivacyService --> SearchMain
         SafetyService["safetyService.ts (Block & Report Content)"] --> SearchMain
         BibleCanon["bibleCanon.ts (66 Books & Fallback)"] --> BibleReader
@@ -223,10 +231,12 @@ exegeomai/
 │   ├── components/                       # Modular UI components
 │   │   ├── Card.tsx                      # Surface-contained cards with 8px spacing
 │   │   ├── CustomTabBar.tsx              # Rule 20 floating pill tab navigation component
+│   │   ├── DeviceSessionsModal.tsx       # Active device hardware info, security audit trail, and session revocation
 │   │   ├── FactCard.tsx                  # Biblical fact card with Strong's deep dive
 │   │   ├── InAppNotificationBanner.tsx   # Real-time slide-in alert banner for in-app achievement unlocks
 │   │   ├── NotificationQuickSheet.tsx    # Interactive quick modal for notifications and devotions preview
 │   │   ├── PastoralCareModal.tsx         # 60-30-10 compassionate pastoral care modal (24/7 Lifelines, SADAG, Scriptures)
+│   │   ├── SabbathModal.tsx              # Digital Sabbath & quiet hours modal with customizable rest days and windows
 │   │   ├── ScriptureCard.tsx             # Scripture card with genre vector badges
 │   │   ├── SearchBar.tsx                 # Search input with clear button and chips
 │   │   ├── SvgIcons.tsx                  # Pure vector SVG library (zero emojis)
@@ -269,12 +279,15 @@ exegeomai/
 │   │   └── WriterDetailsScreen.tsx       # In-depth modal sheet for biblical author biography & manuscripts
 │   ├── services/
 │   │   ├── bibleService.ts               # Multi-tier Bible reading and chapter caching engine
+│   │   ├── contentModerationService.ts   # Community harassment & profanity filter based on Ephesians 4:29
 │   │   ├── encryptionService.ts          # FIPS 197 AES-256-CBC pure TS cipher with Keystore/Keychain master key
 │   │   ├── inAppNotifications.ts         # In-app notification aggregator for sent push devotions and achievements
 │   │   ├── notifications.ts              # 365-day automated calendar push scheduler engine
 │   │   ├── offlineBibleService.ts        # Offline full-translation download, filesystem storage, and 0ms reader
 │   │   ├── pastoralCareService.ts        # Distress keyword analysis, 24/7 crisis lines & comforting Scriptures
 │   │   ├── privacyService.ts             # Hardware-persisted Private Study Mode (Incognito) & scholar privacy
+│   │   ├── sabbathService.ts             # Digital Sabbath schedule, quiet hours suppression engine
+│   │   ├── sessionSecurityService.ts     # Device hardware info, security audit log, and global session revocation
 │   │   ├── supabase.ts                   # Supabase client SDK with AsyncStorage persistence
 │   │   └── updates.ts                    # Expo OTA updates check, download, and reload service
 │   ├── types/
@@ -827,6 +840,17 @@ bible_fun_facts/
   - **Immediate 24/7 Lifelines**: Direct 1-tap phone and SMS dialer links for verified professional lifelines including the 988 Suicide & Crisis Lifeline (US/Canada), SADAG 24/7 Suicide Helpline (`0800 567 567` / SMS `31393`) and Mental Health Helpline (`0800 456 789`) in South Africa, and Samaritans (`116 123`) in the UK.
   - **Comforting Canonical Scripture Promises**: Rotating interactive promises of hope and divine nearness (Psalm 34:18, Matthew 11:28, Romans 8:38-39, Jeremiah 29:11, Psalm 42:11).
   - **Universal On-Demand Availability**: Accessible directly through Search prompts or anytime on-demand from the Profile tab under "Pastoral Care & Crisis Lifelines".
+- **Digital Sabbath Quiet Hours (`sabbathService.ts` & `SabbathModal.tsx`)**:
+  - **Sacred Rest Windows**: Implements automated sacred quiet hours honoring scriptural rest (Genesis 2:2-3, Exodus 20:8-11, Mark 2:27).
+  - **Flexible Schedule Modes**: Configurable for The Lord's Day (Full Sunday), Traditional Sabbath (Fri 18:00 – Sat 18:00), Full Weekend Rest, Nightly Quiet Hours (21:00 – 07:00), or Custom Consecrated Days.
+  - **Automated Push Suppression**: Silences non-essential notifications and devotional alerts during active rest windows in the background and foreground handler.
+- **Device Sessions & Security Audit Log (`sessionSecurityService.ts` & `DeviceSessionsModal.tsx`)**:
+  - **Hardware & Platform Inspection**: Audits device OS version, application build, unique installation UUID, and hardware encryption keystore verification.
+  - **Cryptographic Event Trail**: Tracks security-sensitive events (PIN setup/verification, lockout events, biometric toggles, journal exports) in a tamper-resistant local audit log.
+  - **Global Session Revocation**: Enables scholars to invalidate all active web and mobile authentication sessions across devices via Supabase Auth global signout and local token eradication.
+- **Community Fellowship Content Moderation (`contentModerationService.ts` & `SearchScreen.tsx`)**:
+  - **Ephesians 4:29 Filter**: Screens community queries, reflections, and reports against harassment, profanity, and toxic language.
+  - **Wholesome Fellowship Atmosphere**: Prevents hostility and ensures community interactions remain uplifting, reverent, and edifying.
 - **Hardware Token Encryption (`SecureStoreAdapter.ts`)**: Supabase session tokens, user credentials, and biometric authorization keys are backed by Android Keystore (`EncryptedSharedPreferences`) and iOS Keychain via `expo-secure-store`. Features seamless size-limit handling and graceful fallback to on-device storage on unrooted environments.
 - **Biometric App Lock (`BiometricService.ts` & `BiometricLockOverlay.tsx`)**: Optional Face ID, Touch ID, or Android Biometric prompt gating access to the application and personal study journal. Locks automatically whenever the configured inactivity timeout is exceeded.
 - **Community Safety & Content Moderation (`SafetyService.ts` & `SearchScreen.tsx`)**:

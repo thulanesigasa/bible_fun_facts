@@ -7,16 +7,36 @@ import {
   NIGHTLY_PEACE_365_SCRIPTURES,
   EVENING_FELLOWSHIP_365_PROMPTS,
 } from '../data/notificationVerses';
+import { SabbathService } from './sabbathService';
 
 // ─── Foreground Notification Handler ──────────────────────────────────────────
 Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
+  handleNotification: async (notification) => {
+    // Check if Digital Sabbath quiet hours are active
+    try {
+      const sabbathConfig = await SabbathService.getConfig();
+      const isSabbath = SabbathService.isCurrentlySabbath(sabbathConfig);
+      if (isSabbath) {
+        return {
+          shouldShowAlert: false,
+          shouldPlaySound: false,
+          shouldSetBadge: false,
+          shouldShowBanner: false,
+          shouldShowList: false,
+        };
+      }
+    } catch {
+      // Continue to default
+    }
+
+    return {
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    };
+  },
 });
 
 // ─── Permission Management ───────────────────────────────────────────────────
