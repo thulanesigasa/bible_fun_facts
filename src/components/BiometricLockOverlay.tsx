@@ -11,7 +11,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from './Typography';
-import { LockSvg, FingerprintSvg } from './SvgIcons';
+import { LockSvg, FingerprintSvg, KeypadSvg } from './SvgIcons';
+import { SecurityPinModal } from './SecurityPinModal';
+import { PinSecurityService } from '../services/pinSecurityService';
 
 interface BiometricLockOverlayProps {
   visible: boolean;
@@ -24,53 +26,88 @@ export const BiometricLockOverlay: React.FC<BiometricLockOverlayProps> = ({
   biometricType = 'Face ID / Fingerprint',
   onUnlock,
 }) => {
+  const [showPinModal, setShowPinModal] = React.useState<boolean>(false);
+  const [hasPin, setHasPin] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (visible) {
+      PinSecurityService.isPinSet().then(setHasPin);
+    }
+  }, [visible]);
+
   if (!visible) return null;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom', 'left', 'right']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-      <View style={styles.content}>
-        {/* Brand Container per Rule 15 / 19 */}
-        <View style={styles.logoOuter}>
-          <Image
-            source={require('../../assets/logo-transparent.png')}
-            style={styles.logoImage}
-            resizeMode="contain"
-          />
-        </View>
-
-        <Text variant="h2" weight="800" color="#0F172A" style={styles.title}>
-          exégeomai Secured
-        </Text>
-
-        <Text variant="body" color="#64748B" style={styles.subtitle}>
-          Your sacred study journal, bookmarks, and reflections are locked.
-        </Text>
-
-        <View style={styles.cardContainer}>
-          <View style={styles.iconCircle}>
-            <LockSvg size={28} color="#0F172A" strokeWidth={2.2} />
+    <>
+      <SafeAreaView style={styles.container} edges={['top', 'bottom', 'left', 'right']}>
+        <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
+        <View style={styles.content}>
+          {/* Brand Container per Rule 15 / 19 */}
+          <View style={styles.logoOuter}>
+            <Image
+              source={require('../../assets/logo-transparent.png')}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
           </View>
-          <Text variant="caption" color="#64748B" style={styles.cardText}>
-            Protected with hardware encryption & device credentials
-          </Text>
-        </View>
 
-        {/* Action Button */}
-        <TouchableOpacity
-          style={styles.unlockButton}
-          onPress={onUnlock}
-          activeOpacity={0.85}
-          accessibilityRole="button"
-          accessibilityLabel={`Unlock with ${biometricType || 'Biometrics'}`}
-        >
-          <FingerprintSvg size={20} color="#0F172A" strokeWidth={2.5} />
-          <Text variant="body" weight="800" color="#0F172A" style={styles.unlockButtonText}>
-            {`Unlock with ${biometricType || 'Biometrics'}`}
+          <Text variant="h2" weight="800" color="#0F172A" style={styles.title}>
+            exégeomai Secured
           </Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+
+          <Text variant="body" color="#64748B" style={styles.subtitle}>
+            Your sacred study journal, bookmarks, and reflections are locked.
+          </Text>
+
+          <View style={styles.cardContainer}>
+            <View style={styles.iconCircle}>
+              <LockSvg size={28} color="#0F172A" strokeWidth={2.2} />
+            </View>
+            <Text variant="caption" color="#64748B" style={styles.cardText}>
+              Protected with hardware encryption & device credentials
+            </Text>
+          </View>
+
+          {/* Action Button: Biometrics */}
+          <TouchableOpacity
+            style={styles.unlockButton}
+            onPress={onUnlock}
+            activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel={`Unlock with ${biometricType || 'Biometrics'}`}
+          >
+            <FingerprintSvg size={20} color="#0F172A" strokeWidth={2.5} />
+            <Text variant="body" weight="800" color="#0F172A" style={styles.unlockButtonText}>
+              {`Unlock with ${biometricType || 'Biometrics'}`}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Secondary Action: Security PIN Fallback */}
+          {hasPin && (
+            <TouchableOpacity
+              style={styles.pinFallbackButton}
+              onPress={() => setShowPinModal(true)}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel="Unlock with 4-Digit Security PIN"
+            >
+              <KeypadSvg size={18} color="#0F172A" strokeWidth={2} />
+              <Text variant="body" weight="700" color="#0F172A" style={styles.pinFallbackText}>
+                Use Security PIN
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </SafeAreaView>
+
+      {/* Security PIN Modal */}
+      <SecurityPinModal
+        visible={showPinModal}
+        mode="verify"
+        onSuccess={onUnlock}
+        onClose={() => setShowPinModal(false)}
+      />
+    </>
   );
 };
 
@@ -174,6 +211,28 @@ const styles = StyleSheet.create({
   unlockButtonText: {
     fontSize: 14,
   },
+  pinFallbackButton: {
+    width: '100%',
+    height: 48,
+    backgroundColor: '#FFFFFF', // 30% Surface Panel
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 12,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  pinFallbackText: {
+    fontSize: 13,
+  },
 });
 
 export default BiometricLockOverlay;
+

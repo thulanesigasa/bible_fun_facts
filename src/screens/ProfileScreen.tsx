@@ -37,6 +37,7 @@ import {
 import { UiverseSwitch } from '../components/UiverseSwitch';
 import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
 import { LockTimeoutModal } from '../components/LockTimeoutModal';
+import { SecurityPinModal, PinModalMode } from '../components/SecurityPinModal';
 import { LOCK_TIMEOUT_OPTIONS } from '../services/biometricService';
 import {
   AchievementMilestone,
@@ -84,6 +85,8 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     setLockTimeoutSeconds,
     isPrivacyShieldEnabled,
     setPrivacyShieldEnabled,
+    isPinSet,
+    refreshPinStatus,
     blockedUserIds,
     exportStudyJournal,
     deleteAccountAndPurgeData,
@@ -128,6 +131,8 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
   const [isUploading, setIsUploading] = useState(false);
   const [showStreakModal, setShowStreakModal] = useState<boolean>(false);
   const [showTimeoutModal, setShowTimeoutModal] = useState<boolean>(false);
+  const [showPinModal, setShowPinModal] = useState<boolean>(false);
+  const [pinModalMode, setPinModalMode] = useState<PinModalMode>('setup');
   const [inspectedAchievement, setInspectedAchievement] =
     useState<AchievementMilestone | null>(null);
 
@@ -984,6 +989,59 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
 
           <View style={styles.rowDivider} />
 
+          {/* 4-Digit Security PIN */}
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={() => {
+              if (isPinSet) {
+                Alert.alert(
+                  'Security PIN',
+                  'Your sacred study journal and notes are protected by a 4-digit PIN.',
+                  [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                      text: 'Change PIN',
+                      onPress: () => {
+                        setPinModalMode('change');
+                        setShowPinModal(true);
+                      },
+                    },
+                    {
+                      text: 'Remove PIN',
+                      style: 'destructive',
+                      onPress: () => {
+                        setPinModalMode('remove');
+                        setShowPinModal(true);
+                      },
+                    },
+                  ]
+                );
+              } else {
+                setPinModalMode('setup');
+                setShowPinModal(true);
+              }
+            }}
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel={`4-Digit Security PIN. ${isPinSet ? 'Active. Tap to change or remove.' : 'Not configured. Tap to setup.'}`}
+          >
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                4-Digit Security PIN
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                {isPinSet
+                  ? 'Security PIN active • Tap to change or remove'
+                  : 'Passcode backup for opening exégeomai without biometrics'}
+              </Text>
+            </View>
+            <Text variant="caption" weight="700" color={colors.accent}>
+              {isPinSet ? 'Manage ›' : 'Set PIN ›'}
+            </Text>
+          </TouchableOpacity>
+
+          <View style={styles.rowDivider} />
+
           {/* Blocked Accounts */}
           <TouchableOpacity
             style={styles.actionRow}
@@ -1164,6 +1222,17 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
         currentTimeout={lockTimeoutSeconds}
         onSelect={setLockTimeoutSeconds}
         onClose={() => setShowTimeoutModal(false)}
+      />
+
+      {/* Security PIN Modal */}
+      <SecurityPinModal
+        visible={showPinModal}
+        mode={pinModalMode}
+        onSuccess={async () => {
+          await refreshPinStatus();
+          setShowPinModal(false);
+        }}
+        onClose={() => setShowPinModal(false)}
       />
     </SafeAreaView>
   );

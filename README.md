@@ -22,6 +22,8 @@
   <img src="https://img.shields.io/badge/Biometrics-Face%20ID%20%7C%20Fingerprint-FDD223?style=for-the-badge" alt="Biometric Lock" />
   <img src="https://img.shields.io/badge/Privacy%20Shield-App%20Switcher%20Mask-10B981?style=for-the-badge" alt="App Switcher Privacy Shield" />
   <img src="https://img.shields.io/badge/Auto--Lock-Immediately%20%7C%201m%20%7C%205m%20%7C%2015m-FDD223?style=for-the-badge" alt="Inactivity Auto-Lock" />
+  <img src="https://img.shields.io/badge/Security%20PIN-4--Digit%20Hardware%20Fallback-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="4-Digit Security PIN Fallback" />
+  <img src="https://img.shields.io/badge/Rate%20Limiting-Lockout%20Protection-FDD223?style=for-the-badge" alt="Rate Limiting Lockout Protection" />
   <img src="https://img.shields.io/badge/Privacy-GDPR%20%7C%20POPIA%20%7C%20Data%20Export-3B82F6?style=for-the-badge" alt="Data Portability and Purge" />
   <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
@@ -72,6 +74,7 @@ graph TD
     ProfileStack --> AchievementsMain["AchievementsScreen (48 Milestones, 4 Distinct Geometric Shapes, 3-per-Row Grid)"]
     ProfileStack --> BlockedUsersMain["BlockedUsersScreen (Fellowship Moderation & Unblock Hub)"]
     ProfileStack --> LockTimeoutModal["LockTimeoutModal (Inactivity Timeout: 0s / 60s / 300s / 900s)"]
+    ProfileStack --> SecurityPinModal["SecurityPinModal (Setup, Change, Remove & Verify PIN)"]
     ProfileStack --> Terms
     ProfileStack --> Privacy
     
@@ -79,7 +82,8 @@ graph TD
         BibleService["bibleService.ts & offlineBibleService.ts"] <--> OfflineFS[("expo-file-system (offline_bibles/)")]
         BibleService <--> AsyncStorage[("AsyncStorage Cache (@bible_chapter_cache_)")]
         SecureStorage["SecureStoreAdapter (Android Keystore / iOS Keychain)"] <--> Supabase
-        BiometricService["biometricService.ts (Face ID / Fingerprint Auth)"] --> BiometricLock["BiometricLockOverlay"]
+        BiometricService["biometricService.ts (Face ID / Fingerprint Auth)"] --> BiometricLock["BiometricLockOverlay (Dual Biometric & PIN Lock)"]
+        PinSecurityService["pinSecurityService.ts (Salted SHA-256 + Rate Limiting)"] --> BiometricLock
         BiometricService --> AppSwitcherShield["AppSwitcherShield (OS Snapshot Mask)"]
         SafetyService["safetyService.ts (Block & Report Content)"] --> SearchMain
         BibleCanon["bibleCanon.ts (66 Books & Fallback)"] --> BibleReader
@@ -669,6 +673,7 @@ bible_fun_facts/
 │   │   ├── FactCard.tsx             # Fact presentation card with zero badges
 │   │   ├── LockTimeoutModal.tsx     # Inactivity auto-lock duration selector modal (Immediately to 15m)
 │   │   ├── ScriptureCard.tsx        # Scripture reading card with inline typography
+│   │   ├── SecurityPinModal.tsx     # 4-digit security PIN keypad modal (Setup, Verify, Change, Remove)
 │   │   ├── StreakHexagonBadge.tsx   # 3D metallic hexagonal shield badge (100% dynamic vector, zero fire, custom labels)
 │   │   ├── StreakMilestoneModal.tsx # Fullscreen streak & achievement milestone modal with verified PNG export
 │   │   ├── SvgIcons.tsx             # Curated SVG icon collection (zero emojis)
@@ -710,6 +715,7 @@ bible_fun_facts/
 │   │   ├── bibleService.ts          # Multi-tier memory, persistent AsyncStorage & public domain API client
 │   │   ├── biometricService.ts      # Native Face ID / Fingerprint auth and auto-lock timeout engine
 │   │   ├── offlineBibleService.ts   # Multi-CDN resilient Bible download engine with schema normalization
+│   │   ├── pinSecurityService.ts    # Hardware-backed salted SHA-256 PIN authentication & rate-limiting
 │   │   ├── safetyService.ts         # User blocklists and moderation reporting queue
 │   │   ├── secureStorage.ts         # Hardware-backed token encryption (Keystore / Keychain)
 │   │   ├── supabase.ts              # Defensive Supabase client with fallback anon keys
@@ -785,6 +791,11 @@ bible_fun_facts/
 ### 4. Enterprise Safety, Privacy & Security Standard
 - **App Switcher Privacy Shield (`AppSwitcherShield.tsx`)**: Full-screen 60-30-10 security mask with 50x50 brand logo inside 68x68 container (Rule 15/19) that intercepts OS app switcher transitions (`AppState` `'inactive'` and `'background'`). Prevents mobile OS multitasking snapshots and shoulder-surfing snooping of sensitive scripture notes, prayer requests, and reading activity.
 - **Configurable Inactivity Auto-Lock (`LockTimeoutModal.tsx` & `BiometricService.ts`)**: Allows scholars to configure grace periods before biometric re-authentication is required (`Immediately`, `After 1 minute`, `After 5 minutes`, `After 15 minutes`). Persisted in hardware-backed storage (`@exegeomai_lock_timeout_seconds_v1`). Calculates elapsed background time upon foreground resume (`AppState` `'active'`).
+- **Hardware-Encrypted 4-Digit Security PIN & Keypad Fallback (`pinSecurityService.ts` & `SecurityPinModal.tsx`)**:
+  - **Salted SHA-256 Cryptography**: Passcodes are salted with cryptographically secure random salts and hashed via self-contained FIPS 180-4 SHA-256 before persisting into Android Keystore / iOS Keychain via `SecureStoreAdapter`.
+  - **Rate Limiting & Anti-Brute-Force Lockout**: Automatically tracks consecutive failed attempts. Enforces an immediate 30-second lockout after 5 failed attempts, and a 5-minute lockout after 10 failed attempts with live remaining countdown timer.
+  - **Seamless Biometric Fallback**: When biometrics fail or on devices lacking biometric hardware sensors, scholars can immediately unlock their study journal using their 4-digit PIN.
+  - **Full Management Lifecycle**: Scholars can set, change, or remove their passcode anytime from Profile settings.
 - **Hardware Token Encryption (`SecureStoreAdapter.ts`)**: Supabase session tokens, user credentials, and biometric authorization keys are backed by Android Keystore (`EncryptedSharedPreferences`) and iOS Keychain via `expo-secure-store`. Features seamless size-limit handling and graceful fallback to on-device storage on unrooted environments.
 - **Biometric App Lock (`BiometricService.ts` & `BiometricLockOverlay.tsx`)**: Optional Face ID, Touch ID, or Android Biometric prompt gating access to the application and personal study journal. Locks automatically whenever the configured inactivity timeout is exceeded.
 - **Community Safety & Content Moderation (`SafetyService.ts` & `SearchScreen.tsx`)**:
