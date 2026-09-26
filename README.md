@@ -20,6 +20,8 @@
   <img src="https://img.shields.io/badge/Share%20Engine-Zero%20Blank%20%7C%20High--Fidelity%20PNG-10B981?style=for-the-badge" alt="Zero Blank Share Engine" />
   <img src="https://img.shields.io/badge/Security-Android%20Keystore%20%7C%20iOS%20Keychain-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Keystore and Keychain" />
   <img src="https://img.shields.io/badge/Biometrics-Face%20ID%20%7C%20Fingerprint-FDD223?style=for-the-badge" alt="Biometric Lock" />
+  <img src="https://img.shields.io/badge/Privacy%20Shield-App%20Switcher%20Mask-10B981?style=for-the-badge" alt="App Switcher Privacy Shield" />
+  <img src="https://img.shields.io/badge/Auto--Lock-Immediately%20%7C%201m%20%7C%205m%20%7C%2015m-FDD223?style=for-the-badge" alt="Inactivity Auto-Lock" />
   <img src="https://img.shields.io/badge/Privacy-GDPR%20%7C%20POPIA%20%7C%20Data%20Export-3B82F6?style=for-the-badge" alt="Data Portability and Purge" />
   <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
@@ -69,6 +71,7 @@ graph TD
     BookmarksMain -.->|One-Tap Jump| BibleReader
     ProfileStack --> AchievementsMain["AchievementsScreen (48 Milestones, 4 Distinct Geometric Shapes, 3-per-Row Grid)"]
     ProfileStack --> BlockedUsersMain["BlockedUsersScreen (Fellowship Moderation & Unblock Hub)"]
+    ProfileStack --> LockTimeoutModal["LockTimeoutModal (Inactivity Timeout: 0s / 60s / 300s / 900s)"]
     ProfileStack --> Terms
     ProfileStack --> Privacy
     
@@ -77,6 +80,7 @@ graph TD
         BibleService <--> AsyncStorage[("AsyncStorage Cache (@bible_chapter_cache_)")]
         SecureStorage["SecureStoreAdapter (Android Keystore / iOS Keychain)"] <--> Supabase
         BiometricService["biometricService.ts (Face ID / Fingerprint Auth)"] --> BiometricLock["BiometricLockOverlay"]
+        BiometricService --> AppSwitcherShield["AppSwitcherShield (OS Snapshot Mask)"]
         SafetyService["safetyService.ts (Block & Report Content)"] --> SearchMain
         BibleCanon["bibleCanon.ts (66 Books & Fallback)"] --> BibleReader
         MockUsers["mockUsers.ts (8 Theological Scholars)"] --> SearchMain
@@ -658,9 +662,12 @@ bible_fun_facts/
 │   └── onboarding/                  # Compressed, transparent PNG onboarding slides (1, 2, 3)
 ├── src/
 │   ├── components/                  # Reusable UI components strictly adhering to 60-30-10
+│   │   ├── AppSwitcherShield.tsx    # Hardware-backed OS app switcher snapshot mask & privacy shield
+│   │   ├── BiometricLockOverlay.tsx # Biometric lock screen gating access to study journal and notes
 │   │   ├── Card.tsx                 # Flat surface card with soft elevation shadow
 │   │   ├── CategoryBadge.tsx        # Pure SVG multi-shape vector badges (Hexagon, Ribbon, Diamond, Star)
 │   │   ├── FactCard.tsx             # Fact presentation card with zero badges
+│   │   ├── LockTimeoutModal.tsx     # Inactivity auto-lock duration selector modal (Immediately to 15m)
 │   │   ├── ScriptureCard.tsx        # Scripture reading card with inline typography
 │   │   ├── StreakHexagonBadge.tsx   # 3D metallic hexagonal shield badge (100% dynamic vector, zero fire, custom labels)
 │   │   ├── StreakMilestoneModal.tsx # Fullscreen streak & achievement milestone modal with verified PNG export
@@ -670,7 +677,7 @@ bible_fun_facts/
 │   │   ├── UpdateModal.tsx          # Dual-action OTA update prompt with 30m snooze
 │   │   └── WOTDCard.tsx             # Word of the Day analytical lens viewer
 │   ├── context/
-│   │   └── UserContext.tsx          # Global authentication, preferences, streak & sharesCount state
+│   │   └── UserContext.tsx          # Global authentication, preferences, streak, lock timeout & shares state
 │   ├── data/
 │   │   ├── achievements.ts          # Multi-category achievement catalog (Streak, Bookmark, Highlight, Share)
 │   │   ├── bibleCanon.ts            # Complete 66-book canon metadata and prebundled offline chapters
@@ -701,7 +708,10 @@ bible_fun_facts/
 │   │   └── WOTDScreen.tsx           # Full Holy Bible reader (66 books, 24 translations) + Daily Exegesis
 │   ├── services/
 │   │   ├── bibleService.ts          # Multi-tier memory, persistent AsyncStorage & public domain API client
+│   │   ├── biometricService.ts      # Native Face ID / Fingerprint auth and auto-lock timeout engine
 │   │   ├── offlineBibleService.ts   # Multi-CDN resilient Bible download engine with schema normalization
+│   │   ├── safetyService.ts         # User blocklists and moderation reporting queue
+│   │   ├── secureStorage.ts         # Hardware-backed token encryption (Keystore / Keychain)
 │   │   ├── supabase.ts              # Defensive Supabase client with fallback anon keys
 │   │   └── updates.ts               # Background OTA update listener & dispatcher
 │   └── theme/                       # 60-30-10 color tokens, 8px grid spacing, radius, shadow
@@ -773,8 +783,10 @@ bible_fun_facts/
 - **App Switcher Privacy Overlay**: Optionally integrates privacy blur protection when the application transitions to the background or app switcher.
 
 ### 4. Enterprise Safety, Privacy & Security Standard
+- **App Switcher Privacy Shield (`AppSwitcherShield.tsx`)**: Full-screen 60-30-10 security mask with 50x50 brand logo inside 68x68 container (Rule 15/19) that intercepts OS app switcher transitions (`AppState` `'inactive'` and `'background'`). Prevents mobile OS multitasking snapshots and shoulder-surfing snooping of sensitive scripture notes, prayer requests, and reading activity.
+- **Configurable Inactivity Auto-Lock (`LockTimeoutModal.tsx` & `BiometricService.ts`)**: Allows scholars to configure grace periods before biometric re-authentication is required (`Immediately`, `After 1 minute`, `After 5 minutes`, `After 15 minutes`). Persisted in hardware-backed storage (`@exegeomai_lock_timeout_seconds_v1`). Calculates elapsed background time upon foreground resume (`AppState` `'active'`).
 - **Hardware Token Encryption (`SecureStoreAdapter.ts`)**: Supabase session tokens, user credentials, and biometric authorization keys are backed by Android Keystore (`EncryptedSharedPreferences`) and iOS Keychain via `expo-secure-store`. Features seamless size-limit handling and graceful fallback to on-device storage on unrooted environments.
-- **Biometric App Lock (`BiometricService.ts` & `BiometricLockOverlay.tsx`)**: Optional Face ID, Touch ID, or Android Biometric prompt gating access to the application and personal study journal. Locks automatically whenever the application transitions to background or inactive state.
+- **Biometric App Lock (`BiometricService.ts` & `BiometricLockOverlay.tsx`)**: Optional Face ID, Touch ID, or Android Biometric prompt gating access to the application and personal study journal. Locks automatically whenever the configured inactivity timeout is exceeded.
 - **Community Safety & Content Moderation (`SafetyService.ts` & `SearchScreen.tsx`)**:
   - **Account Blocking**: Users can block any scholar or fellowship participant directly from their profile modal. Blocked accounts are immediately purged from search results, discovery feeds, and reflection threads.
   - **Report Queue**: Structured reporting interface for harassment, inappropriate content, spam, and doctrinal misrepresentation, persisting moderation records for review.

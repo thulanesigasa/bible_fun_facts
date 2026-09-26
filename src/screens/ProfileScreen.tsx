@@ -36,6 +36,8 @@ import {
 } from '../services/bibleService';
 import { UiverseSwitch } from '../components/UiverseSwitch';
 import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
+import { LockTimeoutModal } from '../components/LockTimeoutModal';
+import { LOCK_TIMEOUT_OPTIONS } from '../services/biometricService';
 import {
   AchievementMilestone,
   getTotalAchievementsProgress,
@@ -78,6 +80,10 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     biometricType,
     isBiometricLockEnabled,
     setBiometricLockEnabled,
+    lockTimeoutSeconds,
+    setLockTimeoutSeconds,
+    isPrivacyShieldEnabled,
+    setPrivacyShieldEnabled,
     blockedUserIds,
     exportStudyJournal,
     deleteAccountAndPurgeData,
@@ -121,8 +127,13 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
 
   const [isUploading, setIsUploading] = useState(false);
   const [showStreakModal, setShowStreakModal] = useState<boolean>(false);
+  const [showTimeoutModal, setShowTimeoutModal] = useState<boolean>(false);
   const [inspectedAchievement, setInspectedAchievement] =
     useState<AchievementMilestone | null>(null);
+
+  const currentTimeoutOption =
+    LOCK_TIMEOUT_OPTIONS.find((o) => o.seconds === lockTimeoutSeconds) ||
+    LOCK_TIMEOUT_OPTIONS[0];
 
   const bookmarksCount = favoritesScriptures?.length || 0;
   const highlightsCount = Object.keys(bibleHighlights || {}).length;
@@ -929,8 +940,49 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                 />
               </View>
               <View style={styles.rowDivider} />
+
+              {isBiometricLockEnabled && (
+                <>
+                  <TouchableOpacity
+                    style={styles.actionRow}
+                    onPress={() => setShowTimeoutModal(true)}
+                    activeOpacity={0.75}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Inactivity auto-lock timeout. Currently set to ${currentTimeoutOption.label}. Tap to change.`}
+                  >
+                    <View style={styles.rowTitleBox}>
+                      <Text variant="h3" style={styles.rowTitle}>
+                        Inactivity Auto-Lock
+                      </Text>
+                      <Text variant="caption" color={colors.textSecondary}>
+                        {`Locks ${currentTimeoutOption.label.toLowerCase()} • Tap to change`}
+                      </Text>
+                    </View>
+                    <Text style={styles.rowDisclosureArrow}>›</Text>
+                  </TouchableOpacity>
+                  <View style={styles.rowDivider} />
+                </>
+              )}
             </>
           )}
+
+          {/* App Switcher Privacy Shield */}
+          <View style={styles.actionRow}>
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                App Switcher Privacy Shield
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                Obfuscates screen when multitasking to protect notes & reflections
+              </Text>
+            </View>
+            <UiverseSwitch
+              value={isPrivacyShieldEnabled}
+              onValueChange={setPrivacyShieldEnabled}
+            />
+          </View>
+
+          <View style={styles.rowDivider} />
 
           {/* Blocked Accounts */}
           <TouchableOpacity
@@ -1104,6 +1156,14 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           setShowStreakModal(false);
           setInspectedAchievement(null);
         }}
+      />
+
+      {/* Inactivity Auto-Lock Selector Modal */}
+      <LockTimeoutModal
+        visible={showTimeoutModal}
+        currentTimeout={lockTimeoutSeconds}
+        onSelect={setLockTimeoutSeconds}
+        onClose={() => setShowTimeoutModal(false)}
       />
     </SafeAreaView>
   );
