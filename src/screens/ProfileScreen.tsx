@@ -87,6 +87,14 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     setPrivacyShieldEnabled,
     isPinSet,
     refreshPinStatus,
+    isPrivateStudyMode,
+    setPrivateStudyMode,
+    isDiscoverableInSearch,
+    setDiscoverableInSearch,
+    showStreaksPublicly,
+    setShowStreaksPublicly,
+    privateStudyNotes,
+    setPrivateStudyNotes,
     blockedUserIds,
     exportStudyJournal,
     deleteAccountAndPurgeData,
@@ -1039,6 +1047,78 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
               {isPinSet ? 'Manage ›' : 'Set PIN ›'}
             </Text>
           </TouchableOpacity>
+
+          <View style={styles.rowDivider} />
+
+          {/* Private Study Mode (Incognito) */}
+          <View style={styles.actionRow}>
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Private Study Mode (Incognito)
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                Pauses cloud streak sync & hides activity from community
+              </Text>
+            </View>
+            <UiverseSwitch
+              value={isPrivateStudyMode}
+              onValueChange={setPrivateStudyMode}
+            />
+          </View>
+
+          <View style={styles.rowDivider} />
+
+          {/* Public Scholar Directory */}
+          <View style={styles.actionRow}>
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Public Scholar Directory
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                Allow other scholars to discover your profile in Search
+              </Text>
+            </View>
+            <UiverseSwitch
+              value={isDiscoverableInSearch}
+              onValueChange={setDiscoverableInSearch}
+            />
+          </View>
+
+          <View style={styles.rowDivider} />
+
+          {/* Show Study Streak to Peers */}
+          <View style={styles.actionRow}>
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Show Study Streak to Peers
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                Display active study streaks & milestones on your scholar card
+              </Text>
+            </View>
+            <UiverseSwitch
+              value={showStreaksPublicly}
+              onValueChange={setShowStreaksPublicly}
+            />
+          </View>
+
+          <View style={styles.rowDivider} />
+
+          {/* Private Notes & Bookmarks */}
+          <View style={styles.actionRow}>
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Private Notes & Bookmarks
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                Keep verse reflections strictly offline & unindexed
+              </Text>
+            </View>
+            <UiverseSwitch
+              value={privateStudyNotes}
+              onValueChange={setPrivateStudyNotes}
+            />
+          </View>
 
           <View style={styles.rowDivider} />
 

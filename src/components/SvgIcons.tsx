@@ -920,6 +920,17 @@ export const BackspaceSvg: React.FC<SvgIconProps> = ({ size = 22, color = '#0F17
 );
 
 
+export const IncognitoSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#64748B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M2 10h20M4 10l2-6h12l2 6" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Circle cx="7" cy="16" r="3" stroke={color} strokeWidth={strokeWidth} />
+    <Circle cx="17" cy="16" r="3" stroke={color} strokeWidth={strokeWidth} />
+    <Path d="M10 16h4" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+  </Svg>
+);
+
+
+
 
 
 

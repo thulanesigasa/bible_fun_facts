@@ -24,6 +24,8 @@
   <img src="https://img.shields.io/badge/Auto--Lock-Immediately%20%7C%201m%20%7C%205m%20%7C%2015m-FDD223?style=for-the-badge" alt="Inactivity Auto-Lock" />
   <img src="https://img.shields.io/badge/Security%20PIN-4--Digit%20Hardware%20Fallback-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="4-Digit Security PIN Fallback" />
   <img src="https://img.shields.io/badge/Rate%20Limiting-Lockout%20Protection-FDD223?style=for-the-badge" alt="Rate Limiting Lockout Protection" />
+  <img src="https://img.shields.io/badge/Private%20Study-Incognito%20Mode-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Private Study Incognito Mode" />
+  <img src="https://img.shields.io/badge/Scholar%20Privacy-Directory%20%7C%20Streak%20Visibility%20%7C%20Private%20Notes-FDD223?style=for-the-badge" alt="Scholar Privacy Controls" />
   <img src="https://img.shields.io/badge/Privacy-GDPR%20%7C%20POPIA%20%7C%20Data%20Export-3B82F6?style=for-the-badge" alt="Data Portability and Purge" />
   <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
@@ -85,6 +87,8 @@ graph TD
         BiometricService["biometricService.ts (Face ID / Fingerprint Auth)"] --> BiometricLock["BiometricLockOverlay (Dual Biometric & PIN Lock)"]
         PinSecurityService["pinSecurityService.ts (Salted SHA-256 + Rate Limiting)"] --> BiometricLock
         BiometricService --> AppSwitcherShield["AppSwitcherShield (OS Snapshot Mask)"]
+        PrivacyService["privacyService.ts (Private Study & Scholar Privacy)"] <--> UserContext
+        PrivacyService --> SearchMain
         SafetyService["safetyService.ts (Block & Report Content)"] --> SearchMain
         BibleCanon["bibleCanon.ts (66 Books & Fallback)"] --> BibleReader
         MockUsers["mockUsers.ts (8 Theological Scholars)"] --> SearchMain
@@ -261,6 +265,7 @@ exegeomai/
 │   │   ├── inAppNotifications.ts         # In-app notification aggregator for sent push devotions and achievements
 │   │   ├── notifications.ts              # 365-day automated calendar push scheduler engine
 │   │   ├── offlineBibleService.ts        # Offline full-translation download, filesystem storage, and 0ms reader
+│   │   ├── privacyService.ts             # Hardware-persisted Private Study Mode (Incognito) & scholar privacy
 │   │   ├── supabase.ts                   # Supabase client SDK with AsyncStorage persistence
 │   │   └── updates.ts                    # Expo OTA updates check, download, and reload service
 │   ├── types/
@@ -716,6 +721,7 @@ bible_fun_facts/
 │   │   ├── biometricService.ts      # Native Face ID / Fingerprint auth and auto-lock timeout engine
 │   │   ├── offlineBibleService.ts   # Multi-CDN resilient Bible download engine with schema normalization
 │   │   ├── pinSecurityService.ts    # Hardware-backed salted SHA-256 PIN authentication & rate-limiting
+│   │   ├── privacyService.ts        # Hardware-persisted Private Study Mode (Incognito) & scholar privacy
 │   │   ├── safetyService.ts         # User blocklists and moderation reporting queue
 │   │   ├── secureStorage.ts         # Hardware-backed token encryption (Keystore / Keychain)
 │   │   ├── supabase.ts              # Defensive Supabase client with fallback anon keys
@@ -796,6 +802,12 @@ bible_fun_facts/
   - **Rate Limiting & Anti-Brute-Force Lockout**: Automatically tracks consecutive failed attempts. Enforces an immediate 30-second lockout after 5 failed attempts, and a 5-minute lockout after 10 failed attempts with live remaining countdown timer.
   - **Seamless Biometric Fallback**: When biometrics fail or on devices lacking biometric hardware sensors, scholars can immediately unlock their study journal using their 4-digit PIN.
   - **Full Management Lifecycle**: Scholars can set, change, or remove their passcode anytime from Profile settings.
+- **Scholar Privacy Controls & Private Study Mode (`privacyService.ts`, `ProfileScreen.tsx` & `SearchScreen.tsx`)**:
+  - **Private Study Mode (Incognito Study)**: Pauses all background telemetry, analytics, and study streak updates to remote Supabase database tables (`syncUserDataToRemote` early exit). Enables believers to meditate on scripture in complete confidentiality without logging timestamps or broadcasting status to public community feeds.
+  - **Discrete Incognito Study Indicator**: Displays an elegant, unobtrusive banner in Search & Community when Private Study is active to confirm local-only privacy.
+  - **Granular Scholar Directory Visibility**: Scholars can toggle their appearance in the public search directory (`isDiscoverableInSearch`).
+  - **Study Streak Privacy**: Scholars can hide their active streak numbers and milestone counts from peer cards (`showStreaksPublicly`), rendering as a protected discreet placeholder (`Streak hidden` / `Private`).
+  - **Private Notes & Bookmarks**: Ensures verse highlights, marginalia reflections, and study bookmarks remain offline and unindexed on local hardware storage (`SecureStoreAdapter`).
 - **Hardware Token Encryption (`SecureStoreAdapter.ts`)**: Supabase session tokens, user credentials, and biometric authorization keys are backed by Android Keystore (`EncryptedSharedPreferences`) and iOS Keychain via `expo-secure-store`. Features seamless size-limit handling and graceful fallback to on-device storage on unrooted environments.
 - **Biometric App Lock (`BiometricService.ts` & `BiometricLockOverlay.tsx`)**: Optional Face ID, Touch ID, or Android Biometric prompt gating access to the application and personal study journal. Locks automatically whenever the configured inactivity timeout is exceeded.
 - **Community Safety & Content Moderation (`SafetyService.ts` & `SearchScreen.tsx`)**:
