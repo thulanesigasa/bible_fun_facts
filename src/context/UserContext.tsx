@@ -28,6 +28,7 @@ import * as Sharing from 'expo-sharing';
 import { SafetyService } from '../services/safetyService';
 import { BiometricService } from '../services/biometricService';
 import { PinSecurityService } from '../services/pinSecurityService';
+import { PrivacyService } from '../services/privacyService';
 import { SecureStoreAdapter } from '../services/secureStorage';
 
 export interface UserProfile {
@@ -144,6 +145,15 @@ interface AppContextType extends UserState {
   setPrivacyShieldEnabled: (enabled: boolean) => Promise<void>;
   isPinSet: boolean;
   refreshPinStatus: () => Promise<void>;
+  // Scholar Privacy Controls & Private Study (Incognito)
+  isPrivateStudyMode: boolean;
+  setPrivateStudyMode: (enabled: boolean) => Promise<void>;
+  isDiscoverableInSearch: boolean;
+  setDiscoverableInSearch: (enabled: boolean) => Promise<void>;
+  showStreaksPublicly: boolean;
+  setShowStreaksPublicly: (enabled: boolean) => Promise<void>;
+  privateStudyNotes: boolean;
+  setPrivateStudyNotes: (enabled: boolean) => Promise<void>;
 }
 
 const UserContext = createContext<AppContextType | undefined>(undefined);
@@ -273,7 +283,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     lastReadBible?: LastReadBiblePosition;
     [key: string]: any;
   }) => {
-    if (!SUPABASE_ANON_KEY) return;
+    if (!SUPABASE_ANON_KEY || isPrivateStudyModeRef.current) return;
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
@@ -1204,6 +1214,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isPinSet, setIsPinSetState] = useState<boolean>(false);
   const backgroundTimestampRef = useRef<number | null>(null);
 
+  // Scholar Privacy Controls (Phase 3)
+  const [isPrivateStudyMode, setIsPrivateStudyModeState] = useState<boolean>(false);
+  const [isDiscoverableInSearch, setIsDiscoverableInSearchState] = useState<boolean>(true);
+  const [showStreaksPublicly, setShowStreaksPubliclyState] = useState<boolean>(true);
+  const [privateStudyNotes, setPrivateStudyNotesState] = useState<boolean>(false);
+  const isPrivateStudyModeRef = useRef<boolean>(false);
+
   const refreshPinStatus = useCallback(async () => {
     const set = await PinSecurityService.isPinSet();
     setIsPinSetState(set);
@@ -1226,7 +1243,39 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     BiometricService.getLockTimeout().then(setLockTimeoutSecondsState);
     BiometricService.isPrivacyShieldEnabled().then(setIsPrivacyShieldEnabledState);
     refreshPinStatus();
+
+    // Load Scholar Privacy preferences
+    PrivacyService.getPreferences().then((prefs) => {
+      setIsPrivateStudyModeState(prefs.isPrivateStudyMode);
+      isPrivateStudyModeRef.current = prefs.isPrivateStudyMode;
+      setIsDiscoverableInSearchState(prefs.isDiscoverableInSearch);
+      setShowStreaksPubliclyState(prefs.showStreaksPublicly);
+      setPrivateStudyNotesState(prefs.privateStudyNotes);
+    });
   }, [refreshPinStatus]);
+
+  const setPrivateStudyMode = useCallback(async (enabled: boolean) => {
+    const ok = await PrivacyService.setPrivateStudyMode(enabled);
+    if (ok) {
+      setIsPrivateStudyModeState(enabled);
+      isPrivateStudyModeRef.current = enabled;
+    }
+  }, []);
+
+  const setDiscoverableInSearch = useCallback(async (enabled: boolean) => {
+    const ok = await PrivacyService.setDiscoverableInSearch(enabled);
+    if (ok) setIsDiscoverableInSearchState(enabled);
+  }, []);
+
+  const setShowStreaksPublicly = useCallback(async (enabled: boolean) => {
+    const ok = await PrivacyService.setShowStreaksPublicly(enabled);
+    if (ok) setShowStreaksPubliclyState(enabled);
+  }, []);
+
+  const setPrivateStudyNotes = useCallback(async (enabled: boolean) => {
+    const ok = await PrivacyService.setPrivateStudyNotes(enabled);
+    if (ok) setPrivateStudyNotesState(enabled);
+  }, []);
 
   const setLockTimeoutSeconds = useCallback(async (seconds: number) => {
     const ok = await BiometricService.setLockTimeout(seconds);
@@ -1434,6 +1483,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setPrivacyShieldEnabled,
       isPinSet,
       refreshPinStatus,
+      isPrivateStudyMode,
+      setPrivateStudyMode,
+      isDiscoverableInSearch,
+      setDiscoverableInSearch,
+      showStreaksPublicly,
+      setShowStreaksPublicly,
+      privateStudyNotes,
+      setPrivateStudyNotes,
     }}>
 
       {children}

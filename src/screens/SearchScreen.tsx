@@ -28,6 +28,7 @@ import {
   ChevronRightSvg,
   FlagSvg,
   BlockSvg,
+  IncognitoSvg,
 } from '../components/SvgIcons';
 
 type FilterCategory = 'All' | 'Scholars' | 'Pastors' | 'Exegesis' | 'Linguistics';
@@ -43,7 +44,15 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
   const [reportingUser, setReportingUser] = useState<CommunityUser | null>(null);
   const [selectedReportReason, setSelectedReportReason] = useState<'harassment' | 'inappropriate' | 'spam' | 'impersonation' | 'other'>('harassment');
 
-  const { userProfile, isUserFollowed, toggleFollowUser, blockedUserIds, blockUser } = useUser();
+  const {
+    userProfile,
+    isUserFollowed,
+    toggleFollowUser,
+    blockedUserIds,
+    blockUser,
+    isPrivateStudyMode,
+    showStreaksPublicly,
+  } = useUser();
 
   const fetchLiveProfiles = async () => {
     setLoading(true);
@@ -206,6 +215,23 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
           </View>
         </View>
 
+        {/* Incognito Study Mode Active Banner */}
+        {isPrivateStudyMode && (
+          <View style={styles.incognitoBanner}>
+            <View style={styles.incognitoIconWrap}>
+              <IncognitoSvg size={16} color={colors.accent} />
+            </View>
+            <View style={styles.incognitoBannerTextWrap}>
+              <Text variant="caption" weight="700" color="#0F172A">
+                Private Study Mode Active
+              </Text>
+              <Text variant="caption" color={colors.textSecondary} style={{ fontSize: 11 }}>
+                Live streaks & public discovery are paused on this device.
+              </Text>
+            </View>
+          </View>
+        )}
+
         {/* Search Input Box */}
         <View style={[styles.searchContainer, shadow.sm]}>
           <SearchSvg size={18} color={colors.accent} />
@@ -357,7 +383,7 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
                     </Text>
                     <View style={styles.statsSummary}>
                       <Text variant="caption" color={colors.textTertiary}>
-                        {totalFollowers.toLocaleString()} followers • {user.streak}d streak
+                        {totalFollowers.toLocaleString()} followers • {showStreaksPublicly ? `${user.streak}d streak` : 'Streak hidden'}
                       </Text>
                     </View>
                   </View>
@@ -438,10 +464,12 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
                 </View>
                 <View style={styles.profileStatDivider} />
                 <View style={styles.profileStatCol}>
-                  <Text variant="h3" color={colors.accent}>
-                    {selectedUser.streak}d
+                  <Text variant="h3" color={showStreaksPublicly ? colors.accent : colors.textSecondary}>
+                    {showStreaksPublicly ? `${selectedUser.streak}d` : '—'}
                   </Text>
-                  <Text variant="caption" color={colors.textSecondary}>Streak</Text>
+                  <Text variant="caption" color={colors.textSecondary}>
+                    {showStreaksPublicly ? 'Streak' : 'Private'}
+                  </Text>
                 </View>
                 <View style={styles.profileStatDivider} />
                 <View style={styles.profileStatCol}>
@@ -1039,5 +1067,28 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  incognitoBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
+    gap: 12,
+  },
+  incognitoIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F8FAFC',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  incognitoBannerTextWrap: {
+    flex: 1,
   },
 });
