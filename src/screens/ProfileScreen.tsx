@@ -39,6 +39,9 @@ import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
 import { LockTimeoutModal } from '../components/LockTimeoutModal';
 import { SecurityPinModal, PinModalMode } from '../components/SecurityPinModal';
 import { PastoralCareModal } from '../components/PastoralCareModal';
+import { SabbathModal } from '../components/SabbathModal';
+import { DeviceSessionsModal } from '../components/DeviceSessionsModal';
+import { SessionSecurityService } from '../services/sessionSecurityService';
 import { LOCK_TIMEOUT_OPTIONS } from '../services/biometricService';
 import {
   AchievementMilestone,
@@ -166,6 +169,8 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
   const [showPinModal, setShowPinModal] = useState<boolean>(false);
   const [pinModalMode, setPinModalMode] = useState<PinModalMode>('setup');
   const [showPastoralModal, setShowPastoralModal] = useState<boolean>(false);
+  const [showSabbathModal, setShowSabbathModal] = useState<boolean>(false);
+  const [showDeviceSessionsModal, setShowDeviceSessionsModal] = useState<boolean>(false);
   const [inspectedAchievement, setInspectedAchievement] =
     useState<AchievementMilestone | null>(null);
 
@@ -1193,6 +1198,52 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
 
           <View style={styles.rowDivider} />
 
+          {/* Digital Sabbath & Quiet Hours */}
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={() => setShowSabbathModal(true)}
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel="Digital Sabbath & Sacred Quiet Hours. Tap to configure rest windows."
+          >
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Digital Sabbath & Quiet Hours
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                Automate sacred rest windows and quiet hour silence
+              </Text>
+            </View>
+            <Text variant="caption" weight="700" color={colors.accent}>
+              Configure ›
+            </Text>
+          </TouchableOpacity>
+
+          <View style={styles.rowDivider} />
+
+          {/* Device Sessions & Security Audit */}
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={() => setShowDeviceSessionsModal(true)}
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel="Device Sessions and Security Audit Log. Tap to view active devices."
+          >
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
+                Device Sessions & Security Audit
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                Active hardware sessions and security event trail
+              </Text>
+            </View>
+            <Text variant="caption" weight="700" color={colors.accent}>
+              Inspect ›
+            </Text>
+          </TouchableOpacity>
+
+          <View style={styles.rowDivider} />
+
           {/* Export Study Journal */}
           <TouchableOpacity
             style={styles.actionRow}
@@ -1367,6 +1418,21 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
       <PastoralCareModal
         visible={showPastoralModal}
         onClose={() => setShowPastoralModal(false)}
+      />
+
+      {/* Digital Sabbath Quiet Hours Modal */}
+      <SabbathModal
+        visible={showSabbathModal}
+        onClose={() => setShowSabbathModal(false)}
+      />
+
+      {/* Device Sessions & Security Audit Modal */}
+      <DeviceSessionsModal
+        visible={showDeviceSessionsModal}
+        onClose={() => setShowDeviceSessionsModal(false)}
+        onSessionsRevoked={() => {
+          // Re-render / update state after global session revocation
+        }}
       />
     </SafeAreaView>
   );

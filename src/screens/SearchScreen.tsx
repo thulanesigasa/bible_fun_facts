@@ -33,6 +33,7 @@ import {
 } from '../components/SvgIcons';
 import { PastoralCareModal } from '../components/PastoralCareModal';
 import { PastoralCareService } from '../services/pastoralCareService';
+import { ContentModerationService } from '../services/contentModerationService';
 
 type FilterCategory = 'All' | 'Scholars' | 'Pastors' | 'Exegesis' | 'Linguistics';
 
@@ -50,6 +51,10 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
 
   const distressAnalysis = useMemo(() => {
     return PastoralCareService.checkQueryForDistress(searchText);
+  }, [searchText]);
+
+  const moderationCheck = useMemo(() => {
+    return ContentModerationService.screenText(searchText);
   }, [searchText]);
 
   const {
@@ -277,6 +282,18 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
               View ›
             </Text>
           </TouchableOpacity>
+        )}
+
+        {/* Community Fellowship Content Moderation Notice */}
+        {!moderationCheck.isClean && (
+          <View style={styles.moderationNoticeBanner}>
+            <Text variant="caption" weight="700" color="#0F172A">
+              Fellowship Language Reminder (Eph 4:29)
+            </Text>
+            <Text variant="caption" color={colors.textSecondary} style={{ fontSize: 11, marginTop: 2 }}>
+              Please maintain edifying, wholesome search queries in the scholar community.
+            </Text>
+          </View>
         )}
 
         {/* Filter Categories */}
@@ -1161,5 +1178,14 @@ const styles = StyleSheet.create({
   },
   pastoralTextWrap: {
     flex: 1,
+  },
+  moderationNoticeBanner: {
+    backgroundColor: '#F8FAFC',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
   },
 });

@@ -944,6 +944,13 @@ export const ShieldLockSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#0F1
   </Svg>
 );
 
+export const DevicesSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#0F172A', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Rect x="2" y="3" width="20" height="14" rx="2" stroke={color} strokeWidth={strokeWidth} />
+    <Path d="M8 21h8M12 17v4" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
 
 
 
