@@ -21,6 +21,8 @@ interface SecurityPinModalProps {
   mode?: PinModalMode;
   onSuccess: () => void;
   onClose: () => void;
+  onFallbackToBiometric?: () => void;
+  initialNotice?: string | null;
 }
 
 export const SecurityPinModal: React.FC<SecurityPinModalProps> = ({
@@ -28,6 +30,8 @@ export const SecurityPinModal: React.FC<SecurityPinModalProps> = ({
   mode = 'verify',
   onSuccess,
   onClose,
+  onFallbackToBiometric,
+  initialNotice,
 }) => {
   const [pin, setPin] = useState<string>('');
   const [setupInitialPin, setSetupInitialPin] = useState<string>('');
@@ -35,6 +39,7 @@ export const SecurityPinModal: React.FC<SecurityPinModalProps> = ({
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
+  const [failedPinAttempts, setFailedPinAttempts] = useState<number>(0);
 
   const shakeAnim = useRef(new Animated.Value(0)).current;
 
@@ -45,10 +50,11 @@ export const SecurityPinModal: React.FC<SecurityPinModalProps> = ({
       setSetupInitialPin('');
       setCurrentPinAttempt('');
       setCurrentStep(1);
-      setErrorMessage(null);
+      setErrorMessage(initialNotice || null);
       setIsVerifying(false);
+      setFailedPinAttempts(0);
     }
-  }, [visible, mode]);
+  }, [visible, mode, initialNotice]);
 
   const triggerShake = (callback?: () => void) => {
     Animated.sequence([
@@ -91,9 +97,24 @@ export const SecurityPinModal: React.FC<SecurityPinModalProps> = ({
     if (mode === 'verify') {
       const res = await PinSecurityService.verifyPin(completedPin);
       if (res.success) {
+        setFailedPinAttempts(0);
         onSuccess();
         onClose();
       } else {
+        const nextFailed = failedPinAttempts + 1;
+        setFailedPinAttempts(nextFailed);
+
+        if (nextFailed >= 5 && onFallbackToBiometric) {
+          // PIN failed 5 times -> automatically switch to biometric per user requirement
+          setFailedPinAttempts(0);
+          setErrorMessage(null);
+          setPin('');
+          setIsVerifying(false);
+          onClose();
+          onFallbackToBiometric();
+          return;
+        }
+
         setErrorMessage(res.error || 'Incorrect PIN');
         triggerShake(() => {
           setPin('');
@@ -255,14 +276,12 @@ export const SecurityPinModal: React.FC<SecurityPinModalProps> = ({
         </View>
 
         <View style={styles.content}>
-          {/* Logo container strictly per Rule 15 & 19 */}
-          <View style={styles.logoOuter}>
-            <Image
-              source={require('../../assets/logo-transparent.png')}
-              style={styles.logoImage}
-              resizeMode="contain"
-            />
-          </View>
+          {/* Logo Alone per user instruction (zero border-radius container, logo alone) */}
+          <Image
+            source={require('../../assets/logo-transparent.png')}
+            style={styles.brandLogoAlone}
+            resizeMode="contain"
+          />
 
           <Text variant="h2" weight="800" color="#0F172A" style={styles.title}>
             {title}
@@ -393,27 +412,11 @@ const styles = StyleSheet.create({
     width: '100%',
     alignSelf: 'center',
   },
-  // In-app update / lock logo sizing strictly per Rule 15 & 19
-  logoOuter: {
-    width: 68,
-    height: 68,
-    borderRadius: 18,
-    backgroundColor: '#FFFFFF', // 30% Panel Surface
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  // Brand logo alone with zero container border radius
+  brandLogoAlone: {
+    width: 60,
+    height: 60,
     marginBottom: 16,
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 4,
-  },
-  logoImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 12,
   },
   title: {
     fontSize: 20,

@@ -129,13 +129,11 @@ export default function ThemedAlertModal({
         );
       case 'logo':
         return (
-          <View style={[styles.iconContainer, styles.iconContainerNeutral]}>
-            <Image
-              source={require('../../assets/logo-transparent.png')}
-              style={styles.alertLogoImage}
-              resizeMode="contain"
-            />
-          </View>
+          <Image
+            source={require('../../assets/logo-transparent.png')}
+            style={styles.alertLogoAlone}
+            resizeMode="contain"
+          />
         );
       case 'info':
       default:
@@ -276,10 +274,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F5F9',
     borderColor: 'rgba(15, 23, 42, 0.08)',
   },
-  alertLogoImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 12,
+  alertLogoAlone: {
+    width: 56,
+    height: 56,
   },
   dialogTitle: {
     fontSize: 18,
