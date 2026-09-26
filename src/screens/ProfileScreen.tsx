@@ -38,10 +38,6 @@ import { UiverseSwitch } from '../components/UiverseSwitch';
 import { StreakMilestoneModal } from '../components/StreakMilestoneModal';
 import { LockTimeoutModal } from '../components/LockTimeoutModal';
 import { SecurityPinModal, PinModalMode } from '../components/SecurityPinModal';
-import { PastoralCareModal } from '../components/PastoralCareModal';
-import { SabbathModal } from '../components/SabbathModal';
-import { DeviceSessionsModal } from '../components/DeviceSessionsModal';
-import { SessionSecurityService } from '../services/sessionSecurityService';
 import { LOCK_TIMEOUT_OPTIONS } from '../services/biometricService';
 import {
   AchievementMilestone,
@@ -111,66 +107,11 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     }
   };
 
-  const handleExportJournal = () => {
-    Alert.alert(
-      'Export Study Journal',
-      'Choose how you would like to package your study journal, verse highlights, and bookmarks.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Encrypted (AES-256)',
-          onPress: async () => {
-            const res = await exportStudyJournal({ encrypted: true });
-            if (res.success) {
-              Alert.alert('Encrypted Journal Exported', 'Your reflections and study notes have been encrypted with your device AES-256 hardware key and shared.');
-            } else {
-              Alert.alert('Export Notice', res.error || 'Unable to export encrypted journal.');
-            }
-          },
-        },
-        {
-          text: 'Standard JSON',
-          onPress: async () => {
-            const res = await exportStudyJournal({ encrypted: false });
-            if (res.success) {
-              Alert.alert('Journal Exported', 'Your study reflections, bookmarks, highlights, and streak data have been prepared.');
-            } else {
-              Alert.alert('Export Notice', res.error || 'Unable to export study journal at this time.');
-            }
-          },
-        },
-      ]
-    );
-  };
-
-  const handleConfirmDeleteAccount = () => {
-    Alert.alert(
-      'Delete Account & Purge Data',
-      'This will permanently delete your account, saved bookmarks, scripture highlights, and study streak records from this device and our servers. This action is irreversible.\n\nAre you sure you wish to proceed?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete & Purge',
-          style: 'destructive',
-          onPress: async () => {
-            const success = await deleteAccountAndPurgeData();
-            if (success) {
-              Alert.alert('Account Purged', 'Your account and all personal study data have been completely removed.');
-            }
-          },
-        },
-      ]
-    );
-  };
-
   const [isUploading, setIsUploading] = useState(false);
   const [showStreakModal, setShowStreakModal] = useState<boolean>(false);
   const [showTimeoutModal, setShowTimeoutModal] = useState<boolean>(false);
   const [showPinModal, setShowPinModal] = useState<boolean>(false);
   const [pinModalMode, setPinModalMode] = useState<PinModalMode>('setup');
-  const [showPastoralModal, setShowPastoralModal] = useState<boolean>(false);
-  const [showSabbathModal, setShowSabbathModal] = useState<boolean>(false);
-  const [showDeviceSessionsModal, setShowDeviceSessionsModal] = useState<boolean>(false);
   const [inspectedAchievement, setInspectedAchievement] =
     useState<AchievementMilestone | null>(null);
 
@@ -885,9 +826,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                   </Text>
                 </View>
               )}
-              <Text variant="caption" weight="700" color={colors.accent}>
-                Open ›
-              </Text>
+              <Text style={styles.rowDisclosureArrow}>›</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -1178,10 +1117,10 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           {/* Pastoral Care & Crisis Lifelines */}
           <TouchableOpacity
             style={styles.actionRow}
-            onPress={() => setShowPastoralModal(true)}
+            onPress={() => navigation.navigate('PastoralCare')}
             activeOpacity={0.75}
             accessibilityRole="button"
-            accessibilityLabel="Pastoral Care & 24/7 Crisis Lifelines. Tap to open support lines and comforting scriptures."
+            accessibilityLabel="Pastoral Care & 24/7 Crisis Lifelines. Tap to view support lines and comforting scriptures."
           >
             <View style={styles.rowTitleBox}>
               <Text variant="h3" style={styles.rowTitle}>
@@ -1191,32 +1130,28 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                 24/7 confidential helplines, SADAG, and comforting scriptures
               </Text>
             </View>
-            <Text variant="caption" weight="700" color={colors.accent}>
-              Support ›
-            </Text>
+            <Text style={styles.rowDisclosureArrow}>›</Text>
           </TouchableOpacity>
 
           <View style={styles.rowDivider} />
 
-          {/* Digital Sabbath & Quiet Hours */}
+          {/* Quiet Hours */}
           <TouchableOpacity
             style={styles.actionRow}
-            onPress={() => setShowSabbathModal(true)}
+            onPress={() => navigation.navigate('QuietHours')}
             activeOpacity={0.75}
             accessibilityRole="button"
-            accessibilityLabel="Digital Sabbath & Sacred Quiet Hours. Tap to configure rest windows."
+            accessibilityLabel="Quiet Hours. Tap to configure sacred rest windows."
           >
             <View style={styles.rowTitleBox}>
               <Text variant="h3" style={styles.rowTitle}>
-                Digital Sabbath & Quiet Hours
+                Quiet Hours
               </Text>
               <Text variant="caption" color={colors.textSecondary}>
                 Automate sacred rest windows and quiet hour silence
               </Text>
             </View>
-            <Text variant="caption" weight="700" color={colors.accent}>
-              Configure ›
-            </Text>
+            <Text style={styles.rowDisclosureArrow}>›</Text>
           </TouchableOpacity>
 
           <View style={styles.rowDivider} />
@@ -1224,7 +1159,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           {/* Device Sessions & Security Audit */}
           <TouchableOpacity
             style={styles.actionRow}
-            onPress={() => setShowDeviceSessionsModal(true)}
+            onPress={() => navigation.navigate('DeviceSessions')}
             activeOpacity={0.75}
             accessibilityRole="button"
             accessibilityLabel="Device Sessions and Security Audit Log. Tap to view active devices."
@@ -1237,9 +1172,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                 Active hardware sessions and security event trail
               </Text>
             </View>
-            <Text variant="caption" weight="700" color={colors.accent}>
-              Inspect ›
-            </Text>
+            <Text style={styles.rowDisclosureArrow}>›</Text>
           </TouchableOpacity>
 
           <View style={styles.rowDivider} />
@@ -1247,7 +1180,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           {/* Export Study Journal */}
           <TouchableOpacity
             style={styles.actionRow}
-            onPress={handleExportJournal}
+            onPress={() => navigation.navigate('ExportJournal')}
             activeOpacity={0.75}
             accessibilityRole="button"
             accessibilityLabel="Export study journal to JSON or AES-256 encrypted file"
@@ -1260,9 +1193,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                 Encrypted AES-256 backup or standard JSON format
               </Text>
             </View>
-            <Text variant="caption" weight="700" color={colors.accent}>
-              Export ›
-            </Text>
+            <Text style={styles.rowDisclosureArrow}>›</Text>
           </TouchableOpacity>
 
           <View style={styles.rowDivider} />
@@ -1270,7 +1201,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           {/* Delete Account & Purge Data */}
           <TouchableOpacity
             style={styles.actionRow}
-            onPress={handleConfirmDeleteAccount}
+            onPress={() => navigation.navigate('DeleteAccount')}
             activeOpacity={0.75}
             accessibilityRole="button"
             accessibilityLabel="Delete account and purge all data"
@@ -1283,9 +1214,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                 Permanently erase your account, preferences, and all local study data
               </Text>
             </View>
-            <Text variant="caption" weight="700" color="#64748B">
-              Purge ›
-            </Text>
+            <Text style={styles.rowDisclosureArrow}>›</Text>
           </TouchableOpacity>
         </View>
 
@@ -1412,27 +1341,6 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           setShowPinModal(false);
         }}
         onClose={() => setShowPinModal(false)}
-      />
-
-      {/* Pastoral Care & Crisis Lifeline Modal */}
-      <PastoralCareModal
-        visible={showPastoralModal}
-        onClose={() => setShowPastoralModal(false)}
-      />
-
-      {/* Digital Sabbath Quiet Hours Modal */}
-      <SabbathModal
-        visible={showSabbathModal}
-        onClose={() => setShowSabbathModal(false)}
-      />
-
-      {/* Device Sessions & Security Audit Modal */}
-      <DeviceSessionsModal
-        visible={showDeviceSessionsModal}
-        onClose={() => setShowDeviceSessionsModal(false)}
-        onSessionsRevoked={() => {
-          // Re-render / update state after global session revocation
-        }}
       />
     </SafeAreaView>
   );

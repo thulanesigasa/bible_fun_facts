@@ -77,7 +77,7 @@ graph TD
     HistoryStack --> WriterDetails["WriterDetailsScreen (PageSheet Biography & Manuscripts)"]
     
     SearchStack --> SearchMain["SearchScreen (User Discovery, Follow/Unfollow, Scholar Modal)"]
-    SearchStack --> PastoralCareModal["PastoralCareModal (24/7 Lifelines, SADAG & Scriptures)"]
+    SearchStack --> PastoralCareScreen["PastoralCareScreen (24/7 Lifelines, SADAG & Scriptures)"]
     ProfileStack --> ProfileMain["ProfileScreen (Preferences, Reader Typography, Bookmarks Section)"]
     ProfileStack --> FavoritesMain["FavoritesScreen (Saved Collection)"]
     ProfileStack --> BookmarksMain["BookmarksScreen (Continuous Body Bookmarks Hub)"]
@@ -86,9 +86,11 @@ graph TD
     ProfileStack --> BlockedUsersMain["BlockedUsersScreen (Fellowship Moderation & Unblock Hub)"]
     ProfileStack --> LockTimeoutModal["LockTimeoutModal (Inactivity Timeout: 0s / 60s / 300s / 900s)"]
     ProfileStack --> SecurityPinModal["SecurityPinModal (Setup, Change, Remove & Verify PIN)"]
-    ProfileStack --> PastoralCareModal
-    ProfileStack --> SabbathModal["SabbathModal (Lord's Day, Sabbath, Quiet Hours & Days)"]
-    ProfileStack --> DeviceSessionsModal["DeviceSessionsModal (Hardware Info, Audit Log & Session Revoke)"]
+    ProfileStack --> PastoralCareScreen
+    ProfileStack --> QuietHoursScreen["QuietHoursScreen (Lord's Day, Sabbath, Quiet Hours & Days)"]
+    ProfileStack --> DeviceSessionsScreen["DeviceSessionsScreen (Hardware Info, Audit Log & Session Revoke)"]
+    ProfileStack --> ExportJournalScreen["ExportJournalScreen (Hardware AES-256 Encrypted & JSON Backup)"]
+    ProfileStack --> DeleteAccountScreen["DeleteAccountScreen (GDPR / POPIA Account & Data Purge)"]
     ProfileStack --> Terms
     ProfileStack --> Privacy
     
@@ -1241,16 +1243,29 @@ bible_fun_facts/
 │   │   └── AppNavigator.tsx         # Bottom tab, auth stack, and screen navigation
 │   ├── screens/                     # Primary application screens
 │   │   ├── AchievementsScreen.tsx   # 48-milestone study achievements showcase
+│   │   ├── DeleteAccountScreen.tsx  # GDPR / POPIA account & data purge screen
+│   │   ├── DeviceSessionsScreen.tsx # Device security, hardware enclave & audit log
 │   │   ├── DiscoverScreen.tsx       # Daily feed with top-left bell and streak badge
+│   │   ├── ExportJournalScreen.tsx  # Hardware AES-256 encrypted journal exporter
 │   │   ├── FactDetailsScreen.tsx    # Comprehensive scholarly exegesis details
 │   │   ├── HistoryScreen.tsx        # Canonical authors & manuscript history
 │   │   ├── NotificationsScreen.tsx  # Full notification & achievement center
+│   │   ├── PastoralCareScreen.tsx   # 24/7 crisis lifelines & scriptural assurance
 │   │   ├── ProfileScreen.tsx        # Settings, reading preferences & saved collection
+│   │   ├── QuietHoursScreen.tsx     # Consecrated quiet rest & Sabbath scheduling
 │   │   ├── SearchScreen.tsx         # Believer community discovery & scholar profiles
 │   │   └── WOTDScreen.tsx           # Full 66-book Holy Bible reader & daily exegesis
 │   ├── services/
+│   │   ├── aes256Service.ts         # Hardware-backed AES-256-CBC cryptographic cipher
+│   │   ├── biometricService.ts      # Biometric auth & inactivity lock timeout
 │   │   ├── inAppNotifications.ts    # In-app notifications & achievement state service
+│   │   ├── moderationService.ts     # Content moderation & fellowship guard
 │   │   ├── notifications.ts         # Native OS background notification alarms
+│   │   ├── pastoralCareService.ts   # Spiritual distress detection & crisis lifelines
+│   │   ├── pinSecurityService.ts    # Salted SHA-256 PIN security & lockout
+│   │   ├── privacyService.ts        # Incognito private study & directory visibility
+│   │   ├── sabbathService.ts        # Digital Sabbath & quiet hours scheduling
+│   │   ├── sessionSecurityService.ts# Device hardware registration & session revocation
 │   │   └── supabase.ts              # Supabase authentication and remote persistence
 │   └── theme/                       # 60-30-10 color tokens, spacing & radius
 ├── .gitignore
@@ -1302,6 +1317,45 @@ Version 1.0.4 packages the complete 5-Phase enterprise Safety, Privacy & Securit
 3. **Phase 3: Scholar Privacy Controls & Private Study (Incognito Mode)**: Private Study mode pausing remote analytics/telemetry, customizable directory discoverability, and streak privacy controls.
 4. **Phase 4: Hardware-Encrypted Study Journal & Pastoral Care Distress Net**: Pure TypeScript FIPS 197 AES-256-CBC cipher with Keystore master key for journal exports, paired with compassionate crisis detection and 24/7 emergency lifelines (988, SADAG, Samaritans).
 5. **Phase 5: Digital Sabbath Quiet Hours, Device Sessions & Community Moderation**: Sacred rest scheduling (Sunday, Sabbath, Weekend, Nightly) suppressing push notifications, hardware device audit trail with global session revocation, and Ephesians 4:29 content moderation.
+
+---
+
+### Dedicated Full-Screen Architecture for Safety, Privacy & Security
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Architecture-Dedicated%20Screens%20%7C%20Zero%20Popup%20Modals-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Zero Popup Modals" />
+  <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Pure%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
+  <img src="https://img.shields.io/badge/Icon%20Calibration-50x50%20in%2068x68%20Container-FDD223?style=for-the-badge" alt="Rule 15/19 Logo Calibration" />
+  <img src="https://img.shields.io/badge/Hardware%20Enclave-Keystore%20%7C%20Keychain%20AES--256-0F172A?style=for-the-badge" alt="Hardware Enclave" />
+</p>
+
+To provide an unhurried, respectful, and focused user experience, all critical safety, privacy, and account governance features have been promoted from floating bottom sheets/modals to dedicated full-stack navigation screens:
+
+1. **Pastoral Care & Spiritual Crisis Screen (`PastoralCareScreen.tsx`)**:
+   - Registered in both `ProfileStack` and `SearchStack` (`PastoralCare` route).
+   - Prominently showcases 24/7 confidential helplines (South Africa SADAG, US/Canada 988 Suicide & Crisis Lifeline, UK/ROI Samaritans, South Africa Graceline Pastoral Care) with one-tap dialer and SMS integration.
+   - Features comforting Scripture anchor cards with refreshing devotional promises (Psalm 34:18, Matthew 11:28, Isaiah 41:10) and interactive pastoral prayer petitions.
+   - Features Rule 15/19 calibrated 50x50 SVG icon inside a 68x68 rounded container (`HeartHandshakeSvg`).
+
+2. **Digital Sabbath & Quiet Hours Screen (`QuietHoursScreen.tsx`)**:
+   - Registered in `ProfileStack` (`QuietHours` route).
+   - Allows believers to consecrate sacred rest periods (`Lord's Day (Sunday)`, `Biblical Sabbath (Friday 18:00 - Saturday 18:00)`, `Full Weekend`, `Nightly Quiet Hours (22:00 - 06:00)`, or `Custom Days`).
+   - Automatically suppresses telemetry sync and push notifications during consecrated windows while exempting emergency crisis lifelines.
+
+3. **Device Sessions & Security Audit Screen (`DeviceSessionsScreen.tsx`)**:
+   - Registered in `ProfileStack` (`DeviceSessions` route).
+   - Displays real-time device hardware specifications, OS releases, hardware-backed Keystore enclave status, and active session tokens.
+   - Provides global one-tap remote session revocation and an unalterable chronological security audit trail.
+
+4. **Hardware-Encrypted Study Journal Exporter (`ExportJournalScreen.tsx`)**:
+   - Registered in `ProfileStack` (`ExportJournal` route).
+   - Executes on-device FIPS 197 AES-256-CBC encryption using a cryptographic master key stored in the hardware Keystore/Keychain.
+   - Allows scholars to export their complete study journal, notes, bookmarks, and highlights in either AES-256 encrypted binary format or standard JSON.
+
+5. **GDPR / POPIA Account & Data Purge Screen (`DeleteAccountScreen.tsx`)**:
+   - Registered in `ProfileStack` (`DeleteAccount` route).
+   - Provides a comprehensive, irreversible data destruction workflow with multi-step confirmation and security PIN verification.
+   - Erases all local database records, hardware keys, cached study history, and Supabase cloud authentication profiles.
 
 ---
 
