@@ -8,6 +8,7 @@ import {
   Dimensions,
   Platform,
   TouchableWithoutFeedback,
+  Image,
 } from 'react-native';
 import {
   LogOutSvg,
@@ -35,7 +36,8 @@ export type AlertIconType =
   | 'success'
   | 'info'
   | 'block'
-  | 'flag';
+  | 'flag'
+  | 'logo';
 
 export interface ThemedAlertButton {
   text: string;
@@ -123,6 +125,16 @@ export default function ThemedAlertModal({
         return (
           <View style={[styles.iconContainer, styles.iconContainerNeutral]}>
             <KeypadSvg size={36} color="#0F172A" />
+          </View>
+        );
+      case 'logo':
+        return (
+          <View style={[styles.iconContainer, styles.iconContainerNeutral]}>
+            <Image
+              source={require('../../assets/logo-transparent.png')}
+              style={styles.alertLogoImage}
+              resizeMode="contain"
+            />
           </View>
         );
       case 'info':
@@ -263,6 +275,11 @@ const styles = StyleSheet.create({
   iconContainerNeutral: {
     backgroundColor: '#F1F5F9',
     borderColor: 'rgba(15, 23, 42, 0.08)',
+  },
+  alertLogoImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 12,
   },
   dialogTitle: {
     fontSize: 18,

@@ -31,6 +31,7 @@ export const SecurityPinModal: React.FC<SecurityPinModalProps> = ({
 }) => {
   const [pin, setPin] = useState<string>('');
   const [setupInitialPin, setSetupInitialPin] = useState<string>('');
+  const [currentPinAttempt, setCurrentPinAttempt] = useState<string>('');
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
@@ -42,6 +43,7 @@ export const SecurityPinModal: React.FC<SecurityPinModalProps> = ({
     if (visible) {
       setPin('');
       setSetupInitialPin('');
+      setCurrentPinAttempt('');
       setCurrentStep(1);
       setErrorMessage(null);
       setIsVerifying(false);
@@ -100,6 +102,14 @@ export const SecurityPinModal: React.FC<SecurityPinModalProps> = ({
       }
     } else if (mode === 'setup') {
       if (currentStep === 1) {
+        if (/(.)\1/.test(completedPin)) {
+          setErrorMessage('PIN cannot have consecutive repeated numbers (e.g. 00, 11)');
+          triggerShake(() => {
+            setPin('');
+            setIsVerifying(false);
+          });
+          return;
+        }
         setSetupInitialPin(completedPin);
         setPin('');
         setCurrentStep(2);
@@ -132,6 +142,7 @@ export const SecurityPinModal: React.FC<SecurityPinModalProps> = ({
       if (currentStep === 1) {
         const verify = await PinSecurityService.verifyPin(completedPin);
         if (verify.success) {
+          setCurrentPinAttempt(completedPin);
           setPin('');
           setCurrentStep(2);
           setIsVerifying(false);
@@ -143,6 +154,22 @@ export const SecurityPinModal: React.FC<SecurityPinModalProps> = ({
           });
         }
       } else if (currentStep === 2) {
+        if (completedPin === currentPinAttempt) {
+          setErrorMessage('New PIN cannot be the same as current PIN');
+          triggerShake(() => {
+            setPin('');
+            setIsVerifying(false);
+          });
+          return;
+        }
+        if (/(.)\1/.test(completedPin)) {
+          setErrorMessage('PIN cannot have consecutive repeated numbers (e.g. 00, 11)');
+          triggerShake(() => {
+            setPin('');
+            setIsVerifying(false);
+          });
+          return;
+        }
         setSetupInitialPin(completedPin);
         setPin('');
         setCurrentStep(3);
