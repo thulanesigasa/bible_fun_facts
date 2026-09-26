@@ -898,6 +898,28 @@ export const RadioUncheckedSvg: React.FC<SvgIconProps> = ({ size = 20, color = '
   </Svg>
 );
 
+export const KeypadSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#0F172A', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Rect x="4" y="4" width="4" height="4" rx="1" stroke={color} strokeWidth={strokeWidth} />
+    <Rect x="10" y="4" width="4" height="4" rx="1" stroke={color} strokeWidth={strokeWidth} />
+    <Rect x="16" y="4" width="4" height="4" rx="1" stroke={color} strokeWidth={strokeWidth} />
+    <Rect x="4" y="10" width="4" height="4" rx="1" stroke={color} strokeWidth={strokeWidth} />
+    <Rect x="10" y="10" width="4" height="4" rx="1" stroke={color} strokeWidth={strokeWidth} />
+    <Rect x="16" y="10" width="4" height="4" rx="1" stroke={color} strokeWidth={strokeWidth} />
+    <Rect x="4" y="16" width="4" height="4" rx="1" stroke={color} strokeWidth={strokeWidth} />
+    <Rect x="10" y="16" width="4" height="4" rx="1" stroke={color} strokeWidth={strokeWidth} />
+    <Rect x="16" y="16" width="4" height="4" rx="1" stroke={color} strokeWidth={strokeWidth} />
+  </Svg>
+);
+
+export const BackspaceSvg: React.FC<SvgIconProps> = ({ size = 22, color = '#0F172A', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M18 9l-6 6M12 9l6 6" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+
 
 
 

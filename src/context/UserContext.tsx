@@ -27,6 +27,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import { SafetyService } from '../services/safetyService';
 import { BiometricService } from '../services/biometricService';
+import { PinSecurityService } from '../services/pinSecurityService';
 import { SecureStoreAdapter } from '../services/secureStorage';
 
 export interface UserProfile {
@@ -141,6 +142,8 @@ interface AppContextType extends UserState {
   setLockTimeoutSeconds: (seconds: number) => Promise<void>;
   isPrivacyShieldEnabled: boolean;
   setPrivacyShieldEnabled: (enabled: boolean) => Promise<void>;
+  isPinSet: boolean;
+  refreshPinStatus: () => Promise<void>;
 }
 
 const UserContext = createContext<AppContextType | undefined>(undefined);
@@ -1198,7 +1201,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAppLocked, setIsAppLocked] = useState<boolean>(false);
   const [lockTimeoutSeconds, setLockTimeoutSecondsState] = useState<number>(0);
   const [isPrivacyShieldEnabled, setIsPrivacyShieldEnabledState] = useState<boolean>(true);
+  const [isPinSet, setIsPinSetState] = useState<boolean>(false);
   const backgroundTimestampRef = useRef<number | null>(null);
+
+  const refreshPinStatus = useCallback(async () => {
+    const set = await PinSecurityService.isPinSet();
+    setIsPinSetState(set);
+  }, []);
 
   useEffect(() => {
     BiometricService.checkSupport().then((status) => {
@@ -1206,16 +1215,18 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setBiometricType(status.biometricType);
     });
 
-    BiometricService.isLockEnabled().then((enabled) => {
+    BiometricService.isLockEnabled().then(async (enabled) => {
       setIsBiometricLockEnabledState(enabled);
-      if (enabled) {
+      const pinActive = await PinSecurityService.isPinSet();
+      if (enabled || pinActive) {
         setIsAppLocked(true);
       }
     });
 
     BiometricService.getLockTimeout().then(setLockTimeoutSecondsState);
     BiometricService.isPrivacyShieldEnabled().then(setIsPrivacyShieldEnabledState);
-  }, []);
+    refreshPinStatus();
+  }, [refreshPinStatus]);
 
   const setLockTimeoutSeconds = useCallback(async (seconds: number) => {
     const ok = await BiometricService.setLockTimeout(seconds);
@@ -1238,7 +1249,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           backgroundTimestampRef.current = Date.now();
         }
       } else if (nextAppState === 'active') {
-        if (isBiometricLockEnabled && backgroundTimestampRef.current !== null) {
+        if ((isBiometricLockEnabled || isPinSet) && backgroundTimestampRef.current !== null) {
           const elapsedSec = (Date.now() - backgroundTimestampRef.current) / 1000;
           if (lockTimeoutSeconds === 0 || elapsedSec >= lockTimeoutSeconds) {
             setIsAppLocked(true);
@@ -1249,7 +1260,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     const sub = AppState.addEventListener('change', handleAppStateChange);
     return () => sub.remove();
-  }, [isBiometricLockEnabled, lockTimeoutSeconds]);
+  }, [isBiometricLockEnabled, isPinSet, lockTimeoutSeconds]);
 
   const setBiometricLockEnabled = useCallback(async (enabled: boolean): Promise<{ success: boolean; error?: string }> => {
     const success = await BiometricService.setLockEnabled(enabled);
@@ -1421,6 +1432,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLockTimeoutSeconds,
       isPrivacyShieldEnabled,
       setPrivacyShieldEnabled,
+      isPinSet,
+      refreshPinStatus,
     }}>
 
       {children}
