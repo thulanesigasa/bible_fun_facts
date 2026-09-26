@@ -137,6 +137,10 @@ interface AppContextType extends UserState {
   isAppLocked: boolean;
   setIsAppLocked: (locked: boolean) => void;
   unlockApp: () => Promise<boolean>;
+  lockTimeoutSeconds: number;
+  setLockTimeoutSeconds: (seconds: number) => Promise<void>;
+  isPrivacyShieldEnabled: boolean;
+  setPrivacyShieldEnabled: (enabled: boolean) => Promise<void>;
 }
 
 const UserContext = createContext<AppContextType | undefined>(undefined);
@@ -1192,6 +1196,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [biometricType, setBiometricType] = useState<string | null>(null);
   const [isBiometricLockEnabled, setIsBiometricLockEnabledState] = useState<boolean>(false);
   const [isAppLocked, setIsAppLocked] = useState<boolean>(false);
+  const [lockTimeoutSeconds, setLockTimeoutSecondsState] = useState<number>(0);
+  const [isPrivacyShieldEnabled, setIsPrivacyShieldEnabledState] = useState<boolean>(true);
+  const backgroundTimestampRef = useRef<number | null>(null);
 
   useEffect(() => {
     BiometricService.checkSupport().then((status) => {
@@ -1205,19 +1212,44 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsAppLocked(true);
       }
     });
+
+    BiometricService.getLockTimeout().then(setLockTimeoutSecondsState);
+    BiometricService.isPrivacyShieldEnabled().then(setIsPrivacyShieldEnabledState);
+  }, []);
+
+  const setLockTimeoutSeconds = useCallback(async (seconds: number) => {
+    const ok = await BiometricService.setLockTimeout(seconds);
+    if (ok) {
+      setLockTimeoutSecondsState(seconds);
+    }
+  }, []);
+
+  const setPrivacyShieldEnabled = useCallback(async (enabled: boolean) => {
+    const ok = await BiometricService.setPrivacyShieldEnabled(enabled);
+    if (ok) {
+      setIsPrivacyShieldEnabledState(enabled);
+    }
   }, []);
 
   useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
       if (nextAppState === 'background' || nextAppState === 'inactive') {
-        if (isBiometricLockEnabled) {
-          setIsAppLocked(true);
+        if (backgroundTimestampRef.current === null) {
+          backgroundTimestampRef.current = Date.now();
         }
+      } else if (nextAppState === 'active') {
+        if (isBiometricLockEnabled && backgroundTimestampRef.current !== null) {
+          const elapsedSec = (Date.now() - backgroundTimestampRef.current) / 1000;
+          if (lockTimeoutSeconds === 0 || elapsedSec >= lockTimeoutSeconds) {
+            setIsAppLocked(true);
+          }
+        }
+        backgroundTimestampRef.current = null;
       }
     };
     const sub = AppState.addEventListener('change', handleAppStateChange);
     return () => sub.remove();
-  }, [isBiometricLockEnabled]);
+  }, [isBiometricLockEnabled, lockTimeoutSeconds]);
 
   const setBiometricLockEnabled = useCallback(async (enabled: boolean): Promise<{ success: boolean; error?: string }> => {
     const success = await BiometricService.setLockEnabled(enabled);
@@ -1385,6 +1417,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isAppLocked,
       setIsAppLocked,
       unlockApp,
+      lockTimeoutSeconds,
+      setLockTimeoutSeconds,
+      isPrivacyShieldEnabled,
+      setPrivacyShieldEnabled,
     }}>
 
       {children}

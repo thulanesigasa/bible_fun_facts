@@ -36,6 +36,7 @@ import ScriptureDetailsScreen from '../screens/ScriptureDetailsScreen';
 import WOTDDetailsScreen from '../screens/WOTDDetailsScreen';
 import BlockedUsersScreen from '../screens/BlockedUsersScreen';
 import BiometricLockOverlay from '../components/BiometricLockOverlay';
+import AppSwitcherShield from '../components/AppSwitcherShield';
 import { Fact, Scripture, WOTDEntry } from '../data/mockDatabase';
 import { BiblicalWriter } from '../data/biblicalWriters';
 import { colors } from '../theme/colors';
@@ -453,12 +454,22 @@ const navTheme = {
 };
 
 export default function AppNavigator() {
-  const { userProfile, hideTabBar, accent, unreadNotificationsCount, isAppLocked, biometricType, unlockApp } = useApp();
+  const {
+    userProfile,
+    hideTabBar,
+    accent,
+    unreadNotificationsCount,
+    isAppLocked,
+    biometricType,
+    unlockApp,
+    isPrivacyShieldEnabled,
+  } = useApp();
   const { width } = useWindowDimensions();
   const horizontalPadding = (width - 280) / 2;
 
   return (
     <NavigationContainer theme={navTheme}>
+      <AppSwitcherShield enabled={isPrivacyShieldEnabled} />
       <BiometricLockOverlay
         visible={isAppLocked}
         biometricType={biometricType}
