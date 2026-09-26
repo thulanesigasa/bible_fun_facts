@@ -7,13 +7,13 @@ import {
   TextInput,
   Modal,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
 import { useUser } from '../context/UserContext';
+import { useThemedAlert } from '../context/AlertContext';
 import { CommunityUser } from '../data/mockUsers';
 import { supabase } from '../services/supabase';
 import { SafetyService } from '../services/safetyService';
@@ -116,6 +116,8 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
     fetchLiveProfiles();
   }, [userProfile?.username, userProfile?.email]);
 
+  const { showAlert } = useThemedAlert();
+
   const REPORT_REASONS = [
     { key: 'harassment', label: 'Harassment or Bullying' },
     { key: 'inappropriate', label: 'Inappropriate Content' },
@@ -125,10 +127,12 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
   ];
 
   const handleBlockUser = (user: CommunityUser) => {
-    Alert.alert(
-      'Block Scholar',
-      `Are you sure you want to block ${user.name} (@${user.username})? They will be hidden from your search, fellowship, and study reflections.`,
-      [
+    showAlert({
+      title: 'Block Scholar',
+      message: `Are you sure you want to block ${user.name} (@${user.username})? They will be hidden from your search, fellowship, and study reflections.`,
+      icon: 'block',
+      isDestructive: true,
+      buttons: [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Block',
@@ -136,11 +140,15 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
           onPress: async () => {
             await blockUser(user.id);
             setSelectedUser(null);
-            Alert.alert('Scholar Blocked', `${user.name} has been blocked and removed from your fellowship view.`);
+            showAlert({
+              title: 'Scholar Blocked',
+              message: `${user.name} has been blocked and removed from your fellowship view.`,
+              icon: 'shield',
+            });
           },
         },
-      ]
-    );
+      ],
+    });
   };
 
   const handleOpenReport = (user: CommunityUser) => {
@@ -158,10 +166,12 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
     );
     const target = reportingUser;
     setReportingUser(null);
-    Alert.alert(
-      'Report Submitted',
-      `Thank you for helping keep the exégeomai fellowship safe and edifying. We will review @${target.username}'s contributions. Would you also like to block this account?`,
-      [
+    showAlert({
+      title: 'Report Submitted',
+      message: `Thank you for helping keep the exégeomai fellowship safe and edifying. We will review @${target.username}'s contributions. Would you also like to block this account?`,
+      icon: 'flag',
+      isDestructive: true,
+      buttons: [
         { text: 'No, Keep Visible', style: 'cancel' },
         {
           text: 'Block Account',
@@ -171,8 +181,8 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
             setSelectedUser(null);
           },
         },
-      ]
-    );
+      ],
+    });
   };
 
   const filteredUsers = useMemo(() => {

@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Alert,
   Image,
   ActivityIndicator,
   Animated,
@@ -20,6 +19,7 @@ import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
 import { useUser } from '../context/UserContext';
+import { useThemedAlert } from '../context/AlertContext';
 import {
   ProfileSvg,
   CameraSvg,
@@ -99,11 +99,16 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     exportStudyJournal,
     deleteAccountAndPurgeData,
   } = useUser();
+  const { showAlert } = useThemedAlert();
 
   const handleToggleBiometricLock = async (val: boolean) => {
     const res = await setBiometricLockEnabled(val);
     if (!res.success && res.error) {
-      Alert.alert('Biometric App Lock', res.error);
+      showAlert({
+        title: 'Biometric App Lock',
+        message: res.error,
+        icon: 'warning',
+      });
     }
   };
 
@@ -171,10 +176,12 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
   }, []);
 
   const handleDeleteOfflineTranslation = (id: string, name: string) => {
-    Alert.alert(
-      'Remove Downloaded Bible',
-      `Are you sure you want to remove ${name} from offline storage? You can re-download it at any time.`,
-      [
+    showAlert({
+      title: 'Remove Downloaded Bible',
+      message: `Are you sure you want to remove ${name} from offline storage? You can re-download it at any time.`,
+      icon: 'trash',
+      isDestructive: true,
+      buttons: [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Remove',
@@ -188,8 +195,8 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
             }
           },
         },
-      ]
-    );
+      ],
+    });
   };
 
   // Reader Settings State: 1px to 24px
@@ -287,10 +294,11 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
     try {
       const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!permission.granted) {
-        Alert.alert(
-          'Photo Permission Needed',
-          'Please allow photo library access to select a profile picture.'
-        );
+        showAlert({
+          title: 'Photo Permission Needed',
+          message: 'Please allow photo library access to select a profile picture.',
+          icon: 'info',
+        });
         return;
       }
 
@@ -313,16 +321,25 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
 
         const uploadRes = await uploadAvatar(manipResult.uri);
         if (uploadRes.success) {
-          Alert.alert(
-            'Profile Photo Updated',
-            'Your profile image has been compressed and updated.'
-          );
+          showAlert({
+            title: 'Profile Photo Updated',
+            message: 'Your profile image has been compressed and updated.',
+            icon: 'success',
+          });
         } else {
-          Alert.alert('Upload Notice', uploadRes.error || 'Failed to update avatar image.');
+          showAlert({
+            title: 'Upload Notice',
+            message: uploadRes.error || 'Failed to update avatar image.',
+            icon: 'warning',
+          });
         }
       }
     } catch (e: any) {
-      Alert.alert('Error', e?.message || 'Could not pick image.');
+      showAlert({
+        title: 'Error',
+        message: e?.message || 'Could not pick image.',
+        icon: 'warning',
+      });
     } finally {
       setIsUploading(false);
     }
@@ -354,10 +371,12 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
   );
 
   const triggerSignOut = () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out of your exégeomai account?',
-      [
+    showAlert({
+      title: 'Sign Out',
+      message: 'Are you sure you want to sign out of your exégeomai account? Your saved study notes, highlights, and bookmarks will remain safely stored.',
+      icon: 'logout',
+      isDestructive: true,
+      buttons: [
         {
           text: 'Cancel',
           style: 'cancel',
@@ -368,8 +387,8 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
           style: 'destructive',
           onPress: () => logout(),
         },
-      ]
-    );
+      ],
+    });
   };
 
   const panResponder = useRef(
@@ -971,10 +990,11 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
             style={styles.actionRow}
             onPress={() => {
               if (isPinSet) {
-                Alert.alert(
-                  'Security PIN',
-                  'Your sacred study journal and notes are protected by a 4-digit PIN.',
-                  [
+                showAlert({
+                  title: 'Security PIN',
+                  message: 'Your sacred study journal and notes are protected by a 4-digit PIN.',
+                  icon: 'keypad',
+                  buttons: [
                     { text: 'Cancel', style: 'cancel' },
                     {
                       text: 'Change PIN',
@@ -991,8 +1011,8 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
                         setShowPinModal(true);
                       },
                     },
-                  ]
-                );
+                  ],
+                });
               } else {
                 setPinModalMode('setup');
                 setShowPinModal(true);

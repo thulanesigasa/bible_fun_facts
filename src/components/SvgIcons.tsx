@@ -951,6 +951,31 @@ export const DevicesSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#0F172A
   </Svg>
 );
 
+export const AlertCircleSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#DC2626', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Circle cx="12" cy="12" r="10" stroke={color} strokeWidth={strokeWidth} />
+    <Path d="M12 8v4" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+    <Path d="M12 16h.01" stroke={color} strokeWidth={strokeWidth + 0.5} strokeLinecap="round" />
+  </Svg>
+);
+
+export const AlertTriangleSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M12 9v4" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+    <Path d="M12 17h.01" stroke={color} strokeWidth={strokeWidth + 0.5} strokeLinecap="round" />
+  </Svg>
+);
+
+export const InfoCircleSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#0284C7', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Circle cx="12" cy="12" r="10" stroke={color} strokeWidth={strokeWidth} />
+    <Path d="M12 16v-4" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+    <Path d="M12 8h.01" stroke={color} strokeWidth={strokeWidth + 0.5} strokeLinecap="round" />
+  </Svg>
+);
+
+
 
 
 

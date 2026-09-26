@@ -4,13 +4,13 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
+import { useThemedAlert } from '../context/AlertContext';
 import {
   ExportJournalSvg,
   ShieldLockSvg,
@@ -21,23 +21,33 @@ import { useUser } from '../context/UserContext';
 export default function ExportJournalScreen() {
   const { exportStudyJournal, favoritesFacts, favoritesScriptures, bibleHighlights, streak } = useUser();
   const [isExporting, setIsExporting] = useState(false);
+  const { showAlert } = useThemedAlert();
 
   const handleExport = async (encrypted: boolean) => {
     setIsExporting(true);
     try {
       const res = await exportStudyJournal({ encrypted });
       if (res.success) {
-        Alert.alert(
-          encrypted ? 'Encrypted Journal Exported' : 'Journal Exported',
-          encrypted
+        showAlert({
+          title: encrypted ? 'Encrypted Journal Exported' : 'Journal Exported',
+          message: encrypted
             ? 'Your sacred study reflections and bookmarks have been encrypted with your device AES-256 key and prepared for sharing.'
-            : 'Your study reflections, bookmarks, highlights, and streak data have been prepared in standard JSON format.'
-        );
+            : 'Your study reflections, bookmarks, highlights, and streak data have been prepared in standard JSON format.',
+          icon: 'success',
+        });
       } else {
-        Alert.alert('Export Notice', res.error || 'Unable to prepare export file at this time.');
+        showAlert({
+          title: 'Export Notice',
+          message: res.error || 'Unable to prepare export file at this time.',
+          icon: 'warning',
+        });
       }
     } catch (e: any) {
-      Alert.alert('Export Error', e?.message || 'Failed to export study data.');
+      showAlert({
+        title: 'Export Error',
+        message: e?.message || 'Failed to export study data.',
+        icon: 'warning',
+      });
     } finally {
       setIsExporting(false);
     }
