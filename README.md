@@ -103,7 +103,7 @@ graph TD
         BibleService["bibleService.ts & offlineBibleService.ts"] <--> OfflineFS[("expo-file-system (offline_bibles/)")]
         BibleService <--> AsyncStorage[("AsyncStorage Cache (@bible_chapter_cache_)")]
         SecureStorage["SecureStoreAdapter (Android Keystore / iOS Keychain)"] <--> Supabase
-        BiometricService["biometricService.ts (Face ID / Fingerprint Auth)"] --> BiometricLock["BiometricLockOverlay (Dual Biometric & PIN Lock)"]
+        BiometricService["biometricService.ts (Fingerprint Lock Auth)"] --> BiometricLock["BiometricLockOverlay (Dual Fingerprint & PIN Lock)"]
         PinSecurityService["pinSecurityService.ts (Salted SHA-256 + Rate Limiting)"] --> BiometricLock
         BiometricService --> AppSwitcherShield["AppSwitcherShield (OS Snapshot Mask)"]
         PrivacyService["privacyService.ts (Private Study & Scholar Privacy)"] <--> UserContext
@@ -800,7 +800,7 @@ bible_fun_facts/
 │   │   └── WOTDScreen.tsx           # Full Holy Bible reader (66 books, 24 translations) + Daily Exegesis
 │   ├── services/
 │   │   ├── bibleService.ts          # Multi-tier memory, persistent AsyncStorage & public domain API client
-│   │   ├── biometricService.ts      # Native Face ID / Fingerprint auth and auto-lock timeout engine
+│   │   ├── biometricService.ts      # Native Fingerprint auth and auto-lock timeout engine
 │   │   ├── offlineBibleService.ts   # Multi-CDN resilient Bible download engine with schema normalization
 │   │   ├── pinSecurityService.ts    # Hardware-backed salted SHA-256 PIN authentication & rate-limiting
 │   │   ├── privacyService.ts        # Hardware-persisted Private Study Mode (Incognito) & scholar privacy
@@ -912,7 +912,7 @@ bible_fun_facts/
   - **Ephesians 4:29 Filter**: Screens community queries, reflections, and reports against harassment, profanity, and toxic language.
   - **Wholesome Fellowship Atmosphere**: Prevents hostility and ensures community interactions remain uplifting, reverent, and edifying.
 - **Hardware Token Encryption (`SecureStoreAdapter.ts`)**: Supabase session tokens, user credentials, and biometric authorization keys are backed by Android Keystore (`EncryptedSharedPreferences`) and iOS Keychain via `expo-secure-store`. Features seamless size-limit handling and graceful fallback to on-device storage on unrooted environments.
-- **Biometric App Lock (`BiometricService.ts` & `BiometricLockOverlay.tsx`)**: Optional Face ID, Touch ID, or Android Biometric prompt gating access to the application and personal study journal. Locks automatically whenever the configured inactivity timeout is exceeded.
+- **Fingerprint App Lock (`BiometricService.ts` & `BiometricLockOverlay.tsx`)**: Optional Fingerprint prompt gating access to the application and personal study journal. Locks automatically whenever the configured inactivity timeout is exceeded. Cancelling or pressing Back does not penalize attempt counts, allowing seamless switching to PIN.
 - **Community Safety & Content Moderation (`SafetyService.ts` & `SearchScreen.tsx`)**:
   - **Account Blocking**: Users can block any scholar or fellowship participant directly from their profile modal. Blocked accounts are immediately purged from search results, discovery feeds, and reflection threads.
   - **Report Queue**: Structured reporting interface for harassment, inappropriate content, spam, and doctrinal misrepresentation, persisting moderation records for review.

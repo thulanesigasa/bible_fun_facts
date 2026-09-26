@@ -115,16 +115,16 @@ export default function SecurityScreen({ navigation }: { navigation: any }) {
               <View style={styles.actionRow}>
                 <View style={styles.rowTitleBox}>
                   <Text variant="h3" style={styles.rowTitle}>
-                    Biometrics
+                    Fingerprint Lock
                   </Text>
                   <Text variant="caption" color={colors.textSecondary} style={styles.rowDescription}>
-                    {`Require ${biometricType || 'Fingerprint'} verification whenever exégeomai opens`}
+                    Require Fingerprint verification whenever exégeomai opens
                   </Text>
                 </View>
                 <UiverseSwitch
                   value={isBiometricLockEnabled}
                   onValueChange={handleToggleBiometricLock}
-                  accessibilityLabel="Toggle biometric app lock"
+                  accessibilityLabel="Toggle fingerprint app lock"
                 />
               </View>
               <View style={styles.rowDivider} />

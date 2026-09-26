@@ -11,12 +11,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text } from './Typography';
 import { SecurityPinModal } from './SecurityPinModal';
 import { PinSecurityService } from '../services/pinSecurityService';
+import { BiometricAuthResult } from '../services/biometricService';
 
 interface BiometricLockOverlayProps {
   visible: boolean;
   biometricType?: string | null;
   onUnlock?: () => void;
-  onUnlockBiometric?: () => Promise<boolean>;
+  onUnlockBiometric?: () => Promise<BiometricAuthResult>;
   onUnlockDirectly?: () => void;
 }
 
@@ -43,10 +44,9 @@ export const BiometricLockOverlay: React.FC<BiometricLockOverlayProps> = ({
       setBiometricErrorNotice(null);
       setPinNoticeMessage(null);
 
-      // Auto-trigger biometric on initial lock appearance once if available
+      // Auto-trigger fingerprint on initial lock appearance once if available
       if (onUnlockBiometric && !hasAutoPromptedRef.current) {
         hasAutoPromptedRef.current = true;
-        // Small delay to ensure smooth transition
         const timer = setTimeout(() => {
           handleBiometricAuth();
         }, 200);
@@ -62,12 +62,23 @@ export const BiometricLockOverlay: React.FC<BiometricLockOverlayProps> = ({
     if (!onUnlockBiometric) return;
     setBiometricErrorNotice(null);
 
-    const success = await onUnlockBiometric();
-    if (success) {
+    const result = await onUnlockBiometric();
+    if (result.success) {
       setBiometricFailures(0);
       setBiometricErrorNotice(null);
       // App unlocked via UserContext.isAppLocked = false
     } else {
+      // If user tapped Cancel or pressed Back to switch to PIN:
+      if (result.isCancelled) {
+        // DO NOT count as a failed attempt!
+        if (result.isFallback) {
+          setPinNoticeMessage(null);
+          setShowPinModal(true);
+        }
+        return;
+      }
+
+      // Genuine recognition failure (fingerprint mismatch)
       const nextFailures = biometricFailures + 1;
       setBiometricFailures(nextFailures);
 
@@ -80,7 +91,7 @@ export const BiometricLockOverlay: React.FC<BiometricLockOverlayProps> = ({
       } else {
         const remaining = 5 - nextFailures;
         setBiometricErrorNotice(
-          `${biometricType || 'Fingerprint'} failed. ${remaining} ${remaining === 1 ? 'attempt' : 'attempts'} remaining before PIN fallback.`
+          `Fingerprint not recognized. ${remaining} ${remaining === 1 ? 'attempt' : 'attempts'} remaining before PIN fallback.`
         );
       }
     }
@@ -96,7 +107,7 @@ export const BiometricLockOverlay: React.FC<BiometricLockOverlayProps> = ({
   };
 
   const handlePinFallbackToBiometric = () => {
-    // Vice versa: when PIN fails 5 times, automatically take the user to biometric/fingerprint
+    // Vice versa: when PIN fails 5 times, automatically take the user to fingerprint
     setShowPinModal(false);
     setPinNoticeMessage(null);
     handleBiometricAuth();
@@ -141,10 +152,10 @@ export const BiometricLockOverlay: React.FC<BiometricLockOverlayProps> = ({
               onPress={handleBiometricAuth}
               activeOpacity={0.7}
               accessibilityRole="button"
-              accessibilityLabel={`Unlock with ${biometricType || 'Fingerprint'}`}
+              accessibilityLabel="Unlock with Fingerprint"
             >
               <Text variant="body" weight="700" color="#0F172A" style={styles.actionText}>
-                Unlock with {biometricType || 'Fingerprint'}
+                Unlock with Fingerprint
               </Text>
             </TouchableOpacity>
 

@@ -22,12 +22,20 @@ export const LOCK_TIMEOUT_OPTIONS: LockTimeoutOption[] = [
 export interface BiometricStatus {
   isSupported: boolean;
   isEnrolled: boolean;
-  biometricType: 'Face ID' | 'Fingerprint' | 'Iris' | 'Biometrics' | null;
+  biometricType: 'Fingerprint' | null;
+}
+
+export interface BiometricAuthResult {
+  success: boolean;
+  error?: string;
+  isCancelled?: boolean;
+  isFallback?: boolean;
 }
 
 export const BiometricService = {
   /**
    * Checks whether the device hardware supports biometrics and has enrolled records.
+   * Standardized to 'Fingerprint' exclusively.
    */
   checkSupport: async (): Promise<BiometricStatus> => {
     try {
@@ -37,14 +45,8 @@ export const BiometricService = {
       let biometricType: BiometricStatus['biometricType'] = null;
       if (hasHardware) {
         const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
-        if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
-          biometricType = 'Face ID';
-        } else if (types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
+        if (types.length > 0) {
           biometricType = 'Fingerprint';
-        } else if (types.includes(LocalAuthentication.AuthenticationType.IRIS)) {
-          biometricType = 'Iris';
-        } else if (types.length > 0) {
-          biometricType = 'Biometrics';
         }
       }
 
@@ -64,7 +66,7 @@ export const BiometricService = {
   },
 
   /**
-   * Checks whether Biometric App Lock has been toggled ON by the user.
+   * Checks whether Fingerprint App Lock has been toggled ON by the user.
    */
   isLockEnabled: async (): Promise<boolean> => {
     try {
@@ -76,13 +78,13 @@ export const BiometricService = {
   },
 
   /**
-   * Toggles Biometric App Lock ON or OFF.
+   * Toggles Fingerprint App Lock ON or OFF.
    */
   setLockEnabled: async (enabled: boolean): Promise<boolean> => {
     try {
       if (enabled) {
         // Authenticate first before enabling
-        const auth = await BiometricService.authenticate('Confirm Face ID / Fingerprint to enable App Lock');
+        const auth = await BiometricService.authenticate('Confirm Fingerprint to enable App Lock');
         if (!auth.success) {
           return false;
         }
@@ -150,24 +152,39 @@ export const BiometricService = {
   },
 
   /**
-   * Prompts native biometric prompt (Face ID / Touch ID / Android Biometric).
+   * Prompts native biometric prompt (Fingerprint exclusively).
+   * Accurately flags intentional user cancellation (Back button or Cancel)
+   * vs genuine authentication mismatch.
    */
-  authenticate: async (promptMessage = 'Unlock exégeomai'): Promise<{ success: boolean; error?: string }> => {
+  authenticate: async (promptMessage = 'Unlock exégeomai with Fingerprint'): Promise<BiometricAuthResult> => {
     try {
       const res = await LocalAuthentication.authenticateAsync({
         promptMessage,
         cancelLabel: 'Cancel',
-        fallbackLabel: 'Use Device Passcode',
-        disableDeviceFallback: false,
+        fallbackLabel: 'Use Security PIN',
+        disableDeviceFallback: true,
       });
 
       if (res.success) {
         return { success: true };
       }
-      return { success: false, error: res.error || 'Authentication failed' };
+
+      const isFallback = res.error === 'user_fallback';
+      const isCancelled =
+        res.error === 'user_cancel' ||
+        res.error === 'system_cancel' ||
+        res.error === 'app_cancel' ||
+        isFallback;
+
+      return {
+        success: false,
+        error: res.error || 'Authentication failed',
+        isCancelled,
+        isFallback,
+      };
     } catch (e: any) {
       console.warn('[BiometricService] Auth error:', e);
-      return { success: false, error: e?.message || 'Biometric hardware unavailable' };
+      return { success: false, error: e?.message || 'Fingerprint hardware unavailable' };
     }
   },
 };

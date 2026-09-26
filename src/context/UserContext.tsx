@@ -27,7 +27,7 @@ import {
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import { SafetyService } from '../services/safetyService';
-import { BiometricService } from '../services/biometricService';
+import { BiometricService, BiometricAuthResult } from '../services/biometricService';
 import { PinSecurityService } from '../services/pinSecurityService';
 import { PrivacyService } from '../services/privacyService';
 import { EncryptionService } from '../services/encryptionService';
@@ -140,7 +140,7 @@ interface AppContextType extends UserState {
   setBiometricLockEnabled: (enabled: boolean) => Promise<{ success: boolean; error?: string }>;
   isAppLocked: boolean;
   setIsAppLocked: (locked: boolean) => void;
-  unlockApp: () => Promise<boolean>;
+  unlockApp: () => Promise<BiometricAuthResult>;
   unlockDirectly: () => void;
   lockTimeoutSeconds: number;
   setLockTimeoutSeconds: (seconds: number) => Promise<void>;
@@ -1438,13 +1438,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { success: false, error: 'Biometric verification cancelled or unavailable' };
   }, []);
 
-  const unlockApp = useCallback(async (): Promise<boolean> => {
-    const res = await BiometricService.authenticate('Unlock exégeomai');
+  const unlockApp = useCallback(async (): Promise<BiometricAuthResult> => {
+    const res = await BiometricService.authenticate('Unlock exégeomai with Fingerprint');
     if (res.success) {
       setIsAppLocked(false);
-      return true;
+      return { success: true };
     }
-    return false;
+    return res;
   }, []);
 
   const unlockDirectly = useCallback(() => {
