@@ -11,7 +11,7 @@
   <img src="https://img.shields.io/badge/Supabase-Auth%20&%20Backend-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase Backend" />
   <img src="https://img.shields.io/badge/CI%2FCD-Rule%2021%20Compliant-10B981?style=for-the-badge&logo=githubactions&logoColor=white" alt="Rule 21 Compliant" />
   <img src="https://img.shields.io/badge/EAS%20Channels-Production%20%7C%20Preview-000000?style=for-the-badge&logo=expo&logoColor=white" alt="EAS Channels" />
-  <img src="https://img.shields.io/badge/Outer%20Release-v1.0.3-2563EB?style=for-the-badge&logo=android&logoColor=white" alt="Outer Release v1.0.3" />
+  <img src="https://img.shields.io/badge/Outer%20Release-v1.0.4-2563EB?style=for-the-badge&logo=android&logoColor=white" alt="Outer Release v1.0.4" />
   <img src="https://img.shields.io/badge/Security-Kotlin%20FLAG__SECURE-DC2626?style=for-the-badge&logo=android&logoColor=white" alt="Kotlin FLAG_SECURE" />
   <img src="https://img.shields.io/badge/Tab%20Architecture-Floating%20Pill%20280px-FDD223?style=for-the-badge" alt="Floating Pill Tab Bar" />
   <img src="https://img.shields.io/badge/Streak%20Milestones-3D%20Hexagonal%20Badges-F59E0B?style=for-the-badge" alt="3D Streak Milestone Badges" />
@@ -1280,6 +1280,23 @@ bible_fun_facts/
    - **Bottom Navigation Tab Badge**: Dynamically integrates the active unread notification/achievement count directly into the "Feed" tab label and tab icon via an accent pill badge (`#FDD223` on `#0F172A`), alerting believers to newly earned milestones immediately.
    - **Distinct Achievement Card Rendering**: Clarifies achievement notifications by displaying milestone titles (`item.title`), milestone descriptions (`item.body`), category badge tags, and biblical anchor quotes with scripture references, preventing achievements from being confused with plain scripture bookmarks.
    - **Zero-Friction Milestone Modal Deep-Linking**: Registers `AchievementsScreen` inside `DiscoverStack` and implements route parameter passing (`category`, `milestoneId`) so tapping `"View in Achievements ›"` instantly activates the matching category tab (e.g., Bookmarks) and pops up the 3D milestone modal.
+
+---
+
+### Release v1.0.4: Enterprise Safety, Privacy & Security Architecture
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Release-v1.0.4-2563EB?style=for-the-badge&logo=android&logoColor=white" alt="Release v1.0.4" />
+  <img src="https://img.shields.io/badge/Security-Hardware--Backed%20AES--256%20%7C%20PIN%20%7C%20Sabbath-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Security Suite" />
+  <img src="https://img.shields.io/badge/Binary-exegeomai--v1.0.4.apk-FDD223?style=for-the-badge&logo=android&logoColor=white" alt="v1.0.4 APK" />
+</p>
+
+Version 1.0.4 packages the complete 5-Phase enterprise Safety, Privacy & Security Architecture into a unified native Android build:
+1. **Phase 1: App Switcher Privacy Shield & Inactivity Auto-Lock**: Native background window snapshot obfuscation with customizable inactivity auto-lock grace periods (`Immediately`, `1m`, `5m`, `15m`).
+2. **Phase 2: Hardware-Encrypted 4-Digit Security PIN**: Salted SHA-256 passcode stored in Android Keystore / iOS Keychain with 5-try / 10-try rate-limiting lockout protection and biometric fallback.
+3. **Phase 3: Scholar Privacy Controls & Private Study (Incognito Mode)**: Private Study mode pausing remote analytics/telemetry, customizable directory discoverability, and streak privacy controls.
+4. **Phase 4: Hardware-Encrypted Study Journal & Pastoral Care Distress Net**: Pure TypeScript FIPS 197 AES-256-CBC cipher with Keystore master key for journal exports, paired with compassionate crisis detection and 24/7 emergency lifelines (988, SADAG, Samaritans).
+5. **Phase 5: Digital Sabbath Quiet Hours, Device Sessions & Community Moderation**: Sacred rest scheduling (Sunday, Sabbath, Weekend, Nightly) suppressing push notifications, hardware device audit trail with global session revocation, and Ephesians 4:29 content moderation.
 
 ---
 
