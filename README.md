@@ -35,6 +35,7 @@
   <img src="https://img.shields.io/badge/Unfolded%20Metric-Verified%20Read%20Facts%20Only-FDD223?style=for-the-badge" alt="Truthful Unfolded Count" />
   <img src="https://img.shields.io/badge/Notifications-Zero%20Phantom%20Backlog-10B981?style=for-the-badge" alt="Zero Phantom Notifications" />
   <img src="https://img.shields.io/badge/Privacy-GDPR%20%7C%20POPIA%20%7C%20Data%20Export-3B82F6?style=for-the-badge" alt="Data Portability and Purge" />
+  <img src="https://img.shields.io/badge/Themed%20Alerts-60--30--10%20Custom%20Popups-FDD223?style=for-the-badge&logo=shield&logoColor=white" alt="Themed Dialogs and Custom Popups" />
   <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
   <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License MIT" />
@@ -50,9 +51,10 @@
 
 ```mermaid
 graph TD
-    App["App.tsx"] --> Providers["UserProvider + SafeAreaProvider"]
+    App["App.tsx"] --> Providers["UserProvider + SafeAreaProvider + AlertProvider"]
     Providers --> Nav["AppNavigator"]
     Providers --> UpdateModal["UpdateModal (Update Now / Remind Me Later)"]
+    Providers --> ThemedAlert["ThemedAlertModal (60-30-10 Custom Popups & Dialogs)"]
     Nav --> Welcome["WelcomeScreen (3-Step Onboarding Flow)"]
     Welcome --> Auth["AuthScreen (Direct-Body Layout + Keyboard Next + FLAG_SECURE)"]
     Auth --> Terms["TermsOfServiceScreen (13 Theological & Legal Sections)"]
@@ -216,6 +218,17 @@ All margins, paddings, gaps, and component dimensions follow strict multiples of
 - **Dedicated Login & Multi-Step Registration**: `AuthScreen.tsx` provides toggleable **Sign In** and **Create Account** views with vector input icons (`UserSvg`, `MailSvg`, `LockSvg`), password visibility toggle, real-time username availability checks, password strength progress bar, study preferences, and calibrated **28x28** brand logos per Rule 15/19.
 - **Pure Vector SVGs & Zero Badges**: Strictly adheres to Rule 2 and Rule 4 (zero emojis, zero icon font libraries) and Rule 16 (zero development/status badges).
 
+### 6. Custom 60-30-10 Themed Alert & Dialog System (Rule 1 & Rule 15/19)
+The application replaces all native OS alert dialogs with a unified, custom React Native modal alert system (`ThemedAlertModal.tsx` and `AlertContext.tsx`):
+- **60-30-10 Palette Compliance**: Deep slate backdrop (`rgba(15, 23, 42, 0.6)`), pure white surface card (`#FFFFFF`) with subtle hairline border (`rgba(15, 23, 42, 0.08)`), and dark slate primary action buttons (`#0F172A`).
+- **Calibrated Icon Header**: Centered `50x50` pure vector SVG inside a `68x68` rounded badge container (`borderRadius: 18`) following Rule 15 & Rule 19 specifications.
+- **Categorical Color Tints**:
+  - `Destructive` (crimson `#DC2626` icon on soft red `#FEF2F2` container with solid `#DC2626` confirm button) for account deletion, data purging, session revocation, and blocking.
+  - `Warning` (amber `#D97706` icon on soft amber `#FFFBEB` container) for study notes clearing, PIN removal, and reporting.
+  - `Neutral / Security` (slate `#0F172A` icon on soft slate `#F8FAFC` container) for biometric, PIN, hardware info, and sign out confirmations.
+  - `Success` (emerald `#16A34A` icon on soft green `#F0FDF4` container) for completed backups, exports, and profile updates.
+- **Universal Provider Hook**: `useThemedAlert()` delivers a simple imperative API (`showAlert({ title, message, icon, buttons, isDestructive })`) across all views without requiring local modal state boilerplate.
+
 ---
 
 ## Directory Structure
@@ -245,11 +258,13 @@ exegeomai/
 │   │   ├── ScriptureCard.tsx             # Scripture card with genre vector badges
 │   │   ├── SearchBar.tsx                 # Search input with clear button and chips
 │   │   ├── SvgIcons.tsx                  # Pure vector SVG library (zero emojis)
+│   │   ├── ThemedAlertModal.tsx          # 60-30-10 custom alert modal with 50x50 SVGs in 68x68 container
 │   │   ├── Typography.tsx                # Monochromatic typography hierarchy
 │   │   ├── UiverseSwitch.tsx             # Animated sliding toggle pill switch (60-30-10 calibrated)
 │   │   ├── UpdateModal.tsx               # OTA update modal (50x50 logo in 68x68 container, Remind Me Later snooze)
 │   │   └── WOTDCard.tsx                  # Word of the Day devotional card
 │   ├── context/
+│   │   ├── AlertContext.tsx              # Global imperative alert dialog hook and provider
 │   │   └── UserContext.tsx               # State management with useApp, useUser & Supabase Auth hooks
 │   ├── data/
 │   │   ├── bibleCanon.ts                 # Complete 66-book canon metadata and prebundled offline chapters

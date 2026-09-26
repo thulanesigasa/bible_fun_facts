@@ -5,13 +5,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
+import { useThemedAlert } from '../context/AlertContext';
 import {
   TrashSvg,
   CheckSvg,
@@ -24,19 +24,26 @@ export default function DeleteAccountScreen({ navigation }: { navigation?: any }
   const [confirmedCheck, setConfirmedCheck] = useState(false);
   const [confirmInput, setConfirmInput] = useState('');
   const [isPurging, setIsPurging] = useState(false);
+  const { showAlert } = useThemedAlert();
 
   const isConfirmed = confirmedCheck && confirmInput.trim().toUpperCase() === 'DELETE';
 
   const handleExecuteDelete = () => {
     if (!isConfirmed) {
-      Alert.alert('Confirmation Required', 'Please check the acknowledgement and type DELETE to confirm.');
+      showAlert({
+        title: 'Confirmation Required',
+        message: 'Please check the acknowledgement and type DELETE to confirm.',
+        icon: 'warning',
+      });
       return;
     }
 
-    Alert.alert(
-      'Final Confirmation',
-      'This will immediately and permanently erase your account, study journal, streak records, and personal data from our servers and this device.\n\nProceed?',
-      [
+    showAlert({
+      title: 'Final Confirmation',
+      message: 'This will immediately and permanently erase your account, study journal, streak records, and personal data from our servers and this device.\n\nProceed?',
+      icon: 'trash',
+      isDestructive: true,
+      buttons: [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Delete Forever',
@@ -46,17 +53,26 @@ export default function DeleteAccountScreen({ navigation }: { navigation?: any }
             try {
               const success = await deleteAccountAndPurgeData();
               if (success) {
-                Alert.alert('Account Purged', 'Your account and personal study records have been completely erased.');
+                showAlert({
+                  title: 'Account Purged',
+                  message: 'Your account and personal study records have been completely erased.',
+                  icon: 'trash',
+                  isDestructive: true,
+                });
               }
             } catch (e: any) {
-              Alert.alert('Notice', e?.message || 'Failed to complete data purge.');
+              showAlert({
+                title: 'Notice',
+                message: e?.message || 'Failed to complete data purge.',
+                icon: 'warning',
+              });
             } finally {
               setIsPurging(false);
             }
           },
         },
-      ]
-    );
+      ],
+    });
   };
 
   return (

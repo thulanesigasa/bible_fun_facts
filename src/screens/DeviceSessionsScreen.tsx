@@ -4,7 +4,6 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   Platform,
 } from 'react-native';
@@ -12,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
+import { useThemedAlert } from '../context/AlertContext';
 import {
   DevicesSvg,
   ShieldCheckSvg,
@@ -29,6 +29,7 @@ export default function DeviceSessionsScreen() {
   const [auditLogs, setAuditLogs] = useState<SecurityAuditEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [revoking, setRevoking] = useState(false);
+  const { showAlert } = useThemedAlert();
 
   useEffect(() => {
     loadData();
@@ -46,10 +47,12 @@ export default function DeviceSessionsScreen() {
   };
 
   const handleClearLogs = async () => {
-    Alert.alert(
-      'Clear Audit History',
-      'This will remove all security event logs from this local device. This action cannot be undone.',
-      [
+    showAlert({
+      title: 'Clear Audit History',
+      message: 'This will remove all security event logs from this local device. This action cannot be undone.',
+      icon: 'trash',
+      isDestructive: true,
+      buttons: [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Clear Logs',
@@ -59,15 +62,17 @@ export default function DeviceSessionsScreen() {
             setAuditLogs([]);
           },
         },
-      ]
-    );
+      ],
+    });
   };
 
   const handleRevokeSessions = () => {
-    Alert.alert(
-      'Revoke All Sessions',
-      'This will sign you out of all active web and mobile sessions across all devices. You will need to sign in again.\n\nDo you wish to proceed?',
-      [
+    showAlert({
+      title: 'Revoke All Sessions',
+      message: 'This will sign you out of all active web and mobile sessions across all devices. You will need to sign in again.\n\nDo you wish to proceed?',
+      icon: 'devices',
+      isDestructive: true,
+      buttons: [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Revoke & Sign Out',
@@ -77,15 +82,23 @@ export default function DeviceSessionsScreen() {
             const res = await SessionSecurityService.revokeAllSessions();
             setRevoking(false);
             if (res.success) {
-              Alert.alert('Sessions Revoked', 'All sessions have been terminated.');
+              showAlert({
+                title: 'Sessions Revoked',
+                message: 'All sessions have been terminated.',
+                icon: 'success',
+              });
               loadData();
             } else {
-              Alert.alert('Notice', res.error || 'Failed to revoke sessions.');
+              showAlert({
+                title: 'Notice',
+                message: res.error || 'Failed to revoke sessions.',
+                icon: 'warning',
+              });
             }
           },
         },
-      ]
-    );
+      ],
+    });
   };
 
   return (

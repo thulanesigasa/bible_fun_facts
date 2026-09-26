@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Alert, AppState, AppStateStatus } from 'react-native';
+import { AppState, AppStateStatus } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import { Fact, Scripture, WOTDEntry } from '../data/mockDatabase';
 import { colors } from '../theme/colors';
 import { supabase, SUPABASE_ANON_KEY } from '../services/supabase';
+import { useThemedAlert } from './AlertContext';
 import {
   registerAllAutomatedNotifications,
   cancelAllAutomatedNotifications,
@@ -165,6 +166,7 @@ const PERMANENT_BACKUP_KEY = '@exegeomai_streak_resilient_v2';
 const PERMANENT_LAST_LOGIN_KEY = '@exegeomai_permanent_last_login';
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { showAlert } = useThemedAlert();
   const isLoadedFromStorage = useRef<boolean>(false);
   const [hideTabBar, setHideTabBar] = useState<boolean>(false);
   const [accent, setAccent] = useState<string>(colors.accent);
@@ -712,10 +714,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (profile?.email) {
               targetEmail = profile.email.toLowerCase();
             } else {
-              Alert.alert(
-                'Account Not Found',
-                `No account was found with the username "@${rawInput}". Please check the spelling or enter your email address.`
-              );
+              showAlert({
+                title: 'Account Not Found',
+                message: `No account was found with the username "@${rawInput}". Please check the spelling or enter your email address.`,
+                icon: 'warning',
+              });
               return;
             }
           }
@@ -728,7 +731,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (error) {
           console.warn('Supabase login error:', error.message);
-          Alert.alert('Sign In Failed', error.message);
+          showAlert({
+            title: 'Sign In Failed',
+            message: error.message,
+            icon: 'danger',
+          });
           return;
         }
 
@@ -766,7 +773,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       } catch (err: any) {
         console.warn('Supabase auth network notice:', err);
-        Alert.alert('Network Error', err?.message || 'Unable to connect to Supabase authentication service.');
+        showAlert({
+          title: 'Network Error',
+          message: err?.message || 'Unable to connect to Supabase authentication service.',
+          icon: 'warning',
+        });
         return;
       }
     }
@@ -927,15 +938,20 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         if (error) {
           console.warn('Supabase signup error:', error.message);
-          Alert.alert('Sign Up Notice', error.message);
+          showAlert({
+            title: 'Sign Up Notice',
+            message: error.message,
+            icon: 'warning',
+          });
           return { success: false, error: error.message };
         }
         if (data.user) {
           if (!data.session) {
-            Alert.alert(
-              'Verification Email Sent',
-              `A confirmation email has been dispatched to ${email}. Please verify your email to finish signing in.`
-            );
+            showAlert({
+              title: 'Verification Email Sent',
+              message: `A confirmation email has been dispatched to ${email}. Please verify your email to finish signing in.`,
+              icon: 'success',
+            });
           }
           setState(prev => ({
             ...prev,
@@ -960,7 +976,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       } catch (err: any) {
         console.warn('Supabase signup network notice:', err);
-        Alert.alert('Network Error', err?.message || 'Unable to connect to Supabase authentication service.');
+        showAlert({
+          title: 'Network Error',
+          message: err?.message || 'Unable to connect to Supabase authentication service.',
+          icon: 'warning',
+        });
         return { success: false, error: err?.message };
       }
     }
