@@ -16,7 +16,8 @@
   <img src="https://img.shields.io/badge/Tab%20Architecture-Floating%20Pill%20280px-FDD223?style=for-the-badge" alt="Floating Pill Tab Bar" />
   <img src="https://img.shields.io/badge/Streak%20Milestones-3D%20Hexagonal%20Badges-F59E0B?style=for-the-badge" alt="3D Streak Milestone Badges" />
   <img src="https://img.shields.io/badge/Achievements-Streak%20%7C%20Bookmarks%20%7C%20Highlights%20%7C%20Shares-FDD223?style=for-the-badge" alt="Multi-Category Achievements" />
-  <img src="https://img.shields.io/badge/Offline%20Bibles-24%20Full%20Translations%20%7C%20isiZulu%20%7C%20isiXhosa%20%7C%20Sepedi%20%7C%20Afrikaans-10B981?style=for-the-badge" alt="Offline Bible Translations" />
+  <img src="https://img.shields.io/badge/Offline%20Bibles-32%20Full%20Translations%20%7C%20The%20Message%20(MSG)%20%7C%20All%20Official%20South%20African%20Languages%20%7C%20Shona%20(Zimbabwe)-10B981?style=for-the-badge" alt="Offline Bible Translations" />
+  <img src="https://img.shields.io/badge/African%20Languages-isiZulu%20%7C%20isiXhosa%20%7C%20Sepedi%20%7C%20Sesotho%20%7C%20Setswana%20%7C%20Xitsonga%20%7C%20Tshivenda%20%7C%20siSwati%20%7C%20isiNdebele%20%7C%20ChiShona-FDD223?style=for-the-badge" alt="African Languages Holy Scripture" />
   <img src="https://img.shields.io/badge/Share%20Engine-Zero%20Blank%20%7C%20High--Fidelity%20PNG-10B981?style=for-the-badge" alt="Zero Blank Share Engine" />
   <img src="https://img.shields.io/badge/Security-Android%20Keystore%20%7C%20iOS%20Keychain-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Keystore and Keychain" />
   <img src="https://img.shields.io/badge/Biometrics-Face%20ID%20%7C%20Fingerprint-FDD223?style=for-the-badge" alt="Biometric Lock" />
@@ -255,6 +256,28 @@ The application replaces all native OS alert dialogs with a unified, custom Reac
     - **`QuietHoursScreen.tsx`**: Removed top logo header and card divs (`masterCard`, `modeCard`, `timeWindowCard`). Quiet hours silence master switch, rest window modes, day pills, and safety exemptions integrate directly as body canvas rows with hairline dividers.
     - **`PastoralCareScreen.tsx` & `DeleteAccountScreen.tsx`**: Render 24/7 crisis lines, scripture promises, and GDPR erasure actions directly on the body canvas.
 - **Minimalist Lock Overlay Aesthetics**: `BiometricLockOverlay.tsx` strips container borders and background radiuses from the logo, eliminates the redundant hardware encryption box, retains solely the clean application title `exégeomai`, and replaces oversized buttons with sleek text-styled action touchables.
+
+### 8. Multi-Translation Engine & African Language Architecture (Rule 1 & Rule 18)
+The scripture reader features a high-performance multi-tier offline and streaming Scripture engine supporting 32 full canonical translations:
+- **The Message (MSG)**: Eugene Peterson's acclaimed contemporary English paraphrase, featuring high-speed single-chapter streaming via direct scripture endpoints and full 66-book offline package caching.
+- **South African Official Languages (Complete Indigenous Coverage)**:
+  - **isiZulu** (`zulu`): *IBhayibheli Elingcwele* (1959 Translation)
+  - **isiXhosa** (`xhosa`): *IBhayibhile Engcwele*
+  - **Sepedi / Sesotho sa Leboa** (`sepedi`): *Bibele Taba ye Botse*
+  - **Sesotho / Southern Sotho** (`sotho`): *Bibele*
+  - **Setswana** (`tswana`): *Baebele e e Boitshepo*
+  - **Xitsonga** (`tsonga`): *Bibele ya Xitsonga*
+  - **Tshivenda** (`tshivenda`): *Bivhili Ya Tshivenda*
+  - **siSwati** (`siswati`): *LiBhayibheli Lelingcwele*
+  - **isiNdebele** (`ndebele`): *IBhayibhili Elingcwele* (South Africa & Zimbabwe)
+  - **Afrikaans** (`afr`): *Die Bybel (1933/1953)*
+- **Zimbabwean & Pan-African Languages**:
+  - **ChiShona** (`shona`): *Bhaibheri Dzvene* (Shona Union Bible - Full 66-Book Bible)
+  - **Northern Ndebele** (`ndebele`): *IBhayibhili Elingcwele*
+  - **Kiswahili** (`sw`): *Biblia Takatifu (Union)*
+- **Adaptive Normalization & Multi-CDN Redundancy**:
+  - `normalizeBibleJson`: Unified parsing pipeline transforming nested canonical book arrays, legacy book objects, and flat verse-array schemas (31,000+ verses) into standard 66-book `RawBibleBook[]` structures with instant chapter indexing.
+  - Multi-CDN redundancy via jsDelivr, Fastly, and GitHub raw mirrors with automated BOM-stripping, persistent disk storage via `expo-file-system`, and translation-specific prebundled offline chapters for Genesis 1, John 3, and Psalm 23.
 
 ---
 
