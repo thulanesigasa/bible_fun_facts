@@ -96,6 +96,16 @@ export default function SecurityPinScreen({ navigation }: { navigation?: any }) 
 
     if (flow === 'setup') {
       if (step === 1) {
+        // Validation: Cannot have consecutive repeated digits (e.g. 00, 11, 22)
+        if (/(.)\1/.test(completedPin)) {
+          setErrorMessage('PIN cannot have consecutive repeated numbers (e.g. 00, 11)');
+          triggerShake(() => {
+            setPin('');
+            setIsProcessing(false);
+          });
+          return;
+        }
+
         setFirstPin(completedPin);
         setPin('');
         setStep(2);
@@ -110,7 +120,7 @@ export default function SecurityPinScreen({ navigation }: { navigation?: any }) 
             showAlert({
               title: 'Security PIN Set',
               message: 'Your 4-digit security PIN has been encrypted and saved to your device hardware enclave.',
-              icon: 'success',
+              icon: 'logo',
             });
           } else {
             setErrorMessage('Failed to save PIN. Please retry.');
@@ -146,6 +156,26 @@ export default function SecurityPinScreen({ navigation }: { navigation?: any }) 
           });
         }
       } else if (step === 2) {
+        // Validation 1: New PIN cannot be the same as current PIN
+        if (completedPin === currentPinAttempt) {
+          setErrorMessage('New PIN cannot be the same as your current PIN');
+          triggerShake(() => {
+            setPin('');
+            setIsProcessing(false);
+          });
+          return;
+        }
+
+        // Validation 2: Cannot have consecutive repeated digits (e.g. 00, 11, 22)
+        if (/(.)\1/.test(completedPin)) {
+          setErrorMessage('PIN cannot have consecutive repeated numbers (e.g. 00, 11)');
+          triggerShake(() => {
+            setPin('');
+            setIsProcessing(false);
+          });
+          return;
+        }
+
         setFirstPin(completedPin);
         setPin('');
         setStep(3);
@@ -160,7 +190,7 @@ export default function SecurityPinScreen({ navigation }: { navigation?: any }) 
             showAlert({
               title: 'PIN Updated',
               message: 'Your 4-digit security PIN has been successfully changed.',
-              icon: 'success',
+              icon: 'logo',
             });
           } else {
             setErrorMessage(res.error || 'Failed to update PIN');
@@ -205,12 +235,12 @@ export default function SecurityPinScreen({ navigation }: { navigation?: any }) 
     if (flow === 'setup') {
       return {
         title: step === 1 ? 'Create 4-Digit PIN' : 'Confirm 4-Digit PIN',
-        subtitle: step === 1 ? 'Choose a 4-digit passcode for exégeomai' : 'Re-enter your 4-digit passcode to verify',
+        subtitle: step === 1 ? 'Choose a 4-digit passcode (no repeated numbers e.g. 00, 11)' : 'Re-enter your 4-digit passcode to verify',
       };
     }
     if (flow === 'change') {
       if (step === 1) return { title: 'Current PIN', subtitle: 'Enter your existing 4-digit passcode' };
-      if (step === 2) return { title: 'New PIN', subtitle: 'Enter your new 4-digit passcode' };
+      if (step === 2) return { title: 'New PIN', subtitle: 'Enter new PIN (cannot match old PIN or repeated pairs)' };
       return { title: 'Confirm New PIN', subtitle: 'Re-enter your new 4-digit passcode to confirm' };
     }
     if (flow === 'remove') {

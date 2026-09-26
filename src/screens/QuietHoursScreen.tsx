@@ -4,17 +4,11 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
-import { spacing, radius, shadow } from '../theme';
+import { spacing, radius } from '../theme';
 import { Text } from '../components/Typography';
-import {
-  MoonSvg,
-  CheckSvg,
-  ClockSvg,
-} from '../components/SvgIcons';
 import { UiverseSwitch } from '../components/UiverseSwitch';
 import {
   SabbathConfig,
@@ -63,7 +57,7 @@ const DAYS_OF_WEEK = [
 
 export default function QuietHoursScreen() {
   const [config, setConfig] = useState<SabbathConfig>(DEFAULT_SABBATH_CONFIG);
-  const [saving, setSaving] = useState(false);
+  const [, setSaving] = useState(false);
 
   useEffect(() => {
     loadConfig();
@@ -118,34 +112,27 @@ export default function QuietHoursScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Rule 15/19 Logo Container: 50x50 icon inside 68x68 rounded container */}
-        <View style={styles.logoRow}>
-          <View style={[styles.logoContainer, shadow.sm]}>
-            <MoonSvg size={36} color="#0F172A" />
-          </View>
-        </View>
-
-        {/* Intro Header */}
-        <View style={styles.introHeader}>
-          <Text variant="h2" weight="800" color={colors.textPrimary} style={styles.mainTitle}>
+        {/* Intro Header - Seamless Body Canvas */}
+        <View style={styles.headerBlock}>
+          <Text variant="h2" weight="800" color={colors.textPrimary} style={styles.title}>
             Quiet Hours & Sacred Rest
           </Text>
-          <Text variant="body" color={colors.textSecondary} style={styles.leadParagraph}>
+          <Text variant="body" color={colors.textSecondary} style={styles.subtitle}>
             Consecrate peaceful quiet hours by automatically muting daily push reminders, study streak alerts, and background notifications during designated rest windows.
           </Text>
         </View>
 
         {/* Master Toggle Section */}
-        <View style={styles.bodySection}>
-          <View style={[styles.masterCard, shadow.sm]}>
-            <View style={styles.masterInfo}>
-              <Text variant="h3" weight="700" color={colors.textPrimary} style={styles.masterTitle}>
+        <View style={styles.sectionBlock}>
+          <View style={styles.actionRow}>
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
                 Quiet Hours Silence
               </Text>
-              <Text variant="caption" color={colors.textSecondary} style={styles.masterDesc}>
+              <Text variant="caption" color={colors.textSecondary} style={styles.rowDescription}>
                 {config.isEnabled
-                  ? 'Active • Push notifications are muted during rest'
-                  : 'Disabled • All scheduled devotions will deliver normally'}
+                  ? 'Active • Push notifications are muted during rest windows'
+                  : 'Disabled • All scheduled devotions deliver normally'}
               </Text>
             </View>
             <UiverseSwitch
@@ -156,44 +143,40 @@ export default function QuietHoursScreen() {
         </View>
 
         {/* Schedule Modes Section */}
-        <View style={styles.bodySection}>
+        <View style={styles.sectionBlock}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             SCHEDULE REST WINDOW
           </Text>
 
-          {SCHEDULE_MODES.map((item) => {
+          {SCHEDULE_MODES.map((item, index) => {
             const isSelected = config.mode === item.mode;
             return (
-              <TouchableOpacity
-                key={item.mode}
-                style={[
-                  styles.modeCard,
-                  shadow.sm,
-                  isSelected && styles.modeCardSelected,
-                ]}
-                onPress={() => handleSelectMode(item.mode)}
-                activeOpacity={0.8}
-                accessibilityRole="button"
-                accessibilityLabel={`${item.label}. ${item.desc}`}
-              >
-                <View style={styles.modeCardContent}>
-                  <View style={styles.modeTextCol}>
-                    <Text variant="h3" weight={isSelected ? '800' : '700'} color={colors.textPrimary} style={styles.modeLabel}>
+              <View key={item.mode}>
+                <TouchableOpacity
+                  style={styles.selectableRow}
+                  onPress={() => handleSelectMode(item.mode)}
+                  activeOpacity={0.75}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: isSelected }}
+                  accessibilityLabel={`${item.label}. ${item.desc}`}
+                >
+                  <View style={styles.rowTitleBox}>
+                    <Text
+                      variant="h3"
+                      weight={isSelected ? '800' : '700'}
+                      color={colors.textPrimary}
+                      style={styles.rowTitle}
+                    >
                       {item.label}
                     </Text>
-                    <Text variant="caption" color={colors.textSecondary} style={styles.modeDesc}>
+                    <Text variant="caption" color={colors.textSecondary} style={styles.rowDescription}>
                       {item.desc}
                     </Text>
                   </View>
-                  <View
-                    style={[
-                      styles.checkCircle,
-                      isSelected && styles.checkCircleSelected,
-                    ]}
-                  >
-                    {isSelected && <CheckSvg size={13} color="#FFFFFF" strokeWidth={2.5} />}
+                  <View style={[styles.radioCircle, isSelected && styles.radioCircleSelected]}>
+                    {isSelected && <View style={styles.radioInnerDot} />}
                   </View>
-                </View>
+                </TouchableOpacity>
 
                 {/* Day selector for custom mode */}
                 {item.mode === 'custom' && isSelected && (
@@ -230,45 +213,45 @@ export default function QuietHoursScreen() {
                     </View>
                   </View>
                 )}
-              </TouchableOpacity>
+
+                {index < SCHEDULE_MODES.length - 1 && <View style={styles.rowDivider} />}
+              </View>
             );
           })}
         </View>
 
         {/* Nightly Time Window Detail */}
         {config.mode === 'nightly' && (
-          <View style={styles.bodySection}>
+          <View style={styles.sectionBlock}>
             <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
               NIGHTLY WINDOW HOURS
             </Text>
-            <View style={[styles.timeWindowCard, shadow.sm]}>
-              <View style={styles.timeIconBadge}>
-                <ClockSvg size={18} color="#0F172A" />
-              </View>
-              <View style={styles.timeTextBox}>
-                <Text variant="h3" weight="700" color={colors.textPrimary} style={styles.timeTitle}>
-                  {formatTime(config.startHour, config.startMinute)} to {formatTime(config.endHour, config.endMinute)}
-                </Text>
-                <Text variant="caption" color={colors.textSecondary} style={styles.timeDesc}>
-                  Notifications delivered during this window will be quietly queued.
-                </Text>
-              </View>
+            <View style={styles.specRow}>
+              <Text variant="caption" weight="700" color={colors.textPrimary} style={styles.specLabel}>
+                Silence Window
+              </Text>
+              <Text variant="caption" weight="800" color={colors.textPrimary} style={styles.specValue}>
+                {formatTime(config.startHour, config.startMinute)} – {formatTime(config.endHour, config.endMinute)}
+              </Text>
             </View>
+            <Text variant="caption" color={colors.textSecondary} style={styles.specNote}>
+              Notifications scheduled during this nightly window will be quietly queued.
+            </Text>
           </View>
         )}
 
         {/* Safety & Pastoral Exemption */}
-        <View style={[styles.bodySection, { borderBottomWidth: 0 }]}>
+        <View style={[styles.sectionBlock, { borderBottomWidth: 0 }]}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             SAFETY & EMERGENCY EXEMPTIONS
           </Text>
 
-          <View style={[styles.masterCard, shadow.sm]}>
-            <View style={styles.masterInfo}>
-              <Text variant="h3" weight="700" color={colors.textPrimary} style={styles.masterTitle}>
+          <View style={styles.actionRow}>
+            <View style={styles.rowTitleBox}>
+              <Text variant="h3" style={styles.rowTitle}>
                 Allow Pastoral & Crisis Alerts
               </Text>
-              <Text variant="caption" color={colors.textSecondary} style={styles.masterDesc}>
+              <Text variant="caption" color={colors.textSecondary} style={styles.rowDescription}>
                 Never mute 24/7 emergency support, pastoral care responses, or security alerts.
               </Text>
             </View>
@@ -289,123 +272,84 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background, // 60% Dominant Canvas #F8FAFC
   },
   scrollContent: {
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.lg,
+    paddingHorizontal: spacing.md, // 16px
+    paddingTop: spacing.lg,        // 24px
     paddingBottom: 48,
   },
-  logoRow: {
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  logoContainer: {
-    width: 68,
-    height: 68,
-    borderRadius: 18,
-    backgroundColor: colors.surface, // 30% Panel #FFFFFF
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  introHeader: {
-    alignItems: 'center',
+  headerBlock: {
     marginBottom: spacing.lg,
-    paddingHorizontal: spacing.sm,
   },
-  mainTitle: {
-    fontSize: 20,
-    textAlign: 'center',
-    marginBottom: 4,
+  title: {
+    marginBottom: 6,
   },
-  leadParagraph: {
+  subtitle: {
     fontSize: 13,
     lineHeight: 19,
-    textAlign: 'center',
-    color: colors.textSecondary,
   },
-  bodySection: {
+  sectionBlock: {
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(15, 23, 42, 0.06)',
     paddingBottom: spacing.lg,
     marginBottom: spacing.lg,
   },
   sectionHeader: {
-    fontSize: 10,
-    letterSpacing: 0.6,
-    marginBottom: spacing.sm,
+    letterSpacing: 1.2,
+    marginBottom: spacing.md,
   },
-  masterCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
+  actionRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingVertical: 12,
   },
-  masterInfo: {
+  rowTitleBox: {
     flex: 1,
-    paddingRight: spacing.sm,
+    paddingRight: spacing.md,
   },
-  masterTitle: {
-    fontSize: 14,
+  rowTitle: {
+    color: colors.textPrimary,
+    marginBottom: 3,
   },
-  masterDesc: {
+  rowDescription: {
     fontSize: 12,
-    marginTop: 2,
-    lineHeight: 16,
+    lineHeight: 17,
   },
-  modeCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    marginBottom: spacing.sm,
-  },
-  modeCardSelected: {
-    borderColor: 'rgba(15, 23, 42, 0.35)',
-  },
-  modeCardContent: {
+  selectableRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingVertical: 14,
   },
-  modeTextCol: {
-    flex: 1,
-    paddingRight: spacing.sm,
-  },
-  modeLabel: {
-    fontSize: 14,
-  },
-  modeDesc: {
-    fontSize: 12,
-    marginTop: 2,
-    lineHeight: 16,
-  },
-  checkCircle: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 1.5,
-    borderColor: 'rgba(15, 23, 42, 0.16)',
+  radioCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#CBD5E1',
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  checkCircleSelected: {
-    backgroundColor: '#0F172A',
+  radioCircleSelected: {
     borderColor: '#0F172A',
   },
+  radioInnerDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#0F172A',
+  },
+  rowDivider: {
+    height: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.05)',
+  },
   customDaysContainer: {
-    marginTop: spacing.md,
-    paddingTop: spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(15, 23, 42, 0.06)',
+    paddingBottom: spacing.sm,
+    paddingTop: 4,
   },
   customDaysPrompt: {
     fontSize: 11,
-    marginBottom: 4,
+    marginBottom: 8,
   },
   daysRow: {
     flexDirection: 'row',
@@ -414,13 +358,13 @@ const styles = StyleSheet.create({
   },
   dayPill: {
     flex: 1,
-    paddingVertical: 7,
+    paddingVertical: 8,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.sm,
-    backgroundColor: colors.background,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
+    borderColor: 'rgba(15, 23, 42, 0.1)',
   },
   dayPillActive: {
     backgroundColor: '#0F172A',
@@ -429,32 +373,21 @@ const styles = StyleSheet.create({
   dayLabel: {
     fontSize: 11,
   },
-  timeWindowCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
+  specRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    paddingVertical: 9,
   },
-  timeIconBadge: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.md,
+  specLabel: {
+    fontSize: 12,
   },
-  timeTextBox: {
-    flex: 1,
+  specValue: {
+    fontSize: 12,
   },
-  timeTitle: {
-    fontSize: 14,
-  },
-  timeDesc: {
-    fontSize: 11.5,
-    marginTop: 2,
+  specNote: {
+    fontSize: 11,
+    marginTop: 4,
+    lineHeight: 16,
   },
 });

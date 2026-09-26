@@ -234,8 +234,19 @@ The application replaces all native OS alert dialogs with a unified, custom Reac
 - **Divided Privacy vs. Safety & Security**: ProfileScreen replaces deeply nested toggle rows with clear, dedicated navigation destinations:
   - **Privacy (`PrivacyScreen.tsx`)**: Controls Private Study Mode (Incognito), Public Scholar Directory discovery, Show Study Streak to Peers, Private Notes & Bookmarks, and grouped Blocked Accounts management with immediate persistent state updates.
   - **Safety & Security (`SecurityScreen.tsx`)**: Centralizes Inactivity Auto-Lock (`InactivityLockScreen.tsx`), 4-Digit Security PIN (`SecurityPinScreen.tsx`), Biometrics (`Fingerprint`), and App Switcher Multitasking Privacy Shield.
-- **Dedicated 4-Digit Security PIN Screen (`SecurityPinScreen.tsx`)**: Decoupled from popup alert dialogs into a dedicated full management interface featuring in-screen numeric keypad input, animated shake feedback on error, salted SHA-256 cryptographic verification, PIN setup/change/removal workflows, and hardware Keystore specification audit.
-- **Seamless Body Canvas & Zero Iconography Policy**: Screens such as `PastoralCareScreen.tsx` and `DeleteAccountScreen.tsx` eliminate bulky card/box containers ("divs") and decorative icons (heart, trash, phone), allowing content—such as 24/7 crisis lines (SADAG, Samaritans), comforting scripture promises, and GDPR erasure summaries—to integrate directly into the body canvas.
+- **Dedicated 4-Digit Security PIN Screen & Robust Validation (`SecurityPinScreen.tsx` & `SecurityPinModal.tsx`)**:
+  - Decoupled from popup alert dialogs into a dedicated full management interface featuring in-screen numeric keypad input, animated shake feedback on error, salted SHA-256 cryptographic verification, PIN setup/change/removal workflows, and hardware Keystore specification audit.
+  - **Strict PIN Validation**:
+    - Disallows identical new PIN to existing current PIN in change flow (`newPin !== currentPin`).
+    - Prohibits consecutive identical digits (e.g. `00`, `11`, `22`, etc. via `/(.)\1/`).
+    - Dispatches instant animated shake feedback and clear descriptive error messaging on invalid input.
+  - **Brand Logo Alert Dialogs**: When PIN is successfully created or updated, `ThemedAlertModal` displays the 50x50 brand app logo (`logo-transparent.png`) centered inside a 68x68 container per Rule 15 & 19, replacing generic green checkmark tick icons.
+- **Pure Body Canvas & Zero Extraneous Iconography / Div Policy**:
+  - Screens across the security and settings hierarchy completely eliminate bulky card/box container divs and decorative icons:
+    - **`ExportJournalScreen.tsx`**: Removed top logo header and card wrapper divs (`formatCard`, `manifestCard`). Export formats and archive manifest metrics integrate directly into the body canvas.
+    - **`DeviceSessionsScreen.tsx`**: Removed top logo header and card divs (`deviceCard`, `revokeCard`, `emptyCard`, `logCard`). Active device specs, revocation trigger, and audit logs render seamlessly on the body canvas.
+    - **`QuietHoursScreen.tsx`**: Removed top logo header and card divs (`masterCard`, `modeCard`, `timeWindowCard`). Quiet hours silence master switch, rest window modes, day pills, and safety exemptions integrate directly as body canvas rows with hairline dividers.
+    - **`PastoralCareScreen.tsx` & `DeleteAccountScreen.tsx`**: Render 24/7 crisis lines, scripture promises, and GDPR erasure actions directly on the body canvas.
 - **Minimalist Lock Overlay Aesthetics**: `BiometricLockOverlay.tsx` strips container borders and background radiuses from the logo, eliminates the redundant hardware encryption box, retains solely the clean application title `exégeomai`, and replaces oversized buttons with sleek text-styled action touchables.
 
 ---

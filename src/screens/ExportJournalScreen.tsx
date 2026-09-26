@@ -8,14 +8,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
-import { spacing, radius, shadow } from '../theme';
+import { spacing, radius } from '../theme';
 import { Text } from '../components/Typography';
 import { useThemedAlert } from '../context/AlertContext';
-import {
-  ExportJournalSvg,
-  ShieldLockSvg,
-  CheckSvg,
-} from '../components/SvgIcons';
 import { useUser } from '../context/UserContext';
 
 export default function ExportJournalScreen() {
@@ -63,155 +58,128 @@ export default function ExportJournalScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Rule 15/19 Logo Container: 50x50 icon inside 68x68 rounded container */}
-        <View style={styles.logoRow}>
-          <View style={[styles.logoContainer, shadow.sm]}>
-            <ExportJournalSvg size={36} color="#0F172A" />
-          </View>
-        </View>
-
-        {/* Intro Header */}
-        <View style={styles.introHeader}>
-          <Text variant="h2" weight="800" color={colors.textPrimary} style={styles.mainTitle}>
+        {/* Intro Header - Seamless Body Canvas */}
+        <View style={styles.headerBlock}>
+          <Text variant="h2" weight="800" color={colors.textPrimary} style={styles.title}>
             Export Study Journal
           </Text>
-          <Text variant="body" color={colors.textSecondary} style={styles.leadParagraph}>
+          <Text variant="body" color={colors.textSecondary} style={styles.subtitle}>
             Exercise full ownership over your spiritual journey. Export your reflections, highlighted verses, bookmarks, and study streak in encrypted or open formats.
           </Text>
         </View>
 
         {/* Export Format 1: AES-256 Hardware Encrypted */}
-        <View style={styles.bodySection}>
+        <View style={styles.sectionBlock}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             ENCRYPTED HARDWARE BACKUP
           </Text>
 
-          <View style={[styles.formatCard, shadow.sm]}>
-            <View style={styles.cardHeaderRow}>
-              <View style={styles.iconCircle}>
-                <ShieldLockSvg size={20} color="#0F172A" />
-              </View>
-              <View style={styles.cardTitleBox}>
-                <Text variant="h3" weight="700" color={colors.textPrimary} style={styles.cardTitle}>
-                  Hardware-Encrypted (AES-256-CBC)
-                </Text>
-                <Text variant="caption" color={colors.textSecondary} style={styles.cardSubtitle}>
-                  FIPS 197 standard • Android Keystore & iOS Keychain
-                </Text>
-              </View>
-            </View>
+          <Text variant="h3" weight="700" color={colors.textPrimary} style={styles.optionTitle}>
+            Hardware-Encrypted (AES-256-CBC)
+          </Text>
+          <Text variant="caption" color={colors.textTertiary} style={styles.optionMeta}>
+            FIPS 197 standard • Android Keystore & iOS Keychain
+          </Text>
 
-            <Text variant="body" color={colors.textSecondary} style={styles.cardBody}>
-              Generates an encrypted archive using your device's unique hardware master key. Ideal for secure offline vaulting and confidential backups.
-            </Text>
+          <Text variant="body" color={colors.textSecondary} style={styles.optionDescription}>
+            Generates an encrypted archive using your device's unique hardware master key. Ideal for secure offline vaulting and confidential backups.
+          </Text>
 
-            <TouchableOpacity
-              style={[styles.exportBtn, shadow.sm]}
-              onPress={() => handleExport(true)}
-              activeOpacity={0.8}
-              disabled={isExporting}
-              accessibilityRole="button"
-              accessibilityLabel="Export encrypted study journal"
-            >
-              {isExporting ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
-              ) : (
-                <Text variant="caption" weight="700" color="#FFFFFF" style={styles.exportBtnText}>
-                  Export AES-256 Backup
-                </Text>
-              )}
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.primaryBtn}
+            onPress={() => handleExport(true)}
+            activeOpacity={0.8}
+            disabled={isExporting}
+            accessibilityRole="button"
+            accessibilityLabel="Export AES-256 encrypted backup"
+          >
+            {isExporting ? (
+              <ActivityIndicator size="small" color="#FDD223" />
+            ) : (
+              <Text variant="caption" weight="700" color="#FDD223" style={styles.primaryBtnText}>
+                Export AES-256 Backup
+              </Text>
+            )}
+          </TouchableOpacity>
         </View>
 
         {/* Export Format 2: Standard JSON */}
-        <View style={styles.bodySection}>
+        <View style={styles.sectionBlock}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             PORTABLE OPEN FORMAT
           </Text>
 
-          <View style={[styles.formatCard, shadow.sm]}>
-            <View style={styles.cardHeaderRow}>
-              <View style={styles.iconCircle}>
-                <ExportJournalSvg size={20} color="#0F172A" />
-              </View>
-              <View style={styles.cardTitleBox}>
-                <Text variant="h3" weight="700" color={colors.textPrimary} style={styles.cardTitle}>
-                  Standard Portable JSON
-                </Text>
-                <Text variant="caption" color={colors.textSecondary} style={styles.cardSubtitle}>
-                  Open standard • Human-readable scripture data
-                </Text>
-              </View>
-            </View>
+          <Text variant="h3" weight="700" color={colors.textPrimary} style={styles.optionTitle}>
+            Standard Portable JSON
+          </Text>
+          <Text variant="caption" color={colors.textTertiary} style={styles.optionMeta}>
+            Open standard • Human-readable scripture data
+          </Text>
 
-            <Text variant="body" color={colors.textSecondary} style={styles.cardBody}>
-              Exports your complete study library in clean JSON format, easily imported into personal notes, research spreadsheets, or external biblical tools.
+          <Text variant="body" color={colors.textSecondary} style={styles.optionDescription}>
+            Exports your complete study library in clean JSON format, easily imported into personal notes, research spreadsheets, or external biblical tools.
+          </Text>
+
+          <TouchableOpacity
+            style={styles.secondaryBtn}
+            onPress={() => handleExport(false)}
+            activeOpacity={0.8}
+            disabled={isExporting}
+            accessibilityRole="button"
+            accessibilityLabel="Export standard JSON study journal"
+          >
+            <Text variant="caption" weight="700" color={colors.textPrimary} style={styles.secondaryBtnText}>
+              Export Standard JSON
             </Text>
-
-            <TouchableOpacity
-              style={[styles.secondaryExportBtn, shadow.sm]}
-              onPress={() => handleExport(false)}
-              activeOpacity={0.8}
-              disabled={isExporting}
-              accessibilityRole="button"
-              accessibilityLabel="Export standard JSON study journal"
-            >
-              <Text variant="caption" weight="700" color={colors.textPrimary} style={styles.secondaryExportBtnText}>
-                Export Standard JSON
-              </Text>
-            </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* Archive Manifest Summary */}
-        <View style={[styles.bodySection, { borderBottomWidth: 0 }]}>
+        <View style={[styles.sectionBlock, { borderBottomWidth: 0 }]}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             WHAT IS INCLUDED IN YOUR BACKUP
           </Text>
 
-          <View style={[styles.manifestCard, shadow.sm]}>
-            <View style={styles.manifestRow}>
-              <View style={styles.checkIcon}>
-                <CheckSvg size={12} color="#0F172A" strokeWidth={2.5} />
-              </View>
-              <Text variant="caption" color={colors.textPrimary} style={styles.manifestText}>
-                {bookmarksCount} Bookmarked Verses & Scriptures
-              </Text>
-            </View>
+          <View style={styles.manifestRow}>
+            <Text variant="caption" color={colors.textPrimary} style={styles.manifestLabel}>
+              Bookmarked Verses & Scriptures
+            </Text>
+            <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.manifestValue}>
+              {bookmarksCount} items
+            </Text>
+          </View>
 
-            <View style={styles.manifestDivider} />
+          <View style={styles.rowDivider} />
 
-            <View style={styles.manifestRow}>
-              <View style={styles.checkIcon}>
-                <CheckSvg size={12} color="#0F172A" strokeWidth={2.5} />
-              </View>
-              <Text variant="caption" color={colors.textPrimary} style={styles.manifestText}>
-                {factsCount} Saved Exegesis Insights & Words of the Day
-              </Text>
-            </View>
+          <View style={styles.manifestRow}>
+            <Text variant="caption" color={colors.textPrimary} style={styles.manifestLabel}>
+              Saved Exegesis Insights & Words of the Day
+            </Text>
+            <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.manifestValue}>
+              {factsCount} items
+            </Text>
+          </View>
 
-            <View style={styles.manifestDivider} />
+          <View style={styles.rowDivider} />
 
-            <View style={styles.manifestRow}>
-              <View style={styles.checkIcon}>
-                <CheckSvg size={12} color="#0F172A" strokeWidth={2.5} />
-              </View>
-              <Text variant="caption" color={colors.textPrimary} style={styles.manifestText}>
-                {highlightsCount} Bible Verses with Highlights & Notes
-              </Text>
-            </View>
+          <View style={styles.manifestRow}>
+            <Text variant="caption" color={colors.textPrimary} style={styles.manifestLabel}>
+              Bible Verses with Highlights & Notes
+            </Text>
+            <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.manifestValue}>
+              {highlightsCount} items
+            </Text>
+          </View>
 
-            <View style={styles.manifestDivider} />
+          <View style={styles.rowDivider} />
 
-            <View style={styles.manifestRow}>
-              <View style={styles.checkIcon}>
-                <CheckSvg size={12} color="#0F172A" strokeWidth={2.5} />
-              </View>
-              <Text variant="caption" color={colors.textPrimary} style={styles.manifestText}>
-                {streak || 1} Day Study Streak & Milestone Achievements
-              </Text>
-            </View>
+          <View style={styles.manifestRow}>
+            <Text variant="caption" color={colors.textPrimary} style={styles.manifestLabel}>
+              Study Streak & Milestone Achievements
+            </Text>
+            <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.manifestValue}>
+              {streak || 1} Days
+            </Text>
           </View>
         </View>
       </ScrollView>
@@ -225,136 +193,82 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background, // 60% Dominant Canvas #F8FAFC
   },
   scrollContent: {
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.lg,
+    paddingHorizontal: spacing.md, // 16px
+    paddingTop: spacing.lg,        // 24px
     paddingBottom: 48,
   },
-  logoRow: {
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  logoContainer: {
-    width: 68,
-    height: 68,
-    borderRadius: 18,
-    backgroundColor: colors.surface, // 30% Panel #FFFFFF
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  introHeader: {
-    alignItems: 'center',
+  headerBlock: {
     marginBottom: spacing.lg,
-    paddingHorizontal: spacing.sm,
   },
-  mainTitle: {
-    fontSize: 20,
-    textAlign: 'center',
-    marginBottom: 4,
+  title: {
+    marginBottom: 6,
   },
-  leadParagraph: {
+  subtitle: {
     fontSize: 13,
     lineHeight: 19,
-    textAlign: 'center',
-    color: colors.textSecondary,
   },
-  bodySection: {
+  sectionBlock: {
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(15, 23, 42, 0.06)',
     paddingBottom: spacing.lg,
     marginBottom: spacing.lg,
   },
   sectionHeader: {
-    fontSize: 10,
-    letterSpacing: 0.6,
-    marginBottom: spacing.sm,
-  },
-  formatCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-  },
-  cardHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  iconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.sm,
-  },
-  cardTitleBox: {
-    flex: 1,
-  },
-  cardTitle: {
-    fontSize: 14,
-  },
-  cardSubtitle: {
-    fontSize: 11,
-    marginTop: 2,
-  },
-  cardBody: {
-    fontSize: 12.5,
-    lineHeight: 18,
+    letterSpacing: 1.2,
     marginBottom: spacing.md,
   },
-  exportBtn: {
+  optionTitle: {
+    marginBottom: 2,
+  },
+  optionMeta: {
+    fontSize: 11,
+    marginBottom: 8,
+  },
+  optionDescription: {
+    fontSize: 13,
+    lineHeight: 19,
+    marginBottom: spacing.md,
+  },
+  primaryBtn: {
     backgroundColor: '#0F172A',
-    paddingVertical: 11,
+    height: 48,
     borderRadius: radius.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  exportBtnText: {
-    fontSize: 12,
+  primaryBtnText: {
+    fontSize: 13,
+    letterSpacing: 0.3,
   },
-  secondaryExportBtn: {
-    backgroundColor: colors.surface,
+  secondaryBtn: {
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.16)',
-    paddingVertical: 11,
+    borderColor: 'rgba(15, 23, 42, 0.14)',
+    height: 48,
     borderRadius: radius.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  secondaryExportBtnText: {
-    fontSize: 12,
-  },
-  manifestCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
+  secondaryBtnText: {
+    fontSize: 13,
+    letterSpacing: 0.3,
   },
   manifestRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 6,
+    paddingVertical: 12,
   },
-  checkIcon: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.sm,
-  },
-  manifestText: {
-    fontSize: 12,
+  manifestLabel: {
+    fontSize: 13,
     flex: 1,
+    paddingRight: spacing.sm,
   },
-  manifestDivider: {
+  manifestValue: {
+    fontSize: 12,
+  },
+  rowDivider: {
     height: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.04)',
+    backgroundColor: 'rgba(15, 23, 42, 0.05)',
   },
 });

@@ -9,15 +9,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
-import { spacing, radius, shadow } from '../theme';
+import { spacing, radius } from '../theme';
 import { Text } from '../components/Typography';
 import { useThemedAlert } from '../context/AlertContext';
-import {
-  DevicesSvg,
-  ShieldCheckSvg,
-  ShieldLockSvg,
-  ClockSvg,
-} from '../components/SvgIcons';
 import {
   SessionSecurityService,
   DeviceSessionInfo,
@@ -107,19 +101,12 @@ export default function DeviceSessionsScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Rule 15/19 Logo Container: 50x50 icon inside 68x68 rounded container */}
-        <View style={styles.logoRow}>
-          <View style={[styles.logoContainer, shadow.sm]}>
-            <DevicesSvg size={36} color="#0F172A" />
-          </View>
-        </View>
-
-        {/* Intro Header */}
-        <View style={styles.introHeader}>
-          <Text variant="h2" weight="800" color={colors.textPrimary} style={styles.mainTitle}>
+        {/* Intro Header - Seamless Body Canvas */}
+        <View style={styles.headerBlock}>
+          <Text variant="h2" weight="800" color={colors.textPrimary} style={styles.title}>
             Device Sessions & Security Audit
           </Text>
-          <Text variant="body" color={colors.textSecondary} style={styles.leadParagraph}>
+          <Text variant="body" color={colors.textSecondary} style={styles.subtitle}>
             Monitor active device hardware connections, hardware security status, and inspect local security audit events.
           </Text>
         </View>
@@ -131,108 +118,97 @@ export default function DeviceSessionsScreen() {
         ) : (
           <>
             {/* Current Active Device Section */}
-            <View style={styles.bodySection}>
+            <View style={styles.sectionBlock}>
               <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
                 CURRENT ACTIVE DEVICE
               </Text>
 
-              <View style={[styles.deviceCard, shadow.sm]}>
-                <View style={styles.deviceCardHeader}>
-                  <View style={styles.deviceTitleBox}>
-                    <Text variant="h3" weight="700" color={colors.textPrimary} style={styles.deviceName}>
-                      {deviceInfo?.appName || 'Exegeomai Bible'}
-                    </Text>
-                    <Text variant="caption" color={colors.textSecondary} style={styles.deviceMeta}>
-                      {deviceInfo?.platform === 'ios' ? 'iOS' : deviceInfo?.platform === 'android' ? 'Android' : 'Device'} {deviceInfo?.osVersion} • {deviceInfo?.appName}
-                    </Text>
-                  </View>
-                  <View style={styles.activePill}>
-                    <View style={styles.activeDot} />
-                    <Text variant="caption" weight="700" color={colors.textPrimary} style={styles.activePillText}>
-                      This Device
-                    </Text>
-                  </View>
+              <View style={styles.deviceRow}>
+                <View style={styles.deviceInfo}>
+                  <Text variant="h3" weight="700" color={colors.textPrimary} style={styles.deviceName}>
+                    {deviceInfo?.appName || 'Exegeomai Bible'}
+                  </Text>
+                  <Text variant="caption" color={colors.textSecondary} style={styles.deviceMeta}>
+                    {deviceInfo?.platform === 'ios' ? 'iOS' : deviceInfo?.platform === 'android' ? 'Android' : 'Device'} {deviceInfo?.osVersion} • Primary Hardware
+                  </Text>
                 </View>
+                <Text variant="caption" weight="800" color={colors.accent} style={styles.statusPill}>
+                  THIS DEVICE
+                </Text>
+              </View>
 
-                <View style={styles.divider} />
+              <View style={styles.rowDivider} />
 
-                <View style={styles.specsGrid}>
-                  <View style={styles.specItem}>
-                    <Text variant="caption" color={colors.textTertiary} style={styles.specLabel}>
-                      App Release
-                    </Text>
-                    <Text variant="caption" weight="700" color={colors.textPrimary} style={styles.specValue}>
-                      v{deviceInfo?.appVersion || '1.0.4'}
-                    </Text>
-                  </View>
+              <View style={styles.specRow}>
+                <Text variant="caption" weight="700" color={colors.textPrimary} style={styles.specLabel}>
+                  App Release
+                </Text>
+                <Text variant="caption" color={colors.textSecondary} style={styles.specValue}>
+                  v{deviceInfo?.appVersion || '1.0.4'}
+                </Text>
+              </View>
 
-                  <View style={styles.specItem}>
-                    <Text variant="caption" color={colors.textTertiary} style={styles.specLabel}>
-                      Security Enclave
-                    </Text>
-                    <Text variant="caption" weight="700" color={colors.textPrimary} style={styles.specValue}>
-                      {Platform.OS === 'android' ? 'Android Keystore' : 'Apple Keychain'}
-                    </Text>
-                  </View>
+              <View style={styles.specRow}>
+                <Text variant="caption" weight="700" color={colors.textPrimary} style={styles.specLabel}>
+                  Security Enclave
+                </Text>
+                <Text variant="caption" color={colors.textSecondary} style={styles.specValue}>
+                  {Platform.OS === 'android' ? 'Android Keystore' : 'Apple Keychain'}
+                </Text>
+              </View>
 
-                  <View style={styles.specItem}>
-                    <Text variant="caption" color={colors.textTertiary} style={styles.specLabel}>
-                      Hardware ID
-                    </Text>
-                    <Text variant="caption" weight="700" color={colors.textPrimary} style={styles.specValue}>
-                      {deviceInfo?.deviceId ? deviceInfo.deviceId.substring(0, 14) + '...' : 'Protected ID'}
-                    </Text>
-                  </View>
+              <View style={styles.specRow}>
+                <Text variant="caption" weight="700" color={colors.textPrimary} style={styles.specLabel}>
+                  Hardware ID
+                </Text>
+                <Text variant="caption" color={colors.textSecondary} style={styles.specValue}>
+                  {deviceInfo?.deviceId ? deviceInfo.deviceId.substring(0, 14) + '...' : 'Protected ID'}
+                </Text>
+              </View>
 
-                  <View style={styles.specItem}>
-                    <Text variant="caption" color={colors.textTertiary} style={styles.specLabel}>
-                      Session State
-                    </Text>
-                    <Text variant="caption" weight="700" color={colors.textPrimary} style={styles.specValue}>
-                      Authenticated
-                    </Text>
-                  </View>
-                </View>
+              <View style={styles.specRow}>
+                <Text variant="caption" weight="700" color={colors.textPrimary} style={styles.specLabel}>
+                  Session State
+                </Text>
+                <Text variant="caption" color={colors.textSecondary} style={styles.specValue}>
+                  Hardware Authenticated
+                </Text>
               </View>
             </View>
 
             {/* Global Session Revocation Section */}
-            <View style={styles.bodySection}>
+            <View style={styles.sectionBlock}>
               <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
                 SESSION REVOCATION
               </Text>
 
-              <View style={[styles.revokeCard, shadow.sm]}>
-                <View style={styles.revokeTextBox}>
-                  <Text variant="h3" weight="700" color={colors.textPrimary} style={styles.revokeTitle}>
-                    Terminate All Sessions
-                  </Text>
-                  <Text variant="caption" color={colors.textSecondary} style={styles.revokeDesc}>
-                    If you suspect unauthorized access or lost a secondary device, instantly revoke all active tokens.
-                  </Text>
-                </View>
+              <Text variant="h3" weight="700" color={colors.textPrimary} style={styles.revokeTitle}>
+                Terminate All Sessions
+              </Text>
+              <Text variant="body" color={colors.textSecondary} style={styles.revokeDesc}>
+                If you suspect unauthorized access or lost a secondary device, instantly revoke all active cryptographic session tokens.
+              </Text>
 
-                <TouchableOpacity
-                  style={[styles.revokeBtn, shadow.sm]}
-                  onPress={handleRevokeSessions}
-                  activeOpacity={0.8}
-                  disabled={revoking}
-                  accessibilityRole="button"
-                  accessibilityLabel="Revoke all active sessions"
-                >
-                  {revoking ? (
-                    <ActivityIndicator size="small" color="#FFFFFF" />
-                  ) : (
-                    <Text variant="caption" weight="700" color="#FFFFFF" style={styles.revokeBtnText}>
-                      Revoke All Sessions
-                    </Text>
-                  )}
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity
+                style={styles.revokeBtn}
+                onPress={handleRevokeSessions}
+                activeOpacity={0.8}
+                disabled={revoking}
+                accessibilityRole="button"
+                accessibilityLabel="Revoke all active sessions"
+              >
+                {revoking ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Text variant="caption" weight="700" color="#FFFFFF" style={styles.revokeBtnText}>
+                    Revoke All Sessions
+                  </Text>
+                )}
+              </TouchableOpacity>
             </View>
 
             {/* Security Audit Trail Section */}
-            <View style={[styles.bodySection, { borderBottomWidth: 0 }]}>
+            <View style={[styles.sectionBlock, { borderBottomWidth: 0 }]}>
               <View style={styles.sectionHeaderRow}>
                 <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
                   SECURITY AUDIT TRAIL ({auditLogs.length})
@@ -252,8 +228,7 @@ export default function DeviceSessionsScreen() {
               </View>
 
               {auditLogs.length === 0 ? (
-                <View style={[styles.emptyCard, shadow.sm]}>
-                  <ShieldCheckSvg size={24} color="#0F172A" />
+                <View style={styles.emptyTrailBox}>
                   <Text variant="h3" weight="700" color={colors.textPrimary} style={styles.emptyTitle}>
                     Zero Security Violations
                   </Text>
@@ -262,13 +237,10 @@ export default function DeviceSessionsScreen() {
                   </Text>
                 </View>
               ) : (
-                auditLogs.map((log) => (
-                  <View key={log.id} style={[styles.logCard, shadow.sm]}>
-                    <View style={styles.logHeader}>
-                      <View style={styles.logIconBox}>
-                        <ShieldLockSvg size={16} color="#0F172A" />
-                      </View>
-                      <View style={styles.logTitleBox}>
+                auditLogs.map((log, index) => (
+                  <View key={log.id}>
+                    <View style={styles.logRow}>
+                      <View style={styles.logHeaderLine}>
                         <Text variant="caption" weight="700" color={colors.textPrimary} style={styles.logAction}>
                           {log.title}
                         </Text>
@@ -276,10 +248,11 @@ export default function DeviceSessionsScreen() {
                           {new Date(log.timestamp).toLocaleString()}
                         </Text>
                       </View>
+                      <Text variant="caption" color={colors.textSecondary} style={styles.logDetails}>
+                        {log.detail}
+                      </Text>
                     </View>
-                    <Text variant="caption" color={colors.textSecondary} style={styles.logDetails}>
-                      {log.detail}
-                    </Text>
+                    {index < auditLogs.length - 1 && <View style={styles.rowDivider} />}
                   </View>
                 ))
               )}
@@ -297,45 +270,25 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background, // 60% Dominant Canvas #F8FAFC
   },
   scrollContent: {
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.lg,
+    paddingHorizontal: spacing.md, // 16px
+    paddingTop: spacing.lg,        // 24px
     paddingBottom: 48,
   },
-  logoRow: {
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  logoContainer: {
-    width: 68,
-    height: 68,
-    borderRadius: 18,
-    backgroundColor: colors.surface, // 30% Panel #FFFFFF
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  introHeader: {
-    alignItems: 'center',
+  headerBlock: {
     marginBottom: spacing.lg,
-    paddingHorizontal: spacing.sm,
   },
-  mainTitle: {
-    fontSize: 20,
-    textAlign: 'center',
-    marginBottom: 4,
+  title: {
+    marginBottom: 6,
   },
-  leadParagraph: {
+  subtitle: {
     fontSize: 13,
     lineHeight: 19,
-    textAlign: 'center',
-    color: colors.textSecondary,
   },
   loaderContainer: {
     paddingVertical: 40,
     alignItems: 'center',
   },
-  bodySection: {
+  sectionBlock: {
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(15, 23, 42, 0.06)',
     paddingBottom: spacing.lg,
@@ -345,157 +298,94 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
   },
   sectionHeader: {
-    fontSize: 10,
-    letterSpacing: 0.6,
-    marginBottom: spacing.sm,
+    letterSpacing: 1.2,
+    marginBottom: spacing.md,
   },
-  deviceCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-  },
-  deviceCardHeader: {
+  deviceRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingVertical: 12,
   },
-  deviceTitleBox: {
+  deviceInfo: {
     flex: 1,
+    paddingRight: spacing.sm,
   },
   deviceName: {
-    fontSize: 14,
+    marginBottom: 2,
   },
   deviceMeta: {
+    fontSize: 12,
+  },
+  statusPill: {
     fontSize: 11,
-    marginTop: 2,
+    letterSpacing: 0.8,
   },
-  activePill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    backgroundColor: colors.background,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-  },
-  activeDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.accent,
-  },
-  activePillText: {
-    fontSize: 10,
-  },
-  divider: {
+  rowDivider: {
     height: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.06)',
-    marginVertical: spacing.md,
+    backgroundColor: 'rgba(15, 23, 42, 0.05)',
   },
-  specsGrid: {
+  specRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-  },
-  specItem: {
-    width: '47%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 9,
   },
   specLabel: {
-    fontSize: 10.5,
+    fontSize: 12,
   },
   specValue: {
     fontSize: 12,
-    marginTop: 2,
-  },
-  revokeCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-  },
-  revokeTextBox: {
-    marginBottom: spacing.md,
   },
   revokeTitle: {
-    fontSize: 14,
+    marginBottom: 4,
   },
   revokeDesc: {
-    fontSize: 12,
-    lineHeight: 17,
-    marginTop: 3,
+    fontSize: 13,
+    lineHeight: 19,
+    marginBottom: spacing.md,
   },
   revokeBtn: {
-    backgroundColor: '#0F172A',
-    paddingVertical: 11,
+    backgroundColor: '#DC2626',
+    height: 48,
     borderRadius: radius.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },
   revokeBtnText: {
-    fontSize: 12,
+    fontSize: 13,
+    letterSpacing: 0.3,
   },
-  emptyCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    alignItems: 'center',
+  emptyTrailBox: {
+    paddingVertical: 16,
   },
   emptyTitle: {
-    fontSize: 14,
-    marginTop: spacing.sm,
+    marginBottom: 4,
   },
   emptySubtitle: {
     fontSize: 12,
-    textAlign: 'center',
-    marginTop: 4,
+    lineHeight: 17,
   },
-  logCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    marginBottom: 4,
+  logRow: {
+    paddingVertical: 12,
   },
-  logHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  logIconBox: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.sm,
-  },
-  logTitleBox: {
-    flex: 1,
+  logHeaderLine: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginBottom: 4,
   },
   logAction: {
-    fontSize: 12,
+    fontSize: 13,
   },
   logTimestamp: {
-    fontSize: 10,
+    fontSize: 11,
   },
   logDetails: {
-    fontSize: 11.5,
-    lineHeight: 16,
-    marginLeft: 34,
+    fontSize: 12,
+    lineHeight: 17,
   },
 });
