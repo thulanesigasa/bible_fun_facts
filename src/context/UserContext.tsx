@@ -29,6 +29,7 @@ import { SafetyService } from '../services/safetyService';
 import { BiometricService } from '../services/biometricService';
 import { PinSecurityService } from '../services/pinSecurityService';
 import { PrivacyService } from '../services/privacyService';
+import { EncryptionService } from '../services/encryptionService';
 import { SecureStoreAdapter } from '../services/secureStorage';
 
 export interface UserProfile {
@@ -130,7 +131,7 @@ interface AppContextType extends UserState {
   blockUser: (userId: string) => Promise<void>;
   unblockUser: (userId: string) => Promise<void>;
   isUserBlocked: (userId: string) => boolean;
-  exportStudyJournal: () => Promise<{ success: boolean; filePath?: string; error?: string }>;
+  exportStudyJournal: (options?: { encrypted?: boolean }) => Promise<{ success: boolean; filePath?: string; error?: string }>;
   deleteAccountAndPurgeData: () => Promise<boolean>;
   isBiometricSupported: boolean;
   biometricType: string | null;
@@ -1333,7 +1334,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // ----------------------------------------------------
   // Data Portability & Account Purge (GDPR / POPIA / App Store)
   // ----------------------------------------------------
-  const exportStudyJournal = useCallback(async (): Promise<{ success: boolean; filePath?: string; error?: string }> => {
+  const exportStudyJournal = useCallback(async (options?: { encrypted?: boolean }): Promise<{ success: boolean; filePath?: string; error?: string }> => {
     try {
       const exportPayload = {
         exportVersion: '1.0.0',
@@ -1355,11 +1356,17 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         lastReadingPosition: state.lastReadBible,
       };
 
-      const jsonString = JSON.stringify(exportPayload, null, 2);
-      const fileName = `exegeomai-study-journal-${new Date().toISOString().split('T')[0]}.json`;
+      let outputData = JSON.stringify(exportPayload, null, 2);
+      let fileName = `exegeomai-study-journal-${new Date().toISOString().split('T')[0]}.json`;
+
+      if (options?.encrypted) {
+        outputData = await EncryptionService.encryptJournal(exportPayload);
+        fileName = `exegeomai-study-journal-encrypted-${new Date().toISOString().split('T')[0]}.enc.json`;
+      }
+
       const fileUri = `${FileSystem.documentDirectory}${fileName}`;
 
-      await FileSystem.writeAsStringAsync(fileUri, jsonString, {
+      await FileSystem.writeAsStringAsync(fileUri, outputData, {
         encoding: FileSystem.EncodingType.UTF8,
       });
 
@@ -1367,7 +1374,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (isAvailable) {
         await Sharing.shareAsync(fileUri, {
           mimeType: 'application/json',
-          dialogTitle: 'Export exégeomai Study Journal',
+          dialogTitle: options?.encrypted ? 'Export Encrypted (AES-256) Study Journal' : 'Export exégeomai Study Journal',
           UTI: 'public.json',
         });
       }
