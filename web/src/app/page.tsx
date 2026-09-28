@@ -43,11 +43,11 @@ export default function Home() {
           <span className="angled-cut-top" aria-hidden="true" />
 
           <section className="angled-layout-row">
-            {/* Elevated Featured Card (Left) */}
+            {/* Elevated Featured Card (Left) with Authentic Study Desk Photo */}
             <article className="notus-featured-card">
               <img
-                src="/assets/desk.jpg"
-                alt="Sacred study workspace with Holy Scripture"
+                src="/assets/study_scripture_desk.jpg"
+                alt="Antique Bible manuscript with Greek and Hebrew scholarly notes"
                 className="featured-card-photo"
               />
               <section className="featured-card-content">
@@ -90,7 +90,7 @@ export default function Home() {
           </section>
         </section>
 
-        {/* ── Section 3: Exegetical Study Tools with Floating Layered Cards (Zero Divs) ── */}
+        {/* ── Section 3: Exegetical Study Tools with Floating Semantic App Cards (Zero Divs) ── */}
         <section className="notus-components-section">
           <section className="components-text-col">
             <span className="notus-emblem-lg">LEX</span>
@@ -115,32 +115,68 @@ export default function Home() {
             </Link>
           </section>
 
-          <aside className="layered-components-stage" aria-label="Interactive component previews">
-            <img
-              src="/assets/component-info-card.png"
-              alt="Lexical summary preview"
-              className="floating-layer-img layer-info-card"
-            />
-            <img
-              src="/assets/component-profile-card.png"
-              alt="Strong's Greek lemma preview"
-              className="floating-layer-img layer-profile-card"
-            />
-            <img
-              src="/assets/component-info-2.png"
-              alt="Devotional reading preview"
-              className="floating-layer-img layer-info-2"
-            />
-            <img
-              src="/assets/component-btn-pink.png"
-              alt="Lemma action pill"
-              className="floating-layer-img layer-btn-pink"
-            />
-            <img
-              src="/assets/component-menu.png"
-              alt="Translation selector preview"
-              className="floating-layer-img layer-menu"
-            />
+          {/* Genuine exégeomai App Component Layered Stage (Zero Divs) */}
+          <aside className="layered-components-stage" aria-label="Interactive app component previews">
+            {/* Layer 1: Strong's Lexicon Lemma Card */}
+            <article className="floating-layer-card layer-lexicon-card">
+              <header className="layer-card-header">
+                <span className="layer-card-tag">Strong&apos;s Greek</span>
+                <span className="layer-card-badge">VERB</span>
+              </header>
+              <h5 className="layer-lemma-title">G1834 · ἐξηγέομαι</h5>
+              <p className="layer-lemma-translit">exēgéomai (ex-ay-geh&apos;-om-ahee)</p>
+              <p className="layer-lemma-def">
+                To lead out, declare, unfold the deep sacred meaning of divine truth.
+              </p>
+              <footer className="layer-lemma-meta">
+                <span>Root: ἐκ (1537) + ἡγέομαι (2233)</span>
+                <span className="layer-meta-count">6 Occurrences</span>
+              </footer>
+            </article>
+
+            {/* Layer 2: 3-Lens Devotional Reading Card */}
+            <article className="floating-layer-card layer-devotional-card">
+              <header className="layer-card-header">
+                <span className="layer-card-tag" style={{ color: '#FDD223' }}>Daily Exegesis</span>
+                <span className="layer-card-badge" style={{ background: '#FDD223', color: '#0F172A' }}>John 1:18</span>
+              </header>
+              <p className="layer-scripture-quote">
+                &ldquo;No man hath seen God at any time; the only begotten Son... he hath declared [ἐξηγήσατο] him.&rdquo;
+              </p>
+              <nav className="layer-lens-tabs" aria-label="Exegesis lenses">
+                <span className="lens-pill lens-active">Historical</span>
+                <span className="lens-pill">Customs</span>
+                <span className="lens-pill">Theology</span>
+              </nav>
+            </article>
+
+            {/* Layer 3: Translation Canons Card */}
+            <article className="floating-layer-card layer-canons-card">
+              <header className="layer-card-header">
+                <span className="layer-card-tag">Offline Canons</span>
+                <span className="layer-card-badge">32 Built-in</span>
+              </header>
+              <ul className="layer-canons-list" role="list">
+                <li><strong>KJV</strong> · King James Version (1611)</li>
+                <li><strong>ASV</strong> · American Standard (1901)</li>
+                <li><strong>ZUL</strong> · IBHAYIBHELI ELINGCWELE</li>
+                <li><strong>SNA</strong> · Bhaibheri Dzvene (1949)</li>
+              </ul>
+            </article>
+
+            {/* Layer 4: Hardware Keystore Pill */}
+            <article className="floating-layer-card layer-security-pill">
+              <span>🔒 AES-256 Hardware Keystore · Zero Telemetry</span>
+            </article>
+
+            {/* Layer 5: SQLite FTS5 Search Bar */}
+            <article className="floating-layer-card layer-search-bar">
+              <header className="layer-search-row">
+                <span className="search-prompt-symbol">🔍</span>
+                <span className="search-prompt-text">Search 14,298 Strong&apos;s words...</span>
+                <span className="search-speed-badge">1.8ms</span>
+              </header>
+            </article>
           </aside>
         </section>
 
@@ -218,7 +254,7 @@ export default function Home() {
           </section>
         </section>
 
-        {/* ── Section 5: Scholarly Technical Architecture with 3D Card ── */}
+        {/* ── Section 5: Scholarly Technical Architecture (3D Perspective Code Window) ── */}
         <section className="notus-doc-section">
           <section className="components-text-col">
             <span className="notus-emblem-lg">DOC</span>
@@ -244,16 +280,47 @@ export default function Home() {
             </ul>
           </section>
 
+          {/* Genuine exégeomai SQLite & Crypto Code Window in 3D Perspective (Zero Divs) */}
           <aside style={{ display: 'flex', justifyContent: 'center' }}>
-            <img
-              src="/assets/documentation.png"
-              alt="Scholarly technical architecture preview"
-              className="doc-preview-img"
-            />
+            <article className="doc-code-window">
+              <header className="code-window-header">
+                <span className="code-window-dots">
+                  <span className="code-dot dot-red" />
+                  <span className="code-dot dot-yellow" />
+                  <span className="code-dot dot-green" />
+                </span>
+                <span className="code-window-title">schema_strongs_fts5.sql</span>
+                <span className="code-window-tag">SQLITE WAL</span>
+              </header>
+              <pre className="code-window-body">
+                <code>{`-- 14,298 Lemma SQLite FTS5 Full-Text Search
+CREATE VIRTUAL TABLE strongs_words_fts USING fts5(
+  strongs_id UNINDEXED,
+  lemma,
+  transliteration,
+  pronunciation,
+  definition,
+  kjv_definition,
+  prefix='2 3 4',
+  tokenize='unicode61 remove_diacritics 2'
+);
+
+-- Fast Substring Query (<8ms on Android/iOS)
+SELECT strongs_id, lemma, definition,
+       highlight(strongs_words_fts, 1, '<mark>', '</mark>')
+FROM strongs_words_fts
+WHERE strongs_words_fts MATCH 'exēgeomai*'
+ORDER BY rank LIMIT 25;
+
+-- AES-256-CBC Hardware Keystore Protection
+CIPHER: AES/CBC/PKCS7Padding
+KEYSTORE: AndroidKeyStore / iOS Secure Enclave`}</code>
+              </pre>
+            </article>
           </aside>
         </section>
 
-        {/* ── Section 6: Dedicated Study Portals (Example Pages Layout) ── */}
+        {/* ── Section 6: Dedicated Study Portals (Authentic App UI Cards Trio) ── */}
         <section className="notus-pages-section">
           <header className="pages-section-header">
             <h2>Dedicated Study Portals</h2>
@@ -264,31 +331,76 @@ export default function Home() {
           </header>
 
           <section className="pages-cards-trio">
-            <Link href="/features" className="page-preview-card">
-              <h5>Core Features Portal</h5>
-              <img
-                src="/assets/login.jpg"
-                alt="Core Features portal preview"
-                className="page-preview-thumbnail"
-              />
+            {/* Portal Card 1: Core Features */}
+            <Link href="/features" className="portal-preview-card">
+              <header className="portal-card-topbar">
+                <h5>Core Features Portal</h5>
+                <span className="portal-topbar-tag">365 DEVOTIONALS</span>
+              </header>
+              <section className="portal-card-body">
+                <span className="portal-mockup-badge">DAILY READING · DAY 271</span>
+                <h6 className="portal-mockup-title">John 1:18 — The Only Begotten Son</h6>
+                <p className="portal-mockup-desc">
+                  3-Lens Scholarly Exegesis: 1st Century Roman administration, Second Temple customs, and Christological theology.
+                </p>
+                <dl className="portal-stats-row">
+                  <dt>365</dt><dd>Readings</dd>
+                  <dt>32</dt><dd>Translations</dd>
+                  <dt>100%</dt><dd>Offline</dd>
+                </dl>
+              </section>
+              <footer className="portal-card-footer">
+                <span>Explore Core Features</span>
+                <span>→</span>
+              </footer>
             </Link>
 
-            <Link href="/strongs" className="page-preview-card">
-              <h5>Strong&apos;s Lexicon Engine</h5>
-              <img
-                src="/assets/profile.jpg"
-                alt="Strong's Lexicon engine preview"
-                className="page-preview-thumbnail"
-              />
+            {/* Portal Card 2: Strong's Lexicon */}
+            <Link href="/strongs" className="portal-preview-card">
+              <header className="portal-card-topbar">
+                <h5>Strong&apos;s Lexicon Engine</h5>
+                <span className="portal-topbar-tag">14,298 WORDS</span>
+              </header>
+              <section className="portal-card-body">
+                <span className="portal-mockup-badge">FTS5 SUBSTRING SEARCH</span>
+                <h6 className="portal-mockup-title">G1834 · ἐξηγέομαι (exēgeomai)</h6>
+                <p className="portal-mockup-desc">
+                  Exhaustive Greek &amp; Hebrew concordance with pronunciation, HELPS word-studies, and root lemma etymologies.
+                </p>
+                <dl className="portal-stats-row">
+                  <dt>5,624</dt><dd>Greek</dd>
+                  <dt>8,674</dt><dd>Hebrew</dd>
+                  <dt>&lt;8ms</dt><dd>Latency</dd>
+                </dl>
+              </section>
+              <footer className="portal-card-footer">
+                <span>Launch Lexicon Search</span>
+                <span>→</span>
+              </footer>
             </Link>
 
-            <Link href="/security" className="page-preview-card">
-              <h5>Security &amp; Privacy Vault</h5>
-              <img
-                src="/assets/landing.jpg"
-                alt="Security & Privacy vault preview"
-                className="page-preview-thumbnail"
-              />
+            {/* Portal Card 3: Security & Privacy */}
+            <Link href="/security" className="portal-preview-card">
+              <header className="portal-card-topbar">
+                <h5>Security &amp; Privacy Vault</h5>
+                <span className="portal-topbar-tag">AES-256-CBC</span>
+              </header>
+              <section className="portal-card-body">
+                <span className="portal-mockup-badge">ZERO CLOUD TELEMETRY</span>
+                <h6 className="portal-mockup-title">Hardware Keystore Vault</h6>
+                <p className="portal-mockup-desc">
+                  Biometric Face ID / Fingerprint lock, private study incognito mode, and GDPR Article 17 permanent deletion portal.
+                </p>
+                <dl className="portal-stats-row">
+                  <dt>256-Bit</dt><dd>AES Key</dd>
+                  <dt>PBKDF2</dt><dd>Key Derivation</dd>
+                  <dt>0</dt><dd>Trackers</dd>
+                </dl>
+              </section>
+              <footer className="portal-card-footer">
+                <span>Inspect Security Specs</span>
+                <span>→</span>
+              </footer>
             </Link>
           </section>
         </section>
