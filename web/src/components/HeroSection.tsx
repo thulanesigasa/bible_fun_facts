@@ -5,74 +5,85 @@ import { DownloadSvg, GithubSvg } from './SvgIcons';
 export function HeroSection() {
   return (
     <section className="hero">
-      <div className="container">
-        <h1 className="hero-title">
-          Unfold the Sacred Depth of <span>Scripture</span>
-        </h1>
+      <div className="wrap">
+        <div className="hero-inner">
+          {/* ── Left column — headline + CTAs + stats ── */}
+          <div>
+            <span className="hero-eyebrow">ἐξηγέομαι · Strong&apos;s Greek G1834</span>
+            <h1>
+              Unfold the Sacred<br />
+              Depth of <em>Scripture</em>
+            </h1>
+            <p className="hero-lead">
+              365 calendar-synchronized exegetical devotionals. 14,298 Strong&apos;s
+              concordance entries with FTS5 search. 32 offline Bible translations.
+              All secured by hardware-backed AES-256 encryption.
+            </p>
 
-        <p className="hero-subtitle">
-          Named after Strong&apos;s Greek 1834 (<em>ἐξηγέομαι</em> — to lead out, declare, and interpret).
-          Explore 365 calendar-synchronized daily devotionals through historical, cultural, and
-          theological lenses, alongside 14,298 Strong&apos;s concordance entries and 32 offline Bible translations.
-        </p>
+            <div className="hero-actions">
+              <a
+                href="https://github.com/thulanesigasa/bible_fun_facts/releases/latest"
+                className="btn btn-accent"
+                id="heroDownloadBtn"
+              >
+                <DownloadSvg size={16} />
+                Download APK — v1.0.4
+              </a>
+              <a
+                href="https://github.com/thulanesigasa/bible_fun_facts"
+                className="btn btn-ghost"
+                target="_blank"
+                rel="noopener noreferrer"
+                id="heroGithubBtn"
+              >
+                <GithubSvg size={16} />
+                View on GitHub
+              </a>
+            </div>
 
-        <div className="hero-ctas">
-          <a
-            href="https://github.com/thulanesigasa/bible_fun_facts/releases/latest"
-            className="btn btn-accent btn-lg"
-            id="heroDownloadBtn"
-          >
-            <DownloadSvg size={18} />
-            <span>Download APK (v1.0.4)</span>
-          </a>
-          <a
-            href="https://github.com/thulanesigasa/bible_fun_facts"
-            className="btn btn-outline btn-lg"
-            target="_blank"
-            rel="noopener noreferrer"
-            id="heroGithubBtn"
-          >
-            <GithubSvg size={18} />
-            <span>GitHub Repository</span>
-          </a>
-        </div>
+            <dl className="stat-bar">
+              <div>
+                <dt>14,298</dt>
+                <dd>Strong&apos;s Entries</dd>
+              </div>
+              <div>
+                <dt>365</dt>
+                <dd>Devotionals</dd>
+              </div>
+              <div>
+                <dt>32</dt>
+                <dd>Translations</dd>
+              </div>
+              <div>
+                <dt>AES-256</dt>
+                <dd>Encryption</dd>
+              </div>
+            </dl>
+          </div>
 
-        <div className="meta-stats">
-          <div className="stat-item">
-            <span className="stat-num">14,298</span>
-            <span className="stat-label">Strong&apos;s Entries</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-num">365</span>
-            <span className="stat-label">Exegetical Devotionals</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-num">32</span>
-            <span className="stat-label">Offline Translations</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-num">AES-256</span>
-            <span className="stat-label">Hardware Keystore</span>
-          </div>
-        </div>
-
-        <div className="hero-page-links">
-          <Link href="/features" className="page-link-card">
-            <span className="page-link-title">Core Features</span>
-            <span className="page-link-desc">Devotionals, lexicon, translations, privacy</span>
-          </Link>
-          <Link href="/strongs" className="page-link-card">
-            <span className="page-link-title">Strong&apos;s Lexicon</span>
-            <span className="page-link-desc">14,298 Greek &amp; Hebrew entries, FTS5 search</span>
-          </Link>
-          <Link href="/security" className="page-link-card">
-            <span className="page-link-title">Security &amp; Privacy</span>
-            <span className="page-link-desc">AES-256, PBKDF2, hardware keystore</span>
-          </Link>
-          <Link href="/faq" className="page-link-card">
-            <span className="page-link-title">FAQ</span>
-            <span className="page-link-desc">Common questions about the app</span>
-          </Link>
+          {/* ── Right column — page navigation links ── */}
+          <nav className="hero-nav" aria-label="App sections">
+            <Link href="/features" className="hero-nav-item">
+              <strong>Core Features</strong>
+              <span>Devotionals, lexicon, translations, biometric security</span>
+            </Link>
+            <Link href="/strongs" className="hero-nav-item">
+              <strong>Strong&apos;s Lexicon</strong>
+              <span>14,298 Greek &amp; Hebrew entries, instant FTS5 search</span>
+            </Link>
+            <Link href="/security" className="hero-nav-item">
+              <strong>Security &amp; Privacy</strong>
+              <span>AES-256-CBC, PBKDF2, hardware keystore, zero cloud</span>
+            </Link>
+            <Link href="/faq" className="hero-nav-item">
+              <strong>FAQ</strong>
+              <span>Offline use, data deletion, platform support</span>
+            </Link>
+            <Link href="/deletion" className="hero-nav-item">
+              <strong>Account Deletion</strong>
+              <span>GDPR-compliant data purge portal</span>
+            </Link>
+          </nav>
         </div>
       </div>
     </section>

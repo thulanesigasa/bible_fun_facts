@@ -9,7 +9,7 @@ const faqs = [
   },
   {
     q: 'Does the app work offline?',
-    a: 'Entirely. All Bible translations, the Strong\'s lexicon, and devotional content are embedded in the app bundle. Once installed, the app works indefinitely without any network connection.',
+    a: "Entirely. All Bible translations, the Strong's lexicon, and devotional content are embedded in the app bundle. Once installed, the app works indefinitely without any network connection.",
   },
   {
     q: 'How is my data kept private?',
@@ -25,7 +25,7 @@ const faqs = [
   },
   {
     q: 'Can I contribute to the project?',
-    a: 'Absolutely! exégeomai is open source under the MIT license. Visit the GitHub repository to submit pull requests, report bugs, or suggest features. Lexicon data corrections and new translation additions are especially welcome.',
+    a: 'Absolutely! exégeomai is open source under the MIT license. Visit the GitHub repository to submit pull requests, report bugs, or suggest features.',
   },
   {
     q: 'Which platforms are supported?',
@@ -34,38 +34,38 @@ const faqs = [
 ];
 
 export function FaqSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section className="section" id="faq">
-      <div className="container">
-        <div className="section-head">
-          <h2 className="section-title">Frequently Asked Questions</h2>
-          <p className="section-desc">
-            Everything you need to know about exégeomai — from privacy to platform support.
-          </p>
-        </div>
+    <section className="page-section" id="faq">
+      <div className="wrap">
+        <header className="section-intro">
+          <h2>Frequently Asked Questions</h2>
+          <p>Everything you need to know about exégeomai — privacy, offline use, and platform support.</p>
+        </header>
 
-        <div className="faq-list">
-          {faqs.map((faq, i) => (
-            <div className="faq-item" key={i}>
-              <button
-                className="faq-question"
-                onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                aria-expanded={openIndex === i}
-                id={`faq-btn-${i}`}
-              >
-                <span>{faq.q}</span>
-                <span className="faq-toggle">{openIndex === i ? '−' : '+'}</span>
-              </button>
-              {openIndex === i && (
-                <div className="faq-answer" role="region" aria-labelledby={`faq-btn-${i}`}>
-                  {faq.a}
-                </div>
+        <dl className="faq-list">
+          {faqs.map((f, i) => (
+            <React.Fragment key={i}>
+              <dt>
+                <button
+                  className="faq-trigger"
+                  onClick={() => setOpen(open === i ? null : i)}
+                  aria-expanded={open === i}
+                  id={`faq-${i}`}
+                >
+                  {f.q}
+                  <span className="faq-sign" aria-hidden="true">{open === i ? '−' : '+'}</span>
+                </button>
+              </dt>
+              {open === i && (
+                <dd className="faq-body" role="region" aria-labelledby={`faq-${i}`}>
+                  {f.a}
+                </dd>
               )}
-            </div>
+            </React.Fragment>
           ))}
-        </div>
+        </dl>
       </div>
     </section>
   );

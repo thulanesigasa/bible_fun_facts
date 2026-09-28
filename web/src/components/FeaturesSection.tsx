@@ -15,7 +15,7 @@ const features = [
   },
   {
     title: 'Verse of the Day',
-    body: 'Intelligently curated daily verse with full cross-reference chain, Strong\'s mapping, and contextual commentary — delivered via background notification at your chosen time.',
+    body: "Intelligently curated daily verse with full cross-reference chain, Strong's mapping, and contextual commentary — delivered via background notification at your chosen time.",
   },
   {
     title: 'PIN & Biometric Lock',
@@ -29,23 +29,25 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section className="section" id="features">
-      <div className="container">
-        <div className="section-head">
-          <h2 className="section-title">Everything a Serious Bible Student Needs</h2>
-          <p className="section-desc">
-            Built for depth, not engagement metrics. Every feature serves the goal of
-            understanding Scripture in its original linguistic and cultural context.
-          </p>
-        </div>
+    <section className="page-section" id="features">
+      <div className="wrap">
+        <div className="split">
+          <header className="split-lead">
+            <h2>Everything a Serious Bible Student Needs</h2>
+            <p>
+              Built for depth, not engagement metrics. Every feature serves the goal of
+              understanding Scripture in its original linguistic and cultural context.
+            </p>
+          </header>
 
-        <div className="grid-3">
-          {features.map((f) => (
-            <div className="card" key={f.title}>
-              <h3 className="card-title">{f.title}</h3>
-              <p className="card-body">{f.body}</p>
-            </div>
-          ))}
+          <ul className="feature-list" role="list">
+            {features.map((f) => (
+              <li className="feature-item" key={f.title}>
+                <h3>{f.title}</h3>
+                <p>{f.body}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>
