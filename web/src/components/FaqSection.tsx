@@ -1,12 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChevronDownSvg } from './SvgIcons';
 
 const faqs = [
   {
     q: 'Is exégeomai completely free?',
-    a: 'Yes — 100% free with no ads, no subscriptions, and no in-app purchases. The full app including all 32 translations, 14,298 Strong\'s entries, and 365 devotionals is included in the single APK download.',
+    a: "Yes — 100% free with no ads, no subscriptions, and no in-app purchases. The full app including all 32 translations, 14,298 Strong's entries, and 365 devotionals is included in the single APK download.",
   },
   {
     q: 'Does the app work offline?',
@@ -41,7 +40,6 @@ export function FaqSection() {
     <section className="section" id="faq">
       <div className="container">
         <div className="section-head">
-          <span className="section-label">FAQ</span>
           <h2 className="section-title">Frequently Asked Questions</h2>
           <p className="section-desc">
             Everything you need to know about exégeomai — from privacy to platform support.
@@ -58,11 +56,7 @@ export function FaqSection() {
                 id={`faq-btn-${i}`}
               >
                 <span>{faq.q}</span>
-                <ChevronDownSvg
-                  size={18}
-                  className="faq-icon"
-                  style={{ transform: openIndex === i ? 'rotate(180deg)' : 'rotate(0deg)' }}
-                />
+                <span className="faq-toggle">{openIndex === i ? '−' : '+'}</span>
               </button>
               {openIndex === i && (
                 <div className="faq-answer" role="region" aria-labelledby={`faq-btn-${i}`}>

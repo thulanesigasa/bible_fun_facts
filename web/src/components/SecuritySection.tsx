@@ -1,19 +1,15 @@
 import React from 'react';
-import { ShieldSvg, LockSvg, KeySvg, EyeOffSvg, CheckSvg } from './SvgIcons';
 
 const pillars = [
   {
-    icon: <KeySvg size={18} />,
     title: 'AES-256-CBC Encryption',
     text: 'All sensitive data encrypted via Android Keystore / iOS Secure Enclave hardware. Keys never exportable to userspace.',
   },
   {
-    icon: <LockSvg size={18} />,
     title: 'PBKDF2 PIN Hashing',
     text: '310,000 HMAC-SHA256 iterations per the OWASP 2023 guidance. Brute-force computationally infeasible.',
   },
   {
-    icon: <EyeOffSvg size={18} />,
     title: 'App Switcher Shield',
     text: 'FLAG_SECURE prevents screenshots and replaces the app preview with a solid screen in the recents drawer.',
   },
@@ -33,7 +29,6 @@ export function SecuritySection() {
     <section className="section" id="security">
       <div className="container">
         <div className="section-head">
-          <span className="section-label">Security &amp; Privacy</span>
           <h2 className="section-title">Designed for Confidential Study</h2>
           <p className="section-desc">
             Your faith journey is personal. exégeomai uses hardware-backed cryptography
@@ -44,9 +39,6 @@ export function SecuritySection() {
 
         <div className="security-banner">
           <div className="security-header">
-            <div className="security-icon-large">
-              <ShieldSvg size={26} />
-            </div>
             <div>
               <h3 className="security-title">Hardware-Backed Security Architecture</h3>
               <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: 0 }}>
@@ -67,25 +59,18 @@ export function SecuritySection() {
           <div className="security-pillars">
             {pillars.map((p) => (
               <div className="pillar-item" key={p.title}>
-                <div className="pillar-title">
-                  {p.icon}
-                  {p.title}
-                </div>
+                <div className="pillar-title">{p.title}</div>
                 <p className="pillar-text">{p.text}</p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Data practices */}
         <div className="data-practices">
           <h3 className="data-practices-title">Our Data Practices</h3>
           <div className="data-grid">
             {dataPoints.map((point) => (
               <div className="data-point" key={point}>
-                <div className="data-check">
-                  <CheckSvg size={14} color="var(--text-primary)" />
-                </div>
                 <span>{point}</span>
               </div>
             ))}
