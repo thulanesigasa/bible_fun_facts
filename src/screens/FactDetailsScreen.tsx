@@ -18,7 +18,6 @@ import {
   ShareSvg,
   StrongsIconSvg,
   TheologicalTruthSvg,
-  ModernWalkSvg,
 } from '../components/SvgIcons';
 
 interface FactDetailsScreenProps {
@@ -157,24 +156,6 @@ export default function FactDetailsScreen({ navigation, route }: FactDetailsScre
                 </View>
                 <Text variant="body" color={colors.textSecondary} style={styles.bodyText}>
                   {fact.theological_truth}
-                </Text>
-              </View>
-            </>
-          ) : null}
-
-          {/* Practical Life Application Section */}
-          {fact.life_application ? (
-            <>
-              <View style={styles.hairlineDivider} />
-              <View style={styles.section}>
-                <View style={styles.sectionHeader}>
-                  <ModernWalkSvg size={18} color={colors.accent} />
-                  <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionLabel}>
-                    PRACTICAL APPLICATION
-                  </Text>
-                </View>
-                <Text variant="body" color={colors.textSecondary} style={styles.bodyText}>
-                  {fact.life_application}
                 </Text>
               </View>
             </>

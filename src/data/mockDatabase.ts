@@ -16,7 +16,6 @@ export interface Fact {
   category: Category;
   tags?: string[];
   theological_truth?: string;
-  life_application?: string;
 }
 
 export interface Scripture {

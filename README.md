@@ -5,8 +5,8 @@
   <img src="https://img.shields.io/badge/React%20Native-0.86-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React Native 0.86" />
   <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript 5.9" />
   <img src="https://img.shields.io/badge/Holy%20Bible-66--Book%20Canon%20Reader-FDD223?style=for-the-badge" alt="Full Holy Bible Reader" />
-  <img src="https://img.shields.io/badge/Daily%20Feed-365%20Extended%20Devotionals%20%7C%204--Lens%20Suite-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="365 Extended Devotionals 4-Lens Suite" />
-  <img src="https://img.shields.io/badge/Exegesis-History%20%7C%20Customs%20%7C%20Theology%20%7C%20Application-10B981?style=for-the-badge&logo=book&logoColor=white" alt="4-Lens Exegesis Suite" />
+  <img src="https://img.shields.io/badge/Daily%20Feed-365%20Extended%20Devotionals%20%7C%203--Lens%20Suite-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="365 Extended Devotionals 3-Lens Suite" />
+  <img src="https://img.shields.io/badge/Exegesis-History%20%7C%20Customs%20%7C%20Theology-10B981?style=for-the-badge&logo=book&logoColor=white" alt="3-Lens Exegesis Suite" />
   <img src="https://img.shields.io/badge/History%20Tab-26%20Canonical%20Authors%20%7C%20Timelines%20%26%20Linguistics-0284C7?style=for-the-badge" alt="Biblical Authors History" />
   <img src="https://img.shields.io/badge/Community-Believer%20&%20Scholar%20Hub-10B981?style=for-the-badge" alt="Believer & Scholar Hub" />
   <img src="https://img.shields.io/badge/Supabase-Auth%20&%20Backend-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase Backend" />
@@ -548,16 +548,16 @@ graph TD
 
 ---
 
-## 365 Daily Exegesis Messages: Full 4-Lens Devotional Architecture
+## 365 Daily Exegesis Messages: 3-Lens Scholarly Devotional Architecture
 
 <p align="left">
   <img src="https://img.shields.io/badge/Daily%20Feed-365%20Calendar%20Devotionals-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="365 Calendar Devotionals" />
-  <img src="https://img.shields.io/badge/Exegetical%20Lenses-4%20Comprehensive%20Pillars-10B981?style=for-the-badge&logo=book&logoColor=white" alt="4 Comprehensive Pillars" />
-  <img src="https://img.shields.io/badge/Text%20Depth-%3E300%25%20Length%20Expansion-0284C7?style=for-the-badge" alt="300% Length Expansion" />
+  <img src="https://img.shields.io/badge/Exegetical%20Lenses-3%20Scholarly%20Pillars-10B981?style=for-the-badge&logo=book&logoColor=white" alt="3 Scholarly Pillars" />
+  <img src="https://img.shields.io/badge/Text%20Depth-%3E200%25%20Length%20Expansion-0284C7?style=for-the-badge" alt="200% Length Expansion" />
   <img src="https://img.shields.io/badge/Design%20System-Zero%20Card%20Divs%20%7C%2060--30--10-0F172A?style=for-the-badge" alt="Zero Card Divs" />
 </p>
 
-All 365 calendar-synchronized daily messages (`day_1` through `day_365`) in `src/data/dailyMessages.ts` have been comprehensively expanded by over 300% into a full 4-lens scholarly and pastoral devotional suite:
+All 365 calendar-synchronized daily messages (`day_1` through `day_365`) in `src/data/dailyMessages.ts` feature a focused 3-lens scholarly and historical exegetical suite:
 
 1. **Substantially Expanded Historical Context (`historical_context`)**:
    - Deepens the original historical background with biblical archaeology (Mesopotamian tablets, Tel Dan stele, Pool of Siloam excavations, Roman paved highways), chronological setting, Levantine geography, and the socio-political struggles of ancient Israel and the early Church.
@@ -565,14 +565,11 @@ All 365 calendar-synchronized daily messages (`day_1` through `day_365`) in `src
 2. **Substantially Expanded Cultural Practice (`cultural_practice`)**:
    - Unpacks ancient Near Eastern and Second Temple customs, Hebrew idioms, rabbinic traditions, societal honor/shame dynamics, agricultural cycles, and temple liturgies linked directly to the passage's Strong's lemma.
 
-3. **New Doctrinal Pillar: Theological Truth (`theological_truth`)**:
+3. **Doctrinal Pillar: Theological Truth (`theological_truth`)**:
    - A dedicated doctrinal exposition revealing the character of Yahweh, divine covenant faithfulness (*hesed*), redemption history, and Christological fulfillment.
 
-4. **New Discipleship Pillar: Practical Application (`life_application`)**:
-   - Transformative daily discipleship reflections prompting personal examination, surrender of self-reliance, guided prayer focus, and practical faith in everyday relationships.
-
-5. **Direct Body UI Presentation (`FactDetailsScreen.tsx` & `DiscoverScreen.tsx`)**:
-   - Rendered using continuous flat body layouts with hairline dividers, zero card divs, and bespoke SVG icons (`LandmarkSvg`, `UsersSvg`, `TheologicalTruthSvg`, `ModernWalkSvg`, and `StrongsIconSvg`).
+4. **Direct Body UI Presentation (`FactDetailsScreen.tsx` & `DiscoverScreen.tsx`)**:
+   - Rendered using continuous flat body layouts with hairline dividers, zero card divs, and bespoke SVG icons (`LandmarkSvg`, `UsersSvg`, `TheologicalTruthSvg`, and `StrongsIconSvg`).
 
 ---
 
