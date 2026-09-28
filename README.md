@@ -37,10 +37,10 @@
   <img src="https://img.shields.io/badge/Daily%20Streak-Deterministic%20Calendar%20Day%20%7C%20Feedback%20Loop%20Immune-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Deterministic Daily Streak Engine" />
   <img src="https://img.shields.io/badge/Notifications-Swipe--To--Dismiss%20%7C%20Bidirectional%20PanResponder-FDD223?style=for-the-badge" alt="Swipe To Dismiss Notifications" />
   <img src="https://img.shields.io/badge/Notification%20Tray-Mark%20Read%20%7C%20Clear%20Read%20%7C%20Clear%20All-10B981?style=for-the-badge" alt="Notification Tray Bulk Clear" />
-  <img src="https://img.shields.io/badge/Notifications-Zero%20Phantom%20Backlog-10B981?style=for-the-badge" alt="Zero Phantom Notifications" />
-  <img src="https://img.shields.io/badge/Privacy-GDPR%20%7C%20POPIA%20%7C%20Data%20Export-3B82F6?style=for-the-badge" alt="Data Portability and Purge" />
-  <img src="https://img.shields.io/badge/Themed%20Alerts-60--30--10%20Custom%20Popups-FDD223?style=for-the-badge&logo=shield&logoColor=white" alt="Themed Dialogs and Custom Popups" />
-  <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
+  <img src="https://img.shields.io/badge/The%20Word-Strongs%20%7C%20Hebrew%20%7C%20Greek-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="The Word Concordance and Lexicons" />
+  <img src="https://img.shields.io/badge/Strongs%20Concordance-Hebrew%20H1--H8674%20%7C%20Greek%20G1--G5624-10B981?style=for-the-badge" alt="Strongs Concordance" />
+  <img src="https://img.shields.io/badge/Ancient%20Hebrew-Theological%20Roots%20%7C%20Aleph--Bet%20Guide-FDD223?style=for-the-badge" alt="Ancient Hebrew Lexicon" />
+  <img src="https://img.shields.io/badge/Koine%20Greek-Apostolic%20Lexicon%20%7C%20Alpha--Omega%20Guide-10B981?style=for-the-badge" alt="Koine Greek Lexicon" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
   <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License MIT" />
 </p>
@@ -85,6 +85,9 @@ graph TD
     SearchStack --> SearchMain["SearchScreen (User Discovery, Follow/Unfollow, Scholar Modal)"]
     SearchStack --> PastoralCareScreen["PastoralCareScreen (24/7 Lifelines, SADAG & Scriptures)"]
     ProfileStack --> ProfileMain["ProfileScreen (Modular Hub, Saved Collection & Account)"]
+    ProfileStack --> StrongsScreen["StrongsScreen (Bilingual Hebrew & Greek Root Concordance)"]
+    ProfileStack --> HebrewScreen["HebrewScreen (Ancient Hebrew Roots & 22-Letter Aleph-Bet Guide)"]
+    ProfileStack --> GreekScreen["GreekScreen (Koine Greek Lexicon & 24-Letter Alpha-Omega Guide)"]
     ProfileStack --> ReadingSettingsScreen["ReadingSettingsScreen (Reader Typography & Red Letters)"]
     ProfileStack --> PrivacyScreen["PrivacyScreen (Study Mode, Directory, Streaks, Notes & Blocked Accounts)"]
     ProfileStack --> SecurityScreen["SecurityScreen (Inactivity Lock, PIN & Biometrics)"]
@@ -1310,6 +1313,32 @@ A mathematically resilient streak calculation engine eliminating multi-trigger r
   - `daysDiff > 1`: Missed day. Streak resets gracefully to 1 (`1`).
 - **Self-Healing Inflation Correction**: Automatically sanitizes runaway historical streak values to the authentic user progress baseline.
 
+### 9. The Word: Strong's Concordance, Ancient Hebrew & Koine Greek Lexicons
+
+<p align="left">
+  <img src="https://img.shields.io/badge/The%20Word-Profile%20Scholarly%20Section-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="The Word Section" />
+  <img src="https://img.shields.io/badge/Strongs-Hebrew%20H%20%7C%20Greek%20G%20Search-10B981?style=for-the-badge" alt="Strongs Search" />
+  <img src="https://img.shields.io/badge/Hebrew-22%20Aleph--Bet%20Paleo%20Guide-FDD223?style=for-the-badge" alt="Aleph-Bet Guide" />
+  <img src="https://img.shields.io/badge/Greek-24%20Alpha--Omega%20Theology-10B981?style=for-the-badge" alt="Alpha-Omega Guide" />
+  <img src="https://img.shields.io/badge/Word%20Reader-One--Tap%20Scripture%20Jump-3B82F6?style=for-the-badge" alt="Word Reader Deep-Link" />
+</p>
+
+A scholarly linguistic suite accessible directly from the Profile Hub under "THE WORD", equipping believers and biblical scholars with root language depth:
+- **Strong's Concordance (`StrongsScreen.tsx`)**:
+  - **Bilingual Exhaustive Index**: Comprehensive index of Hebrew (Old Testament H1–H8674) and Koine Greek (New Testament G1–G5624) root words.
+  - **Fast Multi-Parameter Search**: Instant search across Strong's IDs (e.g. `H7965`, `G1834`), original scripts (`שָׁלוֹם`, `ἐξηγέομαι`), phonetic transliterations, definitions, and biblical book references.
+  - **Segmented Language Filters**: One-tap toggling between `All`, `Hebrew (OT)`, and `Greek (NT)`.
+  - **Expandable Exegesis & Share Engine**: Full theological definitions, root etymologies, and one-tap social/notes sharing.
+  - **Direct Word Reader Deep-Link**: Tapping any passage snippet navigates straight into the 66-book Holy Bible reader (`WOTDScreen`).
+- **Ancient Hebrew Lexicon (`HebrewScreen.tsx`)**:
+  - **Thematic Covenant Categories**: Categorized into `Covenant & Names`, `Creation & Spirit`, `Worship & Praise`, and `Righteousness`.
+  - **Interactive Aleph-Bet Guide**: Comprehensive reference table of all 22 sacred Hebrew letters (`א` to `ת`), showing phonetic sounds, numeric values (Gematria), and ancient Paleo-Hebrew pictographic meanings (e.g. Ox head = strength/leader, Tent/House = dwelling of God).
+  - **Hebraic Theological Exegesis**: In-depth explanations of ancient Near Eastern cultural context and covenant bonds.
+- **Koine Greek Lexicon (`GreekScreen.tsx`)**:
+  - **Apostolic New Testament Vocabulary**: Explores New Covenant theology across `Christology`, `Grace & Salvation`, `Holy Spirit`, `Love & Fellowship`, and `Righteousness`.
+  - **Alpha-Omega Alphabet Guide**: Reference guide of all 24 Greek letters (`Α α` to `Ω ω`) with pronunciations and theological associations (e.g. Alpha & Omega, Logos, Theos, Pneuma).
+  - **Grammatical Parsing & Nuances**: Clear distinctions between philosophical Greek and inspired apostolic usage.
+
 ---
 
 ## Directory Structure
@@ -1336,6 +1365,7 @@ bible_fun_facts/
 │   │   ├── achievements.ts          # 48 study milestones across 4 categories
 │   │   ├── biblicalWriters.ts       # 26 canonical biblical author profiles
 │   │   ├── dailyMessages.ts         # 365 daily exegesis feed messages
+│   │   ├── lexiconData.ts           # Comprehensive Strong's concordance, Hebrew & Greek lexicons
 │   │   └── notificationVerses.ts    # 365-day canonical scripture notification datasets
 │   ├── navigation/
 │   │   └── AppNavigator.tsx         # Bottom tab, auth stack, and screen navigation
@@ -1346,12 +1376,15 @@ bible_fun_facts/
 │   │   ├── DiscoverScreen.tsx       # Daily feed with top-left bell and streak badge
 │   │   ├── ExportJournalScreen.tsx  # Hardware AES-256 encrypted journal exporter
 │   │   ├── FactDetailsScreen.tsx    # Comprehensive scholarly exegesis details
+│   │   ├── GreekScreen.tsx          # Koine Greek Lexicon & 24-letter Alpha-Omega guide
+│   │   ├── HebrewScreen.tsx         # Ancient Hebrew Lexicon & 22-letter Aleph-Bet guide
 │   │   ├── HistoryScreen.tsx        # Canonical authors & manuscript history
 │   │   ├── NotificationsScreen.tsx  # Full notification & achievement center
 │   │   ├── PastoralCareScreen.tsx   # 24/7 crisis lifelines & scriptural assurance
-│   │   ├── ProfileScreen.tsx        # Settings, reading preferences & saved collection
+│   │   ├── ProfileScreen.tsx        # Settings, reading preferences, The Word & saved collection
 │   │   ├── QuietHoursScreen.tsx     # Consecrated quiet rest & Sabbath scheduling
 │   │   ├── SearchScreen.tsx         # Believer community discovery & scholar profiles
+│   │   ├── StrongsScreen.tsx        # Strong's Concordance bilingual search & exegesis
 │   │   └── WOTDScreen.tsx           # Full 66-book Holy Bible reader & daily exegesis
 │   ├── services/
 │   │   ├── aes256Service.ts         # Hardware-backed AES-256-CBC cryptographic cipher
