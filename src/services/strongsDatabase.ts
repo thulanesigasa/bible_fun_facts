@@ -69,6 +69,16 @@ async function initSchema(db: SQLite.SQLiteDatabase): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_strongs_translit ON strongs_entries(transliteration);
     CREATE INDEX IF NOT EXISTS idx_strongs_english ON strongs_entries(english_word);
     CREATE INDEX IF NOT EXISTS idx_strongs_script ON strongs_entries(original_script);
+
+    CREATE VIRTUAL TABLE IF NOT EXISTS strongs_fts USING fts5(
+      strongs_number UNINDEXED,
+      original_script,
+      transliteration,
+      english_word,
+      short_definition,
+      exhaustive_definition,
+      tokenize='unicode61'
+    );
   `);
 }
 
@@ -157,6 +167,20 @@ export async function seedStrongsDatabase(
               letter,
             ]
           );
+
+          await db.runAsync(
+            `INSERT OR REPLACE INTO strongs_fts (
+              strongs_number, original_script, transliteration, english_word, short_definition, exhaustive_definition
+            ) VALUES (?, ?, ?, ?, ?, ?);`,
+            [
+              entry.strongsNumber,
+              entry.originalScript,
+              entry.transliteration,
+              entry.englishWord || null,
+              entry.shortDefinition,
+              entry.exhaustiveDefinition,
+            ]
+          );
         }
       });
 
@@ -211,6 +235,38 @@ export async function queryStrongsFromDb(params: {
     const conditions: string[] = [];
     const args: any[] = [];
 
+    const limit = params.limit || 50;
+    const offset = params.offset || 0;
+
+    // 1. Attempt rapid FTS5 Full-Text Match if search query is present
+    if (params.query && params.query.trim().length > 0 && (!params.letter || params.letter === 'All')) {
+      try {
+        const cleanQuery = params.query.trim().replace(/['"*^]/g, '');
+        if (cleanQuery.length > 0) {
+          const ftsMatch = `"${cleanQuery}"*`;
+          const langClause = params.language && params.language !== 'all' ? 'AND s.language = ?' : '';
+          const ftsSql = `
+            SELECT s.* FROM strongs_entries s
+            JOIN strongs_fts f ON s.strongs_number = f.strongs_number
+            WHERE strongs_fts MATCH ? ${langClause}
+            ORDER BY s.english_word ASC, s.transliteration ASC
+            LIMIT ? OFFSET ?;
+          `;
+          const ftsArgs: any[] = [ftsMatch];
+          if (params.language && params.language !== 'all') ftsArgs.push(params.language);
+          ftsArgs.push(limit, offset);
+
+          const ftsRows = await db.getAllAsync<any>(ftsSql, ftsArgs);
+          if (ftsRows && ftsRows.length > 0) {
+            return ftsRows.map(rowToLexiconEntry);
+          }
+        }
+      } catch {
+        // Fall through to structured index query
+      }
+    }
+
+    // 2. Structured Index query (with language, letter filter, and LIKE fallback)
     // Language filter
     if (params.language && params.language !== 'all') {
       conditions.push('language = ?');
@@ -223,7 +279,7 @@ export async function queryStrongsFromDb(params: {
       args.push(params.letter.toUpperCase().trim());
     }
 
-    // Search query
+    // Search query fallback
     if (params.query && params.query.trim().length > 0) {
       const q = `%${params.query.trim()}%`;
       conditions.push(
@@ -233,8 +289,6 @@ export async function queryStrongsFromDb(params: {
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-    const limit = params.limit || 50;
-    const offset = params.offset || 0;
 
     const sql = `
       SELECT * FROM strongs_entries

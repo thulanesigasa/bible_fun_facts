@@ -7,7 +7,8 @@
     "dev": "concurrently --kill-others-on-fail --raw \"npx expo start --port 8082\"",
     "android": "expo start --android --port 8082",
     "ios": "expo start --ios --port 8082",
-    "web": "expo start --web --port 8082"
+    "web": "expo start --web --port 8082",
+    "test": "jest"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "3.1.1",
@@ -40,8 +41,11 @@
     "react-native-worklets": "^0.13.0"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/react": "~19.2.3",
     "concurrently": "^10.0.5",
+    "jest": "^30.5.2",
+    "ts-jest": "^29.4.14",
     "typescript": "~5.9.2"
   },
   "private": true

@@ -21,7 +21,9 @@ export default function App() {
           <UserProvider>
             <SafeAreaProvider>
               <StatusBar style="dark" />
-              <AppNavigator />
+              <ErrorBoundary>
+                <AppNavigator />
+              </ErrorBoundary>
               <UpdateModal />
             </SafeAreaProvider>
           </UserProvider>
