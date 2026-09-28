@@ -1794,8 +1794,9 @@ web/
 ├── next.config.ts
 ├── public/
 │   ├── assets/
-│   │   ├── pattern_nextjs.png      # Hero geometric poster graphic
-│   │   ├── desk.jpg                # Featured card study desk photographic header
+│   │   ├── hero_exegesis_pattern.png # Gold sacred exegesis hero poster graphic (#FDD223)
+│   │   ├── pattern_nextjs.png        # Geometric layout poster reference
+│   │   ├── desk.jpg                  # Featured card study desk photographic header
 │   │   ├── component-btn.png       # Layered floating CSS component
 │   │   ├── component-profile-card.png
 │   │   ├── component-info-card.png
