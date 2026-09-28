@@ -13,14 +13,10 @@ export default function TermsPage() {
     <>
       <Header />
       <main>
-        <div className="legal-container">
-          <div className="legal-header">
-            <span className="section-label">Legal</span>
-            <h1 className="section-title" style={{ marginBottom: '8px' }}>Terms of Service</h1>
-            <p style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
-              Last updated: October 2026 &nbsp;•&nbsp; Effective: October 1, 2026
-            </p>
-          </div>
+        <div className="wrap">
+          <article className="legal-body">
+            <h1>Terms of Service</h1>
+            <span className="legal-meta">Last updated: October 2026 · Effective: October 1, 2026</span>
 
           <div className="legal-section">
             <h2>1. Acceptance of Terms</h2>
@@ -118,6 +114,7 @@ export default function TermsPage() {
               GitHub Issues: <a href="https://github.com/thulanesigasa/bible_fun_facts/issues" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-hover)' }}>github.com/thulanesigasa/bible_fun_facts/issues</a>
             </p>
           </div>
+          </article>
         </div>
       </main>
       <Footer />

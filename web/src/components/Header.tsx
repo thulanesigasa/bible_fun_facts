@@ -6,77 +6,44 @@ import Image from 'next/image';
 import { MenuSvg } from './SvgIcons';
 
 export function Header() {
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
     <header className="site-header" id="top">
-      <div className="container nav-wrap">
-        <Link href="/" className="brand-link" aria-label="exégeomai Home">
-          <Image
-            src="/assets/favicon.png"
-            alt="exégeomai Logo"
-            className="brand-logo"
-            width={36}
-            height={36}
-            priority
-          />
-          <div>
+      <div className="wrap">
+        <Link href="/" className="brand" aria-label="exégeomai Home">
+          <Image src="/assets/favicon.png" alt="" className="brand-logo" width={34} height={34} priority />
+          <span>
             <span className="brand-name">exégeomai</span>
-            <div className="brand-tagline">ἐξηγέομαι • Unfold the Word</div>
-          </div>
+            <span className="brand-sub">ἐξηγέομαι · Unfold the Word</span>
+          </span>
         </Link>
 
         <button
-          className="mobile-toggle"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle Navigation Menu"
-          aria-expanded={mobileOpen}
+          className="nav-toggle"
+          onClick={() => setOpen(!open)}
+          aria-label="Toggle menu"
+          aria-expanded={open}
         >
-          <MenuSvg size={24} />
+          <MenuSvg size={22} />
         </button>
 
-        <ul className={`nav-links ${mobileOpen ? 'open' : ''}`} id="navLinks">
-          <li>
-            <Link href="/features" className="nav-link" onClick={() => setMobileOpen(false)}>
-              Features
-            </Link>
-          </li>
-          <li>
-            <Link href="/strongs" className="nav-link" onClick={() => setMobileOpen(false)}>
-              Strong&apos;s Lexicon
-            </Link>
-          </li>
-          <li>
-            <Link href="/security" className="nav-link" onClick={() => setMobileOpen(false)}>
-              Security &amp; Privacy
-            </Link>
-          </li>
-          <li>
-            <Link href="/faq" className="nav-link" onClick={() => setMobileOpen(false)}>
-              FAQ
-            </Link>
-          </li>
-          <li>
-            <Link href="/deletion" className="nav-link" onClick={() => setMobileOpen(false)}>
-              Account Deletion
-            </Link>
-          </li>
-          <li>
-            <Link href="/privacy" className="nav-link" onClick={() => setMobileOpen(false)}>
-              Privacy Policy
-            </Link>
-          </li>
-        </ul>
+        <nav aria-label="Site" className={open ? 'open' : ''}>
+          <Link href="/features"  onClick={() => setOpen(false)}>Features</Link>
+          <Link href="/strongs"   onClick={() => setOpen(false)}>Strong&apos;s Lexicon</Link>
+          <Link href="/security"  onClick={() => setOpen(false)}>Security &amp; Privacy</Link>
+          <Link href="/faq"       onClick={() => setOpen(false)}>FAQ</Link>
+          <Link href="/deletion"  onClick={() => setOpen(false)}>Account Deletion</Link>
+          <Link href="/privacy"   onClick={() => setOpen(false)}>Privacy</Link>
+        </nav>
 
-        <div className="nav-actions">
-          <a
-            href="https://github.com/thulanesigasa/bible_fun_facts/releases/latest"
-            className="btn btn-accent"
-            id="navDownloadBtn"
-          >
-            Download APK
-          </a>
-        </div>
+        <a
+          href="https://github.com/thulanesigasa/bible_fun_facts/releases/latest"
+          className="header-cta"
+          id="navDownloadBtn"
+        >
+          Download APK
+        </a>
       </div>
     </header>
   );
