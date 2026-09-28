@@ -38,6 +38,11 @@ export interface LexiconEntry {
   };
   englishWord?: string;
   relatedStrongs?: string[];
+  phoneticSpelling?: string;
+  kjvTranslations?: string;
+  nasbTranslations?: string;
+  outlineOfBiblicalUsage?: string[];
+  helpsWordStudies?: string;
 }
 
 export interface HebrewLetterGuide {
@@ -1147,3 +1152,21 @@ export function getGreekLexicon(category?: string, query?: string): LexiconEntry
     );
   }).sort((a, b) => (a.englishWord || a.transliteration).localeCompare(b.englishWord || b.transliteration));
 }
+
+export function getLexiconEntryByStrongs(strongsNumber: string): LexiconEntry | undefined {
+  const all = getAllConcordanceEntries();
+  const normalized = strongsNumber.trim().toUpperCase();
+  return all.find((e) => e.strongsNumber.toUpperCase() === normalized);
+}
+
+export function getAdjacentLexiconEntries(currentStrongs: string): { prev?: LexiconEntry; next?: LexiconEntry } {
+  const all = getAllConcordanceEntries();
+  const currentIndex = all.findIndex((e) => e.strongsNumber.toUpperCase() === currentStrongs.toUpperCase());
+  if (currentIndex === -1) return {};
+
+  return {
+    prev: currentIndex > 0 ? all[currentIndex - 1] : undefined,
+    next: currentIndex < all.length - 1 ? all[currentIndex + 1] : undefined,
+  };
+}
+

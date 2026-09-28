@@ -58,6 +58,8 @@ import SecurityPinScreen from '../screens/SecurityPinScreen';
 import StrongsScreen from '../screens/StrongsScreen';
 import HebrewScreen from '../screens/HebrewScreen';
 import GreekScreen from '../screens/GreekScreen';
+import StrongsDetailScreen from '../screens/StrongsDetailScreen';
+import { LexiconEntry } from '../data/lexiconData';
 
 export type AuthStackParamList = {
   Welcome: undefined;
@@ -99,6 +101,7 @@ export type RootStackParamList = {
   Strongs: undefined;
   Hebrew: undefined;
   Greek: undefined;
+  StrongsDetail: { entry: LexiconEntry };
 };
 
 const Tab = createBottomTabNavigator();
@@ -202,7 +205,8 @@ function getTabBarVisibility(route: any, hideTabBar: boolean): 'none' | 'flex' {
     routeName === 'SecurityPin' ||
     routeName === 'Strongs' ||
     routeName === 'Hebrew' ||
-    routeName === 'Greek'
+    routeName === 'Greek' ||
+    routeName === 'StrongsDetail'
   ) {
     return 'none';
   }
@@ -750,6 +754,25 @@ function ProfileStack() {
             fontWeight: 'bold',
             color: '#0F172A',
             fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="StrongsDetail"
+        component={StrongsDetailScreen}
+        options={{
+          headerShown: true,
+          title: "Strong's Lexicon",
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 16,
             fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
           },
           headerTintColor: '#0F172A',

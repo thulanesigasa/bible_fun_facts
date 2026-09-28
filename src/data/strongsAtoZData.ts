@@ -1478,14 +1478,25 @@ export const STRONGS_A_TO_Z_ENTRIES: LexiconEntry[] = [
     language: 'hebrew',
     originalScript: 'חַי / חַיִּים',
     transliteration: 'chay / chayyim',
-    pronunciation: 'khah\'-ee / khah-yeem\'',
+    pronunciation: "khah'-ee / khah-yeem'",
+    phoneticSpelling: "(khah'-ee)",
     partOfSpeech: 'Noun Masculine Plural / Adjective',
     rootOrigin: 'From chayah (H2421), to live, revive, preserve life.',
     shortDefinition: 'Life, living, alive, lifetime, revival, refreshment of spirit.',
     exhaustiveDefinition:
       'Denotes active, vibrant biological, moral, and spiritual existence. Plural of intensity (chayyim) expressing the fullness and manifold dimensions of life.',
+    kjvTranslations: 'life, living, alive, lifetime, lively',
+    nasbTranslations: 'life, living, alive, lifetime, lives, revitalize',
+    outlineOfBiblicalUsage: [
+      '1. living, alive (of humans, beasts, plants)',
+      '2. the vitality or active power of living (Gen 2:7)',
+      '3. lifetime, duration of life on earth',
+      '4. revival, renewal, spiritual refreshment in God (Ps 27:1)',
+    ],
     theologicalSignificance:
       'In Genesis 2:7, God breathed into Adam\'s nostrils the "breath of lives" (nishmat chayyim). Deuteronomy 30:19 commands: "Choose life (chayyim), that both thou and thy seed may live."',
+    helpsWordStudies:
+      'Hebrew chayyim is grammatically a plural of intensity, conveying that God does not merely grant bare biological breath, but an abundant, multi-dimensional fullness of life in covenant relation with Himself.',
     category: 'Creation & Spirit',
     keyScripture: {
       reference: 'Genesis 2:7',
@@ -1494,7 +1505,42 @@ export const STRONGS_A_TO_Z_ENTRIES: LexiconEntry[] = [
       verse: 7,
       snippet: 'And the LORD God formed man of the dust of the ground, and breathed into his nostrils the breath of life; and man became a living soul.',
     },
-    relatedStrongs: ['H2421', 'H5315', 'G2222'],
+    relatedStrongs: ['H2421', 'H5315', 'G2222', 'G2198'],
+  },
+  {
+    strongsNumber: 'G2198',
+    englishWord: 'Life (To Live / Alive)',
+    language: 'greek',
+    originalScript: 'ζάω',
+    transliteration: 'zaó',
+    pronunciation: "zah'-o",
+    phoneticSpelling: "(dzah'-o)",
+    partOfSpeech: 'Verb',
+    rootOrigin: 'A primary verb; to live, breathe, be vital.',
+    shortDefinition: 'To live, to be alive; active, flourishing, real life.',
+    exhaustiveDefinition:
+      'A primary verb; to live (literally or figuratively) -- life(-time), (a-)live(-ly), quick. Denotes living as opposed to dead, enjoying vital activity, recovery from death or sickness, and the spiritual life given through union with Jesus Christ.',
+    kjvTranslations: 'life(-time), (a-)live(-ly), quick',
+    nasbTranslations: 'live, living, lives, alive, life, lived, get their living',
+    outlineOfBiblicalUsage: [
+      '1. to live, be alive (literally or figuratively)',
+      '2. of natural life and vitality in humans and animals',
+      '3. of the living God as the fountain of all life (John 6:57)',
+      '4. to enjoy true spiritual life, blessed in Christ (Gal 2:20)',
+    ],
+    theologicalSignificance:
+      'In Matthew 13:35 and Galatians 2:20 ("I live; yet not I, but Christ liveth in me"), zaó marks life that is continuously animated and energized by the Spirit of God. While bios refers to mortal lifespan and psuche to the individual soul, zaó is the dynamic principle of divine vitality.',
+    helpsWordStudies:
+      "Cognate: 2198 záō — to live, experience God's gift of life. See 2222 (zōē). Záō emphasizes the active, conscious experience of being truly alive in God.",
+    category: 'Christology',
+    keyScripture: {
+      reference: 'Matthew 13:35',
+      book: 'Matthew',
+      chapter: 13,
+      verse: 35,
+      snippet: 'I will utter things which have been kept secret from the foundation of the world.',
+    },
+    relatedStrongs: ['G2222', 'G979', 'G5590', 'H2416'],
   },
   {
     strongsNumber: 'G2222',
@@ -1503,13 +1549,24 @@ export const STRONGS_A_TO_Z_ENTRIES: LexiconEntry[] = [
     originalScript: 'ζωή',
     transliteration: 'zoe',
     pronunciation: 'dzo-ay\'',
+    phoneticSpelling: "(dzo-ay')",
     partOfSpeech: 'Noun Feminine',
     rootOrigin: 'From zao (G2198), to live, have true vitality.',
     shortDefinition: 'The divine, uncreated, eternal life of God; vitality.',
     exhaustiveDefinition:
       'Life in the absolute sense; life as God has it, which He imparted to the Son and which the Son communicates to believers who trust in Him.',
+    kjvTranslations: 'life, lifetime',
+    nasbTranslations: 'life, living, eternal life',
+    outlineOfBiblicalUsage: [
+      '1. life: physical and biological principle of existence',
+      '2. the state of one who is possessed of vitality or is animate',
+      '3. of the absolute fullness of life, both essential and ethical, which belongs to God (John 5:26)',
+      '4. life real and genuine, a life active and vigorous, devoted to God (John 10:10)',
+    ],
     theologicalSignificance:
       'John 1:4 proclaims: "In him was life (zoe); and the life was the light of men." Jesus promised: "I am come that they might have life, and that they might have it more abundantly" (John 10:10).',
+    helpsWordStudies:
+      'Cognate: 2222 zōē — life (physical and spiritual). All life (2222/zōē) comes from and is sustained by God Himself. In the New Testament, zōē refers especially to the divine life of Christ imparted to the believer.',
     category: 'Christology',
     keyScripture: {
       reference: 'John 10:10',

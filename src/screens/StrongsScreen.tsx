@@ -44,6 +44,10 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
     return searchConcordance(searchQuery, selectedLang, selectedLetter);
   }, [searchQuery, selectedLang, selectedLetter]);
 
+  const handleOpenDetail = (entry: LexiconEntry) => {
+    (navigation as any).navigate('StrongsDetail', { entry });
+  };
+
   const handleOpenScripture = (entry: LexiconEntry) => {
     if (entry.keyScripture?.book && entry.keyScripture?.chapter) {
       navigation.navigate('WOTD', {
@@ -76,7 +80,13 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
       <View style={[styles.entryRow, !isLast && styles.rowDivider]}>
         {/* Row Header: English Word & Strong's Number & Language Label */}
         <View style={styles.rowHeader}>
-          <View style={styles.headerLeftWrap}>
+          <TouchableOpacity
+            style={styles.headerLeftWrap}
+            onPress={() => handleOpenDetail(item)}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`Open Lexical Study for ${item.englishWord || item.strongsNumber}`}
+          >
             <Text variant="h3" weight="800" color={colors.textPrimary}>
               {item.englishWord || item.transliteration}
             </Text>
@@ -86,7 +96,7 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
             <Text variant="caption" weight="700" color={colors.textTertiary}>
               {` • ${isHebrew ? 'HEBREW OT' : 'KOINE GREEK NT'}`}
             </Text>
-          </View>
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.shareBtn}
@@ -100,7 +110,13 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
         </View>
 
         {/* Original Script & Transliteration */}
-        <View style={styles.wordRow}>
+        <TouchableOpacity
+          style={styles.wordRow}
+          onPress={() => handleOpenDetail(item)}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel={`Open Lexical Study for ${item.transliteration}`}
+        >
           <Text
             style={[
               styles.originalScriptText,
@@ -119,7 +135,7 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
               </Text>
             ) : null}
           </View>
-        </View>
+        </TouchableOpacity>
 
         {/* Part of Speech & Origin */}
         <View style={styles.metaRow}>
@@ -135,6 +151,19 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
 
         {/* Short Definition */}
         <Text style={styles.definitionText}>{item.shortDefinition}</Text>
+
+        {/* Full Lexical Study Detail Navigation Button */}
+        <TouchableOpacity
+          style={styles.detailStudyLink}
+          onPress={() => handleOpenDetail(item)}
+          activeOpacity={0.75}
+          accessibilityRole="button"
+          accessibilityLabel={`Open Lexical Study for ${item.englishWord || item.strongsNumber}`}
+        >
+          <Text variant="caption" weight="800" color="#0284C7">
+            View Full Lexical Study & Concordance ›
+          </Text>
+        </TouchableOpacity>
 
         {/* Expandable Theological Exegesis (Continuous Body Flow) */}
         {isExpanded && (
@@ -476,7 +505,11 @@ const styles = StyleSheet.create({
     fontSize: 14.5,
     lineHeight: 22,
     color: colors.textPrimary,
-    marginBottom: 8,
+    marginBottom: 4,
+  },
+  detailStudyLink: {
+    paddingVertical: 4,
+    marginBottom: 6,
   },
 
   // Unboxed Theological Exegesis (Part of Body)

@@ -41,6 +41,8 @@
   <img src="https://img.shields.io/badge/Strongs%20Concordance-Hebrew%20H1--H8674%20%7C%20Greek%20G1--G5624-10B981?style=for-the-badge" alt="Strongs Concordance" />
   <img src="https://img.shields.io/badge/Strongs%20A--Z-Exhaustive%20Canonical%20Dictionary-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="Strongs A-Z Dictionary" />
   <img src="https://img.shields.io/badge/Search%20Engine-English%20Lemma%20%7C%20e.g.%20Life%20%26%20Love-10B981?style=for-the-badge" alt="English Lemma Search" />
+  <img src="https://img.shields.io/badge/Strongs%20Detail-Scholarly%20Lexical%20Summary%20%7C%20HELPS%20Word--Studies-0284C7?style=for-the-badge&logo=book&logoColor=white" alt="Strongs Detail Screen" />
+  <img src="https://img.shields.io/badge/Strongs%20Stepper-Previous%20%7C%20Next%20%E2%97%84%20ID%20%E2%96%BA-10B981?style=for-the-badge" alt="Strongs Stepper" />
   <img src="https://img.shields.io/badge/A--Z%20Selector-Horizontal%20Letter%20Bar%20A--Z-FDD223?style=for-the-badge" alt="A-Z Horizontal Letter Bar" />
   <img src="https://img.shields.io/badge/Ancient%20Hebrew-Theological%20Roots%20%7C%20Aleph--Bet%20Guide-FDD223?style=for-the-badge" alt="Ancient Hebrew Lexicon" />
   <img src="https://img.shields.io/badge/Koine%20Greek-Apostolic%20Lexicon%20%7C%20Alpha--Omega%20Guide-10B981?style=for-the-badge" alt="Koine Greek Lexicon" />
@@ -89,6 +91,7 @@ graph TD
     SearchStack --> PastoralCareScreen["PastoralCareScreen (24/7 Lifelines, SADAG & Scriptures)"]
     ProfileStack --> ProfileMain["ProfileScreen (Modular Hub, Saved Collection & Account)"]
     ProfileStack --> StrongsScreen["StrongsScreen (Bilingual Hebrew & Greek Root Concordance)"]
+    ProfileStack --> StrongsDetailScreen["StrongsDetailScreen (Scholarly Lexical Summary, Stepper & HELPS Exegesis)"]
     ProfileStack --> HebrewScreen["HebrewScreen (Ancient Hebrew Roots & 22-Letter Aleph-Bet Guide)"]
     ProfileStack --> GreekScreen["GreekScreen (Koine Greek Lexicon & 24-Letter Alpha-Omega Guide)"]
     ProfileStack --> ReadingSettingsScreen["ReadingSettingsScreen (Reader Typography & Red Letters)"]
@@ -1342,6 +1345,13 @@ A scholarly linguistic suite accessible directly from the Profile Hub under "THE
   - **Segmented Language Filters**: One-tap toggling between `All`, `Hebrew (OT)`, and `Greek (NT)`.
   - **Expandable Exegesis & Share Engine**: Full theological definitions, root etymologies, and one-tap social/notes sharing.
   - **Direct Word Reader Deep-Link**: Tapping any passage snippet navigates straight into the 66-book Holy Bible reader (`WOTDScreen`).
+- **Strong's Lexical Detail Screen (`StrongsDetailScreen.tsx`)**:
+  - **Scholarly Lexical Summary**: Dedicated full-screen linguistic exegesis for any biblical root word (e.g. `2198. zaó` or `2416. chay`), presenting Original Word in 26px script, Part of Speech, Transliteration, Pronunciation, Phonetic Spelling, KJV & NASB translation concordances, and Word Origin.
+  - **Sequential Stepper Navigation**: Bidirectional previous and next navigation (`◄ [ID] [transliteration] | [current] | [transliteration] [ID] ►`) allowing rapid consecutive study through biblical Strong's IDs.
+  - **Numbered Outline of Biblical Usage**: Structured breakdown of nuanced literal, figurative, and spiritual usages across canon.
+  - **Strong's Exhaustive Concordance**: Complete etymological definitions and root derivation notes.
+  - **HELPS Word-studies & Cross-Reference Cognate Chips**: In-depth apostolic and covenant exegesis with interactive clickable cognate chips (e.g. `See 2222 (zōē)`, `See 5590 (psuchē)`, `See 2416 (chay)`) that instantly jump to related roots.
+  - **One-Tap Canonical Scripture Jumping**: Quick Scripture reference bar with direct "Open in Word Reader ›" deep-linking into the 66-book Holy Bible reader (`WOTDScreen`).
 - **Ancient Hebrew Lexicon (`HebrewScreen.tsx`)**:
   - **Thematic Covenant Categories**: Categorized into `Covenant & Names`, `Creation & Spirit`, `Worship & Praise`, and `Righteousness`.
   - **Interactive Aleph-Bet Guide**: Comprehensive reference table of all 22 sacred Hebrew letters (`א` to `ת`), showing phonetic sounds, numeric values (Gematria), and ancient Paleo-Hebrew pictographic meanings (e.g. Ox head = strength/leader, Tent/House = dwelling of God).
@@ -1398,6 +1408,7 @@ bible_fun_facts/
 │   │   ├── QuietHoursScreen.tsx     # Consecrated quiet rest & Sabbath scheduling
 │   │   ├── SearchScreen.tsx         # Believer community discovery & scholar profiles
 │   │   ├── StrongsScreen.tsx        # Strong's Concordance bilingual search & exegesis
+│   │   ├── StrongsDetailScreen.tsx  # Scholarly lexical summary, stepper & HELPS exegesis
 │   │   └── WOTDScreen.tsx           # Full 66-book Holy Bible reader & daily exegesis
 │   ├── services/
 │   │   ├── aes256Service.ts         # Hardware-backed AES-256-CBC cryptographic cipher
