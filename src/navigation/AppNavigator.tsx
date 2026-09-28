@@ -181,6 +181,7 @@ function shouldShowTabHeader(route: any): boolean {
     'Strongs',
     'Hebrew',
     'Greek',
+    'StrongsDetail',
   ];
   return !childScreens.includes(routeName);
 }
