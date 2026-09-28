@@ -1,0 +1,19 @@
+{
+  "name": "exégeomai — Biblical Exegesis & Strong's Concordance",
+  "short_name": "exégeomai",
+  "description": "Scholarly Biblical exegesis application featuring 365 daily devotionals across historical, cultural, and theological lenses, 14,298 Strong's words with SQLite FTS5 search, and 32 offline translations.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F8FAFC",
+  "theme_color": "#FDD223",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/assets/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "books", "reference"]
+}

@@ -5,16 +5,17 @@ import { DeletionForm } from '@/components/DeletionForm';
 
 export const metadata: Metadata = {
   title: 'Account Deletion Request',
-  description: 'Request permanent deletion of your exégeomai account and all associated data. GDPR and Google Play Policy compliant.',
+  description:
+    'Request permanent deletion of your exégeomai account and all associated data. GDPR Article 17 and Google Play policy compliant.',
   robots: { index: true, follow: false },
 };
 
-const deleted = [
-  'Account credentials and profile information',
-  'Reading history and progress tracking',
-  'Bookmarks, highlights, and notes',
-  'Biometric and PIN security configurations',
-  'Any optional cloud-synced data via Supabase',
+const deletedItems = [
+  'Account credentials and profile authentication data',
+  'Reading history, unfolded progress, and streak statistics',
+  'Personal study journals, bookmarks, and highlights',
+  'Biometric and PIN security derivation credentials',
+  'Any optional cloud-synced databases via Supabase',
 ];
 
 export default function DeletionPage() {
@@ -23,44 +24,44 @@ export default function DeletionPage() {
       <Header />
       <main>
         <section className="page-section">
-          <div className="wrap">
-            <header className="section-intro">
-              <h1>Account &amp; Data Deletion Request</h1>
-              <p>
-                You have the right to request permanent deletion of your exégeomai account
-                and all associated personal data — compliant with GDPR Article 17, CCPA,
-                and Google Play data safety requirements.
+          <header className="section-intro">
+            <h1>Account &amp; Data Deletion Request</h1>
+            <p>
+              You have the right to request the permanent erasure of your personal data
+              at any time — compliant with GDPR Article 17, the California Consumer
+              Privacy Act (CCPA), and Google Play Developer Policies.
+            </p>
+          </header>
+
+          <section className="deletion-split">
+            <article className="deletion-col">
+              <h2>What Will Be Erased</h2>
+              <ul>
+                {deletedItems.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+              <p className="notice">
+                Erasure is <strong>permanent and irreversible</strong>. Your data
+                will be permanently purged from all operational stores within 30 days.
               </p>
-            </header>
+            </article>
 
-            <div className="deletion-split">
-              <article className="deletion-col">
-                <h2>What Will Be Deleted</h2>
-                <ul>
-                  {deleted.map((item) => <li key={item}>{item}</li>)}
-                </ul>
-                <p className="notice">
-                  Deletion is <strong>permanent and irreversible</strong>. Your data will
-                  be fully purged within 30 days of your request being confirmed.
-                </p>
-              </article>
+            <article className="deletion-col">
+              <h2>Data Retention Policy</h2>
+              <p>
+                In strict compliance with statutory obligations, only non-personally
+                identifiable telemetry (such as aggregate crash statistics without device
+                identifiers) and mandatory tax records are retained if applicable.
+              </p>
+              <p style={{ marginTop: '16px' }}>
+                All user journals, reading milestones, and credentials are destroyed
+                with cryptographically unrecoverable key erasure.
+              </p>
+            </article>
+          </section>
 
-              <article className="deletion-col">
-                <h2>What Is Retained</h2>
-                <p>
-                  Certain anonymized records may be retained where legally required —
-                  specifically aggregate crash-report metrics (no personal identifiers)
-                  and financial transaction records required by applicable tax law.
-                </p>
-                <p style={{ marginTop: '14px' }}>
-                  All retained records are fully anonymized. No name, email, or device
-                  identifier is included.
-                </p>
-              </article>
-            </div>
-
-            <DeletionForm />
-          </div>
+          <DeletionForm />
         </section>
       </main>
       <Footer />

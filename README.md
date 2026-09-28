@@ -56,6 +56,9 @@
   <img src="https://img.shields.io/badge/Tests-Jest%2015%2F15%20Passing%20(4%20Suites)-10B981?style=for-the-badge&logo=jest&logoColor=white" alt="Jest 15/15 Passing" />
   <img src="https://img.shields.io/badge/Compliance-GDPR%20Purge%20RPC%20%7C%20Inexact%20Alarms-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="GDPR and Store Compliance" />
   <img src="https://img.shields.io/badge/Legal-Static%20HTML%20Privacy%20%26%20Terms-FDD223?style=for-the-badge&logo=html5&logoColor=white" alt="Static HTML Legal Docs" />
+  <img src="https://img.shields.io/badge/Web%20Portal-Responsive%2060--30--10%20Landing%20Site-0284C7?style=for-the-badge&logo=html5&logoColor=white" alt="Responsive Web Portal" />
+  <img src="https://img.shields.io/badge/SEO-JSON--LD%20%7C%20OpenGraph%20%7C%20Sitemap-10B981?style=for-the-badge&logo=google&logoColor=white" alt="SEO Optimized" />
+  <img src="https://img.shields.io/badge/Deletion%20Portal-Google%20Play%20Policy%20Compliant-DC2626?style=for-the-badge&logo=shield&logoColor=white" alt="Account Deletion Portal" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
   <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License MIT" />
 </p>
@@ -1683,12 +1686,19 @@ bible_fun_facts/
 │   ├── pinSecurityService.test.ts   # Salted SHA-256, 4-digit validation & lockout
 │   ├── offlineBibleService.test.ts  # Translation registry, multi-CDN URLs & African Bibles
 │   └── setup.ts                     # Jest environment setup & native polyfills
-├── public/                          # Public static store assets
-│   ├── privacy.html                 # Hosted static HTML Privacy Policy (60-30-10 palette)
-│   └── terms.html                   # Hosted static HTML Terms of Service (60-30-10 palette)
+├── public/                          # Public Web Portal & Static Store Assets (GitHub Pages)
+│   ├── index.html                   # Semantic, responsive 60-30-10 landing page with JSON-LD SEO
+│   ├── style.css                    # Vanilla CSS design system (Slate #F8FAFC, Surface #FFFFFF, Accent #FDD223)
+│   ├── privacy.html                 # Hosted static HTML Privacy Policy
+│   ├── terms.html                   # Hosted static HTML Terms of Service
+│   ├── manifest.json                # Web App Manifest for PWA and installability
+│   ├── robots.txt                   # Search engine crawler instructions
+│   ├── sitemap.xml                  # XML Sitemap for search indexing
+│   ├── favicon.png                  # 512x512 optimized web icon
+│   └── logo.png                     # Transparent high-resolution brand logo
 ├── supabase/migrations/             # Supabase SQL database migrations
 │   └── 20260928000000_add_delete_user_account_rpc.sql # GDPR cascade deletion RPC
-├── app.json                         # Expo configuration (locked runtimeVersion 1.0.4)
+├── app.json                         # Expo configuration (scheme: exegeomai, locked runtimeVersion 1.0.4)
 ├── jest.config.js                   # Jest test runner configuration
 ├── package.json                     # Dependencies, scripts & test suites
 ├── tsconfig.json                    # TypeScript compiler configuration (extends expo/tsconfig.base.json)
@@ -1726,6 +1736,89 @@ npm test
 - **Account Purge RPC**: Implemented `delete_user_account()` in Supabase PostgreSQL to permanently cascade delete `auth.users`, `public.profiles`, favorites, notes, and avatars per GDPR / Google Play requirements.
 - **Static Legal Pages**: Published `public/privacy.html` and `public/terms.html` for Google Play Store listing URLs.
 - **Inexact Alarms**: Removed `SCHEDULE_EXACT_ALARM` from `app.json` to prevent Google Play policy rejections.
+- **Deep Linking**: Configured `"scheme": "exegeomai"` in `app.json` to support universal links and authentication callbacks.
+
+### 5. Next.js Web Portal — Notus-Inspired Zero-Div Semantic Architecture
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Next.js-15.5-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js 15" />
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 19" />
+  <img src="https://img.shields.io/badge/Semantic%20HTML-Zero%20Div%20Architecture-10B981?style=for-the-badge&logo=html5&logoColor=white" alt="Zero Div Semantic HTML" />
+  <img src="https://img.shields.io/badge/Iconography-Zero%20SVG%20%7C%20Typography%20First-FDD223?style=for-the-badge" alt="Zero SVG Typography First" />
+  <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Rule-FDD223?style=for-the-badge" alt="60-30-10 Design System" />
+  <img src="https://img.shields.io/badge/Pages-Dedicated%20Subpage%20Routing-0284C7?style=for-the-badge" alt="Dedicated Subpage Routing" />
+  <img src="https://img.shields.io/badge/GDPR-Article%2017%20Purge%20Portal-DC2626?style=for-the-badge&logo=shield&logoColor=white" alt="GDPR Article 17 Deletion Portal" />
+  <img src="https://img.shields.io/badge/Offline%20Lexicon-Interactive%20FTS5%20Search-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="Interactive FTS5 Search" />
+</p>
+
+The official companion web portal (`web/`) is built on **Next.js 15 App Router** and inspired by the editorial aesthetics of **Notus NextJS**, re-engineered with a strict **zero-div semantic body architecture**:
+
+#### Core Principles & Design System
+- **Strict 60-30-10 Palette**: 60% Dominant Background (`#F8FAFC`), 30% Panel/Surface (`#FFFFFF`), 10% Gold/Amber Accent (`#FDD223` with `#0F172A` high-contrast text).
+- **Zero-Div Body Architecture**: Content flows naturally as part of the document body using HTML5 semantic elements (`main`, `section`, `article`, `header`, `nav`, `aside`, `dl`, `dt`, `dd`, `table`, `form`, `fieldset`, `p`). No nested wrapper `<div>` containers exist in the entire web codebase.
+- **Fluid Bounded Padding**: Replaced `.wrap` container divs with CSS `padding-inline: max(var(--gutter), calc((100% - var(--container)) / 2));` applied directly on sections and headers.
+- **Zero SVG Icons & Zero Pill Badges**: All layout is driven purely by typography (Outfit and Space Mono), high-contrast hierarchy, and semantic data presentation without decorative iconography or pill tags.
+
+#### Dedicated Subpages & Route Structure
+- **`/` (Home Portal)**:
+  - Sticky editorial header with brand and uppercase navigation.
+  - High-impact Notus-style hero with lead narrative, download CTA (`v1.0.4`), and concordance statistics (`dl`, `dt`, `dd`).
+  - Scholarly Exegesis split section contrasting depth vs social gamification.
+  - Dedicated App Portals grid linking to subpages (`/features`, `/strongs`, `/security`, `/faq`, `/deletion`, `/privacy`).
+  - Open Source & Theological Transparency split section detailing MIT licensing and canonical public domain manuscripts.
+  - High-conversion callout banner for native APK release download.
+- **`/features` (Core Capabilities)**:
+  - Deep breakdown of 365 devotionals, 14,298 Strong's entries, 32 offline translations, and biometric security.
+  - Engineering comparison table (`table`, `thead`, `tbody`) contrasting exégeomai vs conventional commercial Bible apps.
+- **`/strongs` (Interactive Concordance Explorer)**:
+  - Live client-side search interface filtering Greek and Hebrew lexical entries in real time.
+  - Instant lookup across concordance numbers (`G1834`, `G26`, `H7225`), original scripts (`ἐξηγέομαι`, `רֵאשִׁית`), transliterations, definitions, and biblical occurrence counts.
+- **`/security` (Cryptographic Specifications)**:
+  - Detailed breakdown of hardware keystore isolation, PBKDF2 PIN hashing (310,000 iterations), and app switcher privacy shielding.
+  - Cryptographic parameters specification table and verified data privacy practices checklist.
+- **`/faq` (Technical FAQ)**:
+  - Interactive semantic definition list accordion (`dl`, `dt`, `button`, `dd`) covering offline usage, privacy model, data deletion, and multi-platform roadmap.
+- **`/deletion` (GDPR Data Deletion Portal)**:
+  - Google Play policy compliant self-service data eradication portal.
+  - Interactive request form with client-side validation, confirmation checkbox, and asynchronous submission handling via `/api/deletion-request`.
+- **`/privacy` & `/terms` (Legal Documents)**:
+  - Authoritative, full-text privacy policy and terms of service formatted as semantic `<article class="legal-body">` sections.
+
+#### Web Directory Structure
+```
+web/
+├── package.json
+├── tsconfig.json
+├── next.config.ts
+├── public/
+│   ├── assets/favicon.png
+│   ├── favicon.ico
+│   ├── robots.txt
+│   └── sitemap.xml
+└── src/
+    ├── app/
+    │   ├── layout.tsx              # Root HTML5 layout with metadata and OpenGraph
+    │   ├── page.tsx                # Notus-inspired Home Portal
+    │   ├── globals.css             # Zero-div semantic design system
+    │   ├── features/page.tsx       # Dedicated Core Features subpage
+    │   ├── strongs/page.tsx        # Dedicated Strong's Lexicon subpage
+    │   ├── security/page.tsx       # Dedicated Security & Privacy subpage
+    │   ├── faq/page.tsx            # Dedicated FAQ subpage
+    │   ├── deletion/page.tsx       # Dedicated GDPR Deletion subpage
+    │   ├── privacy/page.tsx        # Privacy Policy legal document
+    │   ├── terms/page.tsx          # Terms of Service legal document
+    │   └── api/
+    │       └── deletion-request/   # Edge API endpoint for deletion requests
+    └── components/
+        ├── Header.tsx              # Semantic sticky header (zero divs, zero SVGs)
+        ├── Footer.tsx              # Semantic multi-column footer (zero divs, zero SVGs)
+        ├── HeroSection.tsx         # Hero section with stats & subpage links (zero divs)
+        ├── FeaturesSection.tsx     # Feature breakdown & comparison table (zero divs)
+        ├── StrongsSection.tsx      # Interactive lexical search engine (zero divs)
+        ├── SecuritySection.tsx     # Security specs & cryptographic table (zero divs)
+        ├── FaqSection.tsx          # Semantic accordion FAQ (zero divs)
+        └── DeletionForm.tsx        # Self-service GDPR deletion form (zero divs)
+```
 
 ---
 

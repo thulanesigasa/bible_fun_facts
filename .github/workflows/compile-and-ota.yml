@@ -89,6 +89,9 @@ jobs:
           npx tsc --noEmit
           npx expo config --type public
 
+      - name: Execute Automated Jest Test Suite
+        run: npm test
+
       - name: Setup EAS CLI
         uses: expo/expo-github-action@v8
         with:
@@ -209,6 +212,7 @@ jobs:
       - name: Publish APK to GitHub Release Assets
         run: |
           VERSION=$(node -p "require('./app.json').expo.version")
+          RUNTIME_VER=$(node -p "require('./app.json').expo.runtimeVersion")
           BUILD_NUM="${{ inputs.compile_build_number || github.run_number }}"
           RELEASE_TAG="v${VERSION}"
           RELEASE_TITLE="exégeomai v${VERSION}"
@@ -220,8 +224,8 @@ jobs:
           - **Release Tag**: ${RELEASE_TAG}
           - **Build Environment**: GitHub Actions Ubuntu Runner (Java 17 + Gradle)
           - **Native Build Number**: ${BUILD_NUM}
-          - **Runtime Version**: 1.0.1
-          - **OTA Update Support**: Enabled via Expo Updates (runtimeVersion 1.0.1)
+          - **Runtime Version**: ${RUNTIME_VER}
+          - **OTA Update Support**: Enabled via Expo Updates (runtimeVersion ${RUNTIME_VER})
 
           Download the standalone \`exegeomai-v${VERSION}.apk\` below directly from the release Assets."
 

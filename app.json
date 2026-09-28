@@ -2,6 +2,7 @@
   "expo": {
     "name": "exégeomai",
     "slug": "exegeomai",
+    "scheme": "exegeomai",
     "version": "1.0.4",
     "runtimeVersion": "1.0.4",
     "orientation": "portrait",
