@@ -1760,13 +1760,15 @@ The official companion web portal (`web/`) is built on **Next.js 15 App Router**
 - **Zero SVG Icons & Zero Pill Badges**: All layout is driven purely by typography (Outfit and Space Mono), high-contrast hierarchy, and semantic data presentation without decorative iconography or pill tags.
 
 #### Dedicated Subpages & Route Structure
-- **`/` (Home Portal)**:
-  - Sticky editorial header with brand and uppercase navigation.
-  - High-impact Notus-style hero with lead narrative, download CTA (`v1.0.4`), and concordance statistics (`dl`, `dt`, `dd`).
-  - Scholarly Exegesis split section contrasting depth vs social gamification.
-  - Dedicated App Portals grid linking to subpages (`/features`, `/strongs`, `/security`, `/faq`, `/deletion`, `/privacy`).
-  - Open Source & Theological Transparency split section detailing MIT licensing and canonical public domain manuscripts.
-  - High-conversion callout banner for native APK release download.
+- **`/` (Home Portal — Exact Notus NextJS Visual Progression)**:
+  - **Hero Section**: Left-column bold headline, lead narrative, side-by-side action buttons (`GET STARTED`, `GITHUB STAR`), and right-column geometric modernist artwork.
+  - **Angled Transition & 4 Pillars**: Slanted section transition with elevated featured study card on the left and a 2x2 grid of circular emblem feature pillars on the right.
+  - **Strong's Lexical Components**: Left-column typography overview with horizontal tag cloud and `View All Lexicon >>` link; right-column floating layered concordance cards (`G1834`, `G26`, `H7225`).
+  - **Translations Grid**: 2-column, 3-row grid of 6 vibrant colored translation cards (`KJV`, `ESV`, `WEB`, `MSG`, `isiZulu`, `ChiShona`) paired with a translation overview and `View All Translations >>`.
+  - **Cryptographic Architecture & Code Card**: Left-column security checklist; right-column tilted code card previewing SQLite FTS5 and hardware keystore derivation schemas.
+  - **Beautiful Dedicated Pages Trio**: Centered header with 3 interactive preview cards linking directly to `/features`, `/strongs`, and `/security`.
+  - **Open Source Callout**: Dark slate section with MIT circular emblem, GitHub Star CTA, and large Greek watermark graphic.
+  - **Floating CTA Box & Comprehensive Footer**: Elevated white card overlapping the dark section with download action buttons, followed by a 2-column footer with social links, useful links, and legal resources.
 - **`/features` (Core Capabilities)**:
   - Deep breakdown of 365 devotionals, 14,298 Strong's entries, 32 offline translations, and biometric security.
   - Engineering comparison table (`table`, `thead`, `tbody`) contrasting exégeomai vs conventional commercial Bible apps.
