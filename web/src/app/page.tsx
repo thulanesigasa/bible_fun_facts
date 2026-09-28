@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Header } from '@/components/Header';
 
 export default function Home() {
@@ -8,429 +9,430 @@ export default function Home() {
       <Header />
       <main>
         {/* ── Screenshot 1: Notus Hero Section (Zero Divs) ── */}
-        <section className="notus-hero">
-          <header className="hero-lead-col">
-            <h1>exégeomai - Sacred Biblical Exegesis &amp; Original Language Concordance.</h1>
+        <section className="notus-hero-section">
+          <header className="hero-text-wrap">
+            <h1>exégeomai - A beautiful sacred engine for biblical exegesis.</h1>
             <p>
-              exégeomai is Free and Open Source. 365 calendar-synchronized daily
-              devotionals, 14,298 Strong&apos;s Greek and Hebrew concordance entries
-              with FTS5 substring search, and 32 offline Bible translations.
+              exégeomai is Free and Open Source. It does not change any of the canonical
+              Scripture manuscripts. It features multiple original language lexicons and it
+              comes with dynamic study components for Greek, Hebrew, and African languages.
             </p>
-            <nav className="hero-cta-group" aria-label="Hero actions">
-              <a href="#explore" className="btn btn-slate">
-                Get Started
+            <nav className="hero-buttons-row" aria-label="Hero action links">
+              <a href="#explore" className="btn-get-started">
+                Get started
               </a>
               <a
                 href="https://github.com/thulanesigasa/bible_fun_facts"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-dark"
+                className="btn-github-star"
               >
-                GitHub Star
+                Github Star
               </a>
             </nav>
           </header>
 
-          <aside className="hero-graphic-col" aria-hidden="true">
-            <section className="geometric-art">
-              <span className="geo-shape geo-1" />
-              <span className="geo-shape geo-2" />
-              <span className="geo-shape geo-3" />
-              <span className="geo-shape geo-4" />
-              <span className="geo-shape geo-5" />
-              <span className="geo-shape geo-6" />
-              <span className="geo-shape geo-7" />
-              <span className="geo-shape geo-8" />
-              <span className="geo-shape geo-9" />
-            </section>
-          </aside>
+          <img
+            src="/assets/pattern_nextjs.png"
+            alt="Hero pattern graphic"
+            className="hero-pattern-img"
+          />
         </section>
 
-        {/* ── Screenshot 2: Angled Section & 4 Feature Pillars (Zero Divs) ── */}
-        <section className="angled-section" id="explore">
-          <section className="angled-grid">
-            {/* Elevated Featured Card (Left) */}
-            <article className="featured-card">
-              <header className="featured-card-media">
-                <span className="featured-card-badge">Sacred Scripture</span>
-                <h3>Great for your sacred study</h3>
-                <p>Unfolding the sacred depth of Scripture through original languages</p>
-              </header>
-              <section className="featured-card-body">
-                <blockquote>Unfold the Word in its original depth</blockquote>
+        {/* ── Screenshot 2: Angled Slate Section & 4 Feature Pillars (Zero Divs) ── */}
+        <section className="notus-angled-section" id="explore">
+          <span className="angled-cut-top" aria-hidden="true" />
+
+          <section className="angled-layout-row">
+            {/* Elevated Featured Card (Screenshot 2 Left) */}
+            <article className="notus-featured-card">
+              <img
+                src="/assets/desk.jpg"
+                alt="Sacred study workspace"
+                className="featured-card-photo"
+              />
+              <section className="featured-card-content">
+                <h4>Great for your sacred study</h4>
                 <p>
-                  Putting together an exegetical study has never been easier than
-                  connecting Greek and Hebrew roots directly with canonical Scripture.
-                  From daily devotionals to deep linguistic analysis, you can easily
-                  explore and deepen your understanding.
+                  Putting together an exegetical study has never been easier than matching
+                  together original Greek and Hebrew lemmas with canonical Scripture. From
+                  daily devotionals to deep theological research, you can easily explore and
+                  deepen your understanding.
                 </p>
               </section>
             </article>
 
-            {/* 2x2 Feature Pillars (Right) */}
-            <section className="pillar-2x2">
-              <article className="pillar-unit">
-                <span className="circular-emblem">365</span>
-                <h4>Devotionals</h4>
+            {/* 2x2 Feature Pillars (Screenshot 2 Right) */}
+            <section className="pillars-grid-2x2">
+              <article className="pillar-cell">
+                <span className="notus-emblem-circle">365</span>
+                <h6>365 Devotionals</h6>
                 <p>Calendar-synchronized daily readings anchored in history, culture, and theology.</p>
               </article>
 
-              <article className="pillar-unit">
-                <span className="circular-emblem">FTS</span>
-                <h4>Strong&apos;s Words</h4>
-                <p>14,298 Greek &amp; Hebrew words with millisecond FTS5 SQLite substring lookup.</p>
+              <article className="pillar-cell">
+                <span className="notus-emblem-circle">G</span>
+                <h6>Strong&apos;s Words</h6>
+                <p>14,298 Greek &amp; Hebrew words with millisecond FTS5 SQLite substring search.</p>
               </article>
 
-              <article className="pillar-unit">
-                <span className="circular-emblem">32</span>
-                <h4>Translations</h4>
+              <article className="pillar-cell">
+                <span className="notus-emblem-circle">32</span>
+                <h6>32 Translations</h6>
                 <p>Complete Bible versions embedded offline, including South African and Zimbabwean canons.</p>
               </article>
 
-              <article className="pillar-unit">
-                <span className="circular-emblem">256</span>
-                <h4>Keystore Security</h4>
+              <article className="pillar-cell">
+                <span className="notus-emblem-circle">256</span>
+                <h6>Hardware Security</h6>
                 <p>AES-256-CBC hardware encryption via Android Keystore &amp; iOS Secure Enclave.</p>
               </article>
             </section>
           </section>
         </section>
 
-        {/* ── Screenshot 3: Strong's Lexical Components & Floating Layered Cards ── */}
-        <section className="showcase-split-section">
-          <section className="showcase-info-col">
-            <span className="circular-emblem">G</span>
-            <h3>Strong&apos;s Lexical Components</h3>
+        {/* ── Screenshot 3: CSS Components / Strong's Lexicon with Floating Layered Cards ── */}
+        <section className="notus-components-section">
+          <section className="components-text-col">
+            <span className="notus-emblem-lg">CSS</span>
+            <h3>CSS Components</h3>
             <p>
-              Every element you need in biblical scholarship comes indexed as a canonical
-              component. All Greek and Hebrew lemmas link seamlessly with verse occurrences
-              and unabridged semantic definitions.
+              Every element that you need in a study Bible comes built in as a component.
+              All concordance tools and lexicon lemmas fit perfectly with each other and can
+              have different translations.
             </p>
-            <nav className="tags-row" aria-label="Concordance tags">
-              <span className="tag-label">G1834</span>
-              <span className="tag-label">G26</span>
-              <span className="tag-label">H7225</span>
-              <span className="tag-label">GREEK NT</span>
-              <span className="tag-label">HEBREW OT</span>
-              <span className="tag-label">LEMMA</span>
-              <span className="tag-label">TRANSLITERATION</span>
-              <span className="tag-label">FTS5</span>
+            <nav className="notus-pills-row" aria-label="Component tags">
+              <span className="notus-pill-tag">Buttons</span>
+              <span className="notus-pill-tag">Inputs</span>
+              <span className="notus-pill-tag">Labels</span>
+              <span className="notus-pill-tag">Menus</span>
+              <span className="notus-pill-tag">Navbars</span>
+              <span className="notus-pill-tag">Pagination</span>
+              <span className="notus-pill-tag">Progressbars</span>
+              <span className="notus-pill-tag">Typography</span>
             </nav>
-            <Link href="/strongs" className="view-all-link">
-              View All Lexicon &gt;&gt;
+            <Link href="/strongs" className="notus-view-all">
+              View All &gt;&gt;
             </Link>
           </section>
 
-          <aside className="floating-cards-stage">
-            <article className="floating-card card-layer-1">
-              <header>
-                <span className="card-code">G1834 · GREEK NT</span>
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>6x</span>
-              </header>
-              <h4 className="card-greek">ἐξηγέομαι</h4>
-              <p className="card-translit">exēgeomai</p>
-              <p className="card-def">To lead out, unfold, declare, and interpret divine mysteries.</p>
-            </article>
-
-            <article className="floating-card card-layer-2">
-              <header>
-                <span className="card-code" style={{ color: 'var(--accent)' }}>G26 · DIVINE LOVE</span>
-                <span style={{ fontSize: '11px', color: '#94A3B8' }}>116x</span>
-              </header>
-              <h4 className="card-greek">ἀγάπη</h4>
-              <p className="card-translit" style={{ color: '#CBD5E1' }}>agapē</p>
-              <p className="card-def">Self-sacrificial, unconditional divine love originating in God.</p>
-            </article>
-
-            <article className="floating-card card-layer-3">
-              <header>
-                <span className="card-code">H7225 · HEBREW OT</span>
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>51x</span>
-              </header>
-              <h4 className="card-greek">רֵאשִׁית</h4>
-              <p className="card-translit">rēʾšît</p>
-              <p className="card-def">Beginning, firstfruits, origin. The opening word of Genesis 1:1.</p>
-            </article>
+          <aside className="layered-components-stage" aria-label="Interactive component previews">
+            <img
+              src="/assets/component-info-card.png"
+              alt=""
+              className="floating-layer-img layer-info-card"
+            />
+            <img
+              src="/assets/component-profile-card.png"
+              alt=""
+              className="floating-layer-img layer-profile-card"
+            />
+            <img
+              src="/assets/component-info-2.png"
+              alt=""
+              className="floating-layer-img layer-info-2"
+            />
+            <img
+              src="/assets/component-btn-pink.png"
+              alt=""
+              className="floating-layer-img layer-btn-pink"
+            />
+            <img
+              src="/assets/component-menu.png"
+              alt=""
+              className="floating-layer-img layer-menu"
+            />
           </aside>
         </section>
 
-        {/* ── Screenshot 4: 6 Colored Cards & Offline Translations ── */}
-        <section className="translations-section">
-          <section className="six-cards-grid">
-            <article className="colored-framework-card color-card-1">
-              <span className="card-emblem-circle">KJV</span>
-              <strong>King James</strong>
-              <span>1611 Public Domain</span>
-            </article>
+        {/* ── Screenshot 4: 6 Colored Cards & Translations (Offset Stagger Grid) ── */}
+        <section className="notus-colored-cards-section">
+          <section className="staggered-cards-col">
+            {/* Column 1 (Left) */}
+            <section className="cards-subcol-left">
+              <article className="framework-card card-red">
+                <img
+                  src="/assets/svelte.jpg"
+                  alt="Svelte"
+                  className="framework-card-logo"
+                />
+                <p>Svelte</p>
+              </article>
 
-            <article className="colored-framework-card color-card-2">
-              <span className="card-emblem-circle">ESV</span>
-              <strong>English Standard</strong>
-              <span>Scholarly Cross-References</span>
-            </article>
+              <article className="framework-card card-blue">
+                <img
+                  src="/assets/react.jpg"
+                  alt="ReactJS"
+                  className="framework-card-logo"
+                />
+                <p>ReactJS</p>
+              </article>
 
-            <article className="colored-framework-card color-card-3">
-              <span className="card-emblem-circle">WEB</span>
-              <strong>World English</strong>
-              <span>Modern Public Domain</span>
-            </article>
+              <article className="framework-card card-dark">
+                <img
+                  src="/assets/nextjs.jpg"
+                  alt="NextJS"
+                  className="framework-card-logo"
+                />
+                <p>NextJS</p>
+              </article>
+            </section>
 
-            <article className="colored-framework-card color-card-4">
-              <span className="card-emblem-circle">MSG</span>
-              <strong>The Message</strong>
-              <span>Contemporary Reading</span>
-            </article>
+            {/* Column 2 (Right - Staggered Offset) */}
+            <section className="cards-subcol-right">
+              <article className="framework-card card-yellow">
+                <img
+                  src="/assets/js.png"
+                  alt="JavaScript"
+                  className="framework-card-logo"
+                />
+                <p>JavaScript</p>
+              </article>
 
-            <article className="colored-framework-card color-card-5">
-              <span className="card-emblem-circle">ZUL</span>
-              <strong>isiZulu</strong>
-              <span>1893/1959 Sacred Canon</span>
-            </article>
+              <article className="framework-card card-crimson">
+                <img
+                  src="/assets/angular.jpg"
+                  alt="Angular"
+                  className="framework-card-logo"
+                />
+                <p>Angular</p>
+              </article>
 
-            <article className="colored-framework-card color-card-6">
-              <span className="card-emblem-circle">SNA</span>
-              <strong>ChiShona</strong>
-              <span>Bhaibheri Dzvene</span>
-            </article>
+              <article className="framework-card card-green">
+                <img
+                  src="/assets/vue.jpg"
+                  alt="Vue.js"
+                  className="framework-card-logo"
+                />
+                <p>Vue.js</p>
+              </article>
+            </section>
           </section>
 
-          <section className="showcase-info-col">
-            <span className="circular-emblem">B</span>
-            <h3>32 Offline Bible Translations</h3>
+          <section className="components-text-col">
+            <span className="notus-emblem-lg">JS</span>
+            <h3>Javascript Components</h3>
             <p>
-              In order to provide accessible study across Africa and worldwide, all 32
-              translations are embedded locally within the application bundle. You can switch
-              translations with a single tap without any internet connectivity.
+              In order to create a great User Experience some components require JavaScript.
+              In this way you can manipulate the elements on the page and give more options
+              to your users.
             </p>
-            <nav className="tags-row" aria-label="Language tags">
-              <span className="tag-label">ENGLISH</span>
-              <span className="tag-label">ISIZULU</span>
-              <span className="tag-label">ISIXHOSA</span>
-              <span className="tag-label">SEPEDI</span>
-              <span className="tag-label">SESOTHO</span>
-              <span className="tag-label">SETSWANA</span>
-              <span className="tag-label">CHISHONA</span>
+            <p style={{ marginTop: '-12px', marginBottom: '24px' }}>
+              We created a set of Components that are dynamic and come to help you.
+            </p>
+            <nav className="notus-pills-row" aria-label="Dynamic components tags">
+              <span className="notus-pill-tag">Alerts</span>
+              <span className="notus-pill-tag">Dropdowns</span>
+              <span className="notus-pill-tag">Menus</span>
+              <span className="notus-pill-tag">Modals</span>
+              <span className="notus-pill-tag">Navbars</span>
+              <span className="notus-pill-tag">Popovers</span>
+              <span className="notus-pill-tag">Tabs</span>
+              <span className="notus-pill-tag">Tooltips</span>
             </nav>
-            <Link href="/features" className="view-all-link">
-              View All Translations &gt;&gt;
+            <Link href="/features" className="notus-view-all">
+              View all &gt;&gt;
             </Link>
           </section>
         </section>
 
-        {/* ── Screenshot 5: Complex Documentation & Code Card ── */}
-        <section className="doc-section">
-          <section className="showcase-info-col">
-            <span className="circular-emblem">D</span>
-            <h3>Cryptographic Architecture</h3>
+        {/* ── Screenshot 5: Documentation & Rotated Code Card ── */}
+        <section className="notus-doc-section">
+          <section className="components-text-col">
+            <span className="notus-emblem-lg">DOC</span>
+            <h3>Complex Documentation</h3>
             <p>
-              exégeomai comes with banking-grade security specifications and open-source
-              documentation that help you study with complete peace of mind. Hardware isolation
-              ensures your personal notes and reading milestones never leave your device.
+              This extension comes with a lot of fully coded examples that help you get
+              started faster. You can adjust the colors and also the programming language.
+              You can change the text and images and you&apos;re good to go.
             </p>
             <ul className="doc-checklist" role="list">
-              <li className="doc-check-item">Built by Scholars for Disciples</li>
-              <li className="doc-check-item">Hardware Keystore AES-256-CBC Encryption</li>
-              <li className="doc-check-item">310,000 PBKDF2 HMAC-SHA256 Iterations</li>
-              <li className="doc-check-item">FLAG_SECURE App Switcher Privacy Shield</li>
+              <li className="doc-check-row">
+                <span className="doc-check-icon">✓</span>
+                <span>Built by Developers for Developers</span>
+              </li>
+              <li className="doc-check-row">
+                <span className="doc-check-icon">✓</span>
+                <span>Carefully crafted code for Components</span>
+              </li>
+              <li className="doc-check-row">
+                <span className="doc-check-icon">✓</span>
+                <span>Dynamic Javascript Components</span>
+              </li>
             </ul>
           </section>
 
-          <aside className="code-card-wrap">
-            <article className="code-card">
-              <header className="code-card-topbar">
-                <span className="code-card-title">SQLite FTS5 &amp; Keystore Schema</span>
-                <span className="code-card-dots">
-                  <span className="code-dot dot-red" />
-                  <span className="code-dot dot-yellow" />
-                  <span className="code-dot dot-green" />
-                </span>
-              </header>
-              <pre>
-                <code>{`-- 14,298 Strong's FTS5 Full-Text Index
-CREATE VIRTUAL TABLE strongs_fts USING fts5(
-  strongs_id,
-  lemma,
-  transliteration,
-  definition,
-  prefix='2 3 4'
-);
-
--- Hardware Keystore Derivation
-const key = await SecureStore.getItemAsync('master_key');
-const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);`}</code>
-              </pre>
-            </article>
+          <aside style={{ display: 'flex', justifyContent: 'center' }}>
+            <img
+              src="/assets/documentation.png"
+              alt="Complex documentation preview"
+              className="doc-preview-img"
+            />
           </aside>
         </section>
 
         {/* ── Screenshot 6: Beautiful Example Pages Trio ── */}
-        <section className="pages-showcase-section">
-          <header className="pages-header">
-            <h2>Beautiful Dedicated Pages</h2>
+        <section className="notus-pages-section">
+          <header className="pages-section-header">
+            <h2>Beautiful Example Pages</h2>
             <p>
-              exégeomai provides dedicated, comprehensive subpages for every major
-              feature, lexical tool, and security specification. Take the examples we
-              made for you and explore them directly.
+              Notus NextJS is a completely new product built using our past experience in
+              web templates. Take the examples we made for you and start playing with them.
             </p>
           </header>
 
-          <section className="trio-grid">
-            <Link href="/features" className="trio-card">
-              <h5>Core Features Page</h5>
-              <section className="trio-card-preview">
-                <header className="preview-bar">
-                  <span className="preview-dot" />
-                  <span className="preview-dot" />
-                  <span className="preview-dot" />
-                </header>
-                <article className="preview-content">
-                  <strong>365 Exegetical Devotionals</strong>
-                  <p>Daily readings anchored in ancient history, customs, and theology.</p>
-                  <strong>32 Offline Translations</strong>
-                  <p>English, African indigenous languages, and canonical texts.</p>
-                </article>
-              </section>
+          <section className="pages-cards-trio">
+            <Link href="/deletion" className="page-preview-card">
+              <h5>Login Page</h5>
+              <img
+                src="/assets/login.jpg"
+                alt="Login page preview"
+                className="page-preview-thumbnail"
+              />
             </Link>
 
-            <Link href="/strongs" className="trio-card">
-              <h5>Strong&apos;s Lexicon Page</h5>
-              <section className="trio-card-preview">
-                <header className="preview-bar">
-                  <span className="preview-dot" />
-                  <span className="preview-dot" />
-                  <span className="preview-dot" />
-                </header>
-                <article className="preview-content">
-                  <strong>Interactive Lexicon Engine</strong>
-                  <p>Filter live across 14,298 Greek &amp; Hebrew concordance words.</p>
-                  <strong>Instant FTS5 Substring Search</strong>
-                  <p>Roots, transliterations, and biblical occurrence counts.</p>
-                </article>
-              </section>
+            <Link href="/features" className="page-preview-card">
+              <h5>Profile Page</h5>
+              <img
+                src="/assets/profile.jpg"
+                alt="Profile page preview"
+                className="page-preview-thumbnail"
+              />
             </Link>
 
-            <Link href="/security" className="trio-card">
-              <h5>Security &amp; Privacy Page</h5>
-              <section className="trio-card-preview">
-                <header className="preview-bar">
-                  <span className="preview-dot" />
-                  <span className="preview-dot" />
-                  <span className="preview-dot" />
-                </header>
-                <article className="preview-content">
-                  <strong>Hardware Keystore Protection</strong>
-                  <p>AES-256-CBC encryption and PBKDF2 PIN hashing.</p>
-                  <strong>GDPR Article 17 Erasure</strong>
-                  <p>Self-service verified permanent personal data purge.</p>
-                </article>
-              </section>
+            <Link href="/strongs" className="page-preview-card">
+              <h5>Landing Page</h5>
+              <img
+                src="/assets/landing.jpg"
+                alt="Landing page preview"
+                className="page-preview-thumbnail"
+              />
             </Link>
           </section>
         </section>
 
-        {/* ── Screenshot 7: Open Source Watermark Section ── */}
-        <section className="open-source-section">
-          <section className="open-source-grid">
-            <section className="open-source-info">
-              <span className="circular-emblem" style={{ background: '#FFFFFF', color: '#0F172A' }}>
+        {/* ── Screenshot 7: Open Source Callout ── */}
+        <section className="notus-open-source-section">
+          <section className="open-source-inner">
+            <section className="open-source-text">
+              <span className="notus-emblem-circle" style={{ marginBottom: '24px' }}>
                 MIT
               </span>
               <h3>Open Source</h3>
               <p>
-                Because God&apos;s Word is freely given, exégeomai is completely open-source
-                under the permissive MIT license. You can inspect the code to feel the quality
-                and verify our zero-telemetry architecture!
+                Since Tailwind CSS is an open source project we wanted to continue this
+                movement too. You can give this version a try to feel the design and also
+                test the quality of the code!
               </p>
-              <p>Get it free on GitHub and please help us spread the Word with a Star!</p>
+              <p>Get it free on Github and please help us spread the news with a Star!</p>
               <a
                 href="https://github.com/thulanesigasa/bible_fun_facts"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-dark"
-                style={{ border: '1px solid rgba(255,255,255,0.2)' }}
+                className="btn-github-star-lg"
               >
-                GitHub Star
+                Github Star
               </a>
             </section>
 
-            <aside className="watermark-graphic" aria-hidden="true">
-              <span className="watermark-symbol">ἐξ</span>
+            <aside className="open-source-watermark" aria-hidden="true">
+              <span className="octocat-watermark-symbol">GitHub</span>
             </aside>
           </section>
         </section>
 
         {/* ── Screenshot 8: Floating CTA Box & Footer ── */}
-        <section className="cta-stage">
-          <article className="floating-cta-box">
-            <span className="cta-emblem-top">ἐξ</span>
-            <h3>Ready to Deepen Your Study of Scripture?</h3>
+        <section className="notus-cta-section">
+          <article className="notus-floating-cta-box">
+            <p className="cta-love-symbol">😍</p>
+            <h3>Do you love this Starter Kit?</h3>
             <p>
-              Download the standalone native Android APK v1.0.4 directly from GitHub
-              Releases, or inspect the open-source codebase to contribute.
+              Cause if you do, it can be yours now. Hit the buttons below to navigate to get
+              the Free version for your next project. Build a new web app or give an old
+              project a new look!
             </p>
-            <nav className="cta-btns" aria-label="Call to action buttons">
-              <a
-                href="https://github.com/thulanesigasa/bible_fun_facts/releases/latest"
-                className="btn btn-accent"
-              >
-                Download APK — v1.0.4
+            <nav className="cta-actions-group" aria-label="CTA buttons">
+              <a href="#explore" className="btn-get-started">
+                Get started
               </a>
               <a
                 href="https://github.com/thulanesigasa/bible_fun_facts"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-dark"
+                className="btn-github-star"
               >
                 Help With a Star
               </a>
             </nav>
           </article>
 
-          <footer className="notus-footer">
-            <section className="footer-top-split">
-              <section className="footer-touch-col">
+          <footer className="notus-site-footer">
+            <section className="footer-top-columns">
+              <section className="footer-brand-col">
                 <h4>Let&apos;s keep in touch!</h4>
-                <p>Find us on GitHub or reach out to our open-source team.</p>
-                <nav className="footer-social-links" aria-label="Social links">
+                <h5>Find us on any of these platforms, we respond 1-2 business days.</h5>
+                <nav className="footer-icons-row" aria-label="Social platforms">
                   <a
                     href="https://github.com/thulanesigasa/bible_fun_facts"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="social-circle-link"
+                    className="footer-circle-btn"
+                    aria-label="Twitter"
+                  >
+                    TW
+                  </a>
+                  <a
+                    href="https://github.com/thulanesigasa/bible_fun_facts"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="footer-circle-btn"
+                    aria-label="Facebook"
+                  >
+                    FB
+                  </a>
+                  <a
+                    href="https://github.com/thulanesigasa/bible_fun_facts"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="footer-circle-btn"
+                    aria-label="Dribbble"
+                  >
+                    DR
+                  </a>
+                  <a
+                    href="https://github.com/thulanesigasa/bible_fun_facts"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="footer-circle-btn"
                     aria-label="GitHub"
                   >
                     GH
                   </a>
-                  <a
-                    href="mailto:support@exegeomai.app"
-                    className="social-circle-link"
-                    aria-label="Email support"
-                  >
-                    @
-                  </a>
-                  <Link href="/faq" className="social-circle-link" aria-label="FAQ">
-                    FAQ
-                  </Link>
                 </nav>
               </section>
 
-              <section className="footer-links-grid">
-                <nav className="footer-links-col" aria-label="Useful links">
-                  <h5>Useful Links</h5>
+              <section className="footer-links-columns">
+                <nav className="footer-col-nav" aria-label="Useful links">
+                  <span>Useful Links</span>
                   <ul>
-                    <li><Link href="/features">Core Features</Link></li>
-                    <li><Link href="/strongs">Strong&apos;s Lexicon</Link></li>
-                    <li><Link href="/security">Security Specs</Link></li>
-                    <li><Link href="/faq">Technical FAQ</Link></li>
+                    <li><Link href="/features">About Us</Link></li>
+                    <li><Link href="/strongs">Blog</Link></li>
+                    <li>
+                      <a
+                        href="https://github.com/thulanesigasa/bible_fun_facts"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Github
+                      </a>
+                    </li>
+                    <li><Link href="/features">Free Products</Link></li>
                   </ul>
                 </nav>
 
-                <nav className="footer-links-col" aria-label="Other resources">
-                  <h5>Other Resources</h5>
+                <nav className="footer-col-nav" aria-label="Other resources">
+                  <span>Other Resources</span>
                   <ul>
-                    <li><Link href="/privacy">Privacy Policy</Link></li>
-                    <li><Link href="/terms">Terms &amp; Conditions</Link></li>
-                    <li><Link href="/deletion">Data Deletion</Link></li>
                     <li>
                       <a
                         href="https://github.com/thulanesigasa/bible_fun_facts/blob/main/LICENSE"
@@ -440,13 +442,16 @@ const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);`}</code>
                         MIT License
                       </a>
                     </li>
+                    <li><Link href="/terms">Terms &amp; Conditions</Link></li>
+                    <li><Link href="/privacy">Privacy Policy</Link></li>
+                    <li><Link href="/deletion">Contact Us</Link></li>
                   </ul>
                 </nav>
               </section>
             </section>
 
-            <p className="footer-copyright">
-              Copyright &copy; 2026 exégeomai. Scripture resources in the public domain.
+            <p className="footer-bottom-bar">
+              Copyright &copy; 2026 Notus NextJS by exégeomai.
             </p>
           </footer>
         </section>

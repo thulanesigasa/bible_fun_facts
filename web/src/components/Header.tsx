@@ -1,54 +1,74 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export function Header() {
-  const [open, setOpen] = useState(false);
-
   return (
-    <header className="site-header" id="top">
-      <Link href="/" className="brand" aria-label="exégeomai Home">
-        <Image
-          src="/assets/favicon.png"
-          alt=""
-          className="brand-logo"
-          width={34}
-          height={34}
-          priority
-        />
-        <span className="brand-info">
-          <span className="brand-name">exégeomai</span>
-          <span className="brand-sub">ἐξηγέομαι · Unfold the Word</span>
-        </span>
-      </Link>
+    <header className="notus-navbar" id="top">
+      <nav className="navbar-container" aria-label="Main Navigation">
+        <Link href="/" className="navbar-brand">
+          <Image
+            src="/assets/favicon.png"
+            alt=""
+            width={24}
+            height={24}
+            className="navbar-brand-logo"
+            priority
+          />
+          <span>exégeomai</span>
+        </Link>
 
-      <button
-        type="button"
-        className="nav-toggle"
-        onClick={() => setOpen(!open)}
-        aria-label="Toggle navigation menu"
-        aria-expanded={open}
-      >
-        MENU
-      </button>
+        <ul className="navbar-left-links" role="list">
+          <li>
+            <Link href="/features" className="navbar-link">
+              Docs
+            </Link>
+          </li>
+        </ul>
 
-      <nav className={`site-nav ${open ? 'open' : ''}`} aria-label="Site">
-        <Link href="/features" onClick={() => setOpen(false)}>Features</Link>
-        <Link href="/strongs" onClick={() => setOpen(false)}>Strong&apos;s Lexicon</Link>
-        <Link href="/security" onClick={() => setOpen(false)}>Security &amp; Privacy</Link>
-        <Link href="/faq" onClick={() => setOpen(false)}>FAQ</Link>
-        <Link href="/deletion" onClick={() => setOpen(false)}>Account Deletion</Link>
+        <ul className="navbar-right-links" role="list">
+          <li>
+            <Link href="/features" className="navbar-link">
+              Features
+            </Link>
+          </li>
+          <li>
+            <Link href="/strongs" className="navbar-link">
+              Strong&apos;s
+            </Link>
+          </li>
+          <li>
+            <Link href="/security" className="navbar-link">
+              Security
+            </Link>
+          </li>
+          <li>
+            <Link href="/faq" className="navbar-link">
+              FAQ
+            </Link>
+          </li>
+          <li>
+            <a
+              href="https://github.com/thulanesigasa/bible_fun_facts"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="navbar-link"
+            >
+              GitHub
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://github.com/thulanesigasa/bible_fun_facts/releases/latest"
+              className="btn-nav-download"
+            >
+              Download
+            </a>
+          </li>
+        </ul>
       </nav>
-
-      <a
-        href="https://github.com/thulanesigasa/bible_fun_facts/releases/latest"
-        className="header-cta"
-        id="navDownloadBtn"
-      >
-        Download APK
-      </a>
     </header>
   );
 }
