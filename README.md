@@ -1793,7 +1793,21 @@ web/
 ├── tsconfig.json
 ├── next.config.ts
 ├── public/
-│   ├── assets/favicon.png
+│   ├── assets/
+│   │   ├── pattern_nextjs.png      # Hero geometric poster graphic
+│   │   ├── desk.jpg                # Featured card study desk photographic header
+│   │   ├── component-btn.png       # Layered floating CSS component
+│   │   ├── component-profile-card.png
+│   │   ├── component-info-card.png
+│   │   ├── component-info-2.png
+│   │   ├── component-menu.png
+│   │   ├── component-btn-pink.png
+│   │   ├── documentation.png       # 3D perspective rotated preview
+│   │   ├── login.jpg               # Example pages login preview
+│   │   ├── profile.jpg             # Example pages profile preview
+│   │   ├── landing.jpg             # Example pages landing preview
+│   │   ├── svelte.jpg, react.jpg, nextjs.jpg, js.png, angular.jpg, vue.jpg
+│   │   └── favicon.png
 │   ├── favicon.ico
 │   ├── robots.txt
 │   └── sitemap.xml
