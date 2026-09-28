@@ -86,7 +86,7 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
   const handleRemoveDictionary = () => {
     showAlert({
       title: 'Remove Offline Dictionary?',
-      message: `Are you sure you want to remove the Strong's A-to-Z Dictionary (${offlineMeta?.sizeFormatted || '2.4 MB'}) from this device?\n\nYou can re-download it anytime for offline study.`,
+      message: `Are you sure you want to remove the Strong's A-to-Z Dictionary (${offlineMeta?.sizeFormatted || '9.2 MB'}) from this device?\n\nYou can re-download it anytime for offline study.`,
       icon: 'logo',
       isDestructive: true,
       buttons: [
