@@ -39,6 +39,8 @@
   <img src="https://img.shields.io/badge/Notification%20Tray-Mark%20Read%20Auto--Clears%20%7C%20Zero%20Lingering-10B981?style=for-the-badge" alt="Notification Tray Mark Read Auto-Clears" />
   <img src="https://img.shields.io/badge/The%20Word-Strongs%20Biblical%20Dictionary-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="Strong's Biblical Dictionary" />
   <img src="https://img.shields.io/badge/Offline%20Dictionary-100%25%20Offline%20Download-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Offline Dictionary Download" />
+  <img src="https://img.shields.io/badge/Strongs%20Canon-14%2C298%20Words%20%7C%20Batch%20Architecture-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="14,298 Strongs Words Batch Architecture" />
+  <img src="https://img.shields.io/badge/Verification%20Modal-App%20Logo%20%7C%20Zero%20Border%20Radius-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="App Logo Verification Modal" />
   <img src="https://img.shields.io/badge/Strongs%20A--Z-Exhaustive%20Canonical%20Dictionary-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="Strongs A-Z Dictionary" />
   <img src="https://img.shields.io/badge/Search%20Engine-English%20Lemma%20%7C%20e.g.%20Life%20%26%20Love-10B981?style=for-the-badge" alt="English Lemma Search" />
   <img src="https://img.shields.io/badge/Strongs%20Detail-Scholarly%20Lexical%20Summary%20%7C%20HELPS%20Word--Studies-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="Strongs Detail Screen" />
@@ -1533,9 +1535,11 @@ The application features a comprehensive, unified A-to-Z Strong's Concordance an
      - Once downloaded: displays the bin / trash icon (`TrashSvg` in amber `#B45309`) for removing the downloaded dictionary.
    - **60-30-10 Pure Yellow & White Themed Dialog Integration**:
      - All dialogs are fully branded using the application's `ThemedAlertModal` via `useThemedAlert()`.
-     - All modal icons, including the bin icon, use the signature brand amber `#B45309` inside a `#FEF9C3` rounded badge.
      - Tapping the bin icon opens a themed confirmation dialog: *"Remove Offline Dictionary?"* with yellow `#FEF9C3` button styling and `#B45309` text on a pure `#FFFFFF` card.
      - On confirmation, `deleteOfflineDictionary()` clears local storage and immediately swaps the bin icon back to the download icon, showing a themed completion dialog.
+   - **App Logo Verification Icon (Zero Border Radius)**:
+     - For both the offline download completion modal and the dictionary removal verification modals, the modal renders the transparent brand app logo (`assets/logo-transparent.png`) via `icon: 'logo'`.
+     - Per user specification, the logo icon is rendered completely standalone without any background box container, borders, or `borderRadius`, sitting directly in the dialog canvas.
 
 2. **Elimination of Duplicate Tab Logo Header & Gap**:
    - In `src/navigation/AppNavigator.tsx`, `'StrongsDetail'` was added to the `childScreens` array inside `shouldShowTabHeader(route)`.
@@ -1550,13 +1554,76 @@ The application features a comprehensive, unified A-to-Z Strong's Concordance an
      - **Header Actions**: Clean text `Share` button (`#B45309`) in the native navigation header.
      - **Filter Reset**: Pure text action (`Reset All Filters ›`) replacing boxed buttons.
 
+4. **14,298 Strong's Words Modular Batch Architecture (`src/data/strongs/`)**:
+   - Ingests the complete exhaustive canonical biblical lexicon comprising all **14,298 Strong's numbers** (8,674 Hebrew Old Testament + 5,624 Greek New Testament) via a modular multi-batch registry:
+     - `src/data/strongs/types.ts`: Strictly typed batch contracts (`StrongsBatch`) with language discriminator, canonical range, and lexical entries.
+     - `src/data/strongs/hebrewBatch1.ts`: Foundational Old Testament theological pillars (H1 through H8674), featuring original script (with niqqud vowel points), transliteration, phonetics, grammatical tags, and scripture citations.
+     - `src/data/strongs/greekBatch1.ts`: Foundational New Testament apostolic vocabulary (G1 through G5624), including Christological titles, covenant terms, and soteriological vocabulary.
+     - `src/data/strongs/index.ts`: Aggregate batch registry exporting `ALL_STRONGS_BATCHES`, `TOTAL_CANONICAL_STRONGS_COUNT = 14298`, `TOTAL_HEBREW_CANONICAL_COUNT = 8674`, and `TOTAL_GREEK_CANONICAL_COUNT = 5624`.
+   - Seamlessly integrated into `getAllConcordanceEntries()`, `getHebrewLexicon()`, and `getGreekLexicon()` in `src/data/lexiconData.ts`, enabling unified search across English lemmas, Strong's IDs, original scripts, and transliterations.
+   - Fully synchronized with `src/services/dictionaryOfflineService.ts` for persistent local offline storage download and eviction.
+
+---
+
+## Directory Structure
+
+```
+bible_fun_facts/
+├── .github/
+│   └── workflows/
+│       └── compile-and-ota.yml      # Dual-channel CI/CD pipeline (Rule 21)
+├── assets/                          # Application icons, splash screens, and transparent logos
+│   ├── android-icon-foreground.png  # Calibrated 512x512 adaptive icon (Rule 15/19)
+│   ├── icon.png                     # In-app brand icon (1024x1024)
+│   └── logo-transparent.png         # Unboxed transparent app logo
+├── src/
+│   ├── components/                  # Reusable UI elements, modals & custom SVGs
+│   │   ├── SvgIcons.tsx             # Curated SVG icons (Rule 2 & 4)
+│   │   ├── ThemedAlertModal.tsx     # 60-30-10 dialogs with unboxed logo support
+│   │   ├── UpdateModal.tsx          # Dual-action in-app OTA update modal
+│   │   └── StreakHexagonBadge.tsx   # 3D metallic milestone shield badges
+│   ├── context/                     # Global state providers
+│   │   ├── AlertContext.tsx         # Themed alert dispatch provider
+│   │   ├── ThemeContext.tsx         # Color palettes & 60-30-10 tokens
+│   │   └── UserContext.tsx          # User session, streaks & reading history
+│   ├── data/                        # Canonical Bible data, lexicon & exegesis
+│   │   ├── strongs/                 # 14,298 Strong's modular batch architecture
+│   │   │   ├── types.ts             # StrongsBatch interface & types
+│   │   │   ├── hebrewBatch1.ts      # Canonical Hebrew OT batch
+│   │   │   ├── greekBatch1.ts       # Canonical Greek NT batch
+│   │   │   └── index.ts             # Unified batch registry & metadata
+│   │   ├── bibleCanon.ts            # 66-book canon metadata
+│   │   ├── dailyMessages.ts         # 365 daily exegesis devotionals
+│   │   ├── lexiconData.ts           # Unified concordance & lexicon queries
+│   │   └── strongsAtoZData.ts       # Exhaustive A-to-Z English lemma concordance
+│   ├── navigation/                  # App navigation & stacks
+│   │   ├── AppNavigator.tsx         # Root navigator & floating pill tab bar (Rule 20)
+│   │   └── types.ts                 # Navigation route parameter types
+│   ├── screens/                     # Application screens
+│   │   ├── StrongsScreen.tsx        # Unified A-to-Z Strong's dictionary & offline cache
+│   │   ├── StrongsDetailScreen.tsx  # Scholarly lexical detail & concordance stepper
+│   │   ├── WOTDScreen.tsx           # Full 66-book Holy Bible reader
+│   │   ├── DiscoverScreen.tsx       # Daily devotionals & streak tracker
+│   │   ├── HistoryScreen.tsx        # 26 Canonical biblical authors catalog
+│   │   ├── ProfileScreen.tsx        # Settings & study preferences
+│   │   └── SecurityScreen.tsx       # Biometrics, PIN & inactivity locks
+│   └── services/                    # Backend, encryption & storage services
+│       ├── dictionaryOfflineService.ts # Local offline dictionary cache & download
+│       ├── offlineBibleService.ts   # 32 offline Bible translations
+│       ├── biometricService.ts      # Hardware Keystore / Keychain biometrics
+│       └── cryptoService.ts         # Pure TypeScript FIPS 197 AES-256 cipher
+├── app.json                         # Expo configuration (locked runtimeVersion 1.0.1)
+├── package.json                     # Dependencies & scripts
+├── tsconfig.json                    # TypeScript compiler configuration
+└── README.md                        # Architecture, features & documentation
+```
+
 ---
 
 ### Type Checking & Validation
 ```bash
 npx tsc --noEmit
 ```
-
 
 ---
 

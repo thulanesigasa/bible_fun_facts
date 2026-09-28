@@ -7,6 +7,7 @@
 
 import { DAILY_MESSAGES } from './dailyMessages';
 import { STRONGS_A_TO_Z_ENTRIES } from './strongsAtoZData';
+import { ALL_STRONGS_BATCHES } from './strongs';
 
 export interface LexiconEntry {
   strongsNumber: string;
@@ -1006,6 +1007,18 @@ export function getAllConcordanceEntries(): LexiconEntry[] {
     idMap.set(item.strongsNumber, item);
   }
 
+  // 1b. Add modular batches from the 14,298 Strong's pipeline
+  for (const item of ALL_STRONGS_BATCHES) {
+    if (!idMap.has(item.strongsNumber)) {
+      idMap.set(item.strongsNumber, item);
+    } else {
+      const existing = idMap.get(item.strongsNumber)!;
+      if (!existing.englishWord && item.englishWord) {
+        idMap.set(item.strongsNumber, { ...existing, englishWord: item.englishWord });
+      }
+    }
+  }
+
   // 2. Add curated Hebrew & Greek entries
   for (const item of [...HEBREW_LEXICON_ENTRIES, ...GREEK_LEXICON_ENTRIES]) {
     if (!idMap.has(item.strongsNumber)) {
@@ -1101,7 +1114,12 @@ export function getHebrewLexicon(category?: string, query?: string): LexiconEntr
   const q = query ? query.trim().toLowerCase() : '';
   const idMap = new Map<string, LexiconEntry>();
 
-  for (const item of [...STRONGS_A_TO_Z_ENTRIES.filter(e => e.language === 'hebrew'), ...HEBREW_LEXICON_ENTRIES, ...getExtractedDailyStrongs().filter((e) => e.language === 'hebrew')]) {
+  for (const item of [
+    ...ALL_STRONGS_BATCHES.filter((e) => e.language === 'hebrew'),
+    ...STRONGS_A_TO_Z_ENTRIES.filter((e) => e.language === 'hebrew'),
+    ...HEBREW_LEXICON_ENTRIES,
+    ...getExtractedDailyStrongs().filter((e) => e.language === 'hebrew'),
+  ]) {
     if (!idMap.has(item.strongsNumber)) {
       idMap.set(item.strongsNumber, item);
     }
@@ -1129,7 +1147,12 @@ export function getGreekLexicon(category?: string, query?: string): LexiconEntry
   const q = query ? query.trim().toLowerCase() : '';
   const idMap = new Map<string, LexiconEntry>();
 
-  for (const item of [...STRONGS_A_TO_Z_ENTRIES.filter(e => e.language === 'greek'), ...GREEK_LEXICON_ENTRIES, ...getExtractedDailyStrongs().filter((e) => e.language === 'greek')]) {
+  for (const item of [
+    ...ALL_STRONGS_BATCHES.filter((e) => e.language === 'greek'),
+    ...STRONGS_A_TO_Z_ENTRIES.filter((e) => e.language === 'greek'),
+    ...GREEK_LEXICON_ENTRIES,
+    ...getExtractedDailyStrongs().filter((e) => e.language === 'greek'),
+  ]) {
     if (!idMap.has(item.strongsNumber)) {
       idMap.set(item.strongsNumber, item);
     }
