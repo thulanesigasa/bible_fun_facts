@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://thulanesigasa.github.io/bible_fun_facts/sitemap.xml

@@ -1,0 +1,19 @@
+{
+  "name": "exégeomai — Biblical Exegesis & Strong's Concordance",
+  "short_name": "exégeomai",
+  "description": "Scholarly Biblical exegesis, 14,298 Strong's Greek and Hebrew entries, 32 offline translations, and 365 daily devotionals across historical, cultural, and theological lenses.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F8FAFC",
+  "theme_color": "#FDD223",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "books", "reference"]
+}

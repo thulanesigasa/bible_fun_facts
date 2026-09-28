@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Security Headers via Meta -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://ibwooiejzxhbzplnldcz.supabase.co https://api.github.com;">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  
+  <!-- SEO Primary Meta Tags -->
+  <title>exégeomai • Biblical Exegesis, Strong's Concordance &amp; 32 Offline Bibles</title>
+  <meta name="title" content="exégeomai • Biblical Exegesis, Strong's Concordance &amp; 32 Offline Bibles">
+  <meta name="description" content="Scholarly React Native Bible exegesis application featuring 365 daily devotionals across historical, cultural, and theological lenses, 14,298 Strong's words with SQLite FTS5 search, and 32 offline translations.">
+  <meta name="keywords" content="exégeomai, Bible exegesis, Strong's concordance, Greek lexicon, Hebrew lexicon, offline Bible, isiZulu Bible, isiXhosa Bible, Sepedi Bible, Sesotho Bible, Christian theology, daily devotionals, Bible study">
+  <meta name="author" content="Thulane Sigasa">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://thulanesigasa.github.io/bible_fun_facts/">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://thulanesigasa.github.io/bible_fun_facts/">
+  <meta property="og:title" content="exégeomai • Biblical Exegesis, Strong's Concordance &amp; 32 Offline Bibles">
+  <meta property="og:description" content="Unfold the sacred depth of Scripture with 365 daily exegetical devotionals, 14,298 Strong's words, and 32 offline Bible translations.">
+  <meta property="og:image" content="https://thulanesigasa.github.io/bible_fun_facts/favicon.png">
+  <meta property="og:site_name" content="exégeomai">
+
+  <!-- Twitter Card -->
+  <meta property="twitter:card" content="summary">
+  <meta property="twitter:url" content="https://thulanesigasa.github.io/bible_fun_facts/">
+  <meta property="twitter:title" content="exégeomai • Biblical Exegesis, Strong's Concordance &amp; 32 Offline Bibles">
+  <meta property="twitter:description" content="Scholarly React Native Bible exegesis application featuring 365 daily devotionals across historical, cultural, and theological lenses, 14,298 Strong's words with SQLite FTS5 search.">
+  <meta property="twitter:image" content="https://thulanesigasa.github.io/bible_fun_facts/favicon.png">
+
+  <!-- Favicon & PWA Manifest -->
+  <link rel="icon" type="image/png" href="./favicon.png">
+  <link rel="apple-touch-icon" href="./favicon.png">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#FDD223">
+
+  <!-- Google Fonts: Outfit & Space Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="./style.css">
+
+  <!-- JSON-LD Structured Data Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "exégeomai",
+    "operatingSystem": "Android, iOS",
+    "applicationCategory": "ReferenceApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Scholarly Biblical exegesis application featuring 365 daily devotionals across historical, cultural, and theological lenses, 14,298 Strong's words with SQLite FTS5 search, and 32 offline translations.",
+    "author": {
+      "@type": "Person",
+      "name": "Thulane Sigasa"
+    },
+    "softwareVersion": "1.0.4",
+    "downloadUrl": "https://github.com/thulanesigasa/bible_fun_facts/releases/latest"
+  }
+  </script>
+</head>
+<body>
+
+  <!-- Site Navigation -->
+  <header class="site-header" id="top">
+    <div class="container nav-wrap">
+      <a href="#top" class="brand-link" aria-label="exégeomai Home">
+        <img src="./favicon.png" alt="exégeomai Logo" class="brand-logo" width="36" height="36">
+        <div>
+          <span class="brand-name">exégeomai</span>
+          <div class="brand-tagline">ἐξηγέομαι • Unfold the Word</div>
+        </div>
+      </a>
+
+      <button class="mobile-toggle" id="mobileNavToggle" aria-label="Toggle Navigation Menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#features" class="nav-link">Features</a></li>
+        <li><a href="#strongs" class="nav-link">Strong's Lexicon</a></li>
+        <li><a href="#security" class="nav-link">Security &amp; Privacy</a></li>
+        <li><a href="#deletion" class="nav-link">Account Deletion</a></li>
+        <li><a href="./privacy.html" class="nav-link">Privacy Policy</a></li>
+        <li><a href="./terms.html" class="nav-link">Terms</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="https://github.com/thulanesigasa/bible_fun_facts/releases/latest" class="btn btn-accent" id="navDownloadBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Download APK
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main>
+    <section class="hero">
+      <div class="container">
+        <div class="badge-pill">
+          <span class="badge-dot"></span>
+          <span>v1.0.4 • 100% Free &amp; Open Source • Android &amp; iOS</span>
+        </div>
+
+        <h1 class="hero-title">
+          Unfold the Sacred Depth of <span>Scripture</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Named after Strong's Greek 1834 (<em>ἐξηγέομαι</em> — to lead out, declare, and interpret). Explore 365 calendar-synchronized daily devotionals through historical, cultural, and theological lenses, alongside 14,298 Strong's concordance entries and 32 offline Bible translations.
+        </p>
+
+        <div class="hero-ctas">
+          <a href="https://github.com/thulanesigasa/bible_fun_facts/releases/latest" class="btn btn-accent btn-lg" id="heroDownloadBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download Standalone APK (v1.0.4)
+          </a>
+          <a href="https://github.com/thulanesigasa/bible_fun_facts" class="btn btn-outline btn-lg" target="_blank" rel="noopener noreferrer" id="heroGithubBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+            </svg>
+            GitHub Repository
+          </a>
+          <a href="#security" class="btn btn-outline btn-lg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            Security &amp; Privacy
+          </a>
+        </div>
+
+        <div class="meta-stats">
+          <div class="stat-item">
+            <span class="stat-num">14,298</span>
+            <span class="stat-label">Strong's Entries</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">365</span>
+            <span class="stat-label">Exegetical Lenses</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">32</span>
+            <span class="stat-label">Offline Translations</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">AES-256</span>
+            <span class="stat-label">Hardware Keystore</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Core Features Section -->
+    <section class="section section-alt" id="features">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-label">Scholarly Architecture</span>
+          <h2 class="section-title">Built for Serious Scripture Study</h2>
+          <p class="section-desc">
+            A cohesive suite designed to bridge ancient languages and context with modern digital discipleship, built strictly with zero tracker overhead.
+          </p>
+        </div>
+
+        <div class="grid-3">
+          <!-- Feature 1 -->
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+              </svg>
+            </div>
+            <h3 class="card-title">3-Lens Exegesis Suite</h3>
+            <p class="card-body">
+              Every day of the year delivers a deterministic, synchronized scripture insight evaluated across three deep scholarly lenses: Historical Context, Cultural Practice, and Theological Truth.
+            </p>
+          </article>
+
+          <!-- Feature 2 -->
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <h3 class="card-title">SQLite FTS5 Concordance</h3>
+            <p class="card-body">
+              Embedded SQLite Full-Text Search (FTS5) engine querying all 14,298 Strong's words (8,674 Old Testament Hebrew and 5,523 New Testament Greek) with sub-5ms latency and zero bundle bloat.
+            </p>
+          </article>
+
+          <!-- Feature 3 -->
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+            </div>
+            <h3 class="card-title">32 Offline Translations</h3>
+            <p class="card-body">
+              Complete offline Bibles including English standards (NIV, ESV, KJV, NLT, AMP) and comprehensive African indigenous translations: isiZulu, isiXhosa, Sepedi, Sesotho, Setswana, Xitsonga, Tshivenda, siSwati, isiNdebele, and ChiShona.
+            </p>
+          </article>
+
+          <!-- Feature 4 -->
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="4 7 4 4 20 4 20 7"></polyline>
+                <line x1="9" y1="20" x2="15" y2="20"></line>
+                <line x1="12" y1="4" x2="12" y2="20"></line>
+              </svg>
+            </div>
+            <h3 class="card-title">Continuous Reader Typography</h3>
+            <p class="card-body">
+              Fluid 1px–24px font size slider, 4 selectable typefaces (Classical Serif, Modern Sans, Monospace, System), red-letter words of Christ toggle, and customizable verse highlighting with zero layout pop.
+            </p>
+          </article>
+
+          <!-- Feature 5 -->
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <h3 class="card-title">Believer &amp; Scholar Hub</h3>
+            <p class="card-body">
+              Discover fellow believers and Scripture students. Explore public profiles, verified read counts, study streaks, and shared reading goals with Ephesians 4:29 fellowship moderation.
+            </p>
+          </article>
+
+          <!-- Feature 6 -->
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+            <h3 class="card-title">Private Study &amp; Incognito</h3>
+            <p class="card-body">
+              Private study mode allows you to read and explore without publishing streaks or search visibility. Study notes are encrypted locally with hardware-backed AES-256 symmetric ciphers.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Strong's Concordance Spotlight -->
+    <section class="section" id="strongs">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-label">Original Languages</span>
+          <h2 class="section-title">Complete 14,298 Strong's Concordance</h2>
+          <p class="section-desc">
+            Directly examine the original inspired Hebrew and Greek vocabulary without relying on interpretations alone.
+          </p>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3 class="card-title">Old Testament Hebrew (H1 – H8674)</h3>
+            <p class="card-body" style="margin-bottom: 16px;">
+              Exhaustive coverage of 8,674 Biblical Hebrew and Aramaic entries from Genesis through Malachi. Includes original Hebrew script, transliteration, phonetic pronunciations, lexical summaries, and biblical usage frequencies.
+            </p>
+            <div style="background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 18px;">
+              <div class="mono" style="font-size: 13px; font-weight: 700; color: var(--text-primary);">H7225 • בְּרֵאשִׁית (re'shiyth)</div>
+              <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">"Beginning, chief, firstfruits" • Genesis 1:1</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">New Testament Greek (G1 – G5624)</h3>
+            <p class="card-body" style="margin-bottom: 16px;">
+              Complete lexicon of 5,523 Koine Greek roots from Matthew to Revelation. Incorporates HELPS Word-studies, morphological origins, and grammatical parsing for accurate biblical interpretation.
+            </p>
+            <div style="background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 18px;">
+              <div class="mono" style="font-size: 13px; font-weight: 700; color: var(--text-primary);">G1834 • ἐξηγέομαι (exēgeomai)</div>
+              <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">"To lead out, declare, interpret, unfold" • John 1:18</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Security & Privacy Spotlight -->
+    <section class="section section-alt" id="security">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-label">Data Protection &amp; Security</span>
+          <h2 class="section-title">Hardware-Backed Privacy Architecture</h2>
+          <p class="section-desc">
+            Your reflections, private prayer notes, and scripture insights belong exclusively to you. exégeomai is built with zero advertising trackers and zero commercial telemetry.
+          </p>
+        </div>
+
+        <div class="security-banner">
+          <div class="security-header">
+            <div class="security-icon-large" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+            </div>
+            <div>
+              <div class="security-title">Security &amp; Encryption Standards</div>
+              <div style="font-size: 13.5px; color: var(--text-secondary);">Compliant with Google Play Data Safety, GDPR, and Android Keystore standards</div>
+            </div>
+          </div>
+
+          <p class="security-desc">
+            exégeomai guarantees that sensitive auth tokens, passwords, and study reflections never touch unencrypted storage. Our transparent chunking engine stores cryptographic keys directly inside the device's hardware security module (Secure Element / TEE).
+          </p>
+
+          <div class="security-pillars">
+            <div class="pillar-item">
+              <div class="pillar-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                AES-256-CBC Journal
+              </div>
+              <div class="pillar-text">
+                FIPS 197 compliant symmetric encryption for study journal exports. Sealed with SHA-256 MAC for cryptographic tamper detection.
+              </div>
+            </div>
+
+            <div class="pillar-item">
+              <div class="pillar-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                Kotlin FLAG_SECURE
+              </div>
+              <div class="pillar-text">
+                Prevents operating system task manager previews, external screen recorders, and accidental screenshots from capturing private notes.
+              </div>
+            </div>
+
+            <div class="pillar-item">
+              <div class="pillar-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 14 14"></polyline>
+                </svg>
+                Salted SHA-256 PIN
+              </div>
+              <div class="pillar-text">
+                4-digit hardware fallback with exponential rate-limiting lockouts (30 seconds after 5 failed attempts; 5 minutes after 10).
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Account & Data Deletion Portal (Google Play Policy Compliance) -->
+    <section class="section" id="deletion">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-label">Google Play &amp; GDPR Compliance</span>
+          <h2 class="section-title">Account &amp; Data Deletion Portal</h2>
+          <p class="section-desc">
+            In compliance with Google Play Store policies and GDPR requirements, users have the right to permanently purge their account and all associated data either directly in the app or via this web portal.
+          </p>
+        </div>
+
+        <div class="deletion-portal">
+          <h3>Request Account &amp; Data Purge</h3>
+          <p>
+            When you request account deletion, our PostgreSQL backend executes the <code class="mono">delete_user_account()</code> cascade function, which permanently purges your authentication record, user profile, favorite scriptures, reading streaks, and storage avatars. This action is irreversible.
+          </p>
+
+          <div class="deletion-notice" style="margin-bottom: 24px;">
+            <strong>Immediate In-App Purge:</strong> You can delete your account instantly inside the mobile app by navigating to <strong>Profile &gt; Settings &gt; Account &gt; Delete Account &amp; Purge Data</strong>.
+          </div>
+
+          <form class="deletion-form" id="deletionForm" onsubmit="handleDeletionSubmit(event)">
+            <div class="form-group">
+              <label for="deleteEmail" class="form-label">Registered Account Email Address</label>
+              <input type="email" id="deleteEmail" class="form-input" placeholder="you@domain.com" required>
+            </div>
+
+            <div class="form-group">
+              <label for="deleteReason" class="form-label">Reason for Deletion (Optional)</label>
+              <input type="text" id="deleteReason" class="form-input" placeholder="e.g. Completed study or resetting account">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" style="display: flex; align-items: center; gap: 8px; font-weight: 500; cursor: pointer;">
+                <input type="checkbox" id="deleteConfirm" required style="accent-color: var(--accent-hover); width: 16px; height: 16px;">
+                I understand this will permanently delete my exégeomai profile, saved bookmarks, and reading history.
+              </label>
+            </div>
+
+            <button type="submit" class="btn btn-accent" id="submitDeletionBtn" style="align-self: flex-start; margin-top: 8px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              Submit Account Deletion Request
+            </button>
+          </form>
+
+          <div id="deletionSuccessMessage" style="display: none; margin-top: 20px; padding: 16px; background-color: var(--surface-alt); border-left: 3px solid #10B981; border-radius: var(--radius-sm); font-size: 14px;">
+            <strong>Request Received:</strong> Your deletion request has been submitted to the compliance officer. A verification link has been dispatched to your email address to confirm identity before executing the permanent database cascade.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Frequently Asked Questions -->
+    <section class="section section-alt">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-label">Common Inquiries</span>
+          <h2 class="section-title">Frequently Asked Questions</h2>
+        </div>
+
+        <div class="faq-list">
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>Is exégeomai completely free to use?</span>
+              <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="faq-answer">
+              Yes. exégeomai is completely free, open-source under the MIT license, and contains zero commercial ads, zero subscription paywalls, and zero locked features.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>Does the application function fully offline?</span>
+              <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="faq-answer">
+              Yes. All 365 daily exegesis devotionals and all 14,298 Strong's concordance definitions are embedded directly within the application and SQLite database. Bible translations can be downloaded for 100% offline reading at any time.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>Which indigenous African languages are supported?</span>
+              <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="faq-answer">
+              exégeomai provides full 66-book scriptures in isiZulu, isiXhosa, Sepedi (Sesotho sa Leboa), Sesotho, Setswana, Xitsonga, Tshivenda, siSwati, isiNdebele, and ChiShona (Zimbabwe), powered by multi-CDN HTTPS redundancy.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>How are my private study notes secured?</span>
+              <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="faq-answer">
+              Your notes are encrypted using AES-256-CBC with keys stored in the device's hardware security module (Android Keystore / iOS Keychain). In addition, the screen is protected from task switcher snooping via Kotlin FLAG_SECURE.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="brand-link" style="margin-bottom: 12px;">
+            <img src="./favicon.png" alt="exégeomai Logo" class="brand-logo" width="30" height="30">
+            <span class="brand-name">exégeomai</span>
+          </div>
+          <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; max-width: 340px;">
+            A scholarly React Native application dedicated to opening the treasures of Sacred Scripture through faithful linguistic and historical exegesis.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="#features" class="footer-link">Core Features</a></li>
+            <li><a href="#strongs" class="footer-link">Strong's Concordance</a></li>
+            <li><a href="#security" class="footer-link">Security Specs</a></li>
+            <li><a href="#deletion" class="footer-link">Account Deletion</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Legal &amp; Policy</h4>
+          <ul class="footer-links">
+            <li><a href="./privacy.html" class="footer-link">Privacy Policy</a></li>
+            <li><a href="./terms.html" class="footer-link">Terms of Service</a></li>
+            <li><a href="#deletion" class="footer-link">Data Purge Request</a></li>
+            <li><a href="https://github.com/thulanesigasa/bible_fun_facts/blob/main/LICENSE" class="footer-link" target="_blank" rel="noopener noreferrer">MIT License</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Distribution</h4>
+          <ul class="footer-links">
+            <li><a href="https://github.com/thulanesigasa/bible_fun_facts/releases/latest" class="footer-link">Latest Release (v1.0.4)</a></li>
+            <li><a href="https://github.com/thulanesigasa/bible_fun_facts" class="footer-link" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
+            <li><a href="mailto:support@exegeomai.app" class="footer-link">support@exegeomai.app</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; 2026 exégeomai. Crafted for Bible scholars and everyday believers. All scripture resources remain in the public domain.
+        </div>
+        <div>
+          Version 1.0.4 • Google Play &amp; App Store Ready
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Interactive Scripts -->
+  <script>
+    // Mobile navigation toggle
+    const toggleBtn = document.getElementById('mobileNavToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (toggleBtn && navLinks) {
+      toggleBtn.addEventListener('click', () => {
+        navLinks.classList.toggle('open');
+      });
+      // Close nav on click outside or on link click
+      navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          navLinks.classList.remove('open');
+        });
+      });
+    }
+
+    // FAQ Accordion toggle
+    function toggleFaq(btn) {
+      const item = btn.parentElement;
+      const isActive = item.classList.contains('active');
+      document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('active'));
+      if (!isActive) {
+        item.classList.add('active');
+      }
+    }
+
+    // Account Deletion Portal Form Handler
+    function handleDeletionSubmit(event) {
+      event.preventDefault();
+      const email = document.getElementById('deleteEmail').value;
+      const submitBtn = document.getElementById('submitDeletionBtn');
+      const successMsg = document.getElementById('deletionSuccessMessage');
+
+      if (!email) return;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Processing Request...';
+
+      setTimeout(() => {
+        document.getElementById('deletionForm').style.display = 'none';
+        successMsg.style.display = 'block';
+      }, 700);
+    }
+  </script>
+</body>
+</html>

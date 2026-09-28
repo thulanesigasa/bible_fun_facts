@@ -4,69 +4,73 @@ import React, { useState } from 'react';
 
 const faqs = [
   {
-    q: 'Is exégeomai completely free?',
-    a: "Yes — 100% free with no ads, no subscriptions, and no in-app purchases. The full app including all 32 translations, 14,298 Strong's entries, and 365 devotionals is included in the single APK download.",
+    q: 'Is exégeomai completely free to use?',
+    a: "Yes — 100% free with zero advertisements, no premium subscriptions, and no in-app purchases. All 32 Bible translations, 14,298 Strong's entries, and 365 devotionals are included in the single standalone native binary.",
   },
   {
-    q: 'Does the app work offline?',
-    a: "Entirely. All Bible translations, the Strong's lexicon, and devotional content are embedded in the app bundle. Once installed, the app works indefinitely without any network connection.",
+    q: 'Does the application operate fully offline?',
+    a: "Entirely. All biblical texts, lexicons, transliterations, and daily devotional reflections are packaged locally within the embedded SQLite database. Once downloaded, the application requires zero network connectivity.",
   },
   {
-    q: 'How is my data kept private?',
-    a: 'Your reading history, bookmarks, PIN, and biometric keys never leave your device by default. The PIN is hashed with PBKDF2 and encrypted notes use AES-256-CBC via the Android Keystore or iOS Secure Enclave — hardware-backed security that even a rooted device cannot bypass.',
+    q: 'How does exégeomai protect user privacy?',
+    a: 'Reading history, bookmarks, notes, and preferences remain solely on your device. When optional PIN security is enabled, data is encrypted using AES-256-CBC with keys generated inside the device Hardware Security Module (Keystore / Secure Enclave).',
   },
   {
-    q: 'What is the screen privacy shield?',
-    a: 'When you switch apps or open the recent-apps drawer, exégeomai automatically replaces its preview with a solid screen so your reading content and notes are not visible to anyone looking at your screen.',
+    q: 'What is the app switcher privacy shield?',
+    a: 'Using Android FLAG_SECURE and iOS secure blur primitives, exégeomai obscures screen content whenever the app moves to the background or the app switcher drawer, preventing shoulder-surfing and OS thumbnail storage.',
   },
   {
-    q: 'How do I delete my account and all my data?',
-    a: 'You can request permanent deletion of all your data via the Account Deletion portal on this website, or within the app under Settings → Account → Delete Account. Your data is purged within 30 days as required by GDPR and Google Play Policy.',
+    q: 'How do I permanently delete my account and data?',
+    a: 'You can submit a verified deletion request through the dedicated Account Deletion portal on this website or within the app under Settings → Security → Delete Account. All associated records are permanently purged within 30 days per GDPR Article 17.',
   },
   {
-    q: 'Can I contribute to the project?',
-    a: 'Absolutely! exégeomai is open source under the MIT license. Visit the GitHub repository to submit pull requests, report bugs, or suggest features.',
+    q: 'Can developers and scholars contribute to exégeomai?',
+    a: 'Yes! exégeomai is completely open-source under the MIT license on GitHub. Community members are welcome to contribute bug fixes, new public domain translations, performance improvements, and linguistic commentary.',
   },
   {
-    q: 'Which platforms are supported?',
-    a: 'Android (6.0+) via standalone APK download. iOS support is in active development. The React Native codebase targets both platforms from a single code base.',
+    q: 'Which mobile operating systems are supported?',
+    a: 'Native Android 6.0 (API 23) and higher via direct APK download from GitHub Releases. iOS builds are compiled and managed via the same shared React Native codebase.',
   },
 ];
 
 export function FaqSection() {
-  const [open, setOpen] = useState<number | null>(null);
+  const [open, setOpen] = useState<number | null>(0);
 
   return (
     <section className="page-section" id="faq">
-      <div className="wrap">
-        <header className="section-intro">
-          <h2>Frequently Asked Questions</h2>
-          <p>Everything you need to know about exégeomai — privacy, offline use, and platform support.</p>
-        </header>
+      <header className="section-intro">
+        <h2>Frequently Asked Questions</h2>
+        <p>
+          Everything you need to know about exégeomai — offline functionality,
+          cryptographic standards, data privacy, and open-source contributions.
+        </p>
+      </header>
 
-        <dl className="faq-list">
-          {faqs.map((f, i) => (
-            <React.Fragment key={i}>
-              <dt>
-                <button
-                  className="faq-trigger"
-                  onClick={() => setOpen(open === i ? null : i)}
-                  aria-expanded={open === i}
-                  id={`faq-${i}`}
-                >
-                  {f.q}
-                  <span className="faq-sign" aria-hidden="true">{open === i ? '−' : '+'}</span>
-                </button>
-              </dt>
-              {open === i && (
-                <dd className="faq-body" role="region" aria-labelledby={`faq-${i}`}>
-                  {f.a}
-                </dd>
-              )}
-            </React.Fragment>
-          ))}
-        </dl>
-      </div>
+      <dl className="faq-list">
+        {faqs.map((f, i) => (
+          <React.Fragment key={f.q}>
+            <dt>
+              <button
+                type="button"
+                className="faq-trigger"
+                onClick={() => setOpen(open === i ? null : i)}
+                aria-expanded={open === i}
+                id={`faq-${i}`}
+              >
+                <span>{f.q}</span>
+                <span className="faq-sign" aria-hidden="true">
+                  {open === i ? '−' : '+'}
+                </span>
+              </button>
+            </dt>
+            {open === i && (
+              <dd className="faq-body" role="region" aria-labelledby={`faq-${i}`}>
+                {f.a}
+              </dd>
+            )}
+          </React.Fragment>
+        ))}
+      </dl>
     </section>
   );
 }
