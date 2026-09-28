@@ -69,7 +69,7 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
       showAlert({
         title: 'Offline Dictionary Ready',
         message: `The complete Strong's A-to-Z Biblical Dictionary (${meta.sizeFormatted}) is downloaded and saved to your device for 100% offline study.`,
-        icon: 'success',
+        icon: 'logo',
         buttons: [{ text: 'Done' }],
       });
     } catch {
@@ -87,7 +87,7 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
     showAlert({
       title: 'Remove Offline Dictionary?',
       message: `Are you sure you want to remove the Strong's A-to-Z Dictionary (${offlineMeta?.sizeFormatted || '2.4 MB'}) from this device?\n\nYou can re-download it anytime for offline study.`,
-      icon: 'trash',
+      icon: 'logo',
       isDestructive: true,
       buttons: [
         { text: 'Cancel', style: 'cancel' },
@@ -100,7 +100,7 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
             showAlert({
               title: 'Dictionary Removed',
               message: 'The offline Strong\'s dictionary cache has been deleted from your device.',
-              icon: 'info',
+              icon: 'logo',
               buttons: [{ text: 'OK' }],
             });
           },
