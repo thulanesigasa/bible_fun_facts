@@ -73,58 +73,58 @@ export default function ThemedAlertModal({
     switch (icon) {
       case 'logout':
         return (
-          <View style={[styles.iconContainer, styles.iconContainerDestructive]}>
-            <LogOutSvg size={36} color="#DC2626" />
+          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
+            <LogOutSvg size={36} color="#B45309" />
           </View>
         );
       case 'trash':
       case 'danger':
         return (
-          <View style={[styles.iconContainer, styles.iconContainerDestructive]}>
-            <TrashSvg size={36} color="#DC2626" />
+          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
+            <TrashSvg size={36} color="#B45309" />
           </View>
         );
       case 'warning':
         return (
-          <View style={[styles.iconContainer, styles.iconContainerWarning]}>
-            <AlertTriangleSvg size={36} color="#D97706" />
+          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
+            <AlertTriangleSvg size={36} color="#B45309" />
           </View>
         );
       case 'success':
         return (
-          <View style={[styles.iconContainer, styles.iconContainerSuccess]}>
-            <CheckCircleSvg size={36} color="#16A34A" />
+          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
+            <CheckCircleSvg size={36} color="#B45309" />
           </View>
         );
       case 'shield':
         return (
-          <View style={[styles.iconContainer, styles.iconContainerNeutral]}>
-            <ShieldLockSvg size={36} color="#0F172A" />
+          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
+            <ShieldLockSvg size={36} color="#B45309" />
           </View>
         );
       case 'device':
       case 'devices':
         return (
-          <View style={[styles.iconContainer, styles.iconContainerNeutral]}>
-            <DevicesSvg size={36} color="#0F172A" />
+          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
+            <DevicesSvg size={36} color="#B45309" />
           </View>
         );
       case 'block':
         return (
-          <View style={[styles.iconContainer, styles.iconContainerDestructive]}>
-            <BlockSvg size={36} color="#DC2626" />
+          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
+            <BlockSvg size={36} color="#B45309" />
           </View>
         );
       case 'flag':
         return (
-          <View style={[styles.iconContainer, styles.iconContainerWarning]}>
-            <FlagSvg size={36} color="#D97706" />
+          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
+            <FlagSvg size={36} color="#B45309" />
           </View>
         );
       case 'keypad':
         return (
-          <View style={[styles.iconContainer, styles.iconContainerNeutral]}>
-            <KeypadSvg size={36} color="#0F172A" />
+          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
+            <KeypadSvg size={36} color="#B45309" />
           </View>
         );
       case 'logo':
@@ -138,8 +138,8 @@ export default function ThemedAlertModal({
       case 'info':
       default:
         return (
-          <View style={[styles.iconContainer, styles.iconContainerNeutral]}>
-            <InfoCircleSvg size={36} color="#0F172A" />
+          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
+            <InfoCircleSvg size={36} color="#B45309" />
           </View>
         );
     }
@@ -258,21 +258,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 1,
   },
+  iconContainerTheme: {
+    backgroundColor: '#FEF9C3',
+    borderColor: '#FDE047',
+  },
   iconContainerDestructive: {
-    backgroundColor: '#FEF2F2',
-    borderColor: 'rgba(239, 68, 68, 0.2)',
+    backgroundColor: '#FEF9C3',
+    borderColor: '#FDE047',
   },
   iconContainerWarning: {
     backgroundColor: '#FEF9C3',
-    borderColor: 'rgba(245, 158, 11, 0.2)',
+    borderColor: '#FDE047',
   },
   iconContainerSuccess: {
-    backgroundColor: '#F0FDF4',
-    borderColor: 'rgba(34, 197, 94, 0.2)',
+    backgroundColor: '#FEF9C3',
+    borderColor: '#FDE047',
   },
   iconContainerNeutral: {
-    backgroundColor: '#F1F5F9',
-    borderColor: 'rgba(15, 23, 42, 0.08)',
+    backgroundColor: '#FEF9C3',
+    borderColor: '#FDE047',
   },
   alertLogoAlone: {
     width: 56,
@@ -317,27 +321,29 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   buttonCancel: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.1)',
+    borderColor: 'rgba(15, 23, 42, 0.12)',
   },
   buttonPrimary: {
-    backgroundColor: '#0F172A',
+    backgroundColor: '#FDD223',
   },
   buttonDestructive: {
-    backgroundColor: '#DC2626',
+    backgroundColor: '#FEF9C3',
+    borderWidth: 1,
+    borderColor: '#FDE047',
   },
   buttonTextBase: {
     fontSize: 14,
     fontWeight: '700',
   },
   buttonTextCancel: {
-    color: '#475569',
+    color: '#0F172A',
   },
   buttonTextPrimary: {
-    color: '#FDD223',
+    color: '#0F172A',
   },
   buttonTextDestructive: {
-    color: '#FFFFFF',
+    color: '#B45309',
   },
 });

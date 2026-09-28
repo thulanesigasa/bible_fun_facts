@@ -167,7 +167,7 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
             accessibilityRole="button"
             accessibilityLabel={`Share ${item.englishWord || item.strongsNumber}`}
           >
-            <ShareSvg size={15} color={colors.textSecondary} />
+            <ShareSvg size={15} color="#B45309" />
           </TouchableOpacity>
         </View>
 
@@ -279,7 +279,7 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
         {/* Search Input Row with inline download icon button */}
         <View style={styles.searchRow}>
           <View style={styles.searchInputContainer}>
-            <SearchSvg size={16} color={colors.textSecondary} />
+            <SearchSvg size={16} color="#B45309" />
             <TextInput
               style={styles.searchInput}
               placeholder="Search dictionary (life, love, zaó, G2222)..."
@@ -296,7 +296,7 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
                 accessibilityRole="button"
                 accessibilityLabel="Clear search input"
               >
-                <CloseSvg size={16} color={colors.textTertiary} />
+                <CloseSvg size={16} color="#B45309" />
               </TouchableOpacity>
             )}
           </View>
@@ -316,7 +316,7 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
             {isDownloading ? (
               <ActivityIndicator size="small" color="#B45309" />
             ) : offlineMeta?.isDownloaded ? (
-              <TrashSvg size={20} color="#DC2626" />
+              <TrashSvg size={20} color="#B45309" />
             ) : (
               <DownloadSvg size={20} color="#B45309" />
             )}
@@ -371,7 +371,7 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <StrongsIconSvg size={40} color={colors.textTertiary} />
+            <StrongsIconSvg size={40} color="#FDD223" />
             <Text variant="h3" color={colors.textPrimary}>
               No Words Found
             </Text>

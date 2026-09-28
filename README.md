@@ -1530,10 +1530,11 @@ The application features a comprehensive, unified A-to-Z Strong's Concordance an
    - **Context-Aware Dynamic Icon**:
      - When un-cached / needing download: displays `DownloadSvg` (`#B45309`).
      - When downloading: displays a gold `ActivityIndicator` (`#B45309`).
-     - Once downloaded: displays the bin / trash icon (`TrashSvg` in `#DC2626`) for removing the downloaded dictionary.
-   - **60-30-10 Themed Dialog Integration**:
+     - Once downloaded: displays the bin / trash icon (`TrashSvg` in amber `#B45309`) for removing the downloaded dictionary.
+   - **60-30-10 Pure Yellow & White Themed Dialog Integration**:
      - All dialogs are fully branded using the application's `ThemedAlertModal` via `useThemedAlert()`.
-     - Tapping the bin icon opens a themed destructive confirmation dialog: *"Remove Offline Dictionary?"* with `destructive` red button styling.
+     - All modal icons, including the bin icon, use the signature brand amber `#B45309` inside a `#FEF9C3` rounded badge.
+     - Tapping the bin icon opens a themed confirmation dialog: *"Remove Offline Dictionary?"* with yellow `#FEF9C3` button styling and `#B45309` text on a pure `#FFFFFF` card.
      - On confirmation, `deleteOfflineDictionary()` clears local storage and immediately swaps the bin icon back to the download icon, showing a themed completion dialog.
 
 2. **Elimination of Duplicate Tab Logo Header & Gap**:

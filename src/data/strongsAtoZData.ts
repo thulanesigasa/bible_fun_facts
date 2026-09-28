@@ -1899,6 +1899,106 @@ export const STRONGS_A_TO_Z_ENTRIES: LexiconEntry[] = [
   },
 
   // ==========================================================================
+  // LETTER O
+  // ==========================================================================
+  {
+    strongsNumber: 'G3528',
+    englishWord: 'Overcome',
+    language: 'greek',
+    originalScript: 'νικάω',
+    transliteration: 'nikao',
+    pronunciation: 'nik-ah\'-o',
+    partOfSpeech: 'Verb',
+    rootOrigin: 'From nike (victory).',
+    shortDefinition: 'To conquer, overcome, prevail, carry off the victory.',
+    exhaustiveDefinition:
+      'Denotes ultimate victory and triumphal conquest through faith in Jesus Christ, remaining steadfast against the trials and deceits of the world.',
+    theologicalSignificance:
+      '1 John 5:4-5: "For whatsoever is born of God overcometh the world: and this is the victory that overcometh the world, even our faith. Who is he that overcometh the world, but he that believeth that Jesus is the Son of God?"',
+    category: 'Righteousness',
+    keyScripture: {
+      reference: '1 John 5:4',
+      book: '1 John',
+      chapter: 5,
+      verse: 4,
+      snippet: 'For whatsoever is born of God overcometh the world: and this is the victory that overcometh the world, even our faith.',
+    },
+    relatedStrongs: ['G3529', 'G5245'],
+  },
+  {
+    strongsNumber: 'H8081',
+    englishWord: 'Oil',
+    language: 'hebrew',
+    originalScript: 'שֶׁמֶן',
+    transliteration: 'shemen',
+    pronunciation: 'sheh\'-men',
+    partOfSpeech: 'Noun Masculine',
+    rootOrigin: 'From shaman (to shine, be fat, fruitful).',
+    shortDefinition: 'Oil, anointing oil, emblem of the Holy Spirit.',
+    exhaustiveDefinition:
+      'Olive oil used in consecrated holy anointing, lighting the tabernacle menorah, and pouring upon kings and priests to signify divine empowerment.',
+    theologicalSignificance:
+      'Psalm 23:5: "Thou preparest a table before me in the presence of mine enemies: thou anointest my head with oil; my cup runneth over."',
+    category: 'Creation & Spirit',
+    keyScripture: {
+      reference: 'Psalm 23:5',
+      book: 'Psalms',
+      chapter: 23,
+      verse: 5,
+      snippet: 'Thou preparest a table before me in the presence of mine enemies: thou anointest my head with oil; my cup runneth over.',
+    },
+    relatedStrongs: ['G218', 'H4888'],
+  },
+  {
+    strongsNumber: 'G1520',
+    englishWord: 'One',
+    language: 'greek',
+    originalScript: 'εἷς',
+    transliteration: 'heis',
+    pronunciation: 'hice',
+    partOfSpeech: 'Numeral / Adjective',
+    rootOrigin: 'A primary numeral.',
+    shortDefinition: 'One, single, only, unified into one harmonious body.',
+    exhaustiveDefinition:
+      'Expresses radical unity and indivisibility: one Lord, one faith, one baptism, one God and Father of all.',
+    theologicalSignificance:
+      'Ephesians 4:4-6: "There is one body, and one Spirit, even as ye are called in one hope of your calling; One Lord, one faith, one baptism, One God and Father of all, who is above all, and through all, and in you all."',
+    category: 'Love & Fellowship',
+    keyScripture: {
+      reference: 'Ephesians 4:5',
+      book: 'Ephesians',
+      chapter: 4,
+      verse: 5,
+      snippet: 'One Lord, one faith, one baptism, One God and Father of all, who is above all, and through all, and in you all.',
+    },
+    relatedStrongs: ['H259', 'G1775'],
+  },
+  {
+    strongsNumber: 'H4503',
+    englishWord: 'Offering',
+    language: 'hebrew',
+    originalScript: 'מִנְחָה',
+    transliteration: 'minchah',
+    pronunciation: 'min-khaw\'',
+    partOfSpeech: 'Noun Feminine',
+    rootOrigin: 'From an unused root meaning to apportion, bestow.',
+    shortDefinition: 'Gift, tribute, sacred offering, sacrifice of devotion.',
+    exhaustiveDefinition:
+      'Voluntary or commanded offering presented to the Almighty to acknowledge His sovereign majesty, give thanks, and walk in covenant alignment.',
+    theologicalSignificance:
+      'Malachi 1:11: "For from the rising of the sun even unto the going down of the same my name shall be great among the Gentiles; and in every place incense shall be offered unto my name, and a pure offering."',
+    category: 'Worship & Praise',
+    keyScripture: {
+      reference: 'Malachi 1:11',
+      book: 'Malachi',
+      chapter: 1,
+      verse: 11,
+      snippet: 'For from the rising of the sun even unto the going down of the same my name shall be great among the Gentiles; and in every place incense shall be offered unto my name, and a pure offering.',
+    },
+    relatedStrongs: ['H7133', 'G4376'],
+  },
+
+  // ==========================================================================
   // LETTER P
   // ==========================================================================
   {
@@ -1972,6 +2072,82 @@ export const STRONGS_A_TO_Z_ENTRIES: LexiconEntry[] = [
       snippet: 'But thou art holy, O thou that inhabitest the praises of Israel.',
     },
     relatedStrongs: ['H1984', 'G134'],
+  },
+
+  // ==========================================================================
+  // LETTER Q
+  // ==========================================================================
+  {
+    strongsNumber: 'G4570',
+    englishWord: 'Quench',
+    language: 'greek',
+    originalScript: 'σβέννυμι',
+    transliteration: 'sbennumi',
+    pronunciation: 'sben\'-noo-mee',
+    partOfSpeech: 'Verb',
+    rootOrigin: 'A primary verb meaning to extinguish, suppress.',
+    shortDefinition: 'To quench, extinguish, suppress divine fire.',
+    exhaustiveDefinition:
+      'Used literally of putting out burning fire or fiery darts (Eph 6:16), and spiritually of grieving or stifling the burning fire of the Holy Spirit (1 Thess 5:19).',
+    theologicalSignificance:
+      '1 Thessalonians 5:19: "Quench not the Spirit." Believers are called to keep the flame of devotion burning perpetually upon the altar of their heart.',
+    category: 'Creation & Spirit',
+    keyScripture: {
+      reference: '1 Thessalonians 5:19',
+      book: '1 Thessalonians',
+      chapter: 5,
+      verse: 19,
+      snippet: 'Quench not the Spirit. Despise not prophesyings. Prove all things; hold fast that which is good.',
+    },
+    relatedStrongs: ['G4442', 'G4151'],
+  },
+  {
+    strongsNumber: 'H8252',
+    englishWord: 'Quiet',
+    language: 'hebrew',
+    originalScript: 'שָׁקַט',
+    transliteration: 'shaqat',
+    pronunciation: 'shaw-kat\'',
+    partOfSpeech: 'Verb',
+    rootOrigin: 'A primary root meaning to repose, be peaceful, rest.',
+    shortDefinition: 'To be quiet, at rest, undisturbed peace from God.',
+    exhaustiveDefinition:
+      'A deep, serene stillness granted by God when strife ceases and trust in the sovereign King settles all anxious fears.',
+    theologicalSignificance:
+      'Isaiah 30:15: "In returning and rest shall ye be saved; in quietness and in confidence shall be your strength."',
+    category: 'Grace & Salvation',
+    keyScripture: {
+      reference: 'Isaiah 30:15',
+      book: 'Isaiah',
+      chapter: 30,
+      verse: 15,
+      snippet: 'For thus saith the Lord GOD, the Holy One of Israel; In returning and rest shall ye be saved; in quietness and in confidence shall be your strength.',
+    },
+    relatedStrongs: ['G2270', 'H7965'],
+  },
+  {
+    strongsNumber: 'G2227',
+    englishWord: 'Quick',
+    language: 'greek',
+    originalScript: 'ζῳοποιέω',
+    transliteration: 'zoopoieo',
+    pronunciation: 'dzo-op-oy-eh\'-o',
+    partOfSpeech: 'Verb',
+    rootOrigin: 'From zoos (alive, quick) and poieo (to make).',
+    shortDefinition: 'To make alive, give life, quicken with eternal vitality.',
+    exhaustiveDefinition:
+      'The miraculous resurrection power of God imparting divine, imperishable life to that which was physically or spiritually dead.',
+    theologicalSignificance:
+      'John 6:63: "It is the spirit that quickeneth; the flesh profiteth nothing: the words that I speak unto you, they are spirit, and they are life."',
+    category: 'Creation & Spirit',
+    keyScripture: {
+      reference: 'John 6:63',
+      book: 'John',
+      chapter: 6,
+      verse: 63,
+      snippet: 'It is the spirit that quickeneth; the flesh profiteth nothing: the words that I speak unto you, they are spirit, and they are life.',
+    },
+    relatedStrongs: ['G2198', 'G2222'],
   },
 
   // ==========================================================================
