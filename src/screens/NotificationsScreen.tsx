@@ -305,43 +305,24 @@ export default function NotificationsScreen({
     );
   };
 
-  const readCount = notifications.length - unreadNotificationsCount;
-
   const renderHeader = () => {
     if (notifications.length === 0) return null;
 
     return (
       <View style={styles.headerSection}>
         <View style={styles.headerActionsRow}>
-          {unreadNotificationsCount > 0 && (
-            <TouchableOpacity
-              style={styles.headerActionBtn}
-              onPress={markAllNotificationsAsRead}
-              activeOpacity={0.7}
-              accessibilityRole="button"
-              accessibilityLabel="Mark all notifications as read"
-            >
-              <CheckDoubleSvg size={14} color={colors.accent} />
-              <Text variant="caption" weight="700" color={colors.accent}>
-                Mark all read
-              </Text>
-            </TouchableOpacity>
-          )}
-
-          {readCount > 0 && (
-            <TouchableOpacity
-              style={styles.headerActionBtn}
-              onPress={clearAllReadNotifications}
-              activeOpacity={0.7}
-              accessibilityRole="button"
-              accessibilityLabel="Clear read notifications"
-            >
-              <TrashSvg size={14} color={colors.textSecondary} />
-              <Text variant="caption" weight="600" color={colors.textSecondary}>
-                Clear read ({readCount})
-              </Text>
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity
+            style={styles.headerActionBtn}
+            onPress={markAllNotificationsAsRead}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Mark all notifications as read and clear tray"
+          >
+            <CheckDoubleSvg size={14} color={colors.accent} />
+            <Text variant="caption" weight="700" color={colors.accent}>
+              Mark all as read
+            </Text>
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.headerActionBtn, styles.clearAllBtn]}

@@ -36,8 +36,7 @@
   <img src="https://img.shields.io/badge/Auth-Username%20%7C%20Email%20Login-10B981?style=for-the-badge&logo=supabase&logoColor=white" alt="Username and Email Login" />
   <img src="https://img.shields.io/badge/Unfolded%20Metric-Verified%20Read%20Facts%20Only-FDD223?style=for-the-badge" alt="Truthful Unfolded Count" />
   <img src="https://img.shields.io/badge/Daily%20Streak-Deterministic%20Calendar%20Day%20%7C%20Feedback%20Loop%20Immune-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Deterministic Daily Streak Engine" />
-  <img src="https://img.shields.io/badge/Notifications-Swipe--To--Dismiss%20%7C%20Bidirectional%20PanResponder-FDD223?style=for-the-badge" alt="Swipe To Dismiss Notifications" />
-  <img src="https://img.shields.io/badge/Notification%20Tray-Mark%20Read%20%7C%20Clear%20Read%20%7C%20Clear%20All-10B981?style=for-the-badge" alt="Notification Tray Bulk Clear" />
+  <img src="https://img.shields.io/badge/Notification%20Tray-Mark%20Read%20Auto--Clears%20%7C%20Zero%20Lingering-10B981?style=for-the-badge" alt="Notification Tray Mark Read Auto-Clears" />
   <img src="https://img.shields.io/badge/The%20Word-Strongs%20%7C%20Hebrew%20%7C%20Greek-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="The Word Concordance and Lexicons" />
   <img src="https://img.shields.io/badge/Strongs%20Concordance-Hebrew%20H1--H8674%20%7C%20Greek%20G1--G5624-10B981?style=for-the-badge" alt="Strongs Concordance" />
   <img src="https://img.shields.io/badge/Ancient%20Hebrew-Theological%20Roots%20%7C%20Aleph--Bet%20Guide-FDD223?style=for-the-badge" alt="Ancient Hebrew Lexicon" />
@@ -1294,8 +1293,8 @@ A seamless, real-time in-app notification center and Feed alert hub that bridges
   - Prominent "View All Notifications ›" button navigating directly to the dedicated notification screen.
 - **Dedicated Notifications Screen (`NotificationsScreen.tsx`)**: Full stack screen featuring:
   - **Bidirectional Swipe-To-Dismiss (`SwipeableNotificationRow`)**: Native `PanResponder` and `Animated.Value` gesture engine allowing users to swipe cards either left or right beyond a calibrated threshold (`SCREEN_WIDTH * 0.28`). As cards are swiped, a background action shelf revealing a red trash SVG and dismiss indicator is exposed before smoothly animating offscreen.
-  - **Single-Tap Tray Maintenance**: Tapping any notification opens the deep link and automatically removes the item from the active notification center to prevent piling up.
-  - **Bulk Tray Actions**: Header controls providing "Mark all read" (`CheckDoubleSvg`), "Clear read" (`TrashSvg`), and "Clear all" (with confirmation dialog) for maintaining a pristine, zero-backlog notification tray.
+  - **Single-Tap Tray Maintenance**: Tapping any notification opens the deep link and automatically removes the item from the active notification center so read items never linger.
+  - **Unified Mark As Read & Auto-Clear**: Tapping "Mark all as read" (`CheckDoubleSvg`) marks all notifications as read and immediately clears them from the tray in one unified action, eliminating the need for a secondary clear step and keeping the notification bar and badge completely clean.
   - **Lean In-App Aggregation (`inAppNotifications.ts`)**: Milestones capped to the latest 1-2 milestones per category and recent list capped to 15 items, preventing past historical achievements from flooding the tray.
   - **Dismissal & Read State Persistence**: State persisted via `@exegeomai_read_notification_ids` and `@exegeomai_dismissed_notification_ids`.
 
