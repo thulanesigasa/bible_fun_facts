@@ -55,6 +55,9 @@ import InactivityLockScreen from '../screens/InactivityLockScreen';
 import ReadingSettingsScreen from '../screens/ReadingSettingsScreen';
 import PrivacyScreen from '../screens/PrivacyScreen';
 import SecurityPinScreen from '../screens/SecurityPinScreen';
+import StrongsScreen from '../screens/StrongsScreen';
+import HebrewScreen from '../screens/HebrewScreen';
+import GreekScreen from '../screens/GreekScreen';
 
 export type AuthStackParamList = {
   Welcome: undefined;
@@ -93,6 +96,9 @@ export type RootStackParamList = {
   ReadingSettings: undefined;
   Privacy: undefined;
   SecurityPin: undefined;
+  Strongs: undefined;
+  Hebrew: undefined;
+  Greek: undefined;
 };
 
 const Tab = createBottomTabNavigator();
@@ -169,6 +175,9 @@ function shouldShowTabHeader(route: any): boolean {
     'ReadingSettings',
     'Privacy',
     'SecurityPin',
+    'Strongs',
+    'Hebrew',
+    'Greek',
   ];
   return !childScreens.includes(routeName);
 }
@@ -190,7 +199,10 @@ function getTabBarVisibility(route: any, hideTabBar: boolean): 'none' | 'flex' {
     routeName === 'InactivityLock' ||
     routeName === 'ReadingSettings' ||
     routeName === 'Privacy' ||
-    routeName === 'SecurityPin'
+    routeName === 'SecurityPin' ||
+    routeName === 'Strongs' ||
+    routeName === 'Hebrew' ||
+    routeName === 'Greek'
   ) {
     return 'none';
   }
@@ -674,6 +686,63 @@ function ProfileStack() {
         options={{
           headerShown: true,
           title: 'Reading & Typography',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="Strongs"
+        component={StrongsScreen}
+        options={{
+          headerShown: true,
+          title: "Strong's Concordance",
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="Hebrew"
+        component={HebrewScreen}
+        options={{
+          headerShown: true,
+          title: 'Ancient Hebrew Lexicon',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="Greek"
+        component={GreekScreen}
+        options={{
+          headerShown: true,
+          title: 'Koine Greek Lexicon',
           headerStyle: {
             backgroundColor: '#FFFFFF',
           },
