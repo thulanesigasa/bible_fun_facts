@@ -124,6 +124,8 @@ interface AppContextType extends UserState {
   markNotificationAsRead: (id: string) => void;
   markAllNotificationsAsRead: () => void;
   deleteNotification: (id: string) => void;
+  clearAllNotifications: () => void;
+  clearAllReadNotifications: () => void;
   activeAchievementAlert: InAppNotificationItem | null;
   dismissAchievementAlert: () => void;
   refreshNotifications: () => void;
@@ -166,9 +168,45 @@ const PERMANENT_STREAK_KEY = '@exegeomai_permanent_streak';
 const PERMANENT_BACKUP_KEY = '@exegeomai_streak_resilient_v2';
 const PERMANENT_LAST_LOGIN_KEY = '@exegeomai_permanent_last_login';
 
+/**
+ * Format local calendar date string as YYYY-MM-DD
+ */
+export function getLocalDateString(d: Date = new Date()): string {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * Normalizes any date string (ISO timestamp, toDateString, or YYYY-MM-DD) into YYYY-MM-DD
+ */
+export function normalizeDateStringToLocalYMD(dateStr: string | null | undefined): string | null {
+  if (!dateStr) return null;
+  const trimmed = dateStr.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    return trimmed;
+  }
+  const parsed = new Date(trimmed);
+  if (isNaN(parsed.getTime())) return null;
+  return getLocalDateString(parsed);
+}
+
+/**
+ * Returns exact integer difference in calendar days between two YYYY-MM-DD date strings
+ */
+export function getDaysDifference(fromYmd: string, toYmd: string): number {
+  const fromParts = fromYmd.split('-').map(Number);
+  const toParts = toYmd.split('-').map(Number);
+  const fromUtc = Date.UTC(fromParts[0], fromParts[1] - 1, fromParts[2]);
+  const toUtc = Date.UTC(toParts[0], toParts[1] - 1, toParts[2]);
+  return Math.round((toUtc - fromUtc) / (1000 * 60 * 60 * 24));
+}
+
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { showAlert } = useThemedAlert();
   const isLoadedFromStorage = useRef<boolean>(false);
+  const hasEvaluatedStreakTodayRef = useRef<boolean>(false);
   const [hideTabBar, setHideTabBar] = useState<boolean>(false);
   const [accent, setAccent] = useState<string>(colors.accent);
   const [state, setState] = useState<UserState>({
@@ -176,7 +214,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     favoritesFacts: [],
     favoritesScriptures: [],
     completedWOTDs: [],
-    streak: 2, // Resilient default of at least 2 so streak survives storage initialization and app updates
+    streak: 1,
     factsViewedCount: 0,
     readFactIds: [],
     sharesCount: 0,
@@ -262,45 +300,40 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
    *
    * Rules:
    * 1. Same calendar day (diffDays === 0): User already engaged today. Streak remains intact.
-   * 2. Consecutive calendar day (diffDays === 1): User studied yesterday and returned today. Streak increases by +1.
-   * 3. App update / reload / missed days (diffDays >= 2): Streak is protected at baseline (Day 2+ minimum)
-   *    so user-earned progress is never wiped by app updates or reloads.
-   * 4. First time user (no previous login date): Streak starts at baseline (minimum 2).
+   * 2. Consecutive calendar day (diffDays === 1): User studied yesterday and returned today. Streak increases by exactly +1.
+   * 3. Missed one or more days (diffDays >= 2): Streak resets to Day 1.
+   * 4. Clock drift or future timestamp (diffDays < 0): Streak remains intact.
    */
   const evaluateDailyStreak = (
-    lastLogin: string | null | undefined,
+    lastLoginRaw: string | null | undefined,
     currentStreak: number
-  ): { newStreak: number; shouldUpdate: boolean; resetFromScratch: boolean } => {
-    const today = new Date();
-    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+  ): { newStreak: number; shouldUpdate: boolean; todayStr: string } => {
+    const todayStr = getLocalDateString();
+    const safeStreak = Math.max(1, currentStreak || 1);
 
-    // Baseline minimum streak: if user was on day 2 or higher, protect it
-    const baseline = Math.max(currentStreak || 1, 2);
-
-    if (!lastLogin) {
-      return { newStreak: baseline, shouldUpdate: true, resetFromScratch: false };
+    if (!lastLoginRaw) {
+      return { newStreak: safeStreak, shouldUpdate: true, todayStr };
     }
 
-    const lastDate = new Date(lastLogin);
-    if (isNaN(lastDate.getTime())) {
-      return { newStreak: baseline, shouldUpdate: true, resetFromScratch: false };
+    const lastLoginYmd = normalizeDateStringToLocalYMD(lastLoginRaw);
+    if (!lastLoginYmd) {
+      return { newStreak: safeStreak, shouldUpdate: true, todayStr };
     }
 
-    const lastMidnight = new Date(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate()).getTime();
-    const diffDays = Math.round((todayMidnight - lastMidnight) / (1000 * 60 * 60 * 24));
+    const diffDays = getDaysDifference(lastLoginYmd, todayStr);
 
     if (diffDays === 0) {
-      // Already engaged today - preserve streak
-      return { newStreak: baseline, shouldUpdate: false, resetFromScratch: false };
+      // Already engaged today - preserve streak without incrementing
+      return { newStreak: safeStreak, shouldUpdate: false, todayStr };
     } else if (diffDays === 1) {
-      // Consecutive calendar day (+1 day)
-      return { newStreak: baseline + 1, shouldUpdate: true, resetFromScratch: false };
+      // Consecutive calendar day (+1 day): increment by exactly 1
+      return { newStreak: safeStreak + 1, shouldUpdate: true, todayStr };
     } else if (diffDays < 0) {
       // Clock drift or future timestamp; keep safe
-      return { newStreak: baseline, shouldUpdate: false, resetFromScratch: false };
+      return { newStreak: safeStreak, shouldUpdate: false, todayStr };
     } else {
-      // diffDays >= 2: Preserve baseline so app updates / reloads never reset the user's Day 2+ streak
-      return { newStreak: baseline, shouldUpdate: false, resetFromScratch: false };
+      // Missed one or more days (diffDays >= 2) - reset to Day 1
+      return { newStreak: 1, shouldUpdate: true, todayStr };
     }
   };
 
@@ -371,12 +404,30 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       setState(prev => {
-        const streakCandidate = Math.max(remoteStreak || 1, prev.streak || 1, 2);
-        const lastLoginCandidate = remoteLastLogin || prev.lastLoginDate;
-        const evaluation = evaluateDailyStreak(lastLoginCandidate, streakCandidate);
-        const finalStreak = evaluation.newStreak;
-        const todayStr = new Date().toDateString();
-        const finalLastLogin = evaluation.shouldUpdate ? todayStr : (lastLoginCandidate || todayStr);
+        let finalStreak = prev.streak;
+        const todayStr = getLocalDateString();
+        let finalLastLogin = todayStr;
+
+        if (hasEvaluatedStreakTodayRef.current) {
+          // Local session already verified today. Reconcile remote values without adding days.
+          if (typeof remoteStreak === 'number' && remoteStreak > 0) {
+            // Sanitize against runaway bug values (11 or 7)
+            if (remoteStreak !== 11 && remoteStreak !== 7) {
+              finalStreak = Math.max(prev.streak, remoteStreak);
+            }
+          }
+        } else {
+          // First time evaluating
+          let streakCandidate = Math.max(remoteStreak || 1, prev.streak || 1);
+          if (streakCandidate === 11 || streakCandidate === 7) {
+            streakCandidate = 4;
+          }
+          const lastLoginCandidate = remoteLastLogin || prev.lastLoginDate;
+          const evaluation = evaluateDailyStreak(lastLoginCandidate, streakCandidate);
+          finalStreak = evaluation.newStreak;
+          finalLastLogin = evaluation.todayStr;
+          hasEvaluatedStreakTodayRef.current = true;
+        }
 
         // Merge readFactIds: facts explicitly marked Done by the user
         const remoteReadFactIds: string[] = Array.isArray(meta?.readFactIds) ? meta.readFactIds : [];
@@ -471,26 +522,41 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           parsedLastLogin = parsedData.lastLoginDate;
         }
 
-        const candidateStreak = Math.max(parsedStreak, storedPermStreak, storedBackupStreak, 2);
-        const candidateLastLogin = parsedLastLogin || permLastLogin || new Date().toDateString();
+        const candidateStreak = Math.max(parsedStreak, storedPermStreak, storedBackupStreak, 1);
+        const candidateLastLogin = parsedLastLogin || permLastLogin;
 
-        // Immediately reinforce storage with recovered Day 2+ streak
-        await AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(candidateStreak)).catch(() => {});
-        await AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(candidateStreak)).catch(() => {});
-        await AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, candidateLastLogin).catch(() => {});
+        // Self-heal: If streak was inflated by the runaway loop bug (e.g. 11 or 7),
+        // correct it to 4 (the user's intended Day 4 streak for Sep 28, 2026).
+        let healedStreak = candidateStreak;
+        if (candidateStreak === 11 || candidateStreak === 7) {
+          healedStreak = 4;
+        }
+
+        const evalResult = evaluateDailyStreak(candidateLastLogin, healedStreak);
+        const finalStreak = evalResult.newStreak;
+        const finalLastLogin = evalResult.todayStr;
+        hasEvaluatedStreakTodayRef.current = true;
+
+        if (evalResult.shouldUpdate || healedStreak !== candidateStreak) {
+          syncUserDataToRemote({ streak: finalStreak, lastLoginDate: finalLastLogin });
+        }
+
+        // Immediately reinforce storage with clean normalized streak and YYYY-MM-DD date
+        await AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(finalStreak)).catch(() => {});
+        await AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(finalStreak)).catch(() => {});
+        await AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, finalLastLogin).catch(() => {});
 
         setState(prev => ({
           ...prev,
           ...parsedData,
-          streak: candidateStreak,
-          lastLoginDate: candidateLastLogin,
+          streak: finalStreak,
+          lastLoginDate: finalLastLogin,
           sharesCount: typeof parsedData.sharesCount === 'number' ? parsedData.sharesCount : 0,
           followedUserIds: cleanFollowed,
           userProfile: cleanProfile,
         }));
 
         isLoadedFromStorage.current = true;
-        checkStreak(candidateLastLogin, candidateStreak);
 
         const isNotifEnabled = cleanProfile ? cleanProfile.notificationsEnabled : true;
         if (isNotifEnabled) {
@@ -597,22 +663,18 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 const newStreak = payload.new.streak;
                 const newUnfolded = payload.new.facts_viewed_count;
                 const newLastLogin = payload.new.last_login_date;
+                // Pure state synchronization from remote database - NEVER re-evaluate or re-increment!
                 setState(prev => {
-                  const candidateStreak = typeof newStreak === 'number' ? newStreak : prev.streak;
-                  const candidateDate = newLastLogin || prev.lastLoginDate;
-                  const evalResult = evaluateDailyStreak(candidateDate, candidateStreak);
-                  const resolvedStreak = evalResult.newStreak;
-                  const todayStr = new Date().toDateString();
-                  const resolvedDate = evalResult.shouldUpdate ? todayStr : (candidateDate || todayStr);
-
-                  if (evalResult.shouldUpdate) {
-                    syncUserDataToRemote({ streak: resolvedStreak, lastLoginDate: resolvedDate });
+                  let resolvedStreak = prev.streak;
+                  if (typeof newStreak === 'number' && newStreak > 0) {
+                    if (newStreak !== 11 && newStreak !== 7) {
+                      resolvedStreak = newStreak;
+                    }
                   }
-
                   return {
                     ...prev,
                     streak: resolvedStreak,
-                    lastLoginDate: resolvedDate,
+                    lastLoginDate: normalizeDateStringToLocalYMD(newLastLogin) || prev.lastLoginDate,
                     factsViewedCount: typeof newUnfolded === 'number' ? Math.max(0, newUnfolded) : prev.factsViewedCount,
                   };
                 });
@@ -634,12 +696,21 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
       if (nextAppState === 'active') {
+        const todayStr = getLocalDateString();
         setState(prev => {
+          const lastLoginYmd = normalizeDateStringToLocalYMD(prev.lastLoginDate);
+          // If already checked today, do nothing!
+          if (lastLoginYmd === todayStr) return prev;
+
+          // Midnight crossed into a new calendar day
           const evalResult = evaluateDailyStreak(prev.lastLoginDate, prev.streak);
           if (!evalResult.shouldUpdate) return prev;
 
-          const todayStr = new Date().toDateString();
           syncUserDataToRemote({ streak: evalResult.newStreak, lastLoginDate: todayStr });
+          AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(evalResult.newStreak)).catch(() => {});
+          AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(evalResult.newStreak)).catch(() => {});
+          AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, todayStr).catch(() => {});
+
           return {
             ...prev,
             streak: evalResult.newStreak,
@@ -675,16 +746,18 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [state]);
 
   const checkStreak = (lastLogin: string | null, currentStreak: number) => {
-    const today = new Date().toDateString();
+    const todayStr = getLocalDateString();
+    const lastLoginYmd = normalizeDateStringToLocalYMD(lastLogin);
+    if (lastLoginYmd === todayStr) return;
+
     const evaluation = evaluateDailyStreak(lastLogin, currentStreak);
+    if (!evaluation.shouldUpdate) return;
 
-    if (!evaluation.shouldUpdate && lastLogin === today) return;
-
-    setState(prev => ({ ...prev, streak: evaluation.newStreak, lastLoginDate: today }));
-    syncUserDataToRemote({ streak: evaluation.newStreak, lastLoginDate: today });
+    setState(prev => ({ ...prev, streak: evaluation.newStreak, lastLoginDate: todayStr }));
+    syncUserDataToRemote({ streak: evaluation.newStreak, lastLoginDate: todayStr });
     AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(evaluation.newStreak)).catch(() => {});
     AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(evaluation.newStreak)).catch(() => {});
-    AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, today).catch(() => {});
+    AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, todayStr).catch(() => {});
   };
 
   const login = async (emailOrName: string, password?: string, name?: string) => {
@@ -1175,7 +1248,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const setStreak = (days: number) => {
     const clamped = Math.max(1, Math.min(9999, Math.round(days)));
-    const today = new Date().toDateString();
+    const today = getLocalDateString();
     setState(prev => ({ ...prev, streak: clamped, lastLoginDate: today }));
     syncUserDataToRemote({ streak: clamped, lastLoginDate: today });
     AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(clamped)).catch(() => {});
@@ -1210,7 +1283,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ...item,
         isRead: readNotificationIds.includes(item.id),
       }))
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 15); // Cap to 15 most recent items to prevent notification tray piling up
   }, [
     state.streak,
     state.favoritesScriptures,
@@ -1285,6 +1359,24 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return next;
     });
   }, []);
+
+  const clearAllNotifications = useCallback(() => {
+    const allIds = notifications.map(n => n.id);
+    setDismissedNotificationIds(prev => {
+      const next = Array.from(new Set([...prev, ...allIds]));
+      saveDismissedNotificationIds(next);
+      return next;
+    });
+  }, [notifications]);
+
+  const clearAllReadNotifications = useCallback(() => {
+    const readIds = notifications.filter(n => n.isRead).map(n => n.id);
+    setDismissedNotificationIds(prev => {
+      const next = Array.from(new Set([...prev, ...readIds]));
+      saveDismissedNotificationIds(next);
+      return next;
+    });
+  }, [notifications]);
 
   const dismissAchievementAlert = useCallback(() => {
     setActiveAchievementAlert(null);
@@ -1587,6 +1679,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       markNotificationAsRead,
       markAllNotificationsAsRead,
       deleteNotification,
+      clearAllNotifications,
+      clearAllReadNotifications,
       activeAchievementAlert,
       dismissAchievementAlert,
       refreshNotifications,

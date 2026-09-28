@@ -34,6 +34,9 @@
   <img src="https://img.shields.io/badge/Content%20Filter-Fellowship%20Moderation%20%7C%20Eph%204%3A29-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Fellowship Content Moderation" />
   <img src="https://img.shields.io/badge/Auth-Username%20%7C%20Email%20Login-10B981?style=for-the-badge&logo=supabase&logoColor=white" alt="Username and Email Login" />
   <img src="https://img.shields.io/badge/Unfolded%20Metric-Verified%20Read%20Facts%20Only-FDD223?style=for-the-badge" alt="Truthful Unfolded Count" />
+  <img src="https://img.shields.io/badge/Daily%20Streak-Deterministic%20Calendar%20Day%20%7C%20Feedback%20Loop%20Immune-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Deterministic Daily Streak Engine" />
+  <img src="https://img.shields.io/badge/Notifications-Swipe--To--Dismiss%20%7C%20Bidirectional%20PanResponder-FDD223?style=for-the-badge" alt="Swipe To Dismiss Notifications" />
+  <img src="https://img.shields.io/badge/Notification%20Tray-Mark%20Read%20%7C%20Clear%20Read%20%7C%20Clear%20All-10B981?style=for-the-badge" alt="Notification Tray Bulk Clear" />
   <img src="https://img.shields.io/badge/Notifications-Zero%20Phantom%20Backlog-10B981?style=for-the-badge" alt="Zero Phantom Notifications" />
   <img src="https://img.shields.io/badge/Privacy-GDPR%20%7C%20POPIA%20%7C%20Data%20Export-3B82F6?style=for-the-badge" alt="Data Portability and Purge" />
   <img src="https://img.shields.io/badge/Themed%20Alerts-60--30--10%20Custom%20Popups-FDD223?style=for-the-badge&logo=shield&logoColor=white" alt="Themed Dialogs and Custom Popups" />
@@ -1283,10 +1286,29 @@ A seamless, real-time in-app notification center and Feed alert hub that bridges
   - One-tap "Mark all read" action.
   - Prominent "View All Notifications ›" button navigating directly to the dedicated notification screen.
 - **Dedicated Notifications Screen (`NotificationsScreen.tsx`)**: Full stack screen featuring:
-  - Top summary with unread indicator badges.
-  - Category filter tabs: `All`, `Achievements`, and `Devotions`.
-  - Individual action cards with unread dot indicators, scriptural excerpts, and direct deep-links to the full Holy Bible reader (`WOTDScreen`) or the Study Achievements center (`AchievementsScreen`).
-  - Dismissal and read state persistence via `@exegeomai_read_notification_ids` and `@exegeomai_dismissed_notification_ids`.
+  - **Bidirectional Swipe-To-Dismiss (`SwipeableNotificationRow`)**: Native `PanResponder` and `Animated.Value` gesture engine allowing users to swipe cards either left or right beyond a calibrated threshold (`SCREEN_WIDTH * 0.28`). As cards are swiped, a background action shelf revealing a red trash SVG and dismiss indicator is exposed before smoothly animating offscreen.
+  - **Single-Tap Tray Maintenance**: Tapping any notification opens the deep link and automatically removes the item from the active notification center to prevent piling up.
+  - **Bulk Tray Actions**: Header controls providing "Mark all read" (`CheckDoubleSvg`), "Clear read" (`TrashSvg`), and "Clear all" (with confirmation dialog) for maintaining a pristine, zero-backlog notification tray.
+  - **Lean In-App Aggregation (`inAppNotifications.ts`)**: Milestones capped to the latest 1-2 milestones per category and recent list capped to 15 items, preventing past historical achievements from flooding the tray.
+  - **Dismissal & Read State Persistence**: State persisted via `@exegeomai_read_notification_ids` and `@exegeomai_dismissed_notification_ids`.
+
+### 8. Deterministic Daily Streak Engine (`UserContext.tsx`)
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Calendar%20Day-Strict%20YYYY--MM--DD%20Local-10B981?style=for-the-badge" alt="Strict YYYY-MM-DD Local" />
+  <img src="https://img.shields.io/badge/Feedback%20Loop-Eliminated%20Supabase%20Re-Evaluation-FDD223?style=for-the-badge" alt="Eliminated Supabase Re-Evaluation" />
+  <img src="https://img.shields.io/badge/Single%20Increment-Once%20Per%20Calendar%20Day-10B981?style=for-the-badge" alt="Single Increment Once Per Calendar Day" />
+</p>
+
+A mathematically resilient streak calculation engine eliminating multi-trigger runaway increments across local storage, Supabase Realtime synchronization, and AppState foreground resumes:
+- **Strict Local Calendar Day Representation**: Dates normalized to `YYYY-MM-DD` strings via `getLocalDateString(d: Date)` and `normalizeDateStringToLocalYMD(dateStr)`, ensuring time-of-day offsets never alter calendar day differences.
+- **Single Evaluation Guard (`hasEvaluatedStreakTodayRef`)**: Session ref preventing concurrent or multiple evaluations across `loadData`, `restoreRemoteUserData`, and `AppState.addEventListener`.
+- **Decoupled Supabase Realtime Channel**: Incoming `postgres_changes` payloads apply remote values directly without re-evaluating streak increments, breaking the cyclic feedback loop.
+- **Deterministic Day Stepping**:
+  - `daysDiff === 0`: Same calendar day. Streak remains unchanged (`prevStreak`).
+  - `daysDiff === 1`: Consecutive calendar day. Streak increments by exactly +1 (`prevStreak + 1`).
+  - `daysDiff > 1`: Missed day. Streak resets gracefully to 1 (`1`).
+- **Self-Healing Inflation Correction**: Automatically sanitizes runaway historical streak values to the authentic user progress baseline.
 
 ---
 

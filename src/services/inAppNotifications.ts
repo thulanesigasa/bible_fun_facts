@@ -171,32 +171,35 @@ export function getUnlockedAchievementNotifications(
     count: number
   ) => {
     const milestones = ALL_ACHIEVEMENTS[category] || [];
-    milestones.forEach((m) => {
-      if (count >= m.target) {
-        const coords = parseScriptureCoordinates(m.verseRef);
-        const unlockDateIso = storedTimestamps[m.id] || new Date().toISOString();
-        const deliveryLabel = formatDeliveryLabel(new Date(unlockDateIso));
+    const unlocked = milestones.filter((m) => count >= m.target);
+    if (unlocked.length === 0) return;
 
-        notifications.push({
-          id: `achievement_${m.id}`,
-          type: 'achievement',
-          title: `Milestone Unlocked: ${m.title}`,
-          subtitle: `${deliveryLabel} • ${m.badgeLabel} (${m.target} ${m.target === 1 ? 'day' : 'milestones'})`,
-          body: m.subtitle,
-          scriptureRef: m.verseRef,
-          verseQuote: m.verseQuote,
-          book: coords?.book,
-          chapter: coords?.chapter,
-          verse: coords?.verse,
-          deliveredAtLabel: deliveryLabel,
-          achievementId: m.id,
-          achievementCategory: m.category,
-          achievementTarget: m.target,
-          createdAt: unlockDateIso,
-          isRead: false,
-          actionRoute: 'Achievements',
-        });
-      }
+    // Surface only the latest 1-2 unlocked milestones per category so historical milestones do not flood the notification tray
+    const recentUnlocked = unlocked.slice(-2);
+    recentUnlocked.forEach((m) => {
+      const coords = parseScriptureCoordinates(m.verseRef);
+      const unlockDateIso = storedTimestamps[m.id] || new Date().toISOString();
+      const deliveryLabel = formatDeliveryLabel(new Date(unlockDateIso));
+
+      notifications.push({
+        id: `achievement_${m.id}`,
+        type: 'achievement',
+        title: `Milestone Unlocked: ${m.title}`,
+        subtitle: `${deliveryLabel} • ${m.badgeLabel} (${m.target} ${m.target === 1 ? 'day' : 'milestones'})`,
+        body: m.subtitle,
+        scriptureRef: m.verseRef,
+        verseQuote: m.verseQuote,
+        book: coords?.book,
+        chapter: coords?.chapter,
+        verse: coords?.verse,
+        deliveredAtLabel: deliveryLabel,
+        achievementId: m.id,
+        achievementCategory: m.category,
+        achievementTarget: m.target,
+        createdAt: unlockDateIso,
+        isRead: false,
+        actionRoute: 'Achievements',
+      });
     });
   };
 
