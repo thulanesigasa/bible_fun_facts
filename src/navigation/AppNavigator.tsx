@@ -59,7 +59,7 @@ import StrongsScreen from '../screens/StrongsScreen';
 import HebrewScreen from '../screens/HebrewScreen';
 import GreekScreen from '../screens/GreekScreen';
 import StrongsDetailScreen from '../screens/StrongsDetailScreen';
-import { LexiconEntry } from '../data/lexiconData';
+import type { LexiconEntry } from '../data/lexiconData';
 
 export type AuthStackParamList = {
   Welcome: undefined;

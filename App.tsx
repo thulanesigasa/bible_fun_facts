@@ -7,19 +7,26 @@ import AppNavigator from './src/navigation/AppNavigator';
 import { UserProvider } from './src/context/UserContext';
 import { AlertProvider } from './src/context/AlertContext';
 import { UpdateModal } from './src/components/UpdateModal';
+import { ErrorBoundary } from './src/components/ErrorBoundary';
+import { initSentry } from './src/services/sentryService';
+
+// Initialize production crash logging early in application lifecycle
+initSentry();
 
 export default function App() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <AlertProvider>
-        <UserProvider>
-          <SafeAreaProvider>
-            <StatusBar style="dark" />
-            <AppNavigator />
-            <UpdateModal />
-          </SafeAreaProvider>
-        </UserProvider>
-      </AlertProvider>
-    </GestureHandlerRootView>
+    <ErrorBoundary>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <AlertProvider>
+          <UserProvider>
+            <SafeAreaProvider>
+              <StatusBar style="dark" />
+              <AppNavigator />
+              <UpdateModal />
+            </SafeAreaProvider>
+          </UserProvider>
+        </AlertProvider>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 }
