@@ -1512,6 +1512,39 @@ To provide an unhurried, respectful, and focused user experience, all critical s
 
 ---
 
+### Strong's Concordance & Complete A-to-Z Biblical Dictionary
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Dictionary-Strongs%20A--to--Z%20Biblical%20Lexicon-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="Strong's A-to-Z Dictionary" />
+  <img src="https://img.shields.io/badge/Offline%20Storage-2.4%20MB%20Local%20Lexicon%20Cache-10B981?style=for-the-badge&logo=sqlite&logoColor=white" alt="Offline Storage Cache" />
+  <img src="https://img.shields.io/badge/Search%20Engine-Inline%20Download%20Button%20%7C%20Dynamic%20Width-0284C7?style=for-the-badge" alt="Inline Download Button" />
+  <img src="https://img.shields.io/badge/UI%20Aesthetic-Pure%20Text%20Buttons%20%7C%20Zero%20Boxed%20Pills-FDD223?style=for-the-badge" alt="Pure Text Buttons" />
+  <img src="https://img.shields.io/badge/Header%20Architecture-Tab%20Logo%20Header%20Suppression-0F172A?style=for-the-badge&logo=react&logoColor=white" alt="Header Architecture" />
+</p>
+
+The application features a comprehensive, unified A-to-Z Strong's Concordance and Biblical Dictionary (`StrongsScreen.tsx` and `StrongsDetailScreen.tsx`):
+
+1. **Inline Download Button Next to Search**:
+   - The former text banners ("Download Offline Dictionary" / "Offline Dictionary Active") have been replaced with a compact 40x40 SVG icon button positioned directly beside the search bar.
+   - The search input container dynamically flexes (`flex: 1`) to give clean breathing room to the download trigger.
+   - Displays `DownloadSvg` (`#78350F`) when un-cached and `CheckCircleSvg` (`#15803D`) when active and offline-ready.
+   - Tapping when already downloaded displays an interactive confirmation dialog with options to re-download or cancel.
+
+2. **Elimination of Duplicate Tab Logo Header & Gap**:
+   - In `src/navigation/AppNavigator.tsx`, `'StrongsDetail'` was added to the `childScreens` array inside `shouldShowTabHeader(route)`.
+   - This suppresses the top Tab logo header (`headerTitle: () => <Image source={logo} />`), preventing the nested Stack header (`Strong's Lexicon`) from being pushed down and eliminating the awkward double header gap.
+   - Screen safe areas are calibrated with `edges={['bottom', 'left', 'right']}` from `react-native-safe-area-context` to prevent redundant top notch insets under navigation headers.
+
+3. **Text-Based UI Aesthetics**:
+   - Stripped all boxed chip backgrounds, heavy borders, and pill containers across `StrongsDetailScreen` and `StrongsScreen` in favor of refined, typography-first elements:
+     - **Scripture Bar Link**: Pure text element (`{reference} • Bible Canon`) with inline amber link (`Open in Reader ›`).
+     - **Concordance Stepper**: Pure text navigation (`‹ {prevNumber}` and `{nextNumber} ›` in `#B45309`) flanking the bold centered transliteration.
+     - **Cross-Reference Cognates**: Pure text links (`See {number} ({transliteration}) ›`) replacing bulky chip pills.
+     - **Header Actions**: Clean text `Share` button (`#B45309`) in the native navigation header.
+     - **Filter Reset**: Pure text action (`Reset All Filters ›`) replacing boxed buttons.
+
+---
+
 ### Type Checking & Validation
 ```bash
 npx tsc --noEmit

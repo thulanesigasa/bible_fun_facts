@@ -14,12 +14,6 @@ import {
   getAdjacentLexiconEntries,
   getLexiconEntryByStrongs,
 } from '../data/lexiconData';
-import {
-  ChevronLeftSvg,
-  ChevronRightSvg,
-  ShareSvg,
-  BookOpenSvg,
-} from '../components/SvgIcons';
 import { Text } from '../components/Typography';
 import { colors, spacing } from '../theme';
 
@@ -49,7 +43,9 @@ export default function StrongsDetailScreen({
           accessibilityRole="button"
           accessibilityLabel="Share Strong's study"
         >
-          <ShareSvg size={18} color="#0F172A" />
+          <Text variant="caption" weight="800" color="#B45309" style={styles.headerShareText}>
+            Share
+          </Text>
         </TouchableOpacity>
       ),
     });
@@ -124,48 +120,42 @@ export default function StrongsDetailScreen({
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Quick Scripture Navigation Bar */}
+        {/* Quick Scripture Navigation Bar (Clean Editorial Text) */}
         <View style={styles.scriptureBar}>
           <View style={styles.scriptureBarLeft}>
-            <View style={styles.pillBox}>
-              <Text variant="caption" weight="800" color="#0F172A">
-                {currentEntry.keyScripture.reference}
-              </Text>
-            </View>
-            <View style={styles.pillBoxSubtle}>
-              <Text variant="caption" weight="700" color={colors.textSecondary}>
-                Bible Canon
-              </Text>
-            </View>
+            <Text variant="caption" weight="800" color="#0F172A">
+              {currentEntry.keyScripture.reference}
+            </Text>
+            <Text variant="caption" color={colors.textTertiary}>
+              {' • Bible Canon'}
+            </Text>
           </View>
 
           <TouchableOpacity
-            style={styles.openReaderBtn}
+            style={styles.textLinkBtn}
             onPress={handleOpenScripture}
-            activeOpacity={0.8}
+            activeOpacity={0.7}
             accessibilityRole="button"
             accessibilityLabel={`Open ${currentEntry.keyScripture.reference} in Word Reader`}
           >
-            <BookOpenSvg size={14} color="#0F172A" />
-            <Text variant="caption" weight="800" color="#0F172A" style={styles.openReaderText}>
-              Open in Reader
+            <Text variant="caption" weight="800" color="#B45309">
+              Open in Reader ›
             </Text>
           </TouchableOpacity>
         </View>
 
-        {/* Stepper Bar: ◄ 2198. zaó ► */}
+        {/* Stepper Bar: ‹ 2198. zaó › (Clean Text Navigation) */}
         <View style={styles.stepperContainer}>
           {prevEntry ? (
             <TouchableOpacity
-              style={styles.stepperNavBtn}
+              style={styles.stepperNavTextBtn}
               onPress={() => setCurrentEntry(prevEntry)}
               activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityLabel={`Previous Strong's: ${prevEntry.strongsNumber} ${prevEntry.transliteration}`}
             >
-              <ChevronLeftSvg size={15} color="#B45309" />
               <Text variant="caption" weight="800" color="#B45309" style={styles.stepperBtnText}>
-                {prevEntry.strongsNumber.replace(/^[HG]/, '')}
+                {`‹ ${prevEntry.strongsNumber.replace(/^[HG]/, '')}`}
               </Text>
             </TouchableOpacity>
           ) : (
@@ -180,16 +170,15 @@ export default function StrongsDetailScreen({
 
           {nextEntry ? (
             <TouchableOpacity
-              style={styles.stepperNavBtn}
+              style={styles.stepperNavTextBtn}
               onPress={() => setCurrentEntry(nextEntry)}
               activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityLabel={`Next Strong's: ${nextEntry.strongsNumber} ${nextEntry.transliteration}`}
             >
               <Text variant="caption" weight="800" color="#B45309" style={styles.stepperBtnText}>
-                {nextEntry.strongsNumber.replace(/^[HG]/, '')}
+                {`${nextEntry.strongsNumber.replace(/^[HG]/, '')} ›`}
               </Text>
-              <ChevronRightSvg size={15} color="#B45309" />
             </TouchableOpacity>
           ) : (
             <View style={styles.stepperNavDisabled} />
@@ -336,29 +325,29 @@ export default function StrongsDetailScreen({
             )}
           </Text>
 
-          {/* Clickable Related Strong's Cognates (Yellow Pills) */}
+          {/* Clickable Related Strong's Cognates (Pure Text Links) */}
           {currentEntry.relatedStrongs && currentEntry.relatedStrongs.length > 0 && (
             <View style={styles.cognatesContainer}>
               <Text variant="caption" weight="800" color="#854D0E" style={styles.cognateHeading}>
                 CROSS-REFERENCE COGNATES:
               </Text>
-              <View style={styles.cognateChipsRow}>
+              <View style={styles.cognateLinksRow}>
                 {currentEntry.relatedStrongs.map((relStrongs) => {
                   const relEntry = getLexiconEntryByStrongs(relStrongs);
                   const label = relEntry
-                    ? `See ${relStrongs.replace(/^[HG]/, '')} (${relEntry.transliteration})`
-                    : `See ${relStrongs}`;
+                    ? `See ${relStrongs.replace(/^[HG]/, '')} (${relEntry.transliteration}) ›`
+                    : `See ${relStrongs} ›`;
 
                   return (
                     <TouchableOpacity
                       key={relStrongs}
-                      style={styles.cognateChip}
+                      style={styles.cognateTextBtn}
                       onPress={() => handleSelectRelated(relStrongs)}
-                      activeOpacity={0.75}
+                      activeOpacity={0.7}
                       accessibilityRole="button"
                       accessibilityLabel={`Jump to Strong's ${relStrongs}`}
                     >
-                      <Text variant="caption" weight="800" color="#854D0E">
+                      <Text variant="caption" weight="800" color="#B45309" style={styles.cognateLinkText}>
                         {label}
                       </Text>
                     </TouchableOpacity>
@@ -384,12 +373,11 @@ export default function StrongsDetailScreen({
           <TouchableOpacity
             style={styles.scriptureJumpRow}
             onPress={handleOpenScripture}
-            activeOpacity={0.8}
+            activeOpacity={0.7}
             accessibilityRole="button"
             accessibilityLabel={`Open ${currentEntry.keyScripture.reference} in Word Reader`}
           >
-            <BookOpenSvg size={14} color="#B45309" />
-            <Text variant="caption" weight="800" color="#B45309">
+            <Text variant="caption" weight="800" color="#B45309" style={styles.scriptureJumpText}>
               {`${currentEntry.keyScripture.reference} • Read Full Chapter in Canon ›`}
             </Text>
           </TouchableOpacity>
@@ -412,11 +400,15 @@ const styles = StyleSheet.create({
     paddingBottom: 64,
   },
   headerShareBtn: {
-    padding: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
     marginRight: 4,
   },
+  headerShareText: {
+    fontSize: 13,
+  },
 
-  // Quick Scripture & Version Bar
+  // Quick Scripture & Version Bar (Clean Editorial Text)
   scriptureBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -430,38 +422,14 @@ const styles = StyleSheet.create({
   scriptureBarLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-  },
-  pillBox: {
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    backgroundColor: '#FEF9C3',
-    borderWidth: 1,
-    borderColor: '#FDE047',
-  },
-  pillBoxSubtle: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 8,
-    backgroundColor: '#F8FAFC',
-  },
-  openReaderBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
     gap: 6,
-    paddingVertical: 6,
-    paddingHorizontal: 13,
-    borderRadius: 14,
-    backgroundColor: '#FDD223',
   },
-  openReaderText: {
-    fontSize: 11.5,
-    fontWeight: '800',
-    color: '#0F172A',
+  textLinkBtn: {
+    paddingVertical: 4,
+    paddingHorizontal: 4,
   },
 
-  // Stepper Bar: ◄ 2198. zaó ► (Yellow Theme)
+  // Stepper Bar: ‹ 2198. zaó › (Clean Text Navigation)
   stepperContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -472,22 +440,15 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(15, 23, 42, 0.06)',
   },
-  stepperNavBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
+  stepperNavTextBtn: {
     paddingVertical: 6,
-    paddingHorizontal: 11,
-    borderRadius: 10,
-    backgroundColor: '#FEF9C3',
-    borderWidth: 1,
-    borderColor: '#FDE047',
+    paddingHorizontal: 8,
   },
   stepperBtnText: {
-    fontSize: 12,
+    fontSize: 14,
   },
   stepperNavDisabled: {
-    width: 60,
+    width: 48,
   },
   stepperCenter: {
     alignItems: 'center',
@@ -598,18 +559,17 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     marginBottom: 8,
   },
-  cognateChipsRow: {
+  cognateLinksRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: 12,
   },
-  cognateChip: {
-    paddingVertical: 5,
-    paddingHorizontal: 11,
-    borderRadius: 12,
-    backgroundColor: '#FEF9C3',
-    borderWidth: 1,
-    borderColor: '#FDE047',
+  cognateTextBtn: {
+    paddingVertical: 4,
+    paddingHorizontal: 2,
+  },
+  cognateLinkText: {
+    fontSize: 13,
   },
 
   // Key Scripture Exegesis Context
@@ -618,12 +578,13 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     lineHeight: 22,
     color: '#1E293B',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   scriptureJumpRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingVertical: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 2,
+  },
+  scriptureJumpText: {
+    fontSize: 13,
   },
 });

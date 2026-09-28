@@ -4,11 +4,12 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   TextInput,
   Share,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme';
 import { Text } from '../components/Typography';
@@ -58,6 +59,21 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
   }, [searchQuery, selectedLetter]);
 
   const handleDownload = async () => {
+    if (offlineMeta?.isDownloaded) {
+      Alert.alert(
+        'Offline Dictionary Active',
+        `The Strong's A-to-Z Dictionary (${offlineMeta.sizeFormatted}) is downloaded and saved to your device for 100% offline access.\n\nWould you like to re-download to refresh the lexicon cache?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Re-download', onPress: performDownload },
+        ]
+      );
+      return;
+    }
+    await performDownload();
+  };
+
+  const performDownload = async () => {
     try {
       setIsDownloading(true);
       const meta = await downloadOfflineDictionary();
@@ -237,52 +253,57 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       {/* Search Input Bar & Controls */}
       <View style={styles.searchSection}>
-        {/* Offline Dictionary Download / Status Banner */}
-        <View style={styles.offlineBar}>
-          {offlineMeta?.isDownloaded ? (
-            <View style={styles.offlineReadyRow}>
-              <CheckCircleSvg size={15} color="#15803D" />
-              <Text variant="caption" weight="700" color="#15803D" style={styles.offlineReadyText}>
-                {`Offline Dictionary Active • 100% Offline Ready (${offlineMeta.sizeFormatted})`}
-              </Text>
-            </View>
-          ) : (
-            <TouchableOpacity
-              style={styles.offlineDownloadBtn}
-              onPress={handleDownload}
-              disabled={isDownloading}
-              activeOpacity={0.8}
-            >
-              <DownloadSvg size={14} color="#78350F" />
-              <Text variant="caption" weight="800" color="#78350F" style={styles.offlineDownloadText}>
-                {isDownloading ? 'Downloading Dictionary...' : 'Download Offline Dictionary (2.4 MB)'}
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
+        {/* Search Input Row with inline download icon button */}
+        <View style={styles.searchRow}>
+          <View style={styles.searchInputContainer}>
+            <SearchSvg size={16} color={colors.textSecondary} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search dictionary (life, love, zaó, G2222)..."
+              placeholderTextColor={colors.textTertiary}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity
+                onPress={() => setSearchQuery('')}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityRole="button"
+                accessibilityLabel="Clear search input"
+              >
+                <CloseSvg size={16} color={colors.textTertiary} />
+              </TouchableOpacity>
+            )}
+          </View>
 
-        <View style={styles.searchInputContainer}>
-          <SearchSvg size={16} color={colors.textSecondary} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search dictionary (e.g. life, love, faith, zaó, H2416, G2222)..."
-            placeholderTextColor={colors.textTertiary}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity
-              onPress={() => setSearchQuery('')}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            >
-              <CloseSvg size={16} color={colors.textTertiary} />
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity
+            style={[
+              styles.downloadIconBtn,
+              offlineMeta?.isDownloaded && styles.downloadIconBtnReady,
+            ]}
+            onPress={handleDownload}
+            disabled={isDownloading}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={
+              offlineMeta?.isDownloaded
+                ? 'Offline dictionary active'
+                : 'Download dictionary for offline use'
+            }
+          >
+            {isDownloading ? (
+              <ActivityIndicator size="small" color="#78350F" />
+            ) : offlineMeta?.isDownloaded ? (
+              <CheckCircleSvg size={18} color="#15803D" />
+            ) : (
+              <DownloadSvg size={18} color="#78350F" />
+            )}
+          </TouchableOpacity>
         </View>
 
         {/* A-to-Z Alphabetical Quick Browser */}
@@ -351,10 +372,12 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
                   setSearchQuery('');
                   setSelectedLetter('All');
                 }}
-                activeOpacity={0.8}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel="Reset Search and Letter Filter"
               >
-                <Text variant="caption" weight="800" color="#0F172A">
-                  Reset All Filters
+                <Text variant="caption" weight="800" color="#B45309" style={styles.resetFilterText}>
+                  Reset All Filters ›
                 </Text>
               </TouchableOpacity>
             )}
@@ -379,41 +402,28 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
 
-  // Offline Download & Status Bar (Yellow Theme)
-  offlineBar: {
-    marginBottom: 8,
-  },
-  offlineReadyRow: {
+  searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    backgroundColor: '#F0FDF4',
-    borderWidth: 1,
-    borderColor: '#BBF7D0',
+    gap: 8,
+    marginBottom: 6,
   },
-  offlineReadyText: {
-    fontSize: 12,
-  },
-  offlineDownloadBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+  downloadIconBtn: {
+    width: 40,
+    height: 40,
     borderRadius: 10,
     backgroundColor: '#FEF9C3',
     borderWidth: 1,
     borderColor: '#FDE047',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  offlineDownloadText: {
-    fontSize: 12,
+  downloadIconBtnReady: {
+    backgroundColor: '#F0FDF4',
+    borderColor: '#BBF7D0',
   },
-
   searchInputContainer: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F1F5F9',
@@ -579,10 +589,11 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   resetFilterBtn: {
-    marginTop: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 16,
-    backgroundColor: '#FDD223',
+    marginTop: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+  },
+  resetFilterText: {
+    fontSize: 13,
   },
 });
