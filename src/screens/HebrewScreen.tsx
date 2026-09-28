@@ -69,21 +69,19 @@ export default function HebrewScreen({ navigation }: HebrewScreenProps) {
     }
   };
 
-  const renderWordItem = ({ item }: { item: LexiconEntry }) => {
+  const renderWordItem = ({ item, isLast }: { item: LexiconEntry; isLast: boolean }) => {
     const isExpanded = expandedId === item.strongsNumber;
 
     return (
-      <View style={styles.card}>
-        {/* Card Header: Category & Strong's Tag */}
-        <View style={styles.cardHeader}>
-          <View style={styles.strongsBadge}>
+      <View style={[styles.wordRow, !isLast && styles.rowDivider]}>
+        {/* Row Header: Category & Strong's Label (Directly on Body Canvas) */}
+        <View style={styles.rowHeader}>
+          <View style={styles.headerLeftWrap}>
             <Text variant="caption" weight="800" color="#0F172A">
               {item.strongsNumber}
             </Text>
-          </View>
-          <View style={styles.categoryBadge}>
-            <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.categoryText}>
-              {item.category.toUpperCase()}
+            <Text variant="caption" weight="700" color={colors.textTertiary}>
+              {` • ${item.category.toUpperCase()}`}
             </Text>
           </View>
 
@@ -128,9 +126,9 @@ export default function HebrewScreen({ navigation }: HebrewScreenProps) {
         {/* Short Definition */}
         <Text style={styles.definitionText}>{item.shortDefinition}</Text>
 
-        {/* Deep Dive Covenant Exegesis */}
+        {/* Deep Dive Covenant Exegesis (Continuous Body Flow) */}
         <View style={styles.exegesisSection}>
-          <Text variant="caption" weight="800" color={colors.textTertiary} style={styles.sectionLabel}>
+          <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionLabel}>
             HEBRAIC THEOLOGY & COVENANT CONTEXT
           </Text>
           <Text
@@ -141,28 +139,23 @@ export default function HebrewScreen({ navigation }: HebrewScreenProps) {
           </Text>
         </View>
 
-        {/* Key Scripture Passage Box */}
+        {/* Key Scripture Quote & Reader Link (Unboxed Body Element) */}
         <TouchableOpacity
-          style={styles.scriptureBox}
-          activeOpacity={0.8}
+          style={styles.scriptureLink}
+          activeOpacity={0.7}
           onPress={() => handleOpenScripture(item)}
           accessibilityRole="button"
           accessibilityLabel={`Open ${item.keyScripture.reference} in Word Reader`}
         >
-          <View style={styles.scriptureHeader}>
-            <View style={styles.scriptureRefRow}>
-              <BookOpenSvg size={13} color={colors.accent} />
-              <Text variant="caption" weight="800" color={colors.accent}>
-                {item.keyScripture.reference}
-              </Text>
-            </View>
-            <Text variant="caption" color={colors.accent} weight="700">
-              Open in Word Reader ›
-            </Text>
-          </View>
-          <Text style={styles.scriptureSnippetText} numberOfLines={2}>
+          <Text style={styles.scriptureSnippetText}>
             "{item.keyScripture.snippet}"
           </Text>
+          <View style={styles.scriptureMetaRow}>
+            <BookOpenSvg size={12} color={colors.accent} />
+            <Text variant="caption" weight="700" color={colors.accent}>
+              {item.keyScripture.reference} • Open in Word Reader ›
+            </Text>
+          </View>
         </TouchableOpacity>
 
         {/* Expand Toggle */}
@@ -179,12 +172,12 @@ export default function HebrewScreen({ navigation }: HebrewScreenProps) {
     );
   };
 
-  const renderAlphabetItem = ({ item }: { item: HebrewLetterGuide }) => {
+  const renderAlphabetItem = ({ item, isLast }: { item: HebrewLetterGuide; isLast: boolean }) => {
     return (
-      <View style={styles.alphabetRow}>
-        <View style={styles.alphabetLetterBox}>
+      <View style={[styles.alphabetRow, !isLast && styles.rowDivider]}>
+        <View style={styles.alphabetGlyphCol}>
           <Text style={styles.alphabetGlyph}>{item.letter}</Text>
-          <Text variant="caption" weight="700" color={colors.accent}>
+          <Text variant="caption" weight="800" color={colors.accent}>
             {item.numericValue}
           </Text>
         </View>
@@ -203,11 +196,9 @@ export default function HebrewScreen({ navigation }: HebrewScreenProps) {
             Sound: {item.sound}
           </Text>
 
-          <View style={styles.paleoBox}>
-            <Text variant="caption" weight="700" color="#0F172A">
-              Paleo Meaning: {item.paleoMeaning}
-            </Text>
-          </View>
+          <Text variant="caption" weight="700" color={colors.textPrimary} style={styles.paleoText}>
+            Paleo Meaning: {item.paleoMeaning}
+          </Text>
         </View>
       </View>
     );
@@ -312,7 +303,12 @@ export default function HebrewScreen({ navigation }: HebrewScreenProps) {
         <FlatList
           data={filteredWords}
           keyExtractor={(item) => item.strongsNumber}
-          renderItem={renderWordItem}
+          renderItem={({ item, index }) =>
+            renderWordItem({
+              item,
+              isLast: index === filteredWords.length - 1,
+            })
+          }
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
@@ -335,7 +331,12 @@ export default function HebrewScreen({ navigation }: HebrewScreenProps) {
         <FlatList
           data={HEBREW_ALPHABET_GUIDE}
           keyExtractor={(item) => item.letter}
-          renderItem={renderAlphabetItem}
+          renderItem={({ item, index }) =>
+            renderAlphabetItem({
+              item,
+              isLast: index === HEBREW_ALPHABET_GUIDE.length - 1,
+            })
+          }
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
         />
@@ -412,44 +413,28 @@ const styles = StyleSheet.create({
   },
 
   listContent: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
     paddingBottom: 96,
   },
 
-  // Word Study Card
-  card: {
+  // Continuous Flat Body Row Styling (No Card Divs)
+  wordRow: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    padding: spacing.md,
-    marginBottom: spacing.md,
   },
-  cardHeader: {
+  rowDivider: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
+  },
+  rowHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 6,
   },
-  strongsBadge: {
-    backgroundColor: '#FEF3C7',
-    borderWidth: 1,
-    borderColor: '#F59E0B',
-    paddingVertical: 2,
-    paddingHorizontal: 8,
-    borderRadius: 6,
-  },
-  categoryBadge: {
-    backgroundColor: '#F1F5F9',
-    paddingVertical: 2,
-    paddingHorizontal: 8,
-    borderRadius: 6,
-    marginLeft: 6,
-    marginRight: 'auto',
-  },
-  categoryText: {
-    fontSize: 10,
+  headerLeftWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   shareBtn: {
     padding: 4,
@@ -485,82 +470,62 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 
+  // Unboxed Exegesis Section (Continuous Body Flow)
   exegesisSection: {
-    backgroundColor: '#FAFAF9',
-    borderRadius: 8,
-    padding: 10,
+    marginTop: 2,
     marginBottom: 8,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.accent,
   },
   sectionLabel: {
-    fontSize: 10,
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
     marginBottom: 4,
   },
   exegesisText: {
-    fontSize: 13,
-    lineHeight: 20,
+    fontSize: 13.5,
+    lineHeight: 21,
     color: colors.textSecondary,
   },
 
-  scriptureBox: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: 8,
-    padding: 10,
+  // Unboxed Scripture Link (Part of Body)
+  scriptureLink: {
     marginTop: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.05)',
+    marginBottom: 6,
   },
-  scriptureHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  scriptureSnippetText: {
+    fontSize: 13,
+    fontStyle: 'italic',
+    lineHeight: 19,
+    color: colors.textSecondary,
     marginBottom: 4,
   },
-  scriptureRefRow: {
+  scriptureMetaRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
   },
-  scriptureSnippetText: {
-    fontSize: 12.5,
-    fontStyle: 'italic',
-    lineHeight: 18,
-    color: colors.textSecondary,
-  },
 
   expandToggle: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     paddingVertical: 6,
-    marginTop: 4,
+    marginTop: 2,
   },
 
-  // Alphabet Guide Row
+  // Continuous Body Alphabet Row (No Card Divs)
   alphabetRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    padding: 12,
-    marginBottom: 10,
-    gap: 14,
+    gap: 16,
   },
-  alphabetLetterBox: {
-    width: 52,
-    height: 52,
-    borderRadius: 10,
-    backgroundColor: '#FEF3C7',
-    borderWidth: 1,
-    borderColor: '#F59E0B',
+  alphabetGlyphCol: {
+    width: 44,
     alignItems: 'center',
     justifyContent: 'center',
   },
   alphabetGlyph: {
-    fontSize: 26,
-    fontWeight: '800',
+    fontSize: 32,
+    fontWeight: '700',
     color: '#0F172A',
     fontFamily: Platform.OS === 'ios' ? 'Times New Roman' : 'serif',
   },
@@ -569,20 +534,17 @@ const styles = StyleSheet.create({
   },
   alphabetTitleRow: {
     flexDirection: 'row',
-    alignItems: 'baseline',
+    alignItems: 'center',
     gap: 6,
     marginBottom: 2,
   },
   alphabetSoundText: {
-    fontSize: 12,
-    marginBottom: 4,
+    fontSize: 13,
+    marginBottom: 2,
   },
-  paleoBox: {
-    backgroundColor: '#F1F5F9',
-    paddingVertical: 2,
-    paddingHorizontal: 6,
-    borderRadius: 4,
-    alignSelf: 'flex-start',
+  paleoText: {
+    fontSize: 11.5,
+    marginTop: 2,
   },
 
   emptyContainer: {
