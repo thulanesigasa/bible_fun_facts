@@ -32,48 +32,12 @@ import { PinSecurityService } from '../services/pinSecurityService';
 import { PrivacyService } from '../services/privacyService';
 import { EncryptionService } from '../services/encryptionService';
 import { SecureStoreAdapter } from '../services/secureStorage';
+import { AuthProvider, UserProfile, SignUpExtendedParams } from './AuthContext';
+import { SecurityProvider } from './SecurityContext';
+import { ReaderSettingsProvider, LastReadBiblePosition } from './ReaderSettingsContext';
+import { UserDataProvider } from './UserDataContext';
 
-export interface UserProfile {
-  name: string;
-  firstName?: string;
-  lastName?: string;
-  username: string;
-  avatarUrl?: string;
-  email: string;
-  phoneNumber?: string;
-  countryCode?: string;
-  joinedDate: string;
-  preferredTranslation?: string;
-  notificationsEnabled: boolean;
-  studyFocus?: string;
-  dailyGoal?: string;
-  knowledgeLevel?: string;
-  fontSize?: number;
-  fontType?: 'serif' | 'sans' | 'mono' | 'system';
-  redLetterEnabled?: boolean;
-  followersCount?: number;
-  followingCount?: number;
-}
-
-export interface SignUpExtendedParams {
-  firstName: string;
-  lastName: string;
-  username: string;
-  email: string;
-  password: string;
-  phoneNumber?: string;
-  countryCode?: string;
-  preferredTranslation?: string;
-  studyFocus?: string;
-  dailyGoal?: string;
-  knowledgeLevel?: string;
-}
-
-export interface LastReadBiblePosition {
-  book: string;
-  chapter: number;
-  translation: string;
-}
+export type { UserProfile, SignUpExtendedParams, LastReadBiblePosition };
 
 interface UserState {
   userProfile: UserProfile | null;
@@ -1733,8 +1697,15 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       privateStudyNotes,
       setPrivateStudyNotes,
     }}>
-
-      {children}
+      <AuthProvider>
+        <SecurityProvider>
+          <ReaderSettingsProvider>
+            <UserDataProvider>
+              {children}
+            </UserDataProvider>
+          </ReaderSettingsProvider>
+        </SecurityProvider>
+      </AuthProvider>
     </UserContext.Provider>
   );
 };
@@ -1752,3 +1723,4 @@ export const useUser = () => {
 export const useApp = () => {
   return useUser();
 };
+
