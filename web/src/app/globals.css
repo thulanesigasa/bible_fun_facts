@@ -424,53 +424,217 @@ ul, ol {
   border-color: #B45309;
 }
 
-/* Floating Layered Component Images (Screenshot 3 Right) */
+/* Floating Layered exégeomai App Component Cards (Screenshot 3 Right) */
 .layered-components-stage {
   position: relative;
-  height: 480px;
+  height: 520px;
 }
 
-.floating-layer-img {
+.floating-layer-card {
   position: absolute;
   border-radius: 8px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s ease;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.16);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.layer-info-card {
-  width: 180px;
-  left: 40px;
+.floating-layer-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 25px 35px -5px rgba(0, 0, 0, 0.25);
+}
+
+.layer-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.layer-card-tag {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #64748B;
+}
+
+.layer-card-badge {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #F1F5F9;
+  color: #0F172A;
+}
+
+/* Layer 1: Strong's Lexicon Card (Top Left) */
+.layer-lexicon-card {
+  width: 310px;
+  left: 20px;
   top: 10px;
+  background: #FFFFFF;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-top: 3px solid #FDD223;
+  padding: 20px;
   z-index: 2;
 }
 
-.layer-profile-card {
-  width: 220px;
-  left: 240px;
-  top: 40px;
+.layer-lemma-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0F172A;
+  margin-bottom: 4px;
+}
+
+.layer-lemma-translit {
+  font-size: 12px;
+  font-family: 'Space Mono', monospace;
+  color: #64748B;
+  margin-bottom: 8px;
+}
+
+.layer-lemma-def {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #475569;
+  margin-bottom: 12px;
+}
+
+.layer-lemma-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #64748B;
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+  padding-top: 10px;
+}
+
+.layer-meta-count {
+  font-weight: 700;
+  color: #0F172A;
+}
+
+/* Layer 2: 3-Lens Devotional Card (Top Right) */
+.layer-devotional-card {
+  width: 320px;
+  left: 170px;
+  top: 60px;
+  background: #0F172A;
+  color: #FFFFFF;
+  border: 1px solid rgba(253, 210, 35, 0.3);
+  padding: 22px 20px;
   z-index: 1;
 }
 
-.layer-info-2 {
-  width: 200px;
+.layer-scripture-quote {
+  font-size: 13px;
+  font-style: italic;
+  line-height: 1.6;
+  color: #E2E8F0;
+  margin-bottom: 16px;
+}
+
+.layer-lens-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.lens-pill {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: #1E293B;
+  color: #94A3B8;
+}
+
+.lens-active {
+  background: #FDD223;
+  color: #0F172A;
+}
+
+/* Layer 3: Translation Canons Card (Middle Left) */
+.layer-canons-card {
+  width: 290px;
   left: 0;
-  top: 180px;
+  top: 230px;
+  background: #FFFFFF;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  padding: 18px 20px;
   z-index: 3;
 }
 
-.layer-btn-pink {
-  width: 120px;
-  left: 190px;
-  top: 240px;
-  z-index: 4;
+.layer-canons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 12.5px;
+  color: #475569;
 }
 
-.layer-menu {
+.layer-canons-list strong {
+  color: #0F172A;
+}
+
+/* Layer 4: Hardware Keystore Pill */
+.layer-security-pill {
+  left: 160px;
+  top: 340px;
+  background: #FDD223;
+  color: #0F172A;
+  padding: 10px 18px;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 10px 15px -3px rgba(253, 210, 35, 0.4);
+  z-index: 4;
+  white-space: nowrap;
+}
+
+/* Layer 5: SQLite FTS5 Search Bar */
+.layer-search-bar {
   width: 100%;
-  max-width: 460px;
-  left: 0;
+  max-width: 440px;
+  left: 20px;
   bottom: 10px;
+  background: #1E293B;
+  color: #FFFFFF;
+  border: 1px solid rgba(253, 210, 35, 0.3);
+  padding: 14px 18px;
+  border-radius: 8px;
   z-index: 5;
+}
+
+.layer-search-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.search-prompt-symbol {
+  font-size: 14px;
+  margin-right: 8px;
+}
+
+.search-prompt-text {
+  font-size: 13px;
+  color: #94A3B8;
+  flex-grow: 1;
+}
+
+.search-speed-badge {
+  background: #FDD223;
+  color: #0F172A;
+  font-family: 'Space Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 4px;
 }
 
 /* ── Screenshot 4: 6 Colored Cards & Translations ────────── */
@@ -663,17 +827,71 @@ ul, ol {
   flex-shrink: 0;
 }
 
-.doc-preview-img {
+.doc-code-window {
   width: 100%;
   max-width: 580px;
   border-radius: 8px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  background: #0F172A;
+  border: 1px solid rgba(253, 210, 35, 0.25);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
   transform: perspective(1040px) rotateY(-11deg) rotateX(2deg) rotate(2deg);
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+  overflow: hidden;
 }
 
-.doc-preview-img:hover {
+.doc-code-window:hover {
   transform: perspective(1040px) rotateY(0deg) rotateX(0deg) rotate(0deg);
+  border-color: #FDD223;
+}
+
+.code-window-header {
+  background: #1E293B;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.code-window-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.code-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.dot-red { background: #EF4444; }
+.dot-yellow { background: #FDD223; }
+.dot-green { background: #10B981; }
+
+.code-window-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: #94A3B8;
+}
+
+.code-window-tag {
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: rgba(253, 210, 35, 0.15);
+  color: #FDD223;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.code-window-body {
+  padding: 20px;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  line-height: 1.65;
+  color: #E2E8F0;
+  overflow-x: auto;
+  margin: 0;
+  background: #0F172A;
 }
 
 /* ── Screenshot 6: Beautiful Example Pages Trio ──────────── */
@@ -712,33 +930,113 @@ ul, ol {
   gap: 32px;
 }
 
-.page-preview-card {
+.portal-preview-card {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-}
-
-.page-preview-card h5 {
-  color: #FFFFFF;
-  font-size: 1.15rem;
-  font-weight: 600;
-  margin-bottom: 16px;
-  text-align: center;
-}
-
-.page-preview-thumbnail {
-  width: 100%;
   border-radius: 8px;
-  border: 1px solid rgba(253, 210, 35, 0.2);
+  background: #1E293B;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  overflow: hidden;
+  text-decoration: none;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.page-preview-card:hover .page-preview-thumbnail {
+.portal-preview-card:hover {
   transform: translateY(-8px);
   border-color: #FDD223;
   box-shadow: 0 25px 50px -12px rgba(253, 210, 35, 0.2);
+}
+
+.portal-card-topbar {
+  background: #0F172A;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.portal-card-topbar h5 {
+  color: #FFFFFF;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.portal-topbar-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 800;
+  color: #FDD223;
+  background: rgba(253, 210, 35, 0.12);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.portal-card-body {
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #1E293B;
+  flex-grow: 1;
+}
+
+.portal-mockup-badge {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #FDD223;
+  letter-spacing: 0.5px;
+}
+
+.portal-mockup-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1.35;
+}
+
+.portal-mockup-desc {
+  font-size: 13px;
+  color: #94A3B8;
+  line-height: 1.55;
+}
+
+.portal-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  background: #0F172A;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-top: 6px;
+  text-align: center;
+}
+
+.portal-stats-row dt {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  font-weight: 800;
+  color: #FDD223;
+}
+
+.portal-stats-row dd {
+  font-size: 10px;
+  color: #64748B;
+  text-transform: uppercase;
+}
+
+.portal-card-footer {
+  padding: 14px 20px;
+  background: #0F172A;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 13px;
+  font-weight: 700;
+  color: #FDD223;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 /* ── Screenshot 7: Open Source Callout ───────────────────── */

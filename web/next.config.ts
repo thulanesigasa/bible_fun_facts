@@ -27,7 +27,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  outputFileTracingRoot: require('path').join(__dirname, '../'),
+  outputFileTracingRoot: __dirname,
   async headers() {
     return [
       {

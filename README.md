@@ -1795,20 +1795,8 @@ web/
 ├── public/
 │   ├── assets/
 │   │   ├── hero_exegesis_pattern.png # Gold sacred exegesis hero poster graphic (#FDD223)
-│   │   ├── pattern_nextjs.png        # Geometric layout poster reference
-│   │   ├── desk.jpg                  # Featured card study desk photographic header
-│   │   ├── component-btn.png       # Layered floating CSS component
-│   │   ├── component-profile-card.png
-│   │   ├── component-info-card.png
-│   │   ├── component-info-2.png
-│   │   ├── component-menu.png
-│   │   ├── component-btn-pink.png
-│   │   ├── documentation.png       # 3D perspective rotated preview
-│   │   ├── login.jpg               # Example pages login preview
-│   │   ├── profile.jpg             # Example pages profile preview
-│   │   ├── landing.jpg             # Example pages landing preview
-│   │   ├── svelte.jpg, react.jpg, nextjs.jpg, js.png, angular.jpg, vue.jpg
-│   │   └── favicon.png
+│   │   ├── study_scripture_desk.jpg  # Antique Scripture study desk (Gen 1:1 Hebrew, Jn 1:1 Greek, quill, journal)
+│   │   └── favicon.png               # Brand icon asset
 │   ├── favicon.ico
 │   ├── robots.txt
 │   └── sitemap.xml
