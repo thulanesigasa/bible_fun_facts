@@ -160,7 +160,7 @@ export default function GreekScreen({ navigation }: GreekScreenProps) {
           accessibilityRole="button"
           accessibilityLabel={`Open Lexical Study for ${item.englishWord || item.strongsNumber}`}
         >
-          <Text variant="caption" weight="800" color="#0284C7">
+          <Text variant="caption" weight="800" color="#B45309">
             View Full Lexical Study & Concordance ›
           </Text>
         </TouchableOpacity>

@@ -37,11 +37,11 @@
   <img src="https://img.shields.io/badge/Unfolded%20Metric-Verified%20Read%20Facts%20Only-FDD223?style=for-the-badge" alt="Truthful Unfolded Count" />
   <img src="https://img.shields.io/badge/Daily%20Streak-Deterministic%20Calendar%20Day%20%7C%20Feedback%20Loop%20Immune-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Deterministic Daily Streak Engine" />
   <img src="https://img.shields.io/badge/Notification%20Tray-Mark%20Read%20Auto--Clears%20%7C%20Zero%20Lingering-10B981?style=for-the-badge" alt="Notification Tray Mark Read Auto-Clears" />
-  <img src="https://img.shields.io/badge/The%20Word-Strongs%20%7C%20Hebrew%20%7C%20Greek-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="The Word Concordance and Lexicons" />
-  <img src="https://img.shields.io/badge/Strongs%20Concordance-Hebrew%20H1--H8674%20%7C%20Greek%20G1--G5624-10B981?style=for-the-badge" alt="Strongs Concordance" />
+  <img src="https://img.shields.io/badge/The%20Word-Strongs%20Biblical%20Dictionary-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="Strong's Biblical Dictionary" />
+  <img src="https://img.shields.io/badge/Offline%20Dictionary-100%25%20Offline%20Download-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Offline Dictionary Download" />
   <img src="https://img.shields.io/badge/Strongs%20A--Z-Exhaustive%20Canonical%20Dictionary-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="Strongs A-Z Dictionary" />
   <img src="https://img.shields.io/badge/Search%20Engine-English%20Lemma%20%7C%20e.g.%20Life%20%26%20Love-10B981?style=for-the-badge" alt="English Lemma Search" />
-  <img src="https://img.shields.io/badge/Strongs%20Detail-Scholarly%20Lexical%20Summary%20%7C%20HELPS%20Word--Studies-0284C7?style=for-the-badge&logo=book&logoColor=white" alt="Strongs Detail Screen" />
+  <img src="https://img.shields.io/badge/Strongs%20Detail-Scholarly%20Lexical%20Summary%20%7C%20HELPS%20Word--Studies-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="Strongs Detail Screen" />
   <img src="https://img.shields.io/badge/Strongs%20Stepper-Previous%20%7C%20Next%20%E2%97%84%20ID%20%E2%96%BA-10B981?style=for-the-badge" alt="Strongs Stepper" />
   <img src="https://img.shields.io/badge/A--Z%20Selector-Horizontal%20Letter%20Bar%20A--Z-FDD223?style=for-the-badge" alt="A-Z Horizontal Letter Bar" />
   <img src="https://img.shields.io/badge/Ancient%20Hebrew-Theological%20Roots%20%7C%20Aleph--Bet%20Guide-FDD223?style=for-the-badge" alt="Ancient Hebrew Lexicon" />
@@ -90,10 +90,8 @@ graph TD
     SearchStack --> SearchMain["SearchScreen (User Discovery, Follow/Unfollow, Scholar Modal)"]
     SearchStack --> PastoralCareScreen["PastoralCareScreen (24/7 Lifelines, SADAG & Scriptures)"]
     ProfileStack --> ProfileMain["ProfileScreen (Modular Hub, Saved Collection & Account)"]
-    ProfileStack --> StrongsScreen["StrongsScreen (Bilingual Hebrew & Greek Root Concordance)"]
+    ProfileStack --> StrongsScreen["StrongsScreen (Unified A-Z Biblical Dictionary & Offline Download)"]
     ProfileStack --> StrongsDetailScreen["StrongsDetailScreen (Scholarly Lexical Summary, Stepper & HELPS Exegesis)"]
-    ProfileStack --> HebrewScreen["HebrewScreen (Ancient Hebrew Roots & 22-Letter Aleph-Bet Guide)"]
-    ProfileStack --> GreekScreen["GreekScreen (Koine Greek Lexicon & 24-Letter Alpha-Omega Guide)"]
     ProfileStack --> ReadingSettingsScreen["ReadingSettingsScreen (Reader Typography & Red Letters)"]
     ProfileStack --> PrivacyScreen["PrivacyScreen (Study Mode, Directory, Streaks, Notes & Blocked Accounts)"]
     ProfileStack --> SecurityScreen["SecurityScreen (Inactivity Lock, PIN & Biometrics)"]
@@ -1337,20 +1335,19 @@ A scholarly linguistic suite accessible directly from the Profile Hub under "THE
 - **Continuous Flat Body Standard (Zero Card Divs)**:
   - All screens under The Word (`StrongsScreen.tsx`, `HebrewScreen.tsx`, `GreekScreen.tsx`) eliminate card wrappers, container boxes, badge divs, and nested border panels.
   - Root entries, 22-letter Aleph-Bet guides, 24-letter Alpha-Omega guides, theological exegesis, and scripture snippets flow seamlessly as direct typographic body elements separated only by subtle hairline dividers (`rgba(15, 23, 42, 0.06)`).
-- **Strong's Concordance (`StrongsScreen.tsx`)**:
-  - **A-to-Z Canonical Biblical Dictionary**: Complete alphabetical coverage spanning every letter from A through Z, uniting Old Testament Hebrew (*Tanakh*) and New Testament Koine Greek roots in a single searchable lexicon.
-  - **English Lemma Priority Search**: Search by common biblical English terms (e.g. searching *"life"* immediately ranks top theological root words: Hebrew *chay/chayyim* `H2416`, Greek *zoe* `G2222`, *psuche* `G5590`, *bios* `G979`, and Hebrew *nephesh* `H5315` before substring occurrences; searching *"love"* returns *hesed* `H2617`, *agape* `G26`, *phileo* `G5368`, and *ahavah* `H160`).
+- **Strong's Biblical Dictionary (`StrongsScreen.tsx`)**:
+  - **Unified Single Biblical Dictionary**: Eliminated Hebrew/Greek segregation tabs and labels, uniting all Old Testament and New Testament roots into a single seamless A-to-Z biblical lexicon.
+  - **Offline Download Engine (`dictionaryOfflineService.ts`)**: Built-in one-tap offline download package (2.4 MB) caching the complete dictionary locally to persistent storage for 100% offline study without network dependence.
+  - **Signature Yellow Theme System**: Calibrated all headers, steppers, field labels, cognate pills, and exegesis links strictly to brand yellow/gold (`#FDD223`, `#FEF9C3`, `#B45309`).
+  - **English Lemma Priority Search**: Instant search by common biblical English terms (e.g. searching *"life"* immediately ranks top theological root words: Hebrew *chay/chayyim* `H2416`, Greek *zaó* `G2198`, Greek *zoe* `G2222`, *psuche* `G5590`, *bios* `G979`, and Hebrew *nephesh* `H5315`).
   - **Interactive A-to-Z Quick Selector**: Horizontal, smooth-scrolling alphabetical letter bar (`All, A, B, C, ... Z`) providing one-tap instant filtering across the entire biblical lexicon.
-  - **Fast Multi-Parameter Search**: Instant search across English lemmas, Strong's IDs (e.g. `H7965`, `G1834`), original scripts (`שָׁלוֹם`, `ἐξηγέομαι`), phonetic transliterations, definitions, and biblical book references.
-  - **Segmented Language Filters**: One-tap toggling between `All`, `Hebrew (OT)`, and `Greek (NT)`.
-  - **Expandable Exegesis & Share Engine**: Full theological definitions, root etymologies, and one-tap social/notes sharing.
   - **Direct Word Reader Deep-Link**: Tapping any passage snippet navigates straight into the 66-book Holy Bible reader (`WOTDScreen`).
 - **Strong's Lexical Detail Screen (`StrongsDetailScreen.tsx`)**:
   - **Scholarly Lexical Summary**: Dedicated full-screen linguistic exegesis for any biblical root word (e.g. `2198. zaó` or `2416. chay`), presenting Original Word in 26px script, Part of Speech, Transliteration, Pronunciation, Phonetic Spelling, KJV & NASB translation concordances, and Word Origin.
-  - **Sequential Stepper Navigation**: Bidirectional previous and next navigation (`◄ [ID] [transliteration] | [current] | [transliteration] [ID] ►`) allowing rapid consecutive study through biblical Strong's IDs.
+  - **Sequential Stepper Navigation**: Bidirectional previous and next navigation (`◄ [ID] [transliteration] | [current] | [transliteration] [ID] ►`) in warm yellow styling allowing rapid consecutive study through biblical Strong's IDs.
   - **Numbered Outline of Biblical Usage**: Structured breakdown of nuanced literal, figurative, and spiritual usages across canon.
   - **Strong's Exhaustive Concordance**: Complete etymological definitions and root derivation notes.
-  - **HELPS Word-studies & Cross-Reference Cognate Chips**: In-depth apostolic and covenant exegesis with interactive clickable cognate chips (e.g. `See 2222 (zōē)`, `See 5590 (psuchē)`, `See 2416 (chay)`) that instantly jump to related roots.
+  - **HELPS Word-studies & Cross-Reference Cognate Chips**: In-depth apostolic and covenant exegesis with interactive clickable yellow cognate chips (e.g. `See 2222 (zōē)`, `See 5590 (psuchē)`, `See 2416 (chay)`) that instantly jump to related roots.
   - **One-Tap Canonical Scripture Jumping**: Quick Scripture reference bar with direct "Open in Word Reader ›" deep-linking into the 66-book Holy Bible reader (`WOTDScreen`).
 - **Ancient Hebrew Lexicon (`HebrewScreen.tsx`)**:
   - **Thematic Covenant Categories**: Categorized into `Covenant & Names`, `Creation & Spirit`, `Worship & Praise`, and `Righteousness`.
@@ -1413,6 +1410,7 @@ bible_fun_facts/
 │   ├── services/
 │   │   ├── aes256Service.ts         # Hardware-backed AES-256-CBC cryptographic cipher
 │   │   ├── biometricService.ts      # Biometric auth & inactivity lock timeout
+│   │   ├── dictionaryOfflineService.ts # Complete A-Z Strong's offline storage & caching
 │   │   ├── inAppNotifications.ts    # In-app notifications & achievement state service
 │   │   ├── moderationService.ts     # Content moderation & fellowship guard
 │   │   ├── notifications.ts         # Native OS background notification alarms
