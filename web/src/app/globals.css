@@ -285,6 +285,46 @@ body {
   letter-spacing: 0.4px;
 }
 
+/* Hero page-link navigation cards */
+.hero-page-links {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  max-width: 900px;
+  margin: 48px auto 0;
+}
+
+.page-link-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.page-link-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(15, 23, 42, 0.15);
+}
+
+.page-link-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.2px;
+}
+
+.page-link-desc {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
 /* Sections */
 .section {
   padding: 80px 0;
@@ -569,9 +609,14 @@ body {
   line-height: 1.6;
 }
 
-.faq-icon {
-  transition: transform 0.2s ease;
+.faq-toggle {
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--text-secondary);
   flex-shrink: 0;
+  line-height: 1;
+  width: 20px;
+  text-align: center;
 }
 
 /* Legal Documents */
@@ -806,23 +851,12 @@ body {
 }
 
 .data-point {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
   font-size: 14px;
   color: var(--text-secondary);
-}
-
-.data-check {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--accent-soft);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-top: 1px;
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
 }
 
 /* Deletion Info Grid */
@@ -842,9 +876,6 @@ body {
 }
 
 .deletion-info-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
   margin-bottom: 20px;
 }
 
@@ -873,19 +904,7 @@ body {
 
 /* Deletion Form Success */
 .deletion-success {
-  text-align: center;
-  padding: 24px;
-}
-
-.deletion-success-icon {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: var(--accent-soft);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
+  padding: 24px 0;
 }
 
 .deletion-success h3 {
@@ -953,6 +972,9 @@ body {
   }
   .deletion-info-grid {
     grid-template-columns: 1fr;
+  }
+  .hero-page-links {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -1026,6 +1048,9 @@ body {
   }
   .deletion-info-grid {
     grid-template-columns: 1fr;
+  }
+  .hero-page-links {
+    grid-template-columns: repeat(2, 1fr);
   }
   .data-practices {
     padding: 24px;

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { TrashSvg, CheckSvg } from './SvgIcons';
 
 type FormStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -45,9 +44,6 @@ export function DeletionForm() {
     return (
       <div className="deletion-portal">
         <div className="deletion-success">
-          <div className="deletion-success-icon">
-            <CheckSvg size={28} color="var(--text-primary)" />
-          </div>
           <h3>Request Received</h3>
           <p>
             Your data deletion request has been submitted. You will receive a confirmation
@@ -64,16 +60,11 @@ export function DeletionForm() {
 
   return (
     <div className="deletion-portal">
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '20px' }}>
-        <div className="security-icon-large">
-          <TrashSvg size={22} />
-        </div>
-        <div>
-          <h3 style={{ margin: 0 }}>Submit Deletion Request</h3>
-          <p style={{ margin: 0, fontSize: '13.5px', color: 'var(--text-secondary)' }}>
-            All fields are required. Requests are processed within 30 days.
-          </p>
-        </div>
+      <div style={{ marginBottom: '20px' }}>
+        <h3 style={{ margin: 0, marginBottom: '6px' }}>Submit Deletion Request</h3>
+        <p style={{ margin: 0, fontSize: '13.5px', color: 'var(--text-secondary)' }}>
+          All fields are required. Requests are processed within 30 days.
+        </p>
       </div>
 
       <form className="deletion-form" onSubmit={handleSubmit} id="deletionRequestForm">
