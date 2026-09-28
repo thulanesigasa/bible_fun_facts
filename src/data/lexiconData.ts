@@ -6,6 +6,7 @@
  */
 
 import { DAILY_MESSAGES } from './dailyMessages';
+import { STRONGS_A_TO_Z_ENTRIES } from './strongsAtoZData';
 
 export interface LexiconEntry {
   strongsNumber: string;
@@ -35,6 +36,7 @@ export interface LexiconEntry {
     verse: number;
     snippet: string;
   };
+  englishWord?: string;
   relatedStrongs?: string[];
 }
 
@@ -991,17 +993,40 @@ let _cachedAllConcordance: LexiconEntry[] | null = null;
 export function getAllConcordanceEntries(): LexiconEntry[] {
   if (_cachedAllConcordance) return _cachedAllConcordance;
 
-  const curated = [...HEBREW_LEXICON_ENTRIES, ...GREEK_LEXICON_ENTRIES];
-  const dynamic = getExtractedDailyStrongs();
+  // Deduplicate and combine A-to-Z dataset, curated sets, and daily messages
+  const idMap = new Map<string, LexiconEntry>();
 
-  _cachedAllConcordance = [...curated, ...dynamic].sort((a, b) => {
-    // Sort H first then G, then numeric index
-    if (a.strongsNumber.charAt(0) !== b.strongsNumber.charAt(0)) {
-      return a.strongsNumber.localeCompare(b.strongsNumber);
+  // 1. First add A-to-Z entries (these have rich englishWord lemmas)
+  for (const item of STRONGS_A_TO_Z_ENTRIES) {
+    idMap.set(item.strongsNumber, item);
+  }
+
+  // 2. Add curated Hebrew & Greek entries
+  for (const item of [...HEBREW_LEXICON_ENTRIES, ...GREEK_LEXICON_ENTRIES]) {
+    if (!idMap.has(item.strongsNumber)) {
+      idMap.set(item.strongsNumber, item);
+    } else {
+      const existing = idMap.get(item.strongsNumber)!;
+      if (!existing.englishWord && item.englishWord) {
+        idMap.set(item.strongsNumber, { ...existing, englishWord: item.englishWord });
+      }
     }
-    const numA = parseInt(a.strongsNumber.replace(/\D/g, ''), 10) || 0;
-    const numB = parseInt(b.strongsNumber.replace(/\D/g, ''), 10) || 0;
-    return numA - numB;
+  }
+
+  // 3. Add extracted dynamic entries from daily messages
+  for (const item of getExtractedDailyStrongs()) {
+    if (!idMap.has(item.strongsNumber)) {
+      idMap.set(item.strongsNumber, item);
+    }
+  }
+
+  const combined = Array.from(idMap.values());
+
+  _cachedAllConcordance = combined.sort((a, b) => {
+    // Primary sort: by English lemma if available, else transliteration
+    const nameA = (a.englishWord || a.transliteration).toLowerCase();
+    const nameB = (b.englishWord || b.transliteration).toLowerCase();
+    return nameA.localeCompare(nameB);
   });
 
   return _cachedAllConcordance;
@@ -1009,40 +1034,82 @@ export function getAllConcordanceEntries(): LexiconEntry[] {
 
 export function searchConcordance(
   query: string,
-  filterLang?: 'all' | 'hebrew' | 'greek'
+  filterLang?: 'all' | 'hebrew' | 'greek',
+  letterFilter?: string
 ): LexiconEntry[] {
   const all = getAllConcordanceEntries();
   const q = query.trim().toLowerCase();
+  const targetLetter = letterFilter && letterFilter !== 'All' ? letterFilter.toUpperCase() : null;
 
   return all.filter((entry) => {
+    // 1. Language filter
     if (filterLang === 'hebrew' && entry.language !== 'hebrew') return false;
     if (filterLang === 'greek' && entry.language !== 'greek') return false;
 
+    // 2. A-to-Z Letter Filter
+    if (targetLetter) {
+      const firstLetter = (entry.englishWord || entry.transliteration).trim().charAt(0).toUpperCase();
+      if (firstLetter !== targetLetter) return false;
+    }
+
+    // 3. Search query match
     if (!q) return true;
 
     return (
+      (entry.englishWord && entry.englishWord.toLowerCase().includes(q)) ||
       entry.strongsNumber.toLowerCase().includes(q) ||
       entry.originalScript.toLowerCase().includes(q) ||
       entry.transliteration.toLowerCase().includes(q) ||
       entry.shortDefinition.toLowerCase().includes(q) ||
       entry.exhaustiveDefinition.toLowerCase().includes(q) ||
+      entry.theologicalSignificance.toLowerCase().includes(q) ||
       entry.keyScripture.reference.toLowerCase().includes(q)
     );
+  }).sort((a, b) => {
+    if (!q) {
+      // Natural alphabetical order A-Z
+      const nameA = (a.englishWord || a.transliteration).toLowerCase();
+      const nameB = (b.englishWord || b.transliteration).toLowerCase();
+      return nameA.localeCompare(nameB);
+    }
+
+    // Search relevance ranking: exact English word matches first
+    const aWord = (a.englishWord || '').toLowerCase();
+    const bWord = (b.englishWord || '').toLowerCase();
+
+    if (aWord === q && bWord !== q) return -1;
+    if (bWord === q && aWord !== q) return 1;
+
+    if (aWord.startsWith(q) && !bWord.startsWith(q)) return -1;
+    if (bWord.startsWith(q) && !aWord.startsWith(q)) return 1;
+
+    const aStrongs = a.strongsNumber.toLowerCase();
+    const bStrongs = b.strongsNumber.toLowerCase();
+    if (aStrongs === q && bStrongs !== q) return -1;
+    if (bStrongs === q && aStrongs !== q) return 1;
+
+    return 0;
   });
 }
 
 export function getHebrewLexicon(category?: string, query?: string): LexiconEntry[] {
   const q = query ? query.trim().toLowerCase() : '';
-  const entries = [
-    ...HEBREW_LEXICON_ENTRIES,
-    ...getExtractedDailyStrongs().filter((e) => e.language === 'hebrew'),
-  ];
+  const idMap = new Map<string, LexiconEntry>();
+
+  for (const item of [...STRONGS_A_TO_Z_ENTRIES.filter(e => e.language === 'hebrew'), ...HEBREW_LEXICON_ENTRIES, ...getExtractedDailyStrongs().filter((e) => e.language === 'hebrew')]) {
+    if (!idMap.has(item.strongsNumber)) {
+      idMap.set(item.strongsNumber, item);
+    }
+  }
+
+  const entries = Array.from(idMap.values());
 
   return entries.filter((entry) => {
     if (category && category !== 'All' && entry.category !== category) return false;
     if (!q) return true;
 
     return (
+      (entry.englishWord && entry.englishWord.toLowerCase().includes(q)) ||
       entry.strongsNumber.toLowerCase().includes(q) ||
       entry.originalScript.toLowerCase().includes(q) ||
       entry.transliteration.toLowerCase().includes(q) ||
@@ -1050,21 +1117,27 @@ export function getHebrewLexicon(category?: string, query?: string): LexiconEntr
       entry.theologicalSignificance.toLowerCase().includes(q) ||
       entry.keyScripture.reference.toLowerCase().includes(q)
     );
-  });
+  }).sort((a, b) => (a.englishWord || a.transliteration).localeCompare(b.englishWord || b.transliteration));
 }
 
 export function getGreekLexicon(category?: string, query?: string): LexiconEntry[] {
   const q = query ? query.trim().toLowerCase() : '';
-  const entries = [
-    ...GREEK_LEXICON_ENTRIES,
-    ...getExtractedDailyStrongs().filter((e) => e.language === 'greek'),
-  ];
+  const idMap = new Map<string, LexiconEntry>();
+
+  for (const item of [...STRONGS_A_TO_Z_ENTRIES.filter(e => e.language === 'greek'), ...GREEK_LEXICON_ENTRIES, ...getExtractedDailyStrongs().filter((e) => e.language === 'greek')]) {
+    if (!idMap.has(item.strongsNumber)) {
+      idMap.set(item.strongsNumber, item);
+    }
+  }
+
+  const entries = Array.from(idMap.values());
 
   return entries.filter((entry) => {
     if (category && category !== 'All' && entry.category !== category) return false;
     if (!q) return true;
 
     return (
+      (entry.englishWord && entry.englishWord.toLowerCase().includes(q)) ||
       entry.strongsNumber.toLowerCase().includes(q) ||
       entry.originalScript.toLowerCase().includes(q) ||
       entry.transliteration.toLowerCase().includes(q) ||
@@ -1072,5 +1145,5 @@ export function getGreekLexicon(category?: string, query?: string): LexiconEntry
       entry.theologicalSignificance.toLowerCase().includes(q) ||
       entry.keyScripture.reference.toLowerCase().includes(q)
     );
-  });
+  }).sort((a, b) => (a.englishWord || a.transliteration).localeCompare(b.englishWord || b.transliteration));
 }

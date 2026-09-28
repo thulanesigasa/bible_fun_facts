@@ -39,6 +39,9 @@
   <img src="https://img.shields.io/badge/Notification%20Tray-Mark%20Read%20Auto--Clears%20%7C%20Zero%20Lingering-10B981?style=for-the-badge" alt="Notification Tray Mark Read Auto-Clears" />
   <img src="https://img.shields.io/badge/The%20Word-Strongs%20%7C%20Hebrew%20%7C%20Greek-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="The Word Concordance and Lexicons" />
   <img src="https://img.shields.io/badge/Strongs%20Concordance-Hebrew%20H1--H8674%20%7C%20Greek%20G1--G5624-10B981?style=for-the-badge" alt="Strongs Concordance" />
+  <img src="https://img.shields.io/badge/Strongs%20A--Z-Exhaustive%20Canonical%20Dictionary-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="Strongs A-Z Dictionary" />
+  <img src="https://img.shields.io/badge/Search%20Engine-English%20Lemma%20%7C%20e.g.%20Life%20%26%20Love-10B981?style=for-the-badge" alt="English Lemma Search" />
+  <img src="https://img.shields.io/badge/A--Z%20Selector-Horizontal%20Letter%20Bar%20A--Z-FDD223?style=for-the-badge" alt="A-Z Horizontal Letter Bar" />
   <img src="https://img.shields.io/badge/Ancient%20Hebrew-Theological%20Roots%20%7C%20Aleph--Bet%20Guide-FDD223?style=for-the-badge" alt="Ancient Hebrew Lexicon" />
   <img src="https://img.shields.io/badge/Koine%20Greek-Apostolic%20Lexicon%20%7C%20Alpha--Omega%20Guide-10B981?style=for-the-badge" alt="Koine Greek Lexicon" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
@@ -1332,8 +1335,10 @@ A scholarly linguistic suite accessible directly from the Profile Hub under "THE
   - All screens under The Word (`StrongsScreen.tsx`, `HebrewScreen.tsx`, `GreekScreen.tsx`) eliminate card wrappers, container boxes, badge divs, and nested border panels.
   - Root entries, 22-letter Aleph-Bet guides, 24-letter Alpha-Omega guides, theological exegesis, and scripture snippets flow seamlessly as direct typographic body elements separated only by subtle hairline dividers (`rgba(15, 23, 42, 0.06)`).
 - **Strong's Concordance (`StrongsScreen.tsx`)**:
-  - **Bilingual Exhaustive Index**: Comprehensive index of Hebrew (Old Testament H1–H8674) and Koine Greek (New Testament G1–G5624) root words.
-  - **Fast Multi-Parameter Search**: Instant search across Strong's IDs (e.g. `H7965`, `G1834`), original scripts (`שָׁלוֹם`, `ἐξηγέομαι`), phonetic transliterations, definitions, and biblical book references.
+  - **A-to-Z Canonical Biblical Dictionary**: Complete alphabetical coverage spanning every letter from A through Z, uniting Old Testament Hebrew (*Tanakh*) and New Testament Koine Greek roots in a single searchable lexicon.
+  - **English Lemma Priority Search**: Search by common biblical English terms (e.g. searching *"life"* immediately ranks top theological root words: Hebrew *chay/chayyim* `H2416`, Greek *zoe* `G2222`, *psuche* `G5590`, *bios* `G979`, and Hebrew *nephesh* `H5315` before substring occurrences; searching *"love"* returns *hesed* `H2617`, *agape* `G26`, *phileo* `G5368`, and *ahavah* `H160`).
+  - **Interactive A-to-Z Quick Selector**: Horizontal, smooth-scrolling alphabetical letter bar (`All, A, B, C, ... Z`) providing one-tap instant filtering across the entire biblical lexicon.
+  - **Fast Multi-Parameter Search**: Instant search across English lemmas, Strong's IDs (e.g. `H7965`, `G1834`), original scripts (`שָׁלוֹם`, `ἐξηγέομαι`), phonetic transliterations, definitions, and biblical book references.
   - **Segmented Language Filters**: One-tap toggling between `All`, `Hebrew (OT)`, and `Greek (NT)`.
   - **Expandable Exegesis & Share Engine**: Full theological definitions, root etymologies, and one-tap social/notes sharing.
   - **Direct Word Reader Deep-Link**: Tapping any passage snippet navigates straight into the 66-book Holy Bible reader (`WOTDScreen`).
@@ -1373,7 +1378,8 @@ bible_fun_facts/
 │   │   ├── biblicalWriters.ts       # 26 canonical biblical author profiles
 │   │   ├── dailyMessages.ts         # 365 daily exegesis feed messages
 │   │   ├── lexiconData.ts           # Comprehensive Strong's concordance, Hebrew & Greek lexicons
-│   │   └── notificationVerses.ts    # 365-day canonical scripture notification datasets
+│   │   ├── notificationVerses.ts    # 365-day canonical scripture notification datasets
+│   │   └── strongsAtoZData.ts       # Canonical A-to-Z biblical lexicon & English lemma mapping
 │   ├── navigation/
 │   │   └── AppNavigator.tsx         # Bottom tab, auth stack, and screen navigation
 │   ├── screens/                     # Primary application screens
