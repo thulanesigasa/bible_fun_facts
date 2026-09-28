@@ -1320,13 +1320,17 @@ A mathematically resilient streak calculation engine eliminating multi-trigger r
 
 <p align="left">
   <img src="https://img.shields.io/badge/The%20Word-Profile%20Scholarly%20Section-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="The Word Section" />
+  <img src="https://img.shields.io/badge/UI%20Standard-Continuous%20Flat%20Body%20%7C%20Zero%20Card%20Divs-10B981?style=for-the-badge" alt="Continuous Flat Body Zero Card Divs" />
   <img src="https://img.shields.io/badge/Strongs-Hebrew%20H%20%7C%20Greek%20G%20Search-10B981?style=for-the-badge" alt="Strongs Search" />
   <img src="https://img.shields.io/badge/Hebrew-22%20Aleph--Bet%20Paleo%20Guide-FDD223?style=for-the-badge" alt="Aleph-Bet Guide" />
   <img src="https://img.shields.io/badge/Greek-24%20Alpha--Omega%20Theology-10B981?style=for-the-badge" alt="Alpha-Omega Guide" />
   <img src="https://img.shields.io/badge/Word%20Reader-One--Tap%20Scripture%20Jump-3B82F6?style=for-the-badge" alt="Word Reader Deep-Link" />
 </p>
 
-A scholarly linguistic suite accessible directly from the Profile Hub under "THE WORD", equipping believers and biblical scholars with root language depth:
+A scholarly linguistic suite accessible directly from the Profile Hub under "THE WORD", equipping believers and biblical scholars with root language depth built strictly on a **continuous flat body architecture (zero card divs)**:
+- **Continuous Flat Body Standard (Zero Card Divs)**:
+  - All screens under The Word (`StrongsScreen.tsx`, `HebrewScreen.tsx`, `GreekScreen.tsx`) eliminate card wrappers, container boxes, badge divs, and nested border panels.
+  - Root entries, 22-letter Aleph-Bet guides, 24-letter Alpha-Omega guides, theological exegesis, and scripture snippets flow seamlessly as direct typographic body elements separated only by subtle hairline dividers (`rgba(15, 23, 42, 0.06)`).
 - **Strong's Concordance (`StrongsScreen.tsx`)**:
   - **Bilingual Exhaustive Index**: Comprehensive index of Hebrew (Old Testament H1–H8674) and Koine Greek (New Testament G1–G5624) root words.
   - **Fast Multi-Parameter Search**: Instant search across Strong's IDs (e.g. `H7965`, `G1834`), original scripts (`שָׁלוֹם`, `ἐξηγέομαι`), phonetic transliterations, definitions, and biblical book references.

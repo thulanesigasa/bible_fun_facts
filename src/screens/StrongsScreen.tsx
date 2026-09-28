@@ -58,32 +58,20 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
     }
   };
 
-  const renderConcordanceItem = ({ item }: { item: LexiconEntry }) => {
+  const renderConcordanceItem = ({ item, isLast }: { item: LexiconEntry; isLast: boolean }) => {
     const isExpanded = expandedId === item.strongsNumber;
     const isHebrew = item.language === 'hebrew';
 
     return (
-      <View style={styles.entryCard}>
-        {/* Card Header: Strong's Number & Language Tag */}
-        <View style={styles.cardHeader}>
-          <View style={styles.strongsBadge}>
+      <View style={[styles.entryRow, !isLast && styles.rowDivider]}>
+        {/* Row Header: Strong's Number & Language Label (Seamless Body Text) */}
+        <View style={styles.rowHeader}>
+          <View style={styles.headerLeftWrap}>
             <Text variant="caption" weight="800" color="#0F172A">
               {item.strongsNumber}
             </Text>
-          </View>
-          <View
-            style={[
-              styles.langTag,
-              isHebrew ? styles.hebrewTag : styles.greekTag,
-            ]}
-          >
-            <Text
-              variant="caption"
-              weight="700"
-              color={isHebrew ? '#1E293B' : '#0F172A'}
-              style={styles.langTagText}
-            >
-              {isHebrew ? 'HEBREW OT' : 'KOINE GREEK NT'}
+            <Text variant="caption" weight="700" color={colors.textTertiary}>
+              {` • ${isHebrew ? 'HEBREW OT' : 'KOINE GREEK NT'}`}
             </Text>
           </View>
 
@@ -135,10 +123,10 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
         {/* Short Definition */}
         <Text style={styles.definitionText}>{item.shortDefinition}</Text>
 
-        {/* Expandable Exhaustive Theological Insight */}
+        {/* Expandable Theological Exegesis (Continuous Body Flow) */}
         {isExpanded && (
-          <View style={styles.expandedSection}>
-            <Text variant="caption" weight="800" color={colors.textTertiary} style={styles.expandedHeader}>
+          <View style={styles.theologicalSection}>
+            <Text variant="label" weight="800" color={colors.textTertiary} style={styles.theologicalHeader}>
               THEOLOGICAL EXEGESIS
             </Text>
             <Text style={styles.theologicalText}>
@@ -147,28 +135,23 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
           </View>
         )}
 
-        {/* Key Scripture Passage Box */}
+        {/* Key Scripture Quote & Reader Link (Unboxed Body Element) */}
         <TouchableOpacity
-          style={styles.scriptureBox}
-          activeOpacity={0.8}
+          style={styles.scriptureLink}
+          activeOpacity={0.7}
           onPress={() => handleOpenScripture(item)}
           accessibilityRole="button"
           accessibilityLabel={`Open ${item.keyScripture.reference} in Word Reader`}
         >
-          <View style={styles.scriptureHeader}>
-            <View style={styles.scriptureRefRow}>
-              <BookOpenSvg size={13} color={colors.accent} />
-              <Text variant="caption" weight="800" color={colors.accent}>
-                {item.keyScripture.reference}
-              </Text>
-            </View>
-            <Text variant="caption" color={colors.accent} weight="700">
-              Open Reader ›
-            </Text>
-          </View>
-          <Text style={styles.scriptureSnippetText} numberOfLines={2}>
+          <Text style={styles.scriptureSnippetText}>
             "{item.keyScripture.snippet}"
           </Text>
+          <View style={styles.scriptureMetaRow}>
+            <BookOpenSvg size={12} color={colors.accent} />
+            <Text variant="caption" weight="700" color={colors.accent}>
+              {item.keyScripture.reference} • Open in Reader ›
+            </Text>
+          </View>
         </TouchableOpacity>
 
         {/* Expand Toggle */}
@@ -270,7 +253,12 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
       <FlatList
         data={filteredEntries}
         keyExtractor={(item) => item.strongsNumber}
-        renderItem={renderConcordanceItem}
+        renderItem={({ item, index }) =>
+          renderConcordanceItem({
+            item,
+            isLast: index === filteredEntries.length - 1,
+          })
+        }
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
@@ -340,49 +328,28 @@ const styles = StyleSheet.create({
   },
 
   listContent: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
     paddingBottom: 96,
   },
 
-  // Entry Card
-  entryCard: {
+  // Continuous Flat Body Row Styling (No Card Divs)
+  entryRow: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    padding: spacing.md,
-    marginBottom: spacing.md,
   },
-  cardHeader: {
+  rowDivider: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
+  },
+  rowHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 6,
   },
-  strongsBadge: {
-    backgroundColor: '#FEF3C7',
-    borderWidth: 1,
-    borderColor: '#F59E0B',
-    paddingVertical: 2,
-    paddingHorizontal: 8,
-    borderRadius: 6,
-  },
-  langTag: {
-    paddingVertical: 2,
-    paddingHorizontal: 8,
-    borderRadius: 6,
-    marginLeft: 6,
-    marginRight: 'auto',
-  },
-  hebrewTag: {
-    backgroundColor: '#E2E8F0',
-  },
-  greekTag: {
-    backgroundColor: '#E0F2FE',
-  },
-  langTagText: {
-    fontSize: 10.5,
+  headerLeftWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   shareBtn: {
     padding: 4,
@@ -422,16 +389,16 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 
-  expandedSection: {
-    marginTop: 6,
+  // Unboxed Theological Exegesis (Part of Body)
+  theologicalSection: {
+    marginTop: 4,
     marginBottom: 8,
     paddingTop: 8,
     borderTopWidth: 1,
     borderTopColor: 'rgba(15, 23, 42, 0.06)',
   },
-  expandedHeader: {
-    fontSize: 10,
-    letterSpacing: 0.5,
+  theologicalHeader: {
+    letterSpacing: 0.8,
     marginBottom: 4,
   },
   theologicalText: {
@@ -440,36 +407,28 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
 
-  scriptureBox: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: 8,
-    padding: 10,
-    marginTop: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.05)',
+  // Unboxed Scripture Link (Part of Body)
+  scriptureLink: {
+    marginTop: 6,
+    marginBottom: 6,
   },
-  scriptureHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  scriptureSnippetText: {
+    fontSize: 13,
+    fontStyle: 'italic',
+    lineHeight: 19,
+    color: colors.textSecondary,
     marginBottom: 4,
   },
-  scriptureRefRow: {
+  scriptureMetaRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
   },
-  scriptureSnippetText: {
-    fontSize: 12.5,
-    fontStyle: 'italic',
-    lineHeight: 18,
-    color: colors.textSecondary,
-  },
 
   expandToggle: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     paddingVertical: 6,
-    marginTop: 4,
+    marginTop: 2,
   },
 
   emptyContainer: {
