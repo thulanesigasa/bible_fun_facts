@@ -78,9 +78,18 @@ export default function GreekScreen({ navigation }: GreekScreenProps) {
         {/* Row Header: Category & Strong's Label (Directly on Body Canvas) */}
         <View style={styles.rowHeader}>
           <View style={styles.headerLeftWrap}>
-            <Text variant="caption" weight="800" color="#0F172A">
-              {item.strongsNumber}
-            </Text>
+            {item.englishWord ? (
+              <Text variant="h3" weight="800" color={colors.textPrimary}>
+                {item.englishWord}
+                <Text variant="caption" weight="800" color={colors.accent}>
+                  {`  ${item.strongsNumber}`}
+                </Text>
+              </Text>
+            ) : (
+              <Text variant="caption" weight="800" color="#0F172A">
+                {item.strongsNumber}
+              </Text>
+            )}
             <Text variant="caption" weight="700" color={colors.textTertiary}>
               {` • ${item.category.toUpperCase()}`}
             </Text>
@@ -249,7 +258,7 @@ export default function GreekScreen({ navigation }: GreekScreenProps) {
               <SearchSvg size={16} color={colors.textSecondary} />
               <TextInput
                 style={styles.searchInput}
-                placeholder="Search Greek (e.g. agape, logos, G26)..."
+                placeholder="Search Greek (e.g. life, agape, logos, G26)..."
                 placeholderTextColor={colors.textTertiary}
                 value={searchQuery}
                 onChangeText={setSearchQuery}

@@ -28,14 +28,21 @@ interface StrongsScreenProps {
   navigation: any;
 }
 
+const ALPHABET_LETTERS = [
+  'All',
+  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+  'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+];
+
 export default function StrongsScreen({ navigation }: StrongsScreenProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLang, setSelectedLang] = useState<'all' | 'hebrew' | 'greek'>('all');
+  const [selectedLetter, setSelectedLetter] = useState<string>('All');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const filteredEntries = useMemo(() => {
-    return searchConcordance(searchQuery, selectedLang);
-  }, [searchQuery, selectedLang]);
+    return searchConcordance(searchQuery, selectedLang, selectedLetter);
+  }, [searchQuery, selectedLang, selectedLetter]);
 
   const handleOpenScripture = (entry: LexiconEntry) => {
     if (entry.keyScripture?.book && entry.keyScripture?.chapter) {
@@ -49,9 +56,12 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
 
   const handleShareEntry = async (entry: LexiconEntry) => {
     try {
+      const titleWord = entry.englishWord
+        ? `${entry.englishWord} (${entry.strongsNumber})`
+        : `Strong's ${entry.strongsNumber}: ${entry.transliteration}`;
       await Share.share({
-        title: `Strong's ${entry.strongsNumber}: ${entry.transliteration}`,
-        message: `Strong's ${entry.strongsNumber} (${entry.language.toUpperCase()})\nWord: ${entry.originalScript} (${entry.transliteration})\nPronunciation: ${entry.pronunciation}\nDefinition: ${entry.shortDefinition}\n\n"${entry.keyScripture.snippet}" — ${entry.keyScripture.reference}\n\nDiscovered on exégeomai.`,
+        title: titleWord,
+        message: `${entry.englishWord ? `${entry.englishWord.toUpperCase()} — ` : ''}Strong's ${entry.strongsNumber} (${entry.language.toUpperCase()})\nWord: ${entry.originalScript} (${entry.transliteration})\nPronunciation: ${entry.pronunciation}\nDefinition: ${entry.shortDefinition}\n\n"${entry.keyScripture.snippet}" — ${entry.keyScripture.reference}\n\nDiscovered on exégeomai.`,
       });
     } catch (e) {
       // User cancelled
@@ -64,11 +74,14 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
 
     return (
       <View style={[styles.entryRow, !isLast && styles.rowDivider]}>
-        {/* Row Header: Strong's Number & Language Label (Seamless Body Text) */}
+        {/* Row Header: English Word & Strong's Number & Language Label */}
         <View style={styles.rowHeader}>
           <View style={styles.headerLeftWrap}>
-            <Text variant="caption" weight="800" color="#0F172A">
-              {item.strongsNumber}
+            <Text variant="h3" weight="800" color={colors.textPrimary}>
+              {item.englishWord || item.transliteration}
+            </Text>
+            <Text variant="caption" weight="800" color={colors.accent} style={styles.strongsNumberText}>
+              {`  ${item.strongsNumber}`}
             </Text>
             <Text variant="caption" weight="700" color={colors.textTertiary}>
               {` • ${isHebrew ? 'HEBREW OT' : 'KOINE GREEK NT'}`}
@@ -80,7 +93,7 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
             onPress={() => handleShareEntry(item)}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             accessibilityRole="button"
-            accessibilityLabel={`Share Strong's ${item.strongsNumber}`}
+            accessibilityLabel={`Share ${item.englishWord || item.strongsNumber}`}
           >
             <ShareSvg size={15} color={colors.textSecondary} />
           </TouchableOpacity>
@@ -97,7 +110,7 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
             {item.originalScript}
           </Text>
           <View style={styles.transliterationBox}>
-            <Text variant="h3" weight="800" color={colors.textPrimary}>
+            <Text variant="body" weight="700" color={colors.textPrimary}>
               {item.transliteration}
             </Text>
             {item.pronunciation ? (
@@ -170,13 +183,13 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Search Input Bar */}
+      {/* Search Input Bar & Controls */}
       <View style={styles.searchSection}>
         <View style={styles.searchInputContainer}>
           <SearchSvg size={16} color={colors.textSecondary} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search Strong's (e.g. H7965, G1834, shalom, grace)..."
+            placeholder="Search words (e.g. life, love, faith, H2416, G2222)..."
             placeholderTextColor={colors.textTertiary}
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -247,12 +260,45 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
             </Text>
           </TouchableOpacity>
         </View>
+
+        {/* A-to-Z Alphabetical Quick Browser */}
+        <FlatList
+          horizontal
+          data={ALPHABET_LETTERS}
+          keyExtractor={(letter) => letter}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.alphabetList}
+          renderItem={({ item: letter }) => {
+            const isActive = selectedLetter === letter;
+            return (
+              <TouchableOpacity
+                style={[
+                  styles.letterPill,
+                  isActive && styles.letterPillActive,
+                ]}
+                onPress={() => setSelectedLetter(letter)}
+                activeOpacity={0.75}
+                accessibilityRole="button"
+                accessibilityLabel={`Filter by letter ${letter}`}
+              >
+                <Text
+                  variant="caption"
+                  weight={isActive ? '800' : '600'}
+                  color={isActive ? '#0F172A' : colors.textSecondary}
+                  style={styles.letterText}
+                >
+                  {letter}
+                </Text>
+              </TouchableOpacity>
+            );
+          }}
+        />
       </View>
 
       {/* Concordance List */}
       <FlatList
         data={filteredEntries}
-        keyExtractor={(item) => item.strongsNumber}
+        keyExtractor={(item) => `${item.strongsNumber}-${item.englishWord || item.transliteration}`}
         renderItem={({ item, index }) =>
           renderConcordanceItem({
             item,
@@ -272,8 +318,23 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
               color={colors.textSecondary}
               style={styles.emptyMessage}
             >
-              Try searching by Strong's number (e.g. H7965, G1834) or by root English definition.
+              No entries match "{searchQuery || selectedLetter}". Try searching for another biblical word (e.g. life, love, faith, peace) or Strong's ID.
             </Text>
+            {(searchQuery.length > 0 || selectedLetter !== 'All' || selectedLang !== 'all') && (
+              <TouchableOpacity
+                style={styles.resetFilterBtn}
+                onPress={() => {
+                  setSearchQuery('');
+                  setSelectedLetter('All');
+                  setSelectedLang('all');
+                }}
+                activeOpacity={0.8}
+              >
+                <Text variant="caption" weight="700" color="#0F172A">
+                  Reset All Filters
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         }
       />
@@ -289,7 +350,7 @@ const styles = StyleSheet.create({
   searchSection: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
-    paddingBottom: spacing.sm,
+    paddingBottom: 6,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(15, 23, 42, 0.06)',
     backgroundColor: '#FFFFFF',
@@ -315,16 +376,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginTop: 10,
+    marginTop: 8,
   },
   filterTab: {
-    paddingVertical: 5,
+    paddingVertical: 4,
     paddingHorizontal: 12,
-    borderRadius: 16,
+    borderRadius: 14,
     backgroundColor: '#F1F5F9',
   },
   filterTabActive: {
     backgroundColor: '#FDD223',
+  },
+
+  // A-to-Z Alphabetical Horizontal List
+  alphabetList: {
+    gap: 5,
+    paddingVertical: 8,
+  },
+  letterPill: {
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+    backgroundColor: '#F8FAFC',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.06)',
+  },
+  letterPillActive: {
+    backgroundColor: '#FDD223',
+    borderColor: '#FDD223',
+  },
+  letterText: {
+    fontSize: 11.5,
   },
 
   listContent: {
@@ -345,14 +429,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   headerLeftWrap: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'baseline',
+    flexWrap: 'wrap',
+    flex: 1,
+  },
+  strongsNumberText: {
+    marginRight: 2,
   },
   shareBtn: {
     padding: 4,
+    marginLeft: 6,
   },
 
   wordRow: {
@@ -362,7 +452,7 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   originalScriptText: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: '700',
     color: '#0F172A',
   },
@@ -409,7 +499,7 @@ const styles = StyleSheet.create({
 
   // Unboxed Scripture Link (Part of Body)
   scriptureLink: {
-    marginTop: 6,
+    marginTop: 4,
     marginBottom: 6,
   },
   scriptureSnippetText: {
@@ -434,7 +524,7 @@ const styles = StyleSheet.create({
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 80,
+    paddingTop: 60,
     gap: 8,
     paddingHorizontal: spacing.xl,
   },
@@ -449,5 +539,12 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     textAlign: 'center',
     color: colors.textSecondary,
+  },
+  resetFilterBtn: {
+    marginTop: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    backgroundColor: '#FDD223',
   },
 });
