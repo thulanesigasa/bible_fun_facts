@@ -64,7 +64,7 @@ export function Header() {
               href="https://github.com/thulanesigasa/bible_fun_facts/releases/latest"
               className="btn-nav-download"
             >
-              Download
+              Download APK
             </a>
           </li>
         </ul>

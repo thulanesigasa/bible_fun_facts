@@ -117,20 +117,20 @@ ul, ol {
 }
 
 .btn-nav-download {
-  background: #334155;
-  color: #FFFFFF;
+  background: #FDD223;
+  color: #0F172A;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
   padding: 8px 16px;
   border-radius: 4px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  transition: background 0.15s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  transition: background 0.15s ease, transform 0.15s ease;
 }
 
 .btn-nav-download:hover {
-  background: #1E293B;
+  background: #EAB308;
 }
 
 /* ── Screenshot 1: Hero Section ──────────────────────────── */
@@ -158,7 +158,7 @@ ul, ol {
 .hero-text-wrap h1 {
   font-size: 2.25rem;
   font-weight: 600;
-  color: #475569;
+  color: #0F172A;
   line-height: 1.25;
   margin-bottom: 0;
 }
@@ -166,7 +166,7 @@ ul, ol {
 .hero-text-wrap p {
   font-size: 1.125rem;
   line-height: 1.625;
-  color: #64748B;
+  color: #475569;
   margin-top: 1rem;
   margin-bottom: 3rem;
   max-width: 540px;
@@ -179,39 +179,41 @@ ul, ol {
 }
 
 .btn-get-started {
-  background: #94A3B8;
-  color: #FFFFFF;
+  background: #FDD223;
+  color: #0F172A;
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   padding: 14px 26px;
   border-radius: 4px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(253, 210, 35, 0.3);
   transition: background 0.15s ease, box-shadow 0.15s ease;
 }
 
 .btn-get-started:hover {
-  background: #64748B;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  background: #EAB308;
+  box-shadow: 0 10px 15px -3px rgba(253, 210, 35, 0.4);
 }
 
 .btn-github-star {
-  background: #334155;
+  background: #0F172A;
   color: #FFFFFF;
+  border: 1px solid rgba(253, 210, 35, 0.3);
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   padding: 14px 26px;
   border-radius: 4px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  transition: background 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .btn-github-star:hover {
   background: #1E293B;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-color: #FDD223;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
 }
 
 /* Full Bleed Geometric Hero Poster (Screenshot 1 Right) */
@@ -232,7 +234,7 @@ ul, ol {
 /* ── Screenshot 2: Angled Slate Section & 4 Feature Pillars ─ */
 .notus-angled-section {
   position: relative;
-  background: #F1F5F9;
+  background: #F8FAFC;
   padding-top: 140px;
   padding-bottom: 120px;
   padding-inline: max(24px, calc((100% - 1200px) / 2));
@@ -245,7 +247,7 @@ ul, ol {
   left: 0;
   right: 0;
   height: 80px;
-  background: #F1F5F9;
+  background: #F8FAFC;
   clip-path: polygon(0 100%, 100% 0, 100% 100%);
 }
 
@@ -309,22 +311,22 @@ ul, ol {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #FFFFFF;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  background: #FDD223;
+  color: #0F172A;
+  box-shadow: 0 4px 8px -1px rgba(253, 210, 35, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: 'Space Mono', monospace;
-  font-size: 14px;
-  font-weight: 700;
-  color: #475569;
+  font-size: 13px;
+  font-weight: 800;
   margin-bottom: 16px;
 }
 
 .pillar-cell h6 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #334155;
+  color: #0F172A;
   margin-bottom: 8px;
 }
 
@@ -337,7 +339,7 @@ ul, ol {
 /* ── Screenshot 3: CSS Components & Layered Cards ────────── */
 .notus-components-section {
   position: relative;
-  background: #F1F5F9;
+  background: #FFFFFF;
   padding-top: 100px;
   padding-bottom: 120px;
   padding-inline: max(24px, calc((100% - 1200px) / 2));
@@ -356,22 +358,22 @@ ul, ol {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: #FFFFFF;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  background: #FDD223;
+  color: #0F172A;
+  box-shadow: 0 6px 12px -2px rgba(253, 210, 35, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: 'Space Mono', monospace;
-  font-size: 18px;
-  font-weight: 700;
-  color: #475569;
+  font-size: 16px;
+  font-weight: 800;
   margin-bottom: 24px;
 }
 
 .components-text-col h3 {
   font-size: 2.1rem;
   font-weight: 600;
-  color: #334155;
+  color: #0F172A;
   margin-bottom: 14px;
 }
 
@@ -394,27 +396,32 @@ ul, ol {
 .notus-pill-tag {
   display: inline-block;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  color: #64748B;
+  letter-spacing: 0.5px;
+  color: #0F172A;
   background: #FFFFFF;
-  padding: 4px 10px;
+  padding: 5px 12px;
   border-radius: 9999px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(253, 210, 35, 0.4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .notus-view-all {
   font-size: 14px;
   font-weight: 700;
-  color: #334155;
+  color: #0F172A;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: color 0.15s ease;
+  border-bottom: 2px solid #FDD223;
+  padding-bottom: 2px;
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
 
 .notus-view-all:hover {
-  color: #64748B;
+  color: #B45309;
+  border-color: #B45309;
 }
 
 /* Floating Layered Component Images (Screenshot 3 Right) */
@@ -499,39 +506,121 @@ ul, ol {
 }
 
 .framework-card {
-  padding: 32px 20px;
+  padding: 28px 18px;
   border-radius: 8px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.12);
   text-align: center;
-  color: #FFFFFF;
   display: flex;
   flex-direction: column;
   align-items: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.card-red    { background: #DC2626; }
-.card-blue   { background: #0284C7; }
-.card-dark   { background: #334155; }
-.card-yellow { background: #D97706; }
-.card-crimson{ background: #991B1B; }
-.card-green  { background: #059669; }
+.framework-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+}
 
-.framework-card-logo {
-  width: 56px;
-  height: 56px;
+.card-canon-emblem {
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 12px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  padding: 6px;
-  object-fit: contain;
-  margin-bottom: 14px;
+}
+
+.framework-card h5 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 6px;
 }
 
 .framework-card p {
-  color: #FFFFFF;
-  font-size: 1.15rem;
-  font-weight: 600;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
+
+/* Card 1: Gold Yellow Accent */
+.card-gold {
+  background: #FDD223;
+  color: #0F172A;
+}
+.card-gold .card-canon-emblem {
+  background: #0F172A;
+  color: #FDD223;
+}
+.card-gold h5 { color: #0F172A; }
+.card-gold p { color: #1E293B; }
+
+/* Card 2: Deep Slate Panel */
+.card-dark-slate {
+  background: #1E293B;
+  color: #FFFFFF;
+  border: 1px solid rgba(253, 210, 35, 0.2);
+}
+.card-dark-slate .card-canon-emblem {
+  background: #FDD223;
+  color: #0F172A;
+}
+.card-dark-slate h5 { color: #FFFFFF; }
+.card-dark-slate p { color: #CBD5E1; }
+
+/* Card 3: Deep Charcoal Panel */
+.card-charcoal {
+  background: #0F172A;
+  color: #FFFFFF;
+  border: 1px solid rgba(253, 210, 35, 0.25);
+}
+.card-charcoal .card-canon-emblem {
+  background: #FDD223;
+  color: #0F172A;
+}
+.card-charcoal h5 { color: #FFFFFF; }
+.card-charcoal p { color: #CBD5E1; }
+
+/* Card 4: Clean White Surface */
+.card-white-surface {
+  background: #FFFFFF;
+  color: #0F172A;
+  border: 2px solid #FDD223;
+}
+.card-white-surface .card-canon-emblem {
+  background: #FDD223;
+  color: #0F172A;
+}
+.card-white-surface h5 { color: #0F172A; }
+.card-white-surface p { color: #475569; }
+
+/* Card 5: Deep Gold Warm Panel */
+.card-gold-deep {
+  background: #EAB308;
+  color: #0F172A;
+}
+.card-gold-deep .card-canon-emblem {
+  background: #0F172A;
+  color: #FDD223;
+}
+.card-gold-deep h5 { color: #0F172A; }
+.card-gold-deep p { color: #1E293B; }
+
+/* Card 6: Slate Secondary Panel */
+.card-slate-accent {
+  background: #334155;
+  color: #FFFFFF;
+  border: 1px solid rgba(253, 210, 35, 0.2);
+}
+.card-slate-accent .card-canon-emblem {
+  background: #FDD223;
+  color: #0F172A;
+}
+.card-slate-accent h5 { color: #FFFFFF; }
+.card-slate-accent p { color: #CBD5E1; }
 
 /* ── Screenshot 5: Documentation & Rotated Code Card ──────── */
 .notus-doc-section {
@@ -590,7 +679,7 @@ ul, ol {
 /* ── Screenshot 6: Beautiful Example Pages Trio ──────────── */
 .notus-pages-section {
   position: relative;
-  background: #475569;
+  background: #0F172A;
   padding-top: 100px;
   padding-bottom: 160px;
   padding-inline: max(24px, calc((100% - 1200px) / 2));
@@ -641,23 +730,26 @@ ul, ol {
 .page-preview-thumbnail {
   width: 100%;
   border-radius: 8px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(253, 210, 35, 0.2);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .page-preview-card:hover .page-preview-thumbnail {
   transform: translateY(-8px);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  border-color: #FDD223;
+  box-shadow: 0 25px 50px -12px rgba(253, 210, 35, 0.2);
 }
 
 /* ── Screenshot 7: Open Source Callout ───────────────────── */
 .notus-open-source-section {
   position: relative;
-  background: #475569;
+  background: #0F172A;
   padding-block: 100px 180px;
   padding-inline: max(24px, calc((100% - 1200px) / 2));
   color: #FFFFFF;
   overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .open-source-inner {
@@ -683,39 +775,40 @@ ul, ol {
 
 .btn-github-star-lg {
   display: inline-block;
-  background: #334155;
-  color: #FFFFFF;
+  background: #FDD223;
+  color: #0F172A;
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   padding: 14px 26px;
   border-radius: 4px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 6px -1px rgba(253, 210, 35, 0.3);
+  transition: background 0.15s ease;
 }
 
 .btn-github-star-lg:hover {
-  background: #1E293B;
+  background: #EAB308;
 }
 
 .open-source-watermark {
   display: flex;
   justify-content: flex-end;
-  opacity: 0.8;
+  opacity: 0.7;
 }
 
 .octocat-watermark-symbol {
   font-family: 'Space Mono', monospace;
   font-size: 18rem;
   font-weight: 900;
-  color: #334155;
+  color: #1E293B;
   line-height: 0.8;
 }
 
 /* ── Screenshot 8: Floating CTA Card & Footer ────────────── */
 .notus-cta-section {
   position: relative;
-  background: #E2E8F0;
+  background: #F8FAFC;
   padding-top: 40px;
   padding-bottom: 60px;
   padding-inline: max(24px, calc((100% - 1200px) / 2));
@@ -726,6 +819,7 @@ ul, ol {
   margin-bottom: 80px;
   background: #FFFFFF;
   border-radius: 8px;
+  border-top: 4px solid #FDD223;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
   padding: 64px 48px;
   text-align: center;
@@ -733,21 +827,32 @@ ul, ol {
   z-index: 20;
 }
 
-.cta-love-symbol {
-  font-size: 2.5rem;
-  margin-bottom: 16px;
+.cta-sacred-emblem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #FDD223;
+  color: #0F172A;
+  font-family: 'Space Mono', monospace;
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(253, 210, 35, 0.4);
 }
 
 .notus-floating-cta-box h3 {
   font-size: 2rem;
   font-weight: 600;
-  color: #334155;
+  color: #0F172A;
   margin-bottom: 12px;
 }
 
 .notus-floating-cta-box p {
   font-size: 1.1rem;
-  color: #64748B;
+  color: #475569;
   max-width: 600px;
   margin-inline: auto;
   margin-bottom: 36px;
@@ -809,6 +914,8 @@ ul, ol {
 }
 
 .footer-circle-btn:hover {
+  background: #FDD223;
+  color: #0F172A;
   transform: translateY(-2px);
 }
 
