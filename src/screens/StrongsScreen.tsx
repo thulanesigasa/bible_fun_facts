@@ -6,10 +6,10 @@ import {
   TouchableOpacity,
   TextInput,
   Share,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useThemedAlert } from '../context/AlertContext';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme';
 import { Text } from '../components/Typography';
@@ -20,7 +20,7 @@ import {
   ShareSvg,
   StrongsIconSvg,
   DownloadSvg,
-  CheckCircleSvg,
+  TrashSvg,
 } from '../components/SvgIcons';
 import {
   LexiconEntry,
@@ -30,6 +30,7 @@ import {
   OfflineDictionaryMeta,
   getOfflineDictionaryStatus,
   downloadOfflineDictionary,
+  deleteOfflineDictionary,
 } from '../services/dictionaryOfflineService';
 
 interface StrongsScreenProps {
@@ -43,6 +44,7 @@ const ALPHABET_LETTERS = [
 ];
 
 export default function StrongsScreen({ navigation }: StrongsScreenProps) {
+  const { showAlert } = useThemedAlert();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLetter, setSelectedLetter] = useState<string>('All');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -59,34 +61,52 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
   }, [searchQuery, selectedLetter]);
 
   const handleDownload = async () => {
-    if (offlineMeta?.isDownloaded) {
-      Alert.alert(
-        'Offline Dictionary Active',
-        `The Strong's A-to-Z Dictionary (${offlineMeta.sizeFormatted}) is downloaded and saved to your device for 100% offline access.\n\nWould you like to re-download to refresh the lexicon cache?`,
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Re-download', onPress: performDownload },
-        ]
-      );
-      return;
-    }
-    await performDownload();
-  };
-
-  const performDownload = async () => {
     try {
       setIsDownloading(true);
       const meta = await downloadOfflineDictionary();
       setOfflineMeta(meta);
       setIsDownloading(false);
-      Alert.alert(
-        'Offline Dictionary Ready',
-        `The complete Strong's A-to-Z Biblical Dictionary (${meta.sizeFormatted}) is downloaded and saved to your device. All entries, transliterations, and exegesis are 100% available without internet.`
-      );
+      showAlert({
+        title: 'Offline Dictionary Ready',
+        message: `The complete Strong's A-to-Z Biblical Dictionary (${meta.sizeFormatted}) is downloaded and saved to your device for 100% offline study.`,
+        icon: 'success',
+        buttons: [{ text: 'Done' }],
+      });
     } catch {
       setIsDownloading(false);
-      Alert.alert('Download Error', 'Could not cache offline dictionary. Please try again.');
+      showAlert({
+        title: 'Download Error',
+        message: 'Could not cache offline dictionary to local storage. Please check device storage and try again.',
+        icon: 'warning',
+        buttons: [{ text: 'OK' }],
+      });
     }
+  };
+
+  const handleRemoveDictionary = () => {
+    showAlert({
+      title: 'Remove Offline Dictionary?',
+      message: `Are you sure you want to remove the Strong's A-to-Z Dictionary (${offlineMeta?.sizeFormatted || '2.4 MB'}) from this device?\n\nYou can re-download it anytime for offline study.`,
+      icon: 'trash',
+      isDestructive: true,
+      buttons: [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: async () => {
+            await deleteOfflineDictionary();
+            setOfflineMeta(null);
+            showAlert({
+              title: 'Dictionary Removed',
+              message: 'The offline Strong\'s dictionary cache has been deleted from your device.',
+              icon: 'info',
+              buttons: [{ text: 'OK' }],
+            });
+          },
+        },
+      ],
+    });
   };
 
   const handleOpenDetail = (entry: LexiconEntry) => {
@@ -282,26 +302,23 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
           </View>
 
           <TouchableOpacity
-            style={[
-              styles.downloadIconBtn,
-              offlineMeta?.isDownloaded && styles.downloadIconBtnReady,
-            ]}
-            onPress={handleDownload}
+            style={styles.actionIconBtn}
+            onPress={offlineMeta?.isDownloaded ? handleRemoveDictionary : handleDownload}
             disabled={isDownloading}
             activeOpacity={0.7}
             accessibilityRole="button"
             accessibilityLabel={
               offlineMeta?.isDownloaded
-                ? 'Offline dictionary active'
+                ? 'Remove downloaded offline dictionary'
                 : 'Download dictionary for offline use'
             }
           >
             {isDownloading ? (
-              <ActivityIndicator size="small" color="#78350F" />
+              <ActivityIndicator size="small" color="#B45309" />
             ) : offlineMeta?.isDownloaded ? (
-              <CheckCircleSvg size={18} color="#15803D" />
+              <TrashSvg size={20} color="#DC2626" />
             ) : (
-              <DownloadSvg size={18} color="#78350F" />
+              <DownloadSvg size={20} color="#B45309" />
             )}
           </TouchableOpacity>
         </View>
@@ -408,19 +425,10 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 6,
   },
-  downloadIconBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    backgroundColor: '#FEF9C3',
-    borderWidth: 1,
-    borderColor: '#FDE047',
+  actionIconBtn: {
+    padding: 8,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  downloadIconBtnReady: {
-    backgroundColor: '#F0FDF4',
-    borderColor: '#BBF7D0',
   },
   searchInputContainer: {
     flex: 1,

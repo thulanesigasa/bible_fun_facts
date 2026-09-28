@@ -1517,18 +1517,24 @@ To provide an unhurried, respectful, and focused user experience, all critical s
 <p align="left">
   <img src="https://img.shields.io/badge/Dictionary-Strongs%20A--to--Z%20Biblical%20Lexicon-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="Strong's A-to-Z Dictionary" />
   <img src="https://img.shields.io/badge/Offline%20Storage-2.4%20MB%20Local%20Lexicon%20Cache-10B981?style=for-the-badge&logo=sqlite&logoColor=white" alt="Offline Storage Cache" />
-  <img src="https://img.shields.io/badge/Search%20Engine-Inline%20Download%20Button%20%7C%20Dynamic%20Width-0284C7?style=for-the-badge" alt="Inline Download Button" />
-  <img src="https://img.shields.io/badge/UI%20Aesthetic-Pure%20Text%20Buttons%20%7C%20Zero%20Boxed%20Pills-FDD223?style=for-the-badge" alt="Pure Text Buttons" />
+  <img src="https://img.shields.io/badge/Action%20Button-Download%20%7C%20Bin%20Icon%20%7C%20Zero%20Border%20Radius-0284C7?style=for-the-badge" alt="Action Button" />
+  <img src="https://img.shields.io/badge/Popups-ThemedAlertModal%2060--30--10%20Dialogs-FDD223?style=for-the-badge&logo=shield&logoColor=white" alt="Themed Popups" />
   <img src="https://img.shields.io/badge/Header%20Architecture-Tab%20Logo%20Header%20Suppression-0F172A?style=for-the-badge&logo=react&logoColor=white" alt="Header Architecture" />
 </p>
 
 The application features a comprehensive, unified A-to-Z Strong's Concordance and Biblical Dictionary (`StrongsScreen.tsx` and `StrongsDetailScreen.tsx`):
 
-1. **Inline Download Button Next to Search**:
-   - The former text banners ("Download Offline Dictionary" / "Offline Dictionary Active") have been replaced with a compact 40x40 SVG icon button positioned directly beside the search bar.
-   - The search input container dynamically flexes (`flex: 1`) to give clean breathing room to the download trigger.
-   - Displays `DownloadSvg` (`#78350F`) when un-cached and `CheckCircleSvg` (`#15803D`) when active and offline-ready.
-   - Tapping when already downloaded displays an interactive confirmation dialog with options to re-download or cancel.
+1. **Inline Download & Bin Action Trigger Beside Search**:
+   - The search input dynamically flexes (`flex: 1`) to provide seamless spacing for the action icon button.
+   - **Zero Border Radius & Box Free**: The action button (`actionIconBtn`) has NO background color, NO border width, and NO border radius, sitting cleanly as an integrated icon control.
+   - **Context-Aware Dynamic Icon**:
+     - When un-cached / needing download: displays `DownloadSvg` (`#B45309`).
+     - When downloading: displays a gold `ActivityIndicator` (`#B45309`).
+     - Once downloaded: displays the bin / trash icon (`TrashSvg` in `#DC2626`) for removing the downloaded dictionary.
+   - **60-30-10 Themed Dialog Integration**:
+     - All dialogs are fully branded using the application's `ThemedAlertModal` via `useThemedAlert()`.
+     - Tapping the bin icon opens a themed destructive confirmation dialog: *"Remove Offline Dictionary?"* with `destructive` red button styling.
+     - On confirmation, `deleteOfflineDictionary()` clears local storage and immediately swaps the bin icon back to the download icon, showing a themed completion dialog.
 
 2. **Elimination of Duplicate Tab Logo Header & Gap**:
    - In `src/navigation/AppNavigator.tsx`, `'StrongsDetail'` was added to the `childScreens` array inside `shouldShowTabHeader(route)`.
