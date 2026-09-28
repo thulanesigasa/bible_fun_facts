@@ -3,7 +3,7 @@
     "name": "exégeomai",
     "slug": "exegeomai",
     "version": "1.0.4",
-    "runtimeVersion": "1.0.1",
+    "runtimeVersion": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -59,7 +59,15 @@
     },
     "owner": "thulanesigasa0",
     "plugins": [
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-sqlite",
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "exegeomai",
+          "project": "exegeomai-mobile"
+        }
+      ]
     ]
   }
 }

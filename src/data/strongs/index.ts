@@ -16,28 +16,44 @@ export const TOTAL_CANONICAL_STRONGS_COUNT = 14298;
 export const TOTAL_HEBREW_CANONICAL_COUNT = 8674;
 export const TOTAL_GREEK_CANONICAL_COUNT = 5624;
 
-// Load complete raw canonical partitions lazily/safely using require
-// to prevent massive TypeScript type-synthesis overhead on 14,000+ objects
-const CANONICAL_HEBREW_RAW = require('./canonicalHebrew.json') as LexiconEntry[];
-const CANONICAL_GREEK_RAW = require('./canonicalGreek.json') as LexiconEntry[];
+// Load complete raw canonical partitions lazily on-demand
+// so initial bundle evaluation does not parse 9.5MB of JSON at application boot
+let _hebrewRaw: LexiconEntry[] | null = null;
+let _greekRaw: LexiconEntry[] | null = null;
+
+export function getCanonicalHebrewRaw(): LexiconEntry[] {
+  if (!_hebrewRaw) {
+    _hebrewRaw = require('./canonicalHebrew.json') as LexiconEntry[];
+  }
+  return _hebrewRaw;
+}
+
+export function getCanonicalGreekRaw(): LexiconEntry[] {
+  if (!_greekRaw) {
+    _greekRaw = require('./canonicalGreek.json') as LexiconEntry[];
+  }
+  return _greekRaw;
+}
 
 /**
- * Merges raw canonical datasets with rich theological batches.
+ * Merges raw canonical datasets with rich theological batches on-demand.
  * Curated entries in HEBREW_BATCH_1 and GREEK_BATCH_1 override raw definitions,
  * providing deep theological exegesis, scripture citations, and curated categories.
  */
 function buildCanonicalBatches(): LexiconEntry[] {
+  const hebrewRaw = getCanonicalHebrewRaw();
+  const greekRaw = getCanonicalGreekRaw();
   const map = new Map<string, LexiconEntry>();
 
   // 1. Add all 8,674 Hebrew canonical entries (H1 to H8674)
-  for (let i = 0; i < CANONICAL_HEBREW_RAW.length; i++) {
-    const item = CANONICAL_HEBREW_RAW[i];
+  for (let i = 0; i < hebrewRaw.length; i++) {
+    const item = hebrewRaw[i];
     map.set(item.strongsNumber, item);
   }
 
   // 2. Add all 5,523 Greek canonical entries (G1 to G5624)
-  for (let i = 0; i < CANONICAL_GREEK_RAW.length; i++) {
-    const item = CANONICAL_GREEK_RAW[i];
+  for (let i = 0; i < greekRaw.length; i++) {
+    const item = greekRaw[i];
     map.set(item.strongsNumber, item);
   }
 
@@ -63,7 +79,14 @@ export function getAllCanonicalStrongs(): LexiconEntry[] {
   return _memoizedBatches;
 }
 
-export const ALL_STRONGS_BATCHES: LexiconEntry[] = getAllCanonicalStrongs();
+// Lazy Proxy array: accessing methods/properties evaluates the canonical list on-demand
+// so importing this module never blocks JS evaluation at application startup!
+export const ALL_STRONGS_BATCHES: LexiconEntry[] = new Proxy([] as LexiconEntry[], {
+  get(_target, prop, receiver) {
+    const batches = getAllCanonicalStrongs();
+    return Reflect.get(batches, prop, receiver);
+  },
+});
 
 export const STRONGS_BATCHES: StrongsBatch[] = [
   {
@@ -71,13 +94,13 @@ export const STRONGS_BATCHES: StrongsBatch[] = [
     language: 'hebrew',
     range: 'H1 - H8674',
     description: 'Complete 8,674 Old Testament Hebrew & Aramaic canonical lemmas',
-    entries: CANONICAL_HEBREW_RAW,
+    entries: [],
   },
   {
     batchId: 'greek-canonical-complete',
     language: 'greek',
     range: 'G1 - G5624',
     description: 'Complete 5,523 New Testament Apostolic Koine Greek canonical lemmas',
-    entries: CANONICAL_GREEK_RAW,
+    entries: [],
   },
 ];
