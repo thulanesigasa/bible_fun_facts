@@ -112,9 +112,16 @@ jobs:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
   # Job 2: Compile Native Android APK directly on GitHub Actions Runners
+  # Strictly gated: compiled ONLY when explicitly requested via workflow_dispatch or deliberate commit flag ([build-apk], [compile-apk], [release-apk])
   compile_native_app:
     name: Compile Native Android APK on GitHub
-    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (inputs.action == 'compile_native_app' || inputs.action == 'both'))
+    if: |
+      (github.event_name == 'workflow_dispatch' && (inputs.action == 'compile_native_app' || inputs.action == 'both')) ||
+      (github.event_name == 'push' && (
+        contains(github.event.head_commit.message, '[build-apk]') ||
+        contains(github.event.head_commit.message, '[compile-apk]') ||
+        contains(github.event.head_commit.message, '[release-apk]')
+      ))
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:

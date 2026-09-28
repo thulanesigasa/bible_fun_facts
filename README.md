@@ -10,6 +10,7 @@
   <img src="https://img.shields.io/badge/Community-Believer%20&%20Scholar%20Hub-10B981?style=for-the-badge" alt="Believer & Scholar Hub" />
   <img src="https://img.shields.io/badge/Supabase-Auth%20&%20Backend-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase Backend" />
   <img src="https://img.shields.io/badge/CI%2FCD-Rule%2021%20Compliant-10B981?style=for-the-badge&logo=githubactions&logoColor=white" alt="Rule 21 Compliant" />
+  <img src="https://img.shields.io/badge/Native%20APK-Conditional%20Gated%20Compilation-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Conditional Gated Compilation" />
   <img src="https://img.shields.io/badge/EAS%20Channels-Production%20%7C%20Preview-000000?style=for-the-badge&logo=expo&logoColor=white" alt="EAS Channels" />
   <img src="https://img.shields.io/badge/Outer%20Release-v1.0.4-2563EB?style=for-the-badge&logo=android&logoColor=white" alt="Outer Release v1.0.4" />
   <img src="https://img.shields.io/badge/Security-Kotlin%20FLAG__SECURE-DC2626?style=for-the-badge&logo=android&logoColor=white" alt="Kotlin FLAG_SECURE" />
@@ -1053,7 +1054,7 @@ This project strictly adheres to **Rule 21** of our global mobile standards:
 
 | Standard | Implementation in `exégeomai` |
 | :--- | :--- |
-| **Direct Runner Compilation** | Android APKs compile on `ubuntu-latest` GitHub Actions runners using Java 17 Temurin, Android SDK, and `./gradlew assembleRelease`, bypassing cloud build queues entirely. |
+| **Direct Runner Compilation (Gated)** | Android APKs compile on `ubuntu-latest` GitHub Actions runners on demand (via `workflow_dispatch` or commit flags `[build-apk]`, `[compile-apk]`, `[release-apk]`), preventing redundant native compilations when routine UI/TS changes are delivered via OTA. |
 | **EAS Exclusively for OTA** | EAS CLI is reserved exclusively for Over-The-Air updates (`production` and `preview` channels) via `npx eas-cli update`. |
 | **Automated Release Distribution** | Compiled APKs are automatically uploaded to GitHub Releases (e.g. `exegeomai-v1.0.3.apk` under release tag `v1.0.3`) using `gh release upload --clobber`. |
 | **Locked Runtime Versioning** | `runtimeVersion` is explicitly locked to `1.0.1` in `app.json`, guaranteeing continuous OTA compatibility across all installed clients while CI injects dynamic `versionCode = github.run_number` and creates dynamic release tags (`v${VERSION}`). |
@@ -1096,12 +1097,15 @@ npx eas-cli update --branch production --message "Update description"
 npx eas-cli update --branch preview --message "Preview update description"
 ```
 
-### Compiling Native Binaries on GitHub Actions
-Native compilation runs automatically on push to `main` directly on GitHub Actions compute runners (Java 17 + runner-native Android SDK + Gradle) without relying on EAS Cloud build servers:
+### Compiling Native Binaries on GitHub Actions (Gated)
+Native compilation runs directly on GitHub Actions compute runners (Java 17 + runner-native Android SDK + Gradle) without burning EAS Cloud build servers. To prevent redundant builds on routine TypeScript and UI updates, compilation is strictly gated:
 
+- **Selective Triggering**: Native APK compilation runs ONLY when:
+  1. Manually triggered via GitHub Actions (`workflow_dispatch` selecting `compile_native_app` or `both`).
+  2. Or when a commit/PR message includes deliberate build flags: `[build-apk]`, `[compile-apk]`, or `[release-apk]`.
 - **Workflow**: `.github/workflows/compile-and-ota.yml` (`compile_native_app` job)
 - **Engine**: `npx expo prebuild --platform android --no-install` + `./gradlew assembleRelease -x lint -x test --no-daemon`
-- **Output**: Generates `exegeomai-v${VERSION}.apk` (e.g. `exegeomai-v1.0.3.apk`) and uploads it directly to the repository's GitHub Releases page under **Assets** with automatic clobbering.
+- **Output**: Generates `exegeomai-v${VERSION}.apk` (e.g. `exegeomai-v1.0.4.apk`) and uploads it directly to the repository's GitHub Releases page under **Assets** with automatic clobbering.
 
 ### GitHub Releases vs. Over-The-Air (OTA) Updates
 - **GitHub Releases (`/releases`)**: Houses official version tags (e.g. `v1.0.3`), changelogs, and direct `.apk` binary downloads compiled directly on GitHub Actions.
