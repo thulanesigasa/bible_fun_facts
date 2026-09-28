@@ -461,69 +461,27 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
         </View>
 
         {/* ================================================================ */}
-        {/* THE WORD (STRONGS, HEBREW, GREEK)                                */}
+        {/* THE WORD (UNIFIED STRONG'S BIBLICAL DICTIONARY)                  */}
         {/* ================================================================ */}
         <View style={styles.bodySection}>
           <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
             THE WORD
           </Text>
 
-          {/* Strong's */}
+          {/* Strong's Biblical Dictionary */}
           <TouchableOpacity
             style={styles.actionRow}
             onPress={() => navigation.navigate('Strongs')}
             activeOpacity={0.75}
             accessibilityRole="button"
-            accessibilityLabel="Open Strong's Concordance"
+            accessibilityLabel="Open Strong's Biblical Dictionary"
           >
             <View style={styles.rowTitleBox}>
               <Text variant="h3" style={styles.rowTitle}>
-                Strongs
+                Strong's Biblical Dictionary
               </Text>
               <Text variant="caption" color={colors.textSecondary}>
-                Bilingual Hebrew & Greek root index, Strong's numbers and definitions
-              </Text>
-            </View>
-            <Text style={styles.rowDisclosureArrow}>›</Text>
-          </TouchableOpacity>
-
-          <View style={styles.rowDivider} />
-
-          {/* Hebrew */}
-          <TouchableOpacity
-            style={styles.actionRow}
-            onPress={() => navigation.navigate('Hebrew')}
-            activeOpacity={0.75}
-            accessibilityRole="button"
-            accessibilityLabel="Open Ancient Hebrew Lexicon"
-          >
-            <View style={styles.rowTitleBox}>
-              <Text variant="h3" style={styles.rowTitle}>
-                Hebrew
-              </Text>
-              <Text variant="caption" color={colors.textSecondary}>
-                Old Testament theological roots, covenant terms and Aleph-Bet guide
-              </Text>
-            </View>
-            <Text style={styles.rowDisclosureArrow}>›</Text>
-          </TouchableOpacity>
-
-          <View style={styles.rowDivider} />
-
-          {/* Greek */}
-          <TouchableOpacity
-            style={styles.actionRow}
-            onPress={() => navigation.navigate('Greek')}
-            activeOpacity={0.75}
-            accessibilityRole="button"
-            accessibilityLabel="Open Koine Greek Lexicon"
-          >
-            <View style={styles.rowTitleBox}>
-              <Text variant="h3" style={styles.rowTitle}>
-                Greek
-              </Text>
-              <Text variant="caption" color={colors.textSecondary}>
-                New Testament apostolic vocabulary, Christological titles and Alpha-Omega guide
+                Complete A-to-Z biblical lexicon & concordance with offline download support
               </Text>
             </View>
             <Text style={styles.rowDisclosureArrow}>›</Text>

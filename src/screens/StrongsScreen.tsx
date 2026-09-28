@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   FlatList,
@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   TextInput,
-  Platform,
   Share,
+  Alert,
 } from 'react-native';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme';
@@ -18,11 +18,18 @@ import {
   BookOpenSvg,
   ShareSvg,
   StrongsIconSvg,
+  DownloadSvg,
+  CheckCircleSvg,
 } from '../components/SvgIcons';
 import {
   LexiconEntry,
   searchConcordance,
 } from '../data/lexiconData';
+import {
+  OfflineDictionaryMeta,
+  getOfflineDictionaryStatus,
+  downloadOfflineDictionary,
+} from '../services/dictionaryOfflineService';
 
 interface StrongsScreenProps {
   navigation: any;
@@ -36,13 +43,35 @@ const ALPHABET_LETTERS = [
 
 export default function StrongsScreen({ navigation }: StrongsScreenProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedLang, setSelectedLang] = useState<'all' | 'hebrew' | 'greek'>('all');
   const [selectedLetter, setSelectedLetter] = useState<string>('All');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [offlineMeta, setOfflineMeta] = useState<OfflineDictionaryMeta | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
 
+  useEffect(() => {
+    getOfflineDictionaryStatus().then(setOfflineMeta);
+  }, []);
+
+  // Single unified dictionary search across all biblical entries
   const filteredEntries = useMemo(() => {
-    return searchConcordance(searchQuery, selectedLang, selectedLetter);
-  }, [searchQuery, selectedLang, selectedLetter]);
+    return searchConcordance(searchQuery, 'all', selectedLetter);
+  }, [searchQuery, selectedLetter]);
+
+  const handleDownload = async () => {
+    try {
+      setIsDownloading(true);
+      const meta = await downloadOfflineDictionary();
+      setOfflineMeta(meta);
+      setIsDownloading(false);
+      Alert.alert(
+        'Offline Dictionary Ready',
+        `The complete Strong's A-to-Z Biblical Dictionary (${meta.sizeFormatted}) is downloaded and saved to your device. All entries, transliterations, and exegesis are 100% available without internet.`
+      );
+    } catch {
+      setIsDownloading(false);
+      Alert.alert('Download Error', 'Could not cache offline dictionary. Please try again.');
+    }
+  };
 
   const handleOpenDetail = (entry: LexiconEntry) => {
     (navigation as any).navigate('StrongsDetail', { entry });
@@ -65,9 +94,9 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
         : `Strong's ${entry.strongsNumber}: ${entry.transliteration}`;
       await Share.share({
         title: titleWord,
-        message: `${entry.englishWord ? `${entry.englishWord.toUpperCase()} — ` : ''}Strong's ${entry.strongsNumber} (${entry.language.toUpperCase()})\nWord: ${entry.originalScript} (${entry.transliteration})\nPronunciation: ${entry.pronunciation}\nDefinition: ${entry.shortDefinition}\n\n"${entry.keyScripture.snippet}" — ${entry.keyScripture.reference}\n\nDiscovered on exégeomai.`,
+        message: `${entry.englishWord ? `${entry.englishWord.toUpperCase()} — ` : ''}Strong's ${entry.strongsNumber}\nWord: ${entry.originalScript} (${entry.transliteration})\nPronunciation: ${entry.pronunciation}\nDefinition: ${entry.shortDefinition}\n\n"${entry.keyScripture.snippet}" — ${entry.keyScripture.reference}\n\nDiscovered on exégeomai — Complete Biblical Dictionary.`,
       });
-    } catch (e) {
+    } catch {
       // User cancelled
     }
   };
@@ -78,7 +107,7 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
 
     return (
       <View style={[styles.entryRow, !isLast && styles.rowDivider]}>
-        {/* Row Header: English Word & Strong's Number & Language Label */}
+        {/* Row Header: English Word & Strong's Number (Single Unified Dictionary) */}
         <View style={styles.rowHeader}>
           <TouchableOpacity
             style={styles.headerLeftWrap}
@@ -90,11 +119,8 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
             <Text variant="h3" weight="800" color={colors.textPrimary}>
               {item.englishWord || item.transliteration}
             </Text>
-            <Text variant="caption" weight="800" color={colors.accent} style={styles.strongsNumberText}>
+            <Text variant="caption" weight="800" color="#B45309" style={styles.strongsNumberText}>
               {`  ${item.strongsNumber}`}
-            </Text>
-            <Text variant="caption" weight="700" color={colors.textTertiary}>
-              {` • ${isHebrew ? 'HEBREW OT' : 'KOINE GREEK NT'}`}
             </Text>
           </TouchableOpacity>
 
@@ -139,7 +165,7 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
 
         {/* Part of Speech & Origin */}
         <View style={styles.metaRow}>
-          <Text variant="caption" weight="700" color={colors.accent}>
+          <Text variant="caption" weight="700" color="#B45309">
             {item.partOfSpeech}
           </Text>
           {item.rootOrigin ? (
@@ -152,7 +178,7 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
         {/* Short Definition */}
         <Text style={styles.definitionText}>{item.shortDefinition}</Text>
 
-        {/* Full Lexical Study Detail Navigation Button */}
+        {/* Full Lexical Study Detail Navigation Button (Signature Yellow Accent) */}
         <TouchableOpacity
           style={styles.detailStudyLink}
           onPress={() => handleOpenDetail(item)}
@@ -160,7 +186,7 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
           accessibilityRole="button"
           accessibilityLabel={`Open Lexical Study for ${item.englishWord || item.strongsNumber}`}
         >
-          <Text variant="caption" weight="800" color="#0284C7">
+          <Text variant="caption" weight="800" color="#B45309">
             View Full Lexical Study & Concordance ›
           </Text>
         </TouchableOpacity>
@@ -189,8 +215,8 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
             "{item.keyScripture.snippet}"
           </Text>
           <View style={styles.scriptureMetaRow}>
-            <BookOpenSvg size={12} color={colors.accent} />
-            <Text variant="caption" weight="700" color={colors.accent}>
+            <BookOpenSvg size={12} color="#B45309" />
+            <Text variant="caption" weight="800" color="#B45309">
               {item.keyScripture.reference} • Open in Reader ›
             </Text>
           </View>
@@ -214,80 +240,49 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
     <SafeAreaView style={styles.safeArea}>
       {/* Search Input Bar & Controls */}
       <View style={styles.searchSection}>
+        {/* Offline Dictionary Download / Status Banner */}
+        <View style={styles.offlineBar}>
+          {offlineMeta?.isDownloaded ? (
+            <View style={styles.offlineReadyRow}>
+              <CheckCircleSvg size={15} color="#15803D" />
+              <Text variant="caption" weight="700" color="#15803D" style={styles.offlineReadyText}>
+                {`Offline Dictionary Active • 100% Offline Ready (${offlineMeta.sizeFormatted})`}
+              </Text>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={styles.offlineDownloadBtn}
+              onPress={handleDownload}
+              disabled={isDownloading}
+              activeOpacity={0.8}
+            >
+              <DownloadSvg size={14} color="#78350F" />
+              <Text variant="caption" weight="800" color="#78350F" style={styles.offlineDownloadText}>
+                {isDownloading ? 'Downloading Dictionary...' : 'Download Offline Dictionary (2.4 MB)'}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
         <View style={styles.searchInputContainer}>
           <SearchSvg size={16} color={colors.textSecondary} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search words (e.g. life, love, faith, H2416, G2222)..."
+            placeholder="Search dictionary (e.g. life, love, faith, zaó, H2416, G2222)..."
             placeholderTextColor={colors.textTertiary}
             value={searchQuery}
             onChangeText={setSearchQuery}
             autoCapitalize="none"
             autoCorrect={false}
-            clearButtonMode="while-editing"
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity
               onPress={() => setSearchQuery('')}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <CloseSvg size={14} color={colors.textSecondary} />
+              <CloseSvg size={16} color={colors.textTertiary} />
             </TouchableOpacity>
           )}
-        </View>
-
-        {/* Language Filter Tabs */}
-        <View style={styles.filterTabsRow}>
-          <TouchableOpacity
-            style={[
-              styles.filterTab,
-              selectedLang === 'all' && styles.filterTabActive,
-            ]}
-            onPress={() => setSelectedLang('all')}
-            activeOpacity={0.8}
-          >
-            <Text
-              variant="caption"
-              weight="700"
-              color={selectedLang === 'all' ? '#0F172A' : colors.textSecondary}
-            >
-              All ({filteredEntries.length})
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.filterTab,
-              selectedLang === 'hebrew' && styles.filterTabActive,
-            ]}
-            onPress={() => setSelectedLang('hebrew')}
-            activeOpacity={0.8}
-          >
-            <Text
-              variant="caption"
-              weight="700"
-              color={selectedLang === 'hebrew' ? '#0F172A' : colors.textSecondary}
-            >
-              Hebrew (OT)
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.filterTab,
-              selectedLang === 'greek' && styles.filterTabActive,
-            ]}
-            onPress={() => setSelectedLang('greek')}
-            activeOpacity={0.8}
-          >
-            <Text
-              variant="caption"
-              weight="700"
-              color={selectedLang === 'greek' ? '#0F172A' : colors.textSecondary}
-            >
-              Greek (NT)
-            </Text>
-          </TouchableOpacity>
         </View>
 
         {/* A-to-Z Alphabetical Quick Browser */}
@@ -338,9 +333,9 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <StrongsIconSvg size={36} color={colors.accent} />
-            <Text variant="h3" style={styles.emptyTitle}>
-              No Concordance Entries Found
+            <StrongsIconSvg size={40} color={colors.textTertiary} />
+            <Text variant="h3" color={colors.textPrimary}>
+              No Words Found
             </Text>
             <Text
               variant="body"
@@ -349,17 +344,16 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
             >
               No entries match "{searchQuery || selectedLetter}". Try searching for another biblical word (e.g. life, love, faith, peace) or Strong's ID.
             </Text>
-            {(searchQuery.length > 0 || selectedLetter !== 'All' || selectedLang !== 'all') && (
+            {(searchQuery.length > 0 || selectedLetter !== 'All') && (
               <TouchableOpacity
                 style={styles.resetFilterBtn}
                 onPress={() => {
                   setSearchQuery('');
                   setSelectedLetter('All');
-                  setSelectedLang('all');
                 }}
                 activeOpacity={0.8}
               >
-                <Text variant="caption" weight="700" color="#0F172A">
+                <Text variant="caption" weight="800" color="#0F172A">
                   Reset All Filters
                 </Text>
               </TouchableOpacity>
@@ -374,47 +368,65 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF', // Continuous flat 30% panel surface
+    backgroundColor: '#F8FAFC',
   },
   searchSection: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
-    paddingBottom: 6,
+    paddingBottom: 4,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(15, 23, 42, 0.06)',
     backgroundColor: '#FFFFFF',
   },
+
+  // Offline Download & Status Bar (Yellow Theme)
+  offlineBar: {
+    marginBottom: 8,
+  },
+  offlineReadyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    backgroundColor: '#F0FDF4',
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
+  },
+  offlineReadyText: {
+    fontSize: 12,
+  },
+  offlineDownloadBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    backgroundColor: '#FEF9C3',
+    borderWidth: 1,
+    borderColor: '#FDE047',
+  },
+  offlineDownloadText: {
+    fontSize: 12,
+  },
+
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F1F5F9',
     borderRadius: 12,
     paddingHorizontal: 12,
-    height: 44,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
+    paddingVertical: 8,
     gap: 8,
   },
   searchInput: {
     flex: 1,
     fontSize: 14,
-    color: colors.textPrimary,
-    paddingVertical: 0,
-  },
-  filterTabsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 8,
-  },
-  filterTab: {
-    paddingVertical: 4,
-    paddingHorizontal: 12,
-    borderRadius: 14,
-    backgroundColor: '#F1F5F9',
-  },
-  filterTabActive: {
-    backgroundColor: '#FDD223',
+    color: '#0F172A',
+    padding: 0,
   },
 
   // A-to-Z Alphabetical Horizontal List
@@ -443,11 +455,9 @@ const styles = StyleSheet.create({
   listContent: {
     paddingBottom: 96,
   },
-
-  // Continuous Flat Body Row Styling (No Card Divs)
   entryRow: {
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingVertical: 14,
     backgroundColor: '#FFFFFF',
   },
   rowDivider: {
@@ -486,12 +496,16 @@ const styles = StyleSheet.create({
     color: '#0F172A',
   },
   hebrewScript: {
-    fontFamily: Platform.OS === 'ios' ? 'Times New Roman' : 'serif',
+    writingDirection: 'rtl',
   },
   greekScript: {
-    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
+    writingDirection: 'ltr',
   },
   transliterationBox: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 6,
+    flexWrap: 'wrap',
     flex: 1,
   },
 
@@ -551,7 +565,6 @@ const styles = StyleSheet.create({
   expandToggle: {
     alignItems: 'flex-start',
     paddingVertical: 6,
-    marginTop: 2,
   },
 
   emptyContainer: {
@@ -561,15 +574,7 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingHorizontal: spacing.xl,
   },
-  emptyTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    textAlign: 'center',
-  },
   emptyMessage: {
-    fontSize: 13,
-    lineHeight: 20,
     textAlign: 'center',
     color: colors.textSecondary,
   },

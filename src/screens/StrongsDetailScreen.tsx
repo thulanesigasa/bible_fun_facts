@@ -5,7 +5,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Share,
-  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -33,18 +32,15 @@ export default function StrongsDetailScreen({
   const initialEntry = route.params.entry;
   const [currentEntry, setCurrentEntry] = useState<LexiconEntry>(initialEntry);
 
-  const isHebrew = currentEntry.language === 'hebrew';
-  const languageLabel = isHebrew ? "Strong's Hebrew" : "Strong's Greek";
-
   // Stepper: get previous and next entries
   const { prev: prevEntry, next: nextEntry } = useMemo(() => {
     return getAdjacentLexiconEntries(currentEntry.strongsNumber);
   }, [currentEntry.strongsNumber]);
 
-  // Set screen title dynamically in native header
+  // Set screen title dynamically in native header (Unified Dictionary title)
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: `${languageLabel}: ${currentEntry.strongsNumber}. ${currentEntry.originalScript} (${currentEntry.transliteration})`,
+      title: `Strong's: ${currentEntry.strongsNumber}. ${currentEntry.originalScript} (${currentEntry.transliteration})`,
       headerRight: () => (
         <TouchableOpacity
           onPress={handleShare}
@@ -57,11 +53,11 @@ export default function StrongsDetailScreen({
         </TouchableOpacity>
       ),
     });
-  }, [navigation, currentEntry, languageLabel]);
+  }, [navigation, currentEntry]);
 
   const handleShare = async () => {
     try {
-      const title = `${languageLabel} ${currentEntry.strongsNumber}: ${currentEntry.transliteration} (${currentEntry.originalScript})`;
+      const title = `Strong's ${currentEntry.strongsNumber}: ${currentEntry.transliteration} (${currentEntry.originalScript})`;
       const message =
         `${title}\n` +
         `English: ${currentEntry.englishWord || currentEntry.transliteration}\n` +
@@ -69,10 +65,11 @@ export default function StrongsDetailScreen({
         `Part of Speech: ${currentEntry.partOfSpeech}\n` +
         `Pronunciation: /${currentEntry.pronunciation}/ ${currentEntry.phoneticSpelling || ''}\n` +
         (currentEntry.kjvTranslations ? `KJV Translations: ${currentEntry.kjvTranslations}\n` : '') +
+        (currentEntry.nasbTranslations ? `NASB Translations: ${currentEntry.nasbTranslations}\n` : '') +
         `\nExhaustive Concordance:\n${currentEntry.exhaustiveDefinition}\n\n` +
         `Theological Exegesis:\n${currentEntry.theologicalSignificance}\n\n` +
         `Scripture: "${currentEntry.keyScripture.snippet}" — ${currentEntry.keyScripture.reference}\n\n` +
-        `Studied in exégeomai (ἐξηγέομαι) — Sacred Biblical Lexicon`;
+        `Studied in exégeomai (ἐξηγέομαι) — Complete Biblical Lexicon`;
 
       await Share.share({
         message,
@@ -116,7 +113,7 @@ export default function StrongsDetailScreen({
     }
     return [
       `1. ${currentEntry.shortDefinition}`,
-      `2. of literal or figurative biblical usage`,
+      `2. of literal or figurative biblical usage across canon`,
     ];
   }, [currentEntry]);
 
@@ -166,8 +163,8 @@ export default function StrongsDetailScreen({
               accessibilityRole="button"
               accessibilityLabel={`Previous Strong's: ${prevEntry.strongsNumber} ${prevEntry.transliteration}`}
             >
-              <ChevronLeftSvg size={16} color="#0284C7" />
-              <Text variant="caption" weight="800" color="#0284C7">
+              <ChevronLeftSvg size={15} color="#B45309" />
+              <Text variant="caption" weight="800" color="#B45309" style={styles.stepperBtnText}>
                 {prevEntry.strongsNumber.replace(/^[HG]/, '')}
               </Text>
             </TouchableOpacity>
@@ -189,19 +186,19 @@ export default function StrongsDetailScreen({
               accessibilityRole="button"
               accessibilityLabel={`Next Strong's: ${nextEntry.strongsNumber} ${nextEntry.transliteration}`}
             >
-              <Text variant="caption" weight="800" color="#0284C7">
+              <Text variant="caption" weight="800" color="#B45309" style={styles.stepperBtnText}>
                 {nextEntry.strongsNumber.replace(/^[HG]/, '')}
               </Text>
-              <ChevronRightSvg size={16} color="#0284C7" />
+              <ChevronRightSvg size={15} color="#B45309" />
             </TouchableOpacity>
           ) : (
             <View style={styles.stepperNavDisabled} />
           )}
         </View>
 
-        {/* Section 1: Lexical Summary */}
+        {/* Section 1: Lexical Summary (Yellow Banner) */}
         <View style={styles.sectionHeaderBanner}>
-          <Text variant="caption" weight="800" color="#0F172A" style={styles.sectionBannerText}>
+          <Text variant="caption" weight="800" style={styles.sectionBannerText}>
             Lexical Summary
           </Text>
         </View>
@@ -214,14 +211,14 @@ export default function StrongsDetailScreen({
           {/* Key-Value Linguistic Properties */}
           <View style={styles.fieldGrid}>
             <View style={styles.fieldRow}>
-              <Text variant="body" weight="800" color="#0284C7" style={styles.fieldLabel}>
+              <Text variant="body" weight="700" style={styles.fieldLabel}>
                 Original Word:
               </Text>
               <Text style={styles.originalWordValue}>{currentEntry.originalScript}</Text>
             </View>
 
             <View style={styles.fieldRow}>
-              <Text variant="body" weight="800" color="#0284C7" style={styles.fieldLabel}>
+              <Text variant="body" weight="700" style={styles.fieldLabel}>
                 Part of Speech:
               </Text>
               <Text variant="body" weight="600" color="#0F172A" style={styles.fieldValue}>
@@ -230,7 +227,7 @@ export default function StrongsDetailScreen({
             </View>
 
             <View style={styles.fieldRow}>
-              <Text variant="body" weight="800" color="#0284C7" style={styles.fieldLabel}>
+              <Text variant="body" weight="700" style={styles.fieldLabel}>
                 Transliteration:
               </Text>
               <Text variant="body" weight="700" color="#0F172A" style={styles.fieldValue}>
@@ -239,7 +236,7 @@ export default function StrongsDetailScreen({
             </View>
 
             <View style={styles.fieldRow}>
-              <Text variant="body" weight="800" color="#0284C7" style={styles.fieldLabel}>
+              <Text variant="body" weight="700" style={styles.fieldLabel}>
                 Pronunciation:
               </Text>
               <Text variant="body" weight="600" color="#0F172A" style={styles.fieldValue}>
@@ -249,7 +246,7 @@ export default function StrongsDetailScreen({
 
             {currentEntry.phoneticSpelling ? (
               <View style={styles.fieldRow}>
-                <Text variant="body" weight="800" color="#0284C7" style={styles.fieldLabel}>
+                <Text variant="body" weight="700" style={styles.fieldLabel}>
                   Phonetic Spelling:
                 </Text>
                 <Text variant="body" weight="600" color="#0F172A" style={styles.fieldValue}>
@@ -260,7 +257,7 @@ export default function StrongsDetailScreen({
 
             {currentEntry.kjvTranslations ? (
               <View style={styles.fieldRow}>
-                <Text variant="body" weight="800" color="#0284C7" style={styles.fieldLabel}>
+                <Text variant="body" weight="700" style={styles.fieldLabel}>
                   KJV:
                 </Text>
                 <Text variant="body" weight="600" color="#0F172A" style={styles.fieldValue}>
@@ -271,7 +268,7 @@ export default function StrongsDetailScreen({
 
             {currentEntry.nasbTranslations ? (
               <View style={styles.fieldRow}>
-                <Text variant="body" weight="800" color="#0284C7" style={styles.fieldLabel}>
+                <Text variant="body" weight="700" style={styles.fieldLabel}>
                   NASB:
                 </Text>
                 <Text variant="body" weight="600" color="#0F172A" style={styles.fieldValue}>
@@ -282,7 +279,7 @@ export default function StrongsDetailScreen({
 
             {currentEntry.rootOrigin ? (
               <View style={styles.fieldRow}>
-                <Text variant="body" weight="800" color="#0284C7" style={styles.fieldLabel}>
+                <Text variant="body" weight="700" style={styles.fieldLabel}>
                   Word Origin:
                 </Text>
                 <Text variant="body" weight="600" color="#0F172A" style={styles.fieldValue}>
@@ -304,7 +301,7 @@ export default function StrongsDetailScreen({
 
         {/* Section 2: Strong's Exhaustive Concordance */}
         <View style={styles.sectionHeaderBanner}>
-          <Text variant="caption" weight="800" color="#0F172A" style={styles.sectionBannerText}>
+          <Text variant="caption" weight="800" style={styles.sectionBannerText}>
             Strong's Exhaustive Concordance
           </Text>
         </View>
@@ -320,7 +317,7 @@ export default function StrongsDetailScreen({
 
         {/* Section 3: HELPS Word-studies */}
         <View style={styles.sectionHeaderBanner}>
-          <Text variant="caption" weight="800" color="#0F172A" style={styles.sectionBannerText}>
+          <Text variant="caption" weight="800" style={styles.sectionBannerText}>
             HELPS Word-studies & Exegesis
           </Text>
         </View>
@@ -339,10 +336,10 @@ export default function StrongsDetailScreen({
             )}
           </Text>
 
-          {/* Clickable Related Strong's Cognates */}
+          {/* Clickable Related Strong's Cognates (Yellow Pills) */}
           {currentEntry.relatedStrongs && currentEntry.relatedStrongs.length > 0 && (
             <View style={styles.cognatesContainer}>
-              <Text variant="caption" weight="800" color={colors.textTertiary} style={styles.cognateHeading}>
+              <Text variant="caption" weight="800" color="#854D0E" style={styles.cognateHeading}>
                 CROSS-REFERENCE COGNATES:
               </Text>
               <View style={styles.cognateChipsRow}>
@@ -361,7 +358,7 @@ export default function StrongsDetailScreen({
                       accessibilityRole="button"
                       accessibilityLabel={`Jump to Strong's ${relStrongs}`}
                     >
-                      <Text variant="caption" weight="800" color="#0284C7">
+                      <Text variant="caption" weight="800" color="#854D0E">
                         {label}
                       </Text>
                     </TouchableOpacity>
@@ -374,7 +371,7 @@ export default function StrongsDetailScreen({
 
         {/* Section 4: Key Scripture Exegesis Context */}
         <View style={styles.sectionHeaderBanner}>
-          <Text variant="caption" weight="800" color="#0F172A" style={styles.sectionBannerText}>
+          <Text variant="caption" weight="800" style={styles.sectionBannerText}>
             Key Canonical Scripture
           </Text>
         </View>
@@ -391,8 +388,8 @@ export default function StrongsDetailScreen({
             accessibilityRole="button"
             accessibilityLabel={`Open ${currentEntry.keyScripture.reference} in Word Reader`}
           >
-            <BookOpenSvg size={14} color={colors.accent} />
-            <Text variant="caption" weight="800" color={colors.accent}>
+            <BookOpenSvg size={14} color="#B45309" />
+            <Text variant="caption" weight="800" color="#B45309">
               {`${currentEntry.keyScripture.reference} • Read Full Chapter in Canon ›`}
             </Text>
           </TouchableOpacity>
@@ -439,7 +436,9 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 8,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#FEF9C3',
+    borderWidth: 1,
+    borderColor: '#FDE047',
   },
   pillBoxSubtle: {
     paddingVertical: 4,
@@ -451,16 +450,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingVertical: 5,
-    paddingHorizontal: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 13,
     borderRadius: 14,
     backgroundColor: '#FDD223',
   },
   openReaderText: {
     fontSize: 11.5,
+    fontWeight: '800',
+    color: '#0F172A',
   },
 
-  // Stepper Bar: ◄ 2198. zaó ►
+  // Stepper Bar: ◄ 2198. zaó ► (Yellow Theme)
   stepperContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -476,9 +477,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
     paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    backgroundColor: '#F0F9FF',
+    paddingHorizontal: 11,
+    borderRadius: 10,
+    backgroundColor: '#FEF9C3',
+    borderWidth: 1,
+    borderColor: '#FDE047',
+  },
+  stepperBtnText: {
+    fontSize: 12,
   },
   stepperNavDisabled: {
     width: 60,
@@ -491,35 +497,40 @@ const styles = StyleSheet.create({
     fontSize: 17,
   },
 
-  // Section Header Banner (matching screenshot)
+  // Section Header Banner (Signature Yellow Banner per user request)
   sectionHeaderBanner: {
-    backgroundColor: '#ECEFF3',
-    paddingVertical: 6,
+    backgroundColor: '#FEF9C3',
+    paddingVertical: 7,
     paddingHorizontal: spacing.lg,
     marginTop: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#F59E0B',
   },
   sectionBannerText: {
-    fontSize: 13,
-    letterSpacing: 0.3,
+    fontSize: 12.5,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+    color: '#78350F',
+    fontWeight: '800',
   },
 
   // Section Body
   sectionBody: {
     paddingHorizontal: spacing.lg,
-    paddingVertical: 12,
+    paddingVertical: 14,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(15, 23, 42, 0.04)',
   },
   headwordText: {
     fontSize: 16.5,
-    marginBottom: 12,
+    marginBottom: 14,
     lineHeight: 22,
   },
 
   // Key-Value Grid
   fieldGrid: {
-    gap: 8,
+    gap: 9,
     marginBottom: 14,
   },
   fieldRow: {
@@ -530,6 +541,8 @@ const styles = StyleSheet.create({
   fieldLabel: {
     width: 145,
     fontSize: 14,
+    color: '#B45309',
+    fontWeight: '700',
   },
   fieldValue: {
     flex: 1,
@@ -545,7 +558,7 @@ const styles = StyleSheet.create({
 
   // Outline of Usage
   usageContainer: {
-    marginTop: 6,
+    marginTop: 8,
     paddingTop: 10,
     borderTopWidth: 1,
     borderTopColor: 'rgba(15, 23, 42, 0.05)',
@@ -592,11 +605,11 @@ const styles = StyleSheet.create({
   },
   cognateChip: {
     paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    backgroundColor: '#F0F9FF',
+    paddingHorizontal: 11,
+    borderRadius: 12,
+    backgroundColor: '#FEF9C3',
     borderWidth: 1,
-    borderColor: '#BAE6FD',
+    borderColor: '#FDE047',
   },
 
   // Key Scripture Exegesis Context
