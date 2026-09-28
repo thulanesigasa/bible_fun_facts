@@ -49,6 +49,10 @@ export default function GreekScreen({ navigation }: GreekScreenProps) {
     return getGreekLexicon(selectedCategory, searchQuery);
   }, [selectedCategory, searchQuery]);
 
+  const handleOpenDetail = (entry: LexiconEntry) => {
+    (navigation as any).navigate('StrongsDetail', { entry });
+  };
+
   const handleOpenScripture = (entry: LexiconEntry) => {
     if (entry.keyScripture?.book && entry.keyScripture?.chapter) {
       navigation.navigate('WOTD', {
@@ -77,7 +81,13 @@ export default function GreekScreen({ navigation }: GreekScreenProps) {
       <View style={[styles.wordRow, !isLast && styles.rowDivider]}>
         {/* Row Header: Category & Strong's Label (Directly on Body Canvas) */}
         <View style={styles.rowHeader}>
-          <View style={styles.headerLeftWrap}>
+          <TouchableOpacity
+            style={styles.headerLeftWrap}
+            onPress={() => handleOpenDetail(item)}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`Open Lexical Study for ${item.englishWord || item.strongsNumber}`}
+          >
             {item.englishWord ? (
               <Text variant="h3" weight="800" color={colors.textPrimary}>
                 {item.englishWord}
@@ -93,7 +103,7 @@ export default function GreekScreen({ navigation }: GreekScreenProps) {
             <Text variant="caption" weight="700" color={colors.textTertiary}>
               {` • ${item.category.toUpperCase()}`}
             </Text>
-          </View>
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.shareBtn}
@@ -107,7 +117,13 @@ export default function GreekScreen({ navigation }: GreekScreenProps) {
         </View>
 
         {/* Greek Script & Transliteration */}
-        <View style={styles.wordHeaderRow}>
+        <TouchableOpacity
+          style={styles.wordHeaderRow}
+          onPress={() => handleOpenDetail(item)}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel={`Open Lexical Study for ${item.transliteration}`}
+        >
           <Text style={styles.greekScriptText}>{item.originalScript}</Text>
           <View style={styles.transliterationCol}>
             <Text variant="h2" weight="800" color={colors.textPrimary}>
@@ -119,7 +135,7 @@ export default function GreekScreen({ navigation }: GreekScreenProps) {
               </Text>
             ) : null}
           </View>
-        </View>
+        </TouchableOpacity>
 
         {/* Part of speech & root */}
         <View style={styles.metaRow}>
@@ -135,6 +151,19 @@ export default function GreekScreen({ navigation }: GreekScreenProps) {
 
         {/* Short Definition */}
         <Text style={styles.definitionText}>{item.shortDefinition}</Text>
+
+        {/* Full Lexical Study Detail Navigation Button */}
+        <TouchableOpacity
+          style={styles.detailStudyLink}
+          onPress={() => handleOpenDetail(item)}
+          activeOpacity={0.75}
+          accessibilityRole="button"
+          accessibilityLabel={`Open Lexical Study for ${item.englishWord || item.strongsNumber}`}
+        >
+          <Text variant="caption" weight="800" color="#0284C7">
+            View Full Lexical Study & Concordance ›
+          </Text>
+        </TouchableOpacity>
 
         {/* Deep Dive Apostolic Exegesis (Continuous Body Flow) */}
         <View style={styles.exegesisSection}>
@@ -474,7 +503,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     lineHeight: 22,
     color: colors.textPrimary,
-    marginBottom: 8,
+    marginBottom: 4,
+  },
+  detailStudyLink: {
+    paddingVertical: 4,
+    marginBottom: 6,
   },
 
   // Unboxed Exegesis Section (Continuous Body Flow)
