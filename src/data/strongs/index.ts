@@ -35,46 +35,74 @@ export function getCanonicalGreekRaw(): LexiconEntry[] {
   return _greekRaw;
 }
 
+let _memoizedHebrewBatches: LexiconEntry[] | null = null;
+let _memoizedGreekBatches: LexiconEntry[] | null = null;
+let _memoizedBatches: LexiconEntry[] | null = null;
+
+export function isCanonicalHebrewLoaded(): boolean {
+  return _memoizedHebrewBatches !== null;
+}
+
+export function isCanonicalGreekLoaded(): boolean {
+  return _memoizedGreekBatches !== null;
+}
+
 /**
- * Merges raw canonical datasets with rich theological batches on-demand.
- * Curated entries in HEBREW_BATCH_1 and GREEK_BATCH_1 override raw definitions,
- * providing deep theological exegesis, scripture citations, and curated categories.
+ * Merges raw Hebrew canonical dataset (8,674 entries) with curated Hebrew Batch 1.
+ * Loads ONLY canonicalHebrew.json lazily on-demand without touching Greek data.
  */
-function buildCanonicalBatches(): LexiconEntry[] {
+export function getCanonicalHebrewBatches(): LexiconEntry[] {
+  if (_memoizedHebrewBatches) return _memoizedHebrewBatches;
+
   const hebrewRaw = getCanonicalHebrewRaw();
-  const greekRaw = getCanonicalGreekRaw();
   const map = new Map<string, LexiconEntry>();
 
-  // 1. Add all 8,674 Hebrew canonical entries (H1 to H8674)
   for (let i = 0; i < hebrewRaw.length; i++) {
     const item = hebrewRaw[i];
     map.set(item.strongsNumber, item);
   }
 
-  // 2. Add all 5,523 Greek canonical entries (G1 to G5624)
+  for (let i = 0; i < HEBREW_BATCH_1.length; i++) {
+    const item = HEBREW_BATCH_1[i];
+    map.set(item.strongsNumber, item);
+  }
+
+  _memoizedHebrewBatches = Array.from(map.values());
+  return _memoizedHebrewBatches;
+}
+
+/**
+ * Merges raw Greek canonical dataset (5,523 entries) with curated Greek Batch 1.
+ * Loads ONLY canonicalGreek.json lazily on-demand without touching Hebrew data.
+ */
+export function getCanonicalGreekBatches(): LexiconEntry[] {
+  if (_memoizedGreekBatches) return _memoizedGreekBatches;
+
+  const greekRaw = getCanonicalGreekRaw();
+  const map = new Map<string, LexiconEntry>();
+
   for (let i = 0; i < greekRaw.length; i++) {
     const item = greekRaw[i];
     map.set(item.strongsNumber, item);
   }
 
-  // 3. Override with curated theological batch 1 (higher depth & scholarly exegesis)
-  for (let i = 0; i < HEBREW_BATCH_1.length; i++) {
-    const item = HEBREW_BATCH_1[i];
-    map.set(item.strongsNumber, item);
-  }
   for (let i = 0; i < GREEK_BATCH_1.length; i++) {
     const item = GREEK_BATCH_1[i];
     map.set(item.strongsNumber, item);
   }
 
-  return Array.from(map.values());
+  _memoizedGreekBatches = Array.from(map.values());
+  return _memoizedGreekBatches;
 }
 
-let _memoizedBatches: LexiconEntry[] | null = null;
-
+/**
+ * Combines both Hebrew and Greek canonical batches into the full 14,298 Strong's lexicon.
+ */
 export function getAllCanonicalStrongs(): LexiconEntry[] {
   if (!_memoizedBatches) {
-    _memoizedBatches = buildCanonicalBatches();
+    const hebrew = getCanonicalHebrewBatches();
+    const greek = getCanonicalGreekBatches();
+    _memoizedBatches = [...hebrew, ...greek];
   }
   return _memoizedBatches;
 }

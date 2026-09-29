@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   FlatList,
@@ -8,6 +8,8 @@ import {
   TextInput,
   Platform,
   Share,
+  ActivityIndicator,
+  InteractionManager,
 } from 'react-native';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme';
@@ -22,6 +24,8 @@ import {
 import {
   LexiconEntry,
   getHebrewLexicon,
+  getBaseHebrewEntries,
+  isHebrewLexiconCached,
   HEBREW_ALPHABET_GUIDE,
   HebrewLetterGuide,
 } from '../data/lexiconData';
@@ -42,11 +46,33 @@ export default function HebrewScreen({ navigation }: HebrewScreenProps) {
   const [activeTab, setActiveTab] = useState<'words' | 'alphabet'>('words');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [debouncedQuery, setDebouncedQuery] = useState<string>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [isReady, setIsReady] = useState<boolean>(isHebrewLexiconCached());
+
+  // Debounce search query input (150ms) to preserve 60fps scrolling
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Non-blocking background initialization on first mount
+  useEffect(() => {
+    if (!isReady) {
+      const interaction = InteractionManager.runAfterInteractions(() => {
+        getBaseHebrewEntries();
+        setIsReady(true);
+      });
+      return () => interaction.cancel();
+    }
+  }, [isReady]);
 
   const filteredWords = useMemo(() => {
-    return getHebrewLexicon(selectedCategory, searchQuery);
-  }, [selectedCategory, searchQuery]);
+    if (!isReady) return [];
+    return getHebrewLexicon(selectedCategory, debouncedQuery);
+  }, [selectedCategory, debouncedQuery, isReady]);
 
   const handleOpenDetail = (entry: LexiconEntry) => {
     (navigation as any).navigate('StrongsDetail', { entry });
@@ -349,20 +375,35 @@ export default function HebrewScreen({ navigation }: HebrewScreenProps) {
           }
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          initialNumToRender={12}
+          maxToRenderPerBatch={12}
+          windowSize={5}
+          removeClippedSubviews={Platform.OS !== 'web'}
+          updateCellsBatchingPeriod={50}
+          keyboardShouldPersistTaps="handled"
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <ScrollSvg size={36} color={colors.accent} />
-              <Text variant="h3" style={styles.emptyTitle}>
-                No Hebrew Terms Found
-              </Text>
-              <Text
-                variant="body"
-                color={colors.textSecondary}
-                style={styles.emptyMessage}
-              >
-                No entries match "{searchQuery}" in {selectedCategory}. Try searching by transliteration or Strong's number.
-              </Text>
-            </View>
+            !isReady ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color={colors.accent} />
+                <Text variant="caption" color={colors.textSecondary} style={styles.loadingText}>
+                  Loading Sacred Hebrew Canon...
+                </Text>
+              </View>
+            ) : (
+              <View style={styles.emptyContainer}>
+                <ScrollSvg size={36} color={colors.accent} />
+                <Text variant="h3" style={styles.emptyTitle}>
+                  No Hebrew Terms Found
+                </Text>
+                <Text
+                  variant="body"
+                  color={colors.textSecondary}
+                  style={styles.emptyMessage}
+                >
+                  No entries match "{debouncedQuery}" in {selectedCategory}. Try searching by transliteration or Strong's number.
+                </Text>
+              </View>
+            )
           }
         />
       ) : (
@@ -607,5 +648,18 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     textAlign: 'center',
     color: colors.textSecondary,
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 80,
+    gap: 8,
+    paddingHorizontal: spacing.xl,
+  },
+  loadingText: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    fontWeight: '600',
+    marginTop: spacing.sm,
   },
 });
