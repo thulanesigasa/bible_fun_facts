@@ -21,7 +21,7 @@ export const AlertProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [alertConfig, setAlertConfig] = useState<AlertOptions>({
     title: '',
     message: '',
-    icon: 'info',
+    icon: 'logo',
     buttons: [{ text: 'OK' }],
     isDestructive: false,
   });
@@ -30,7 +30,7 @@ export const AlertProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setAlertConfig({
       title: options.title,
       message: options.message,
-      icon: options.icon || 'info',
+      icon: options.icon || 'logo',
       buttons: options.buttons && options.buttons.length > 0 ? options.buttons : [{ text: 'OK' }],
       isDestructive: options.isDestructive || false,
     });
