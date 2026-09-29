@@ -204,9 +204,14 @@ The in-app update experience is implemented in `src/components/UpdateModal.tsx` 
 - **Aesthetic**: Pure white surface card (`#FFFFFF`), biblical amber gold action button (`#FDD223`), clean typography, and zero status badges per Rule 16.
 
 ### 4. Automated GitHub Actions Workflow (`compile-and-ota.yml`)
-The workflow `.github/workflows/compile-and-ota.yml` coordinates automated deployments:
+The workflow `.github/workflows/compile-and-ota.yml` coordinates automated deployments and native builds:
 - **Automatic OTA Publish**: Triggered on push to `main` when application code changes. Compiles the JS bundle, validates TypeScript, and publishes directly to both `production` and `preview` channels.
-- **Manual Native Compilation**: Triggered via `workflow_dispatch` with parameters for platform (`android`, `ios`, `all`), build profile (`preview`, `production`, `development`), target OTA channel (`both`, `production`, `preview`), and custom build numbers.
+- **Direct GitHub Actions Native APK Compilation (Rule 21)**: Compiles native release binaries (`exegeomai-v<version>.apk`) directly on GitHub Actions Ubuntu runners using Eclipse Temurin JDK 17, Android SDK tools, `npx expo prebuild --no-install`, and `./gradlew assembleRelease -x lint -x test --no-daemon`.
+- **Headless Sentry Source Map Upload Suppression**: To eliminate CI authentication roadblocks without requiring external CLI login tokens during native binary compilation, source map auto-upload is disabled via:
+  - `app.json`: `@sentry/react-native/expo` plugin configuration `"disableAutoUpload": true`.
+  - `android/gradle.properties`: Injected with `sentry.uploadSources=false` and `sentry.autoUpload=false`.
+  - Gradle CLI & Environment: Executed with `-Psentry.uploadSources=false -Psentry.autoUpload=false` and environment variables `SENTRY_DISABLE_AUTO_UPLOAD="true"` and `SENTRY_DISABLE_NATIVE_DEBUG_UPLOAD="true"`.
+- **Automatic GitHub Releases Distribution**: Compiled native APKs are automatically uploaded to repository GitHub Releases via `gh release upload "$RELEASE_TAG"` and saved to workflow run artifacts.
 
 ---
 
