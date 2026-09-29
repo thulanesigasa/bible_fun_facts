@@ -176,9 +176,9 @@ EAS Update is configured with two distinct channels:
 - **Dual Deployment**: Pushes to `main` automatically publish OTA updates to both channels so that internal testers on preview APKs and production users receive updates concurrently.
 
 ### 2. Dual Versioning Model (Preserving `v1.0.1`)
-- **Locked OTA & App Version**: `app.json` specifies `"version": "1.0.1"` and `"runtimeVersion": "1.0.1"`. All Over-The-Air updates deployed through EAS target runtime `1.0.1`.
-- **Dynamic Native Compilation Build Numbers**: When native binaries are compiled through GitHub Actions or EAS Build, the CI pipeline automatically injects incremental build identifiers (`android.versionCode` and `ios.buildNumber`) derived from `github.run_number` while strictly preserving `1.0.1` as the base version and runtimeVersion.
-- **Runtime Compatibility Guarantee**: Any compiled native application bearing runtimeVersion `1.0.1` will continuously and seamlessly receive OTA JavaScript and asset updates without triggering native version mismatches.
+- **Locked OTA & App Version**: `app.json` specifies `"version": "1.0.4"` and `"runtimeVersion": "1.0.1"`. All Over-The-Air updates deployed through EAS target runtime `1.0.1` matching the compiled native APK base.
+- **Dynamic Native Compilation Build Numbers**: When native binaries are compiled through GitHub Actions or EAS Build, the CI pipeline automatically injects incremental build identifiers (`android.versionCode` and `ios.buildNumber`) derived from `github.run_number` while strictly preserving `1.0.1` as the base runtimeVersion.
+- **Runtime Compatibility Guarantee**: Any compiled native application bearing runtimeVersion `1.0.1` will continuously and seamlessly receive OTA JavaScript and asset updates without triggering native version mismatches. Never increment `runtimeVersion` in `app.json` unless simultaneously compiling, releasing, and distributing a new native APK, as doing so breaks OTA updates for existing installed devices.
 
 ### 3. In-App Update Notification & Reminder Flow (Rule 15 & Rule 19)
 The in-app update experience is implemented in `src/components/UpdateModal.tsx` and strictly adheres to Rule 15 and Rule 19 sizing specifications:
@@ -1705,7 +1705,7 @@ bible_fun_facts/
 │   └── logo.png                     # Transparent high-resolution brand logo
 ├── supabase/migrations/             # Supabase SQL database migrations
 │   └── 20260928000000_add_delete_user_account_rpc.sql # GDPR cascade deletion RPC
-├── app.json                         # Expo configuration (scheme: exegeomai, locked runtimeVersion 1.0.4)
+├── app.json                         # Expo configuration (scheme: exegeomai, locked runtimeVersion 1.0.1)
 ├── jest.config.js                   # Jest test runner configuration
 ├── package.json                     # Dependencies, scripts & test suites
 ├── tsconfig.json                    # TypeScript compiler configuration (extends expo/tsconfig.base.json)
