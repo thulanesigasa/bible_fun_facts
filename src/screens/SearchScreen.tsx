@@ -278,45 +278,45 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
           </View>
         </View>
 
-        {/* Search Scope Switcher Segmented Control */}
-        <View style={styles.scopeToggleContainer}>
+        {/* Scope Switcher: Pure Text Switcher */}
+        <View style={styles.scopeTextRow}>
           <TouchableOpacity
-            style={[styles.scopeBtn, searchScope === 'believers' && styles.scopeBtnActive]}
             onPress={() => setSearchScope('believers')}
             activeOpacity={0.7}
-            accessibilityRole="tab"
-            accessibilityLabel="Believers and Scholars Search"
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            accessibilityRole="button"
+            accessibilityLabel="Switch to Believers"
           >
-            <UsersSvg
-              size={14}
-              color={searchScope === 'believers' ? '#0F172A' : colors.textSecondary}
-            />
             <Text
-              variant="caption"
-              weight={searchScope === 'believers' ? '800' : '600'}
-              color={searchScope === 'believers' ? '#0F172A' : colors.textSecondary}
+              variant="body"
+              style={[
+                styles.scopeText,
+                searchScope === 'believers' ? styles.scopeTextActive : styles.scopeTextInactive,
+              ]}
             >
-              BELIEVERS
+              Believers
             </Text>
           </TouchableOpacity>
 
+          <Text variant="body" color={colors.textTertiary} style={styles.scopeDivider}>
+            •
+          </Text>
+
           <TouchableOpacity
-            style={[styles.scopeBtn, searchScope === 'ministries' && styles.scopeBtnActive]}
             onPress={() => setSearchScope('ministries')}
             activeOpacity={0.7}
-            accessibilityRole="tab"
-            accessibilityLabel="Ministries and Churches Directory"
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            accessibilityRole="button"
+            accessibilityLabel="Switch to Churches"
           >
-            <ChurchSvg
-              size={14}
-              color={searchScope === 'ministries' ? '#0F172A' : colors.textSecondary}
-            />
             <Text
-              variant="caption"
-              weight={searchScope === 'ministries' ? '800' : '600'}
-              color={searchScope === 'ministries' ? '#0F172A' : colors.textSecondary}
+              variant="body"
+              style={[
+                styles.scopeText,
+                searchScope === 'ministries' ? styles.scopeTextActive : styles.scopeTextInactive,
+              ]}
             >
-              MINISTRIES & CHURCHES
+              Churches
             </Text>
           </TouchableOpacity>
         </View>
@@ -545,50 +545,34 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
         )}
       </>
     ) : (
-      /* Scope 2: Ministries & Churches Directory */
+      /* Scope 2: Ministries & Churches Directory (Continuous Screen Body) */
       <View style={styles.ministriesScopeContainer}>
-        {/* Action Banner: Register Your Ministry */}
-        <View style={styles.registerMinistryHeroCard}>
-          <View style={styles.regCardHeader}>
-            <View style={styles.churchIconBadge}>
-              <ChurchSvg size={22} color="#B45309" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text variant="body" weight="700" color={colors.textPrimary}>
-                Register Your Ministry
-              </Text>
-              <Text variant="caption" color={colors.textSecondary}>
-                Connect your church family, regional branches, and homecell clusters.
-              </Text>
-            </View>
-          </View>
+        {/* Direct Action Row on Body Canvas */}
+        <View style={styles.actionsBodyRow}>
+          <TouchableOpacity
+            style={styles.registerActionTextBtn}
+            onPress={() => navigation?.navigate('RegisterMinistry')}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Register Your Ministry"
+          >
+            <Text variant="caption" weight="800" color="#0F172A">
+              + REGISTER YOUR MINISTRY
+            </Text>
+          </TouchableOpacity>
 
-          <View style={styles.regCardActionRow}>
-            <TouchableOpacity
-              style={styles.regActionBtn}
-              onPress={() => navigation.navigate('RegisterMinistry')}
-              activeOpacity={0.8}
-              accessibilityRole="button"
-              accessibilityLabel="Register Your Ministry"
-            >
-              <Text variant="caption" weight="700" style={styles.regActionBtnText}>
-                + REGISTER YOUR MINISTRY
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.mapActionBtn}
-              onPress={() => navigation.navigate('BranchMap', {})}
-              activeOpacity={0.8}
-              accessibilityRole="button"
-              accessibilityLabel="Explore Church Map"
-            >
-              <MapPinSvg size={14} color="#0F172A" />
-              <Text variant="caption" weight="700" style={styles.mapActionBtnText}>
-                RADAR MAP
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.radarActionTextBtn}
+            onPress={() => navigation?.navigate('BranchMap')}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Explore Radar Map"
+          >
+            <MapPinSvg size={14} color="#0F172A" />
+            <Text variant="caption" weight="800" color="#0F172A">
+              RADAR MAP ›
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Results Counter */}
@@ -598,7 +582,7 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
           </Text>
         </View>
 
-        {/* Ministry Cards List */}
+        {/* Churches List on Screen Body Canvas (Zero Card Divs, Zero Pills, Zero Branch/Homecell Counts) */}
         {filteredMinistries.length === 0 ? (
           <View style={styles.emptyContainer}>
             <View style={styles.emptyCircle}>
@@ -612,63 +596,41 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
             </Text>
           </View>
         ) : (
-          <View style={styles.ministryCardsList}>
+          <View style={styles.ministryBodyList}>
             {filteredMinistries.map((m) => (
               <TouchableOpacity
                 key={m.id}
-                style={[styles.ministryCard, shadow.sm]}
-                onPress={() => navigation.navigate('MinistryDetail', { ministryId: m.id })}
-                activeOpacity={0.85}
+                style={styles.ministryBodyRow}
+                onPress={() => navigation?.navigate('MinistryDetail', { ministryId: m.id })}
+                activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityLabel={`View details for ${m.name}`}
               >
-                <View style={styles.ministryCardTop}>
-                  <View style={styles.minCategoryBadge}>
-                    <Text variant="caption" weight="700" style={styles.minCategoryBadgeText}>
-                      {m.category.toUpperCase()}
-                    </Text>
-                  </View>
-                  <Text variant="caption" color={colors.textSecondary}>
-                    {m.headquarters}
+                <View style={styles.ministryRowMain}>
+                  <Text variant="h3" color={colors.textPrimary} style={styles.ministryRowName}>
+                    {m.name}
+                  </Text>
+
+                  <Text variant="caption" color={colors.textSecondary} style={styles.ministryRowMeta}>
+                    {m.headquarters} • {m.category}
+                  </Text>
+
+                  <Text variant="caption" weight="600" color="#B45309" style={styles.ministryRowFounder}>
+                    Senior Pastor / Founder: {m.founder}
+                  </Text>
+
+                  <Text
+                    variant="caption"
+                    color={colors.textSecondary}
+                    numberOfLines={2}
+                    style={styles.ministryRowDesc}
+                  >
+                    {m.description}
                   </Text>
                 </View>
 
-                <Text variant="h3" color={colors.textPrimary} style={styles.ministryCardName}>
-                  {m.name}
-                </Text>
-
-                <Text variant="caption" weight="700" color="#B45309" style={styles.ministryCardFounder}>
-                  Senior Pastor / Founder: {m.founder}
-                </Text>
-
-                <Text
-                  variant="caption"
-                  color={colors.textSecondary}
-                  numberOfLines={2}
-                  style={styles.ministryCardDesc}
-                >
-                  {m.description}
-                </Text>
-
-                <View style={styles.ministryCardFooter}>
-                  <View style={styles.statCounters}>
-                    <Text variant="caption" weight="700" color={colors.textPrimary}>
-                      {m.branchesCount} Branches
-                    </Text>
-                    <Text variant="caption" color={colors.textSecondary}>
-                      {' '}•{' '}
-                    </Text>
-                    <Text variant="caption" weight="700" color={colors.textPrimary}>
-                      {m.homecellsCount} Homecells
-                    </Text>
-                  </View>
-
-                  <View style={styles.exploreLink}>
-                    <Text variant="caption" weight="700" style={styles.exploreLinkText}>
-                      EXPLORE BRANCHES
-                    </Text>
-                    <ChevronRightSvg size={14} color="#0F172A" />
-                  </View>
+                <View style={styles.ministryRowChevron}>
+                  <ChevronRightSvg size={16} color={colors.textSecondary} />
                 </View>
               </TouchableOpacity>
             ))}
@@ -1421,147 +1383,89 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.08)',
   },
-  // Scope Switcher Styles
-  scopeToggleContainer: {
+  // Scope Switcher Styles (Pure Text Switcher)
+  scopeTextRow: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: radius.md,
-    padding: 4,
+    alignItems: 'center',
+    gap: 14,
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    gap: 6,
+    paddingHorizontal: 4,
   },
-  scopeBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-    borderRadius: 8,
-    gap: 6,
+  scopeText: {
+    fontSize: 16,
   },
-  scopeBtnActive: {
-    backgroundColor: '#FDD223',
+  scopeTextActive: {
+    color: '#0F172A',
+    fontWeight: '800',
   },
-  // Ministry Directory Styles
+  scopeTextInactive: {
+    color: colors.textSecondary,
+    fontWeight: '500',
+  },
+  scopeDivider: {
+    fontSize: 16,
+    opacity: 0.35,
+  },
+  // Ministry Directory Styles (Continuous Body Canvas)
   ministriesScopeContainer: {
-    gap: spacing.sm,
+    paddingTop: 4,
   },
-  registerMinistryHeroCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    marginBottom: spacing.xs,
-    ...shadow.sm,
-  },
-  regCardHeader: {
+  actionsBodyRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
+    justifyContent: 'space-between',
+    gap: 12,
+    marginBottom: 12,
   },
-  churchIconBadge: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    backgroundColor: 'rgba(253, 210, 35, 0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  regCardActionRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  regActionBtn: {
+  registerActionTextBtn: {
     flex: 1,
     backgroundColor: '#FDD223',
-    paddingVertical: 9,
+    paddingVertical: 10,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  regActionBtnText: {
-    fontSize: 11,
-    color: '#0F172A',
-  },
-  mapActionBtn: {
+  radarActionTextBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
     backgroundColor: '#F1F5F9',
-    paddingHorizontal: 14,
-    paddingVertical: 9,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     borderRadius: 8,
   },
-  mapActionBtnText: {
-    fontSize: 11,
-    color: '#0F172A',
+  ministryBodyList: {
+    paddingTop: 4,
   },
-  ministryCardsList: {
-    gap: spacing.sm,
-  },
-  ministryCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-  },
-  ministryCardTop: {
+  ministryBodyRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.08)',
   },
-  minCategoryBadge: {
-    backgroundColor: 'rgba(253, 210, 35, 0.2)',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
+  ministryRowMain: {
+    flex: 1,
+    paddingRight: 12,
   },
-  minCategoryBadgeText: {
-    fontSize: 9,
-    color: '#B45309',
+  ministryRowName: {
+    fontSize: 16,
+    marginBottom: 2,
   },
-  ministryCardName: {
-    fontSize: 17,
-    marginVertical: 2,
+  ministryRowMeta: {
+    fontSize: 12,
+    marginBottom: 3,
   },
-  ministryCardFounder: {
+  ministryRowFounder: {
     fontSize: 12,
     marginBottom: 4,
   },
-  ministryCardDesc: {
+  ministryRowDesc: {
     fontSize: 12,
     lineHeight: 17,
-    marginBottom: spacing.sm,
   },
-  ministryCardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: spacing.xs,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(15, 23, 42, 0.05)',
-  },
-  statCounters: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  exploreLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: '#FDD223',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  exploreLinkText: {
-    fontSize: 10,
-    color: '#0F172A',
+  ministryRowChevron: {
+    paddingLeft: 4,
   },
 });

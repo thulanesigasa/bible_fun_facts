@@ -396,6 +396,7 @@ exegeomai/
 │   │   ├── AuthScreen.tsx                # Dedicated Login & Sign Up with 28x28 calibrated logo
 │   │   ├── BlockedUsersScreen.tsx        # Fellowship moderation and blocked scholars manager
 │   │   ├── BookmarksScreen.tsx           # Dedicated Bookmarks continuous body view (flat rows, dotted underlines)
+│   │   ├── BranchMapScreen.tsx           # Full-screen global church, branch, and homecell radar map
 │   │   ├── DeleteAccountScreen.tsx       # GDPR / POPIA Account & Data Purge (direct-body canvas, zero card divs)
 │   │   ├── DeviceSessionsScreen.tsx      # Device hardware info, security audit log, and global session revocation
 │   │   ├── DiscoverScreen.tsx            # Daily 1-message calendar exegesis view with top-right bell header
@@ -406,6 +407,7 @@ exegeomai/
 │   │   ├── HistoryScreen.tsx             # Sacred History catalog of biblical authors with search & categories
 │   │   ├── HomeScreen.tsx                # Alternate home showcase
 │   │   ├── InactivityLockScreen.tsx      # Dedicated auto-lock timeout selector (Immediately / 1m / 5m / 15m)
+│   │   ├── MinistryDetailScreen.tsx      # Ministry leadership, vision, and branch/homecell hierarchy directory
 │   │   ├── NotificationsScreen.tsx       # Continuous flat body notifications center (zero card divs, dotted underlines)
 │   │   ├── PastoralCareScreen.tsx        # 24/7 Lifelines, SADAG, and Scripture promises (seamless body canvas, zero icons)
 │   │   ├── PrivacyPolicyScreen.tsx       # 11-section privacy policy modal screen
@@ -413,9 +415,11 @@ exegeomai/
 │   │   ├── ProfileScreen.tsx             # Profile tab (Modular hub, reading settings, privacy, and account security)
 │   │   ├── QuietHoursScreen.tsx          # Digital Sabbath and custom quiet hours scheduler
 │   │   ├── ReadingSettingsScreen.tsx     # Reader typography, font size slider, classical serif/sans, and red-letters
+│   │   ├── RegisterBranchScreen.tsx      # Branch, homecell, cell branch, and cluster registration with live OSM geocoding
+│   │   ├── RegisterMinistryScreen.tsx    # New church / ministry registration interface
 │   │   ├── ScriptureDetailsScreen.tsx    # In-depth modal sheet for scripture texts
 │   │   ├── ScripturesScreen.tsx          # Scripture library
-│   │   ├── SearchScreen.tsx              # Unified search and community scholar interface
+│   │   ├── SearchScreen.tsx              # Unified search and community scholar interface (Believers / Churches text switcher)
 │   │   ├── SecurityPinScreen.tsx         # Dedicated 4-digit Security PIN management screen with in-screen keypad
 │   │   ├── SecurityScreen.tsx            # Safety & Security hub (Inactivity lock, 4-digit PIN, biometrics & app shield)
 │   │   ├── TermsOfServiceScreen.tsx      # 13-section terms of service modal screen
