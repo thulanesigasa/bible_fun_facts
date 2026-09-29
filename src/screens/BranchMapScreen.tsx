@@ -3,6 +3,9 @@
  *
  * Full-screen interactive vector map plotting churches, branches, homecells,
  * and clusters globally with ministry filtering and 1-tap native map navigation.
+ *
+ * Rendered directly on the continuous screen body canvas (zero card divs/boxes/pills).
+ * 100% free open-source map tiles and in-memory offline database: ZERO external API key needed.
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -12,10 +15,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  Platform,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
-import { spacing, radius, shadow } from '../theme';
+import { spacing, radius } from '../theme';
 import { Text } from '../components/Typography';
 import { BranchRadarMap } from '../components/BranchRadarMap';
 import {
@@ -24,8 +29,9 @@ import {
   Ministry,
   Branch,
   BranchType,
+  getBranchTypeLabel,
 } from '../services/ministryService';
-import { CloseSvg } from '../components/SvgIcons';
+import { CloseSvg, MapPinSvg, ChevronRightSvg } from '../components/SvgIcons';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -65,9 +71,21 @@ export default function BranchMapScreen({
     return list;
   }, [branches, selectedMinistryId, selectedType]);
 
+  const handleOpenDirections = (b: Branch) => {
+    const query = encodeURIComponent(`${b.name}, ${b.address}, ${b.town}, ${b.country}`);
+    const url = Platform.select({
+      ios: `maps:0,0?q=${query}`,
+      android: `geo:0,0?q=${query}`,
+    }) || `https://www.google.com/maps/search/?api=1&query=${query}`;
+
+    Linking.openURL(url).catch(() => {
+      Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${query}`);
+    });
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Header */}
+      {/* Top Header */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -78,33 +96,49 @@ export default function BranchMapScreen({
           <CloseSvg size={20} color={colors.textPrimary} />
         </TouchableOpacity>
         <Text variant="h3" color={colors.textPrimary} style={styles.headerTitle}>
-          Church & Campus Radar Map
+          Church & Campus Radar
         </Text>
         <View style={{ width: 36 }} />
       </View>
 
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        {/* Ministry Filter Selector */}
-        <View style={styles.filterSection}>
-          <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.filterLabel}>
-            SELECT MINISTRY
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Zero-API-Key Informative Meta Bar */}
+        <View style={styles.metaInfoRow}>
+          <Text style={styles.metaNotice}>
+            OPEN-SOURCE VECTOR RADAR • ZERO EXTERNAL API KEYS REQUIRED
           </Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
+          <Text style={styles.metaSubNotice}>
+            Uses bundled in-memory database and open OpenStreetMap / CARTO street tiles.
+          </Text>
+        </View>
+
+        {/* Ministry Text Filter on Screen Body */}
+        <View style={styles.filterSection}>
+          <Text style={styles.filterSectionTitle}>MINISTRIES</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.horizontalScroll}
+            contentContainerStyle={styles.textFilterContainer}
+          >
             <TouchableOpacity
-              style={[
-                styles.filterPill,
-                selectedMinistryId === 'all' && styles.filterPillActive,
-              ]}
+              style={styles.textFilterItem}
               onPress={() => setSelectedMinistryId('all')}
               activeOpacity={0.7}
             >
               <Text
-                variant="caption"
-                weight={selectedMinistryId === 'all' ? '800' : '600'}
-                color={selectedMinistryId === 'all' ? '#0F172A' : colors.textSecondary}
+                style={[
+                  styles.filterText,
+                  selectedMinistryId === 'all' && styles.filterTextActive,
+                ]}
               >
                 All Churches ({branches.length})
               </Text>
+              {selectedMinistryId === 'all' && <View style={styles.activeUnderline} />}
             </TouchableOpacity>
 
             {ministries.map((m) => {
@@ -113,29 +147,34 @@ export default function BranchMapScreen({
               return (
                 <TouchableOpacity
                   key={m.id}
-                  style={[styles.filterPill, isSelected && styles.filterPillActive]}
+                  style={styles.textFilterItem}
                   onPress={() => setSelectedMinistryId(m.id)}
                   activeOpacity={0.7}
                 >
                   <Text
-                    variant="caption"
-                    weight={isSelected ? '800' : '600'}
-                    color={isSelected ? '#0F172A' : colors.textSecondary}
+                    style={[
+                      styles.filterText,
+                      isSelected && styles.filterTextActive,
+                    ]}
                   >
                     {m.name} ({count})
                   </Text>
+                  {isSelected && <View style={styles.activeUnderline} />}
                 </TouchableOpacity>
               );
             })}
           </ScrollView>
         </View>
 
-        {/* Structure Type Filter */}
+        {/* Location Type Filter on Screen Body */}
         <View style={styles.filterSection}>
-          <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.filterLabel}>
-            LOCATION TYPE
-          </Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
+          <Text style={styles.filterSectionTitle}>STRUCTURE TYPE</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.horizontalScroll}
+            contentContainerStyle={styles.textFilterContainer}
+          >
             {(['all', 'branch', 'homecell', 'cell_branch', 'sub_cluster', 'cluster'] as const).map(
               (type) => {
                 const isSelected = selectedType === type;
@@ -154,17 +193,19 @@ export default function BranchMapScreen({
                 return (
                   <TouchableOpacity
                     key={type}
-                    style={[styles.typePill, isSelected && styles.typePillActive]}
+                    style={styles.textFilterItem}
                     onPress={() => setSelectedType(type)}
                     activeOpacity={0.7}
                   >
                     <Text
-                      variant="caption"
-                      weight={isSelected ? '800' : '600'}
-                      color={isSelected ? '#0F172A' : colors.textSecondary}
+                      style={[
+                        styles.filterText,
+                        isSelected && styles.filterTextActive,
+                      ]}
                     >
                       {label}
                     </Text>
+                    {isSelected && <View style={styles.activeUnderline} />}
                   </TouchableOpacity>
                 );
               }
@@ -172,14 +213,14 @@ export default function BranchMapScreen({
           </ScrollView>
         </View>
 
-        {/* Full-View Interactive Radar Vector Map */}
-        <View style={styles.mapCard}>
-          <View style={styles.mapHeaderRow}>
-            <Text variant="caption" weight="700" color={colors.textSecondary}>
-              LIVE GEOGRAPHIC RADAR PROJECTION
+        {/* Continuous Body Vector Radar Map (Zero Outer Card Wrapper) */}
+        <View style={styles.mapCanvasWrapper}>
+          <View style={styles.mapCanvasHeader}>
+            <Text style={styles.mapCanvasHeaderTitle}>
+              GEOGRAPHIC RADAR PROJECTION
             </Text>
-            <Text variant="caption" color={colors.textSecondary}>
-              {filteredBranches.length} Markers
+            <Text style={styles.mapCanvasHeaderCount}>
+              {filteredBranches.length} Markers Plotted
             </Text>
           </View>
 
@@ -187,20 +228,97 @@ export default function BranchMapScreen({
             branches={filteredBranches}
             selectedBranchId={activeBranch?.id}
             onSelectBranch={setActiveBranch}
-            height={SCREEN_HEIGHT * 0.45}
+            height={SCREEN_HEIGHT * 0.42}
+            showFooter={false}
           />
         </View>
 
-        {/* Fast Action CTA */}
-        <TouchableOpacity
-          style={styles.registerCta}
-          onPress={() => navigation.navigate('RegisterBranch', {})}
-          activeOpacity={0.8}
-        >
-          <Text variant="body" weight="700" style={styles.registerCtaText}>
-            + REGISTER A NEW LOCATION ON THIS MAP
-          </Text>
-        </TouchableOpacity>
+        {/* Selected Branch Details Directly on Body Canvas */}
+        {activeBranch ? (
+          <View style={styles.activeLocationSection}>
+            <View style={styles.locationHeaderRow}>
+              <Text style={styles.locationTypeLabel}>
+                {getBranchTypeLabel(activeBranch.type).toUpperCase()}
+              </Text>
+              <Text style={styles.locationCityLabel}>
+                {activeBranch.town}, {activeBranch.province}
+              </Text>
+            </View>
+
+            <Text style={styles.locationName}>
+              {activeBranch.name}
+            </Text>
+
+            <View style={styles.locationMetaRow}>
+              <MapPinSvg size={14} color="#64748B" />
+              <Text style={styles.locationAddressText}>
+                {activeBranch.address || `${activeBranch.town}, ${activeBranch.country} (${activeBranch.postalCode})`}
+              </Text>
+            </View>
+
+            {activeBranch.leaderName ? (
+              <Text style={styles.locationDetailText}>
+                Leader in charge: {activeBranch.leaderName}
+              </Text>
+            ) : null}
+
+            {activeBranch.meetingTimes ? (
+              <Text style={styles.locationDetailText}>
+                Services: {activeBranch.meetingTimes}
+              </Text>
+            ) : null}
+
+            {/* Direct Action Links on Body */}
+            <View style={styles.locationActionRow}>
+              <TouchableOpacity
+                style={styles.directionsLink}
+                onPress={() => handleOpenDirections(activeBranch)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.directionsLinkText}>
+                  Get Directions in Native Maps ›
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.addHereLink}
+                onPress={() =>
+                  navigation.navigate('RegisterBranch', {
+                    ministryId: activeBranch.ministryId,
+                  })
+                }
+                activeOpacity={0.7}
+              >
+                <Text style={styles.addHereLinkText}>
+                  + Add Nearby Branch
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : (
+          <View style={styles.noLocationSelected}>
+            <Text style={styles.noLocationText}>
+              Tap any pin on the map to view campus details and get directions.
+            </Text>
+          </View>
+        )}
+
+        {/* Register New Location Link on Body Canvas */}
+        <View style={styles.bottomActionContainer}>
+          <TouchableOpacity
+            style={styles.registerLocationLink}
+            onPress={() => navigation.navigate('RegisterBranch', {})}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Register a new location on this map"
+          >
+            <Text style={styles.registerLocationPlus}>+</Text>
+            <Text style={styles.registerLocationText}>
+              Register a New Location on this Map
+            </Text>
+            <ChevronRightSvg size={14} color="#0F172A" />
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -226,76 +344,194 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 16,
+    fontWeight: '700',
   },
   container: {
     flex: 1,
   },
   contentContainer: {
-    padding: spacing.lg,
-    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.xxl,
+    gap: 12,
+  },
+  metaInfoRow: {
+    paddingVertical: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
+    paddingBottom: 8,
+  },
+  metaNotice: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#B45309',
+    letterSpacing: 0.5,
+  },
+  metaSubNotice: {
+    fontSize: 11,
+    color: '#64748B',
+    marginTop: 2,
   },
   filterSection: {
-    marginBottom: spacing.xs,
+    paddingVertical: 2,
   },
-  filterLabel: {
+  filterSectionTitle: {
     fontSize: 10,
-    marginBottom: 4,
+    fontWeight: '800',
+    color: '#64748B',
+    letterSpacing: 0.5,
+    marginBottom: 6,
   },
   horizontalScroll: {
     flexDirection: 'row',
   },
-  filterPill: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    marginRight: 8,
+  textFilterContainer: {
+    gap: 16,
+    paddingBottom: 4,
   },
-  filterPillActive: {
-    backgroundColor: '#FDD223',
-    borderColor: '#FDD223',
+  textFilterItem: {
+    paddingVertical: 2,
+    alignItems: 'flex-start',
   },
-  typePill: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 6,
-    marginRight: 6,
+  filterText: {
+    fontSize: 13,
+    color: '#64748B',
+    fontWeight: '500',
   },
-  typePillActive: {
+  filterTextActive: {
+    color: '#0F172A',
+    fontWeight: '800',
+  },
+  activeUnderline: {
+    height: 2,
     backgroundColor: '#0F172A',
-    borderColor: '#0F172A',
+    width: '100%',
+    marginTop: 3,
+    borderRadius: 1,
   },
-  mapCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    ...shadow.sm,
+  mapCanvasWrapper: {
+    marginTop: 4,
   },
-  mapHeaderRow: {
+  mapCanvasHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.xs,
+    marginBottom: 6,
   },
-  registerCta: {
-    backgroundColor: '#FDD223',
-    borderRadius: radius.md,
-    paddingVertical: spacing.md,
+  mapCanvasHeaderTitle: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#64748B',
+    letterSpacing: 0.5,
+  },
+  mapCanvasHeaderCount: {
+    fontSize: 11,
+    color: '#64748B',
+    fontWeight: '600',
+  },
+  activeLocationSection: {
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
+    gap: 4,
+  },
+  locationHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  locationTypeLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#B45309',
+    letterSpacing: 0.4,
+  },
+  locationCityLabel: {
+    fontSize: 11,
+    color: '#64748B',
+    fontWeight: '600',
+  },
+  locationName: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: '#0F172A',
+    marginTop: 2,
+  },
+  locationMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 2,
+  },
+  locationAddressText: {
+    fontSize: 13,
+    color: '#475569',
+  },
+  locationDetailText: {
+    fontSize: 12,
+    color: '#64748B',
+    marginTop: 2,
+  },
+  locationActionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(15, 23, 42, 0.05)',
+  },
+  directionsLink: {
+    paddingVertical: 4,
+  },
+  directionsLinkText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  addHereLink: {
+    paddingVertical: 4,
+  },
+  addHereLinkText: {
+    fontSize: 12,
+    color: '#64748B',
+    fontWeight: '600',
+  },
+  noLocationSelected: {
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  noLocationText: {
+    fontSize: 12,
+    color: '#94A3B8',
+    textAlign: 'center',
+  },
+  bottomActionContainer: {
+    paddingVertical: 8,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(15, 23, 42, 0.06)',
+  },
+  registerLocationLink: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.xl,
-    ...shadow.sm,
+    gap: 8,
+    paddingVertical: 12,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.12)',
+    borderRadius: radius.sm,
   },
-  registerCtaText: {
+  registerLocationPlus: {
+    fontSize: 16,
+    fontWeight: '700',
     color: '#0F172A',
-    fontSize: 12,
-    letterSpacing: 0.5,
+  },
+  registerLocationText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0F172A',
+    letterSpacing: 0.2,
   },
 });

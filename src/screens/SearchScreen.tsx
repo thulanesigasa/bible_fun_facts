@@ -547,31 +547,31 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
     ) : (
       /* Scope 2: Ministries & Churches Directory (Continuous Screen Body) */
       <View style={styles.ministriesScopeContainer}>
-        {/* Direct Action Row on Body Canvas */}
-        <View style={styles.actionsBodyRow}>
+        {/* Editorial Action Navigation on Screen Body Canvas */}
+        <View style={styles.ministryActionsRow}>
           <TouchableOpacity
-            style={styles.registerActionTextBtn}
+            style={styles.ministryActionLink}
             onPress={() => navigation?.navigate('RegisterMinistry')}
-            activeOpacity={0.7}
+            activeOpacity={0.65}
             accessibilityRole="button"
             accessibilityLabel="Register Your Ministry"
           >
-            <Text variant="caption" weight="800" color="#0F172A">
-              + REGISTER YOUR MINISTRY
-            </Text>
+            <Text style={styles.actionPlusGlyph}>+</Text>
+            <Text style={styles.actionLinkText}>Register Ministry</Text>
           </TouchableOpacity>
 
+          <View style={styles.actionDividerDot} />
+
           <TouchableOpacity
-            style={styles.radarActionTextBtn}
+            style={styles.ministryActionLink}
             onPress={() => navigation?.navigate('BranchMap')}
-            activeOpacity={0.7}
+            activeOpacity={0.65}
             accessibilityRole="button"
             accessibilityLabel="Explore Radar Map"
           >
             <MapPinSvg size={14} color="#0F172A" />
-            <Text variant="caption" weight="800" color="#0F172A">
-              RADAR MAP ›
-            </Text>
+            <Text style={styles.actionLinkText}>Radar Map</Text>
+            <ChevronRightSvg size={12} color="#64748B" />
           </TouchableOpacity>
         </View>
 
@@ -1410,29 +1410,38 @@ const styles = StyleSheet.create({
   ministriesScopeContainer: {
     paddingTop: 4,
   },
-  actionsBodyRow: {
+  ministryActionsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-    marginBottom: 12,
-  },
-  registerActionTextBtn: {
-    flex: 1,
-    backgroundColor: '#FDD223',
+    gap: 16,
     paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.08)',
   },
-  radarActionTextBtn: {
+  ministryActionLink: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#F1F5F9',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 8,
+    paddingVertical: 4,
+  },
+  actionPlusGlyph: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#0F172A',
+    lineHeight: 18,
+  },
+  actionLinkText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0F172A',
+    letterSpacing: 0.2,
+  },
+  actionDividerDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: '#94A3B8',
   },
   ministryBodyList: {
     paddingTop: 4,

@@ -293,7 +293,7 @@ export default function RegisterBranchScreen({
           keyboardShouldPersistTaps="handled"
         >
           {/* Section 1: Target Ministry */}
-          <View style={styles.card}>
+          <View style={styles.bodySection}>
             <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.cardSectionLabel}>
               CHURCH / MINISTRY AFFILIATION
             </Text>
@@ -321,7 +321,7 @@ export default function RegisterBranchScreen({
           </View>
 
           {/* Section 2: Branch Structure Type */}
-          <View style={styles.card}>
+          <View style={styles.bodySection}>
             <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.cardSectionLabel}>
               STRUCTURE TYPE
             </Text>
@@ -349,7 +349,7 @@ export default function RegisterBranchScreen({
           </View>
 
           {/* Section 3: Branch Details */}
-          <View style={styles.card}>
+          <View style={styles.bodySection}>
             <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.cardSectionLabel}>
               BRANCH DETAILS
             </Text>
@@ -413,7 +413,7 @@ export default function RegisterBranchScreen({
           </View>
 
           {/* Section 4: Automated Geocoding Cascade (Town -> Province -> Country -> Postal Code) */}
-          <View style={styles.card}>
+          <View style={styles.bodySection}>
             <View style={styles.sectionHeaderRow}>
               <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.cardSectionLabel}>
                 GEOGRAPHIC LOCATION & AUTO-CASCADE
@@ -515,7 +515,7 @@ export default function RegisterBranchScreen({
           </View>
 
           {/* Section 5: Live Map Preview */}
-          <View style={styles.card}>
+          <View style={styles.bodySection}>
             <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.cardSectionLabel}>
               LOCATION RADAR PREVIEW
             </Text>
@@ -569,13 +569,10 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.md,
   },
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    ...shadow.sm,
+  bodySection: {
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
   },
   cardSectionLabel: {
     fontSize: 11,
@@ -692,20 +689,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   submitButton: {
-    backgroundColor: '#FDD223',
-    borderRadius: radius.md,
+    backgroundColor: '#0F172A',
+    borderRadius: radius.sm,
     paddingVertical: spacing.md,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: spacing.sm,
+    marginTop: spacing.md,
     marginBottom: spacing.xl,
-    ...shadow.sm,
   },
   submitButtonDisabled: {
     opacity: 0.6,
   },
   submitButtonText: {
-    color: '#0F172A',
-    letterSpacing: 0.5,
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
 });
