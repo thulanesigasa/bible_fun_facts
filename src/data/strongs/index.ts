@@ -16,23 +16,15 @@ export const TOTAL_CANONICAL_STRONGS_COUNT = 14298;
 export const TOTAL_HEBREW_CANONICAL_COUNT = 8674;
 export const TOTAL_GREEK_CANONICAL_COUNT = 5624;
 
-// Load complete raw canonical partitions lazily on-demand
-// so initial bundle evaluation does not parse 9.5MB of JSON at application boot
-let _hebrewRaw: LexiconEntry[] | null = null;
-let _greekRaw: LexiconEntry[] | null = null;
+import { getCanonicalHebrewData } from './canonicalHebrewData';
+import { getCanonicalGreekData } from './canonicalGreekData';
 
 export function getCanonicalHebrewRaw(): LexiconEntry[] {
-  if (!_hebrewRaw) {
-    _hebrewRaw = require('./canonicalHebrew.json') as LexiconEntry[];
-  }
-  return _hebrewRaw;
+  return getCanonicalHebrewData();
 }
 
 export function getCanonicalGreekRaw(): LexiconEntry[] {
-  if (!_greekRaw) {
-    _greekRaw = require('./canonicalGreek.json') as LexiconEntry[];
-  }
-  return _greekRaw;
+  return getCanonicalGreekData();
 }
 
 let _memoizedHebrewBatches: LexiconEntry[] | null = null;
