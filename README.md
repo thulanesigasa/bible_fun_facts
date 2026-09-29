@@ -644,6 +644,21 @@ The application is backed by a full production-ready relational schema on Supaba
 | **`public.user_favorites_scriptures`** | User-saved scripture passages collection. | Owner-restricted select, insert, and delete (`auth.uid() = user_id`). | User-generated |
 | **`public.user_study_progress`** | Tracks completed daily devotionals and reading streaks per authenticated user. | Owner-restricted select, insert, and delete (`auth.uid() = user_id`). | User-generated |
 | **`public.study_notes`** | User-authored exegesis notes, reflections, and cross-references linked to scripture verses. | Owner-restricted select, insert, update, delete (`auth.uid() = user_id`). | User-generated |
+| **`public.ministries`** | Global church/ministry organizations — name, founder, headquarters, category, branch/homecell counters. Pre-seeded with 4 canonical organizations; user-registered ministries appended. Migration: `20260929153319_create_ministries_and_branches.sql`. | Public read; authenticated insert/update (non-preadded). | 4 canonical |
+| **`public.branches`** | Ministry campus branches, homecells, clusters, and sub-clusters with GPS coordinates (lat/lng), address, meeting times, and leader info. Linked to `ministries` via UUID FK. Migration: `20260929153319_create_ministries_and_branches.sql`. | Public read; authenticated insert/update (non-preadded). | 16 canonical |
+
+### Ministry Directory SQL Migration
+
+Migration file: `supabase/migrations/20260929153319_create_ministries_and_branches.sql`
+
+Key features applied to live database (`ibwooiejzxhbzplnldcz`):
+
+- UUID primary keys on both `ministries` and `branches`
+- `increment_ministry_count(p_ministry_id, p_branch_type)` RPC — atomically increments `branches_count` or `homecells_count` on the parent ministry after every `registerBranch()` call
+- `set_updated_at()` trigger — automatically maintains `updated_at` on both tables
+- Indexes on `branches(ministry_id)`, `branches(town)`, `branches(country)`, `branches(type)` for fast radar map and filter queries
+- `service_role` policy allows edge functions and admin tooling to bypass RLS for seeding and admin operations
+- `ministryService.ts` is fully Supabase-backed — no AsyncStorage, no in-memory PRE_ADDED arrays
 
 ---
 
