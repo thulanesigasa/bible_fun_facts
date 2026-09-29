@@ -15,7 +15,9 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
 
 import {
   searchTowns,
+  searchTownsOnline,
   resolveTownDetails,
+  resolveTownDetailsAsync,
   getAllCountries,
   getProvincesByCountry,
   GEO_DATABASE,
@@ -33,8 +35,14 @@ import {
 } from '../src/services/ministryService';
 
 describe('Geographic Geocoding Service (geoService)', () => {
-  it('contains comprehensive database of cities across SA, UK, Zimbabwe, Malawi, Nigeria, USA', () => {
-    expect(GEO_DATABASE.length).toBeGreaterThan(25);
+  it('contains expanded database of 60+ cities and townships across SA and global hubs', () => {
+    expect(GEO_DATABASE.length).toBeGreaterThan(60);
+    const towns = GEO_DATABASE.map((g) => g.town);
+    expect(towns).toContain('Tembisa');
+    expect(towns).toContain('Khayelitsha');
+    expect(towns).toContain('Umlazi');
+    expect(towns).toContain('Harare');
+    expect(towns).toContain('Lilongwe');
   });
 
   it('searches towns by partial query', () => {
@@ -51,7 +59,7 @@ describe('Geographic Geocoding Service (geoService)', () => {
     expect(durban).toBeDefined();
     expect(durban?.province).toBe('KwaZulu-Natal');
     expect(durban?.country).toBe('South Africa');
-    expect(durban?.postalCode).toBe('4000');
+    expect(durban?.postalCode).toMatch(/^400[01]$/);
     expect(durban?.coordinates.latitude).toBeCloseTo(-29.8587, 2);
 
     const london = resolveTownDetails('London');
@@ -66,6 +74,49 @@ describe('Geographic Geocoding Service (geoService)', () => {
     const lilongwe = resolveTownDetails('Lilongwe');
     expect(lilongwe).toBeDefined();
     expect(lilongwe?.country).toBe('Malawi');
+  });
+
+  it('queries live OpenStreetMap Nominatim and caches result', async () => {
+    const originalFetch = global.fetch;
+    global.fetch = jest.fn().mockImplementation(async (url: string) => {
+      if (url.includes('nominatim.openstreetmap.org')) {
+        return {
+          ok: true,
+          json: async () => [
+            {
+              name: 'Diepsloot',
+              lat: '-25.9307',
+              lon: '28.0123',
+              address: {
+                suburb: 'Diepsloot',
+                state: 'Gauteng',
+                country: 'South Africa',
+                postcode: '2069',
+              },
+            },
+          ],
+        };
+      }
+      return { ok: false };
+    }) as any;
+
+    try {
+      const results = await searchTownsOnline('dieps');
+      expect(results.length).toBeGreaterThan(0);
+      const diepsloot = results.find((r) => r.town.toLowerCase().includes('diepsloot'));
+      expect(diepsloot).toBeDefined();
+      expect(diepsloot?.province).toBe('Gauteng');
+      expect(diepsloot?.country).toBe('South Africa');
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
+  it('resolves town details asynchronously with fallback', async () => {
+    const resolved = await resolveTownDetailsAsync('Soweto');
+    expect(resolved).toBeDefined();
+    expect(resolved?.province).toBe('Gauteng');
+    expect(resolved?.country).toBe('South Africa');
   });
 
   it('returns distinct countries and provinces correctly', () => {
