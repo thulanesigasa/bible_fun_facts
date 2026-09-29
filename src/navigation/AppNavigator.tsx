@@ -190,6 +190,10 @@ function shouldShowTabHeader(route: any): boolean {
     'Hebrew',
     'Greek',
     'StrongsDetail',
+    'MinistryDetail',
+    'RegisterMinistry',
+    'RegisterBranch',
+    'BranchMap',
   ];
   return !childScreens.includes(routeName);
 }
@@ -215,7 +219,11 @@ function getTabBarVisibility(route: any, hideTabBar: boolean): 'none' | 'flex' {
     routeName === 'Strongs' ||
     routeName === 'Hebrew' ||
     routeName === 'Greek' ||
-    routeName === 'StrongsDetail'
+    routeName === 'StrongsDetail' ||
+    routeName === 'MinistryDetail' ||
+    routeName === 'RegisterMinistry' ||
+    routeName === 'RegisterBranch' ||
+    routeName === 'BranchMap'
   ) {
     return 'none';
   }
@@ -321,6 +329,40 @@ function SearchStack() {
             fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
           },
           headerTintColor: '#0F172A',
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="MinistryDetail"
+        component={MinistryDetailScreen}
+        options={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="RegisterMinistry"
+        component={RegisterMinistryScreen}
+        options={{
+          presentation: 'modal',
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="RegisterBranch"
+        component={RegisterBranchScreen}
+        options={{
+          presentation: 'modal',
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="BranchMap"
+        component={BranchMapScreen}
+        options={{
+          headerShown: false,
           contentStyle: { backgroundColor: colors.background },
         }}
       />
