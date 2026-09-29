@@ -4,12 +4,36 @@
  * Tests use a Supabase mock so no real network calls are made.
  * The canonical seed data (God Embassy, Christ Embassy, Spirit Embassy,
  * ECG The Jesus Nation Church) is reflected in the mock responses.
+ *
+ * NOTE: @react-native-async-storage/async-storage is mocked here because
+ * geoService.ts imports it for online search result caching. Without this
+ * mock Jest fails with "Must use import to load ES Module" since the package
+ * ships as ESM and ts-jest runs in CommonJS mode.
  */
+
+// ---------------------------------------------------------------------------
+// Mock AsyncStorage (required by geoService.ts online caching path)
+// ---------------------------------------------------------------------------
+let mockStorage: Record<string, string> = {};
+
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  getItem: jest.fn(async (key: string) => mockStorage[key] || null),
+  setItem: jest.fn(async (key: string, value: string) => {
+    mockStorage[key] = value;
+  }),
+  removeItem: jest.fn(async (key: string) => {
+    delete mockStorage[key];
+  }),
+  clear: jest.fn(async () => {
+    mockStorage = {};
+  }),
+}));
 
 // ---------------------------------------------------------------------------
 // Mock Supabase client
 // ---------------------------------------------------------------------------
 const mockMinistries = [
+
   {
     id: '00000000-0000-0000-0000-000000000001',
     name: 'God Embassy',
@@ -189,32 +213,37 @@ const newBranchRow = {
   updated_at: new Date().toISOString(),
 };
 
+// ---------------------------------------------------------------------------
+// Chainable Supabase query mock factory
+// Supports: .select().eq().order().order() and .select().order().order()
+// and .select().eq().single() and .insert().select().single()
+// ---------------------------------------------------------------------------
+function makeChain(
+  data: unknown[],
+  singleData: unknown | null = null
+): any {
+  const chain: any = {
+    order: jest.fn(() => chain),
+    eq: jest.fn(() => chain),
+    single: jest.fn(async () => ({ data: singleData ?? data[0] ?? null, error: null })),
+    // Make the chain itself thenable so `await query` resolves
+    then: (resolve: (v: unknown) => void) =>
+      Promise.resolve({ data, error: null }).then(resolve),
+  };
+  return chain;
+}
+
 jest.mock('../src/services/supabase', () => ({
   supabase: {
     from: jest.fn((table: string) => {
       const isMinistries = table === 'ministries';
-      const isInsert = false;
       return {
-        select: jest.fn(() => ({
-          order: jest.fn(() => ({
-            order: jest.fn(async () => ({
-              data: isMinistries ? mockMinistries : mockBranches,
-              error: null,
-            })),
-            eq: jest.fn(async () => ({
-              data: isMinistries
-                ? mockMinistries.filter((m) => m.is_preadded)
-                : mockBranches.filter((b) => b.ministry_id === '00000000-0000-0000-0000-000000000003'),
-              error: null,
-            })),
-          })),
-          eq: jest.fn(() => ({
-            single: jest.fn(async () => ({
-              data: isMinistries ? mockMinistries[0] : mockBranches[0],
-              error: null,
-            })),
-          })),
-        })),
+        select: jest.fn(() =>
+          makeChain(
+            isMinistries ? mockMinistries : mockBranches,
+            isMinistries ? mockMinistries[0] : mockBranches[0]
+          )
+        ),
         insert: jest.fn(() => ({
           select: jest.fn(() => ({
             single: jest.fn(async () => ({
@@ -228,6 +257,7 @@ jest.mock('../src/services/supabase', () => ({
     rpc: jest.fn(async () => ({ error: null })),
   },
 }));
+
 
 import {
   getAllMinistries,
