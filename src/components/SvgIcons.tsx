@@ -982,6 +982,23 @@ export const TypefaceSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#0F172
   </Svg>
 );
 
+export const ChurchSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M12 2v4M10 4h4" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+    <Path d="M12 6L4 11v11h16V11L12 6z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M10 22v-6h4v6" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Circle cx="12" cy="11" r="2" stroke={color} strokeWidth={strokeWidth} />
+  </Svg>
+);
+
+export const MapPinSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Circle cx="12" cy="10" r="3" stroke={color} strokeWidth={strokeWidth} />
+  </Svg>
+);
+
+
 
 
 

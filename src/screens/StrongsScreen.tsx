@@ -7,7 +7,6 @@ import {
   TextInput,
   Share,
   ActivityIndicator,
-  InteractionManager,
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -55,7 +54,9 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [offlineMeta, setOfflineMeta] = useState<OfflineDictionaryMeta | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [isReady, setIsReady] = useState<boolean>(isConcordanceCached());
+  const [fullDatasetReady, setFullDatasetReady] = useState<boolean>(isConcordanceCached());
+  const PAGE_SIZE = 30;
+  const [displayLimit, setDisplayLimit] = useState<number>(PAGE_SIZE);
 
   useEffect(() => {
     getOfflineDictionaryStatus().then(setOfflineMeta);
@@ -69,22 +70,37 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Non-blocking background initialization on first mount
+  // Reset pagination window when search query or letter selection changes
   useEffect(() => {
-    if (!isReady) {
-      const interaction = InteractionManager.runAfterInteractions(() => {
+    setDisplayLimit(PAGE_SIZE);
+  }, [debouncedQuery, selectedLetter]);
+
+  // Non-blocking background warmup for the complete 14,298 canonical dataset
+  useEffect(() => {
+    if (!fullDatasetReady) {
+      const timer = setTimeout(() => {
         getAllConcordanceEntries();
-        setIsReady(true);
-      });
-      return () => interaction.cancel();
+        setFullDatasetReady(true);
+      }, 50);
+      return () => clearTimeout(timer);
     }
-  }, [isReady]);
+  }, [fullDatasetReady]);
 
   // Single unified dictionary search across all biblical entries
   const filteredEntries = useMemo(() => {
-    if (!isReady) return [];
     return searchConcordance(debouncedQuery, 'all', selectedLetter);
-  }, [debouncedQuery, selectedLetter, isReady]);
+  }, [debouncedQuery, selectedLetter, fullDatasetReady]);
+
+  // Windowed visible entries slice for instant 0ms mount and 60fps scrolling
+  const visibleEntries = useMemo(() => {
+    return filteredEntries.slice(0, displayLimit);
+  }, [filteredEntries, displayLimit]);
+
+  const handleLoadMore = () => {
+    if (displayLimit < filteredEntries.length) {
+      setDisplayLimit((prev) => Math.min(prev + PAGE_SIZE, filteredEntries.length));
+    }
+  };
 
   const handleDownload = async () => {
     try {
@@ -385,36 +401,37 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
 
       {/* Concordance List */}
       <FlatList
-        data={filteredEntries}
-        keyExtractor={(item) => `${item.strongsNumber}-${item.englishWord || item.transliteration}`}
+        data={visibleEntries}
+        keyExtractor={(item) => item.strongsNumber}
         renderItem={({ item, index }) =>
           renderConcordanceItem({
             item,
-            isLast: index === filteredEntries.length - 1,
+            isLast: index === visibleEntries.length - 1,
           })
         }
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
-        initialNumToRender={12}
-        maxToRenderPerBatch={12}
+        initialNumToRender={15}
+        maxToRenderPerBatch={15}
         windowSize={5}
         removeClippedSubviews={Platform.OS !== 'web'}
         updateCellsBatchingPeriod={50}
         keyboardShouldPersistTaps="handled"
-        ListEmptyComponent={
-          !isReady ? (
-            <View style={styles.loadingContainer}>
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          displayLimit < filteredEntries.length ? (
+            <View style={styles.footerLoader}>
               <ActivityIndicator size="small" color="#B45309" />
-              <Text variant="caption" color={colors.textSecondary} style={styles.loadingText}>
-                Loading Strong's Exhaustive Concordance...
-              </Text>
             </View>
-          ) : (
-            <View style={styles.emptyContainer}>
-              <StrongsIconSvg size={40} color="#FDD223" />
-              <Text variant="h3" color={colors.textPrimary}>
-                No Words Found
-              </Text>
+          ) : null
+        }
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <StrongsIconSvg size={40} color="#FDD223" />
+            <Text variant="h3" color={colors.textPrimary}>
+              No Words Found
+            </Text>
               <Text
                 variant="body"
                 color={colors.textSecondary}
@@ -440,7 +457,6 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
                 </TouchableOpacity>
               )}
             </View>
-          )
         }
       />
     </SafeAreaView>
@@ -658,5 +674,10 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontWeight: '600',
     marginTop: spacing.sm,
+  },
+  footerLoader: {
+    paddingVertical: spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

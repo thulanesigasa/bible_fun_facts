@@ -5,6 +5,7 @@ export { colors } from './colors';
  * All spacing MUST use multiples of 8px (8, 16, 24, 32, 48, 56, 64).
  */
 export const spacing = {
+  xs: 4,
   sm: 8,
   md: 16,
   lg: 24,

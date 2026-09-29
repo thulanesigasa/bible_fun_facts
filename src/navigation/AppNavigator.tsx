@@ -59,6 +59,10 @@ import StrongsScreen from '../screens/StrongsScreen';
 import HebrewScreen from '../screens/HebrewScreen';
 import GreekScreen from '../screens/GreekScreen';
 import StrongsDetailScreen from '../screens/StrongsDetailScreen';
+import MinistryDetailScreen from '../screens/MinistryDetailScreen';
+import RegisterMinistryScreen from '../screens/RegisterMinistryScreen';
+import RegisterBranchScreen from '../screens/RegisterBranchScreen';
+import BranchMapScreen from '../screens/BranchMapScreen';
 import type { LexiconEntry } from '../data/lexiconData';
 
 export type AuthStackParamList = {
@@ -102,6 +106,10 @@ export type RootStackParamList = {
   Hebrew: undefined;
   Greek: undefined;
   StrongsDetail: { entry: LexiconEntry };
+  MinistryDetail: { ministryId: string };
+  RegisterMinistry: undefined;
+  RegisterBranch: { ministryId?: string; ministryName?: string } | undefined;
+  BranchMap: { ministryId?: string; branchId?: string } | undefined;
 };
 
 const Tab = createBottomTabNavigator();
@@ -777,6 +785,40 @@ function ProfileStack() {
             fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
           },
           headerTintColor: '#0F172A',
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="MinistryDetail"
+        component={MinistryDetailScreen}
+        options={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="RegisterMinistry"
+        component={RegisterMinistryScreen}
+        options={{
+          presentation: 'modal',
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="RegisterBranch"
+        component={RegisterBranchScreen}
+        options={{
+          presentation: 'modal',
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="BranchMap"
+        component={BranchMapScreen}
+        options={{
+          headerShown: false,
           contentStyle: { backgroundColor: colors.background },
         }}
       />
