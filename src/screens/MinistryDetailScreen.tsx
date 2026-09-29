@@ -1,9 +1,9 @@
 /**
  * Ministry Detail & Branch Directory Screen
  *
- * Displays detailed ministry vision, leadership, and hierarchical directory
- * of Main Branches, Homecells, Cell Branches, Clusters, and Sub-Clusters.
- * Includes interactive radar vector map and instant CTA to register new branches.
+ * Flat body-canvas architecture — zero cards, zero pills, zero badge divs.
+ * Filter tabs are plain text labels.
+ * Branch list renders as clean editorial rows with hairline dividers.
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
-import { spacing, radius, shadow } from '../theme';
+import { spacing } from '../theme';
 import { Text } from '../components/Typography';
 import { BranchRadarMap } from '../components/BranchRadarMap';
 import {
@@ -32,7 +32,6 @@ import {
 import {
   CloseSvg,
   SearchSvg,
-  ChevronRightSvg,
 } from '../components/SvgIcons';
 
 type StructureTab = 'all' | BranchType;
@@ -81,11 +80,9 @@ export default function MinistryDetailScreen({
 
   const filteredBranches = useMemo(() => {
     let list = branches;
-
     if (activeTab !== 'all') {
       list = list.filter((b) => b.type === activeTab);
     }
-
     if (searchQuery.trim().length > 0) {
       const q = searchQuery.trim().toLowerCase();
       list = list.filter(
@@ -97,34 +94,16 @@ export default function MinistryDetailScreen({
           b.country.toLowerCase().includes(q)
       );
     }
-
     return list;
   }, [branches, activeTab, searchQuery]);
 
-  const countsByType = useMemo(() => {
-    const counts: Record<string, number> = {
-      all: branches.length,
-      branch: 0,
-      homecell: 0,
-      cell_branch: 0,
-      sub_cluster: 0,
-      cluster: 0,
-    };
-    branches.forEach((b) => {
-      if (counts[b.type] !== undefined) {
-        counts[b.type] += 1;
-      }
-    });
-    return counts;
-  }, [branches]);
-
   const handleOpenDirections = (b: Branch) => {
     const query = encodeURIComponent(`${b.name}, ${b.address}, ${b.town}, ${b.country}`);
-    const url = Platform.select({
-      ios: `maps:0,0?q=${query}`,
-      android: `geo:0,0?q=${query}`,
-    }) || `https://www.google.com/maps/search/?api=1&query=${query}`;
-
+    const url =
+      Platform.select({
+        ios: `maps:0,0?q=${query}`,
+        android: `geo:0,0?q=${query}`,
+      }) || `https://www.google.com/maps/search/?api=1&query=${query}`;
     Linking.openURL(url).catch(() => {
       Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${query}`);
     });
@@ -137,15 +116,11 @@ export default function MinistryDetailScreen({
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeBtn}>
             <CloseSvg size={20} color={colors.textPrimary} />
           </TouchableOpacity>
-          <Text variant="h3" color={colors.textPrimary}>
-            Ministry Details
-          </Text>
+          <Text variant="h3" color={colors.textPrimary}>Ministry Details</Text>
           <View style={{ width: 36 }} />
         </View>
-        <View style={styles.emptyContainer}>
-          <Text variant="body" color={colors.textSecondary}>
-            Loading ministry information...
-          </Text>
+        <View style={styles.loadingRow}>
+          <Text variant="body" color={colors.textSecondary}>Loading...</Text>
         </View>
       </SafeAreaView>
     );
@@ -153,13 +128,13 @@ export default function MinistryDetailScreen({
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Top Header */}
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.closeBtn}
           accessibilityRole="button"
-          accessibilityLabel="Back to search"
+          accessibilityLabel="Back"
         >
           <CloseSvg size={20} color={colors.textPrimary} />
         </TouchableOpacity>
@@ -174,83 +149,79 @@ export default function MinistryDetailScreen({
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        {/* Ministry Hero Overview */}
-        <View style={styles.heroCard}>
-          <View style={styles.categoryBadge}>
-            <Text variant="caption" weight="700" style={styles.categoryBadgeText}>
-              {ministry.category.toUpperCase()}
-            </Text>
-          </View>
+        {/* — Ministry overview — */}
+        <View style={styles.overviewSection}>
+          <Text variant="caption" weight="700" color="#B45309" style={styles.categoryLabel}>
+            {ministry.category.toUpperCase()}
+          </Text>
 
           <Text variant="h2" color={colors.textPrimary} style={styles.ministryName}>
             {ministry.name}
           </Text>
 
-          <Text variant="body" weight="700" color="#B45309" style={styles.founderText}>
-            Senior Pastor / Founder: {ministry.founder}
+          <Text variant="body" color={colors.textSecondary} style={styles.founderLine}>
+            {ministry.founder}
           </Text>
 
-          <Text variant="caption" color={colors.textSecondary} style={styles.hqText}>
-            Headquarters: {ministry.headquarters} ({ministry.headquartersCountry})
+          <Text variant="caption" color={colors.textTertiary} style={styles.hqLine}>
+            {ministry.headquarters}, {ministry.headquartersCountry}
           </Text>
 
           <Text variant="body" color={colors.textSecondary} style={styles.descriptionText}>
             {ministry.description}
           </Text>
-
-          {/* Action Row */}
-          <View style={styles.heroActionRow}>
-            <TouchableOpacity
-              style={styles.primaryActionBtn}
-              onPress={() =>
-                navigation.navigate('RegisterBranch', {
-                  ministryId: ministry.id,
-                  ministryName: ministry.name,
-                })
-              }
-              activeOpacity={0.8}
-            >
-              <Text variant="caption" weight="700" style={styles.primaryActionBtnText}>
-                + REGISTER BRANCH / CELL
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.secondaryActionBtn}
-              onPress={() =>
-                navigation.navigate('BranchMap', {
-                  ministryId: ministry.id,
-                })
-              }
-              activeOpacity={0.8}
-            >
-              <Text variant="caption" weight="700" style={styles.secondaryActionBtnText}>
-                FULL MAP VIEW
-              </Text>
-            </TouchableOpacity>
-          </View>
         </View>
 
-        {/* Embedded Interactive Radar Vector Map */}
-        <View style={styles.mapCard}>
-          <View style={styles.sectionHeader}>
-            <Text variant="caption" weight="700" color={colors.textSecondary}>
-              CAMPUS & HOMECELL RADAR LOCATIONS
+        {/* — Action links — */}
+        <View style={styles.actionRow}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('RegisterBranch', {
+                ministryId: ministry.id,
+                ministryName: ministry.name,
+              })
+            }
+            activeOpacity={0.7}
+          >
+            <Text variant="caption" weight="700" style={styles.actionLink}>
+              + Register Campus or Cell
             </Text>
-            <Text variant="caption" color={colors.textSecondary}>
-              {branches.length} Locations Plotted
-            </Text>
-          </View>
+          </TouchableOpacity>
 
+          <Text variant="caption" color={colors.textTertiary}> · </Text>
+
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('BranchMap', { ministryId: ministry.id })
+            }
+            activeOpacity={0.7}
+          >
+            <Text variant="caption" weight="700" style={styles.actionLinkSecondary}>
+              Full Map View
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* — Radar map — */}
+        <View style={styles.mapSection}>
+          <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.sectionLabel}>
+            CAMPUS RADAR LOCATIONS
+          </Text>
           <BranchRadarMap
             branches={branches}
             selectedBranchId={selectedBranch?.id}
             onSelectBranch={setSelectedBranch}
             height={240}
+            showFooter={false}
           />
+          {branches.length > 0 && (
+            <Text variant="caption" color={colors.textTertiary} style={styles.radarCaption}>
+              {branches.length} location{branches.length !== 1 ? 's' : ''} plotted
+            </Text>
+          )}
         </View>
 
-        {/* Hierarchical Structure Filter Tabs */}
+        {/* — Filter: plain text tabs — */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -259,131 +230,122 @@ export default function MinistryDetailScreen({
         >
           {STRUCTURE_TABS.map((tab) => {
             const isSelected = activeTab === tab.key;
-            const count = countsByType[tab.key] || 0;
             return (
               <TouchableOpacity
                 key={tab.key}
-                style={[styles.tabButton, isSelected && styles.tabButtonActive]}
                 onPress={() => setActiveTab(tab.key)}
-                activeOpacity={0.7}
+                activeOpacity={0.6}
+                style={styles.tabTouchable}
               >
                 <Text
                   variant="caption"
-                  weight={isSelected ? '800' : '600'}
-                  color={isSelected ? '#0F172A' : colors.textSecondary}
+                  weight={isSelected ? '800' : '500'}
+                  color={isSelected ? colors.textPrimary : colors.textTertiary}
+                  style={isSelected ? styles.tabLabelActive : styles.tabLabel}
                 >
-                  {tab.label} ({count})
+                  {tab.label}
                 </Text>
               </TouchableOpacity>
             );
           })}
         </ScrollView>
 
-        {/* Search Input for Branches */}
-        <View style={styles.searchBarWrapper}>
-          <SearchSvg size={16} color={colors.textSecondary} />
+        {/* — Search — */}
+        <View style={styles.searchBar}>
+          <SearchSvg size={14} color={colors.textTertiary} />
           <TextInput
-            style={styles.searchTextInput}
-            placeholder={`Search ${ministry.name} branches, cells, towns...`}
+            style={styles.searchInput}
+            placeholder="Search locations, leaders, towns..."
             placeholderTextColor={colors.textTertiary}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
         </View>
 
-        {/* Branches and Homecells List */}
+        {/* — Branch rows — */}
         <View style={styles.branchesList}>
           {filteredBranches.length === 0 ? (
-            <View style={styles.emptyCard}>
+            <View style={styles.emptySection}>
               <Text variant="body" weight="700" color={colors.textPrimary}>
-                No Locations Found in This Category
+                No locations found
               </Text>
-              <Text variant="caption" color={colors.textSecondary} style={{ textAlign: 'center' }}>
-                Is your campus, homecell, or cluster not listed yet? Register it now to appear in the global directory.
+              <Text variant="caption" color={colors.textSecondary} style={{ marginTop: 4 }}>
+                Is your campus or cell not listed? Register it to appear in the global directory.
               </Text>
               <TouchableOpacity
-                style={styles.registerHereBtn}
                 onPress={() =>
                   navigation.navigate('RegisterBranch', {
                     ministryId: ministry.id,
                     ministryName: ministry.name,
                   })
                 }
+                style={{ marginTop: spacing.sm }}
               >
-                <Text variant="caption" weight="700" style={styles.registerHereBtnText}>
-                  + REGISTER YOUR BRANCH
+                <Text variant="caption" weight="700" style={styles.actionLink}>
+                  + Register Your Branch
                 </Text>
               </TouchableOpacity>
             </View>
           ) : (
-            filteredBranches.map((b) => (
-              <View key={b.id} style={styles.branchCard}>
-                <View style={styles.branchCardHeader}>
-                  <View
-                    style={[
-                      styles.typeBadge,
-                      b.type === 'homecell' && styles.homecellBadge,
-                      b.type === 'cluster' && styles.clusterBadge,
-                    ]}
-                  >
-                    <Text variant="caption" weight="700" style={styles.typeBadgeText}>
-                      {getBranchTypeLabel(b.type).toUpperCase()}
-                    </Text>
-                  </View>
-                  <Text variant="caption" color={colors.textSecondary}>
-                    {b.town}, {b.province}
-                  </Text>
-                </View>
+            filteredBranches.map((b, index) => (
+              <View key={b.id} style={[styles.branchRow, index === 0 && styles.branchRowFirst]}>
+                {/* Type label as plain text, not a pill */}
+                <Text variant="caption" weight="700" color="#B45309" style={styles.branchTypeText}>
+                  {getBranchTypeLabel(b.type).toUpperCase()}
+                </Text>
 
-                <Text variant="h3" color={colors.textPrimary} style={styles.branchCardTitle}>
+                <Text variant="h3" color={colors.textPrimary} style={styles.branchName}>
                   {b.name}
                 </Text>
 
                 <Text variant="caption" color={colors.textSecondary} style={styles.branchMeta}>
-                  Leader: <Text variant="caption" weight="700" color={colors.textPrimary}>{b.leaderName}</Text> • Tel: <Text variant="caption" weight="700" color={colors.textPrimary}>{b.contactNumber}</Text>
+                  {b.town}, {b.province}
                 </Text>
 
                 <Text variant="caption" color={colors.textSecondary} style={styles.branchMeta}>
-                  Schedule: {b.meetingTimes}
+                  Leader: <Text variant="caption" weight="700" color={colors.textPrimary}>{b.leaderName}</Text>
+                  {'  ·  '}
+                  <Text variant="caption" weight="700" color={colors.textPrimary}>{b.contactNumber}</Text>
+                </Text>
+
+                <Text variant="caption" color={colors.textSecondary} style={styles.branchMeta}>
+                  {b.meetingTimes}
                 </Text>
 
                 <Text variant="caption" color={colors.textTertiary} style={styles.branchAddress}>
-                  {b.address} ({b.postalCode}, {b.country})
+                  {b.address}
                 </Text>
 
-                <View style={styles.branchFooter}>
-                  <TouchableOpacity
-                    style={styles.directionsAction}
-                    onPress={() => handleOpenDirections(b)}
-                    activeOpacity={0.7}
-                  >
-                    <Text variant="caption" weight="700" style={styles.directionsActionText}>
-                      DIRECTIONS & MAP
-                    </Text>
-                    <ChevronRightSvg size={14} color="#0F172A" />
-                  </TouchableOpacity>
-                </View>
+                <TouchableOpacity
+                  onPress={() => handleOpenDirections(b)}
+                  activeOpacity={0.7}
+                  style={styles.directionsLink}
+                >
+                  <Text variant="caption" weight="700" style={styles.directionsLinkText}>
+                    Directions & Map
+                  </Text>
+                </TouchableOpacity>
               </View>
             ))
           )}
         </View>
 
-        {/* Global Footer CTA */}
+        {/* — Footer CTA — */}
         <TouchableOpacity
-          style={styles.bottomCtaBanner}
           onPress={() =>
             navigation.navigate('RegisterBranch', {
               ministryId: ministry.id,
               ministryName: ministry.name,
             })
           }
-          activeOpacity={0.8}
+          activeOpacity={0.7}
+          style={styles.footerCta}
         >
-          <Text variant="caption" weight="700" color="#B45309">
-            ARE YOU LEADING A NEW CELL OR CAMPUS?
+          <Text variant="caption" weight="700" color={colors.textTertiary}>
+            LEADING A NEW CELL OR CAMPUS?
           </Text>
-          <Text variant="body" weight="700" color={colors.textPrimary}>
-            Tap here to register and pinpoint your location
+          <Text variant="body" weight="700" color={colors.textPrimary} style={{ marginTop: 2 }}>
+            Register and appear in the global directory
           </Text>
         </TouchableOpacity>
       </ScrollView>
@@ -414,163 +376,144 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
   },
+  loadingRow: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   container: {
     flex: 1,
   },
   contentContainer: {
-    padding: spacing.lg,
-    gap: spacing.md,
+    paddingBottom: spacing.xxl + spacing.nav,
   },
-  heroCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    ...shadow.sm,
+
+  // Overview
+  overviewSection: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
   },
-  categoryBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(253, 210, 35, 0.2)',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-    marginBottom: spacing.xs,
-  },
-  categoryBadgeText: {
+  categoryLabel: {
     fontSize: 10,
-    color: '#B45309',
+    letterSpacing: 0.6,
+    marginBottom: spacing.xs,
   },
   ministryName: {
     fontSize: 22,
     marginBottom: 4,
   },
-  founderText: {
+  founderLine: {
     fontSize: 14,
     marginBottom: 2,
   },
-  hqText: {
+  hqLine: {
     fontSize: 12,
     marginBottom: spacing.sm,
   },
   descriptionText: {
     fontSize: 13,
-    lineHeight: 19,
-    marginBottom: spacing.md,
+    lineHeight: 20,
   },
-  heroActionRow: {
+
+  // Action links
+  actionRow: {
     flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  primaryActionBtn: {
-    flex: 1,
-    backgroundColor: '#FDD223',
-    paddingVertical: 10,
-    borderRadius: 8,
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
   },
-  primaryActionBtnText: {
-    fontSize: 11,
+  actionLink: {
+    fontSize: 12,
     color: '#0F172A',
+    textDecorationLine: 'underline',
   },
-  secondaryActionBtn: {
-    backgroundColor: '#0F172A',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
+  actionLinkSecondary: {
+    fontSize: 12,
+    color: colors.textSecondary,
   },
-  secondaryActionBtnText: {
+
+  // Radar map
+  mapSection: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
+  },
+  sectionLabel: {
+    fontSize: 10,
+    letterSpacing: 0.5,
+    marginBottom: spacing.sm,
+  },
+  radarCaption: {
     fontSize: 11,
-    color: '#FFFFFF',
+    marginTop: spacing.xs,
   },
-  mapCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    ...shadow.sm,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
-  },
+
+  // Filter tabs
   tabsScroll: {
     flexGrow: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
   },
   tabsContainer: {
-    gap: 8,
-    paddingVertical: 4,
+    flexDirection: 'row',
+    gap: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
-  tabButton: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
+  tabTouchable: {},
+  tabLabel: {
+    fontSize: 12,
   },
-  tabButtonActive: {
-    backgroundColor: '#FDD223',
-    borderColor: '#FDD223',
+  tabLabelActive: {
+    fontSize: 12,
+    borderBottomWidth: 1.5,
+    borderBottomColor: '#0F172A',
+    paddingBottom: 1,
   },
-  searchBarWrapper: {
+
+  // Search
+  searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.12)',
-    borderRadius: radius.sm,
-    paddingHorizontal: spacing.md,
-    gap: spacing.xs,
-  },
-  searchTextInput: {
-    flex: 1,
+    paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
+    gap: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
+  },
+  searchInput: {
+    flex: 1,
     fontSize: 13,
     color: colors.textPrimary,
+    paddingVertical: 4,
   },
-  branchesList: {
-    gap: spacing.sm,
+
+  // Branch rows
+  branchesList: {},
+  branchRowFirst: {
+    borderTopWidth: 0,
   },
-  branchCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    ...shadow.sm,
+  branchRow: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(15, 23, 42, 0.06)',
   },
-  branchCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  branchTypeText: {
+    fontSize: 9,
+    letterSpacing: 0.5,
     marginBottom: 4,
   },
-  typeBadge: {
-    backgroundColor: 'rgba(180, 83, 9, 0.1)',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  homecellBadge: {
-    backgroundColor: 'rgba(56, 189, 248, 0.15)',
-  },
-  clusterBadge: {
-    backgroundColor: 'rgba(168, 85, 247, 0.15)',
-  },
-  typeBadgeText: {
-    fontSize: 9,
-    color: '#B45309',
-  },
-  branchCardTitle: {
+  branchName: {
     fontSize: 15,
-    marginVertical: 2,
+    marginBottom: 4,
   },
   branchMeta: {
     fontSize: 12,
@@ -581,62 +524,28 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontStyle: 'italic',
   },
-  branchFooter: {
+  directionsLink: {
     marginTop: spacing.sm,
-    paddingTop: spacing.xs,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(15, 23, 42, 0.05)',
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    alignSelf: 'flex-start',
   },
-  directionsAction: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: '#FDD223',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  directionsActionText: {
-    fontSize: 10,
-    color: '#0F172A',
-  },
-  emptyCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: radius.md,
-    padding: spacing.xl,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-  },
-  registerHereBtn: {
-    backgroundColor: '#FDD223',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 8,
-    marginTop: 4,
-  },
-  registerHereBtnText: {
+  directionsLinkText: {
     fontSize: 11,
     color: '#0F172A',
+    textDecorationLine: 'underline',
   },
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+
+  // Empty state
+  emptySection: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
   },
-  bottomCtaBanner: {
-    backgroundColor: 'rgba(253, 210, 35, 0.2)',
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(180, 83, 9, 0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 2,
-    marginBottom: spacing.xl,
+
+  // Footer
+  footerCta: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(15, 23, 42, 0.06)',
+    marginTop: spacing.md,
   },
 });
