@@ -38,6 +38,7 @@ interface BranchRadarMapProps {
   selectedBranchId?: string;
   onSelectBranch?: (branch: Branch) => void;
   height?: number;
+  showFooter?: boolean;
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -57,6 +58,7 @@ export const BranchRadarMap: React.FC<BranchRadarMapProps> = ({
   selectedBranchId,
   onSelectBranch,
   height = 360,
+  showFooter = true,
 }) => {
   const mapWidth = SCREEN_WIDTH - spacing.xl * 2;
   const mapHeight = height;
@@ -457,39 +459,41 @@ export const BranchRadarMap: React.FC<BranchRadarMapProps> = ({
         )}
       </View>
 
-      {/* Selected Branch Footer Card */}
-      {activeBranch ? (
-        <View style={styles.cardContainer}>
-          <View style={styles.cardHeader}>
-            <View style={{ flex: 1, marginRight: spacing.sm }}>
-              <View style={styles.tagRow}>
-                <View style={styles.typeBadge}>
-                  <Text style={styles.typeBadgeText}>
-                    {getBranchTypeLabel(activeBranch.type)}
+      {/* Selected Branch Footer Card (only when showFooter is true) */}
+      {showFooter && (
+        activeBranch ? (
+          <View style={styles.cardContainer}>
+            <View style={styles.cardHeader}>
+              <View style={{ flex: 1, marginRight: spacing.sm }}>
+                <View style={styles.tagRow}>
+                  <View style={styles.typeBadge}>
+                    <Text style={styles.typeBadgeText}>
+                      {getBranchTypeLabel(activeBranch.type)}
+                    </Text>
+                  </View>
+                  <Text style={styles.locationText} numberOfLines={1}>
+                    {activeBranch.town}, {activeBranch.province}
                   </Text>
                 </View>
-                <Text style={styles.locationText} numberOfLines={1}>
-                  {activeBranch.town}, {activeBranch.province}
+                <Text style={styles.branchName} numberOfLines={1}>
+                  {activeBranch.name}
                 </Text>
               </View>
-              <Text style={styles.branchName} numberOfLines={1}>
-                {activeBranch.name}
-              </Text>
-            </View>
 
-            <TouchableOpacity
-              style={styles.navButton}
-              onPress={() => handleOpenNavigation(activeBranch)}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.navButtonText}>Directions</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.navButton}
+                onPress={() => handleOpenNavigation(activeBranch)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.navButtonText}>Directions</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      ) : (
-        <View style={styles.emptyCard}>
-          <Text style={styles.emptyCardText}>No branch selected</Text>
-        </View>
+        ) : (
+          <View style={styles.emptyCard}>
+            <Text style={styles.emptyCardText}>No branch selected</Text>
+          </View>
+        )
       )}
     </View>
   );
@@ -499,11 +503,10 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     backgroundColor: '#FFFFFF',
-    borderRadius: radius.md,
+    borderRadius: 8,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.08)',
-    ...shadow.sm,
   },
   topControlBar: {
     flexDirection: 'row',

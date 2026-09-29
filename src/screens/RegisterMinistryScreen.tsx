@@ -1,13 +1,16 @@
 /**
  * Register Church Ministry Screen
  *
- * Allows users to register a new church or ministry if their organization
- * is not yet listed in the pre-added directory.
- * Upon successful creation, the user is navigated directly to RegisterBranchScreen
- * with their new ministry pre-selected to add their branches and homecells.
+ * Step-by-Step wizard on a continuous screen body canvas (zero card divs/boxes/pills).
+ * - Step 1: Ministry Identity & Vision
+ * - Step 2: Headquarters Location (with automated cascading geocoding via local database)
+ * - Step 3: Structured Review & Confirmation
+ *
+ * Upon registration, seamlessly navigates to RegisterBranchScreen to register
+ * campuses, branches, and homecells.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   ScrollView,
@@ -19,11 +22,20 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
-import { spacing, radius, shadow } from '../theme';
+import { spacing, radius } from '../theme';
 import { Text } from '../components/Typography';
 import { useThemedAlert } from '../context/AlertContext';
 import { registerMinistry } from '../services/ministryService';
-import { CloseSvg } from '../components/SvgIcons';
+import {
+  searchTownsOnline,
+  GeoLocation,
+} from '../services/geoService';
+import {
+  CloseSvg,
+  CheckSvg,
+  SearchSvg,
+  ChevronRightSvg,
+} from '../components/SvgIcons';
 
 const CATEGORY_OPTIONS = [
   'Apostolic & Kingdom Reformation',
@@ -37,58 +49,107 @@ const CATEGORY_OPTIONS = [
 export default function RegisterMinistryScreen({ navigation }: { navigation: any }) {
   const { showAlert } = useThemedAlert();
 
+  // Wizard Step: 1 = Identity, 2 = Headquarters & Contact, 3 = Review & Confirm
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
+
+  // Step 1: Identity & Vision
   const [name, setName] = useState('');
   const [founder, setFounder] = useState('');
-  const [headquarters, setHeadquarters] = useState('');
-  const [headquartersCountry, setHeadquartersCountry] = useState('South Africa');
-  const [description, setDescription] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(CATEGORY_OPTIONS[0]);
+  const [description, setDescription] = useState('');
+
+  // Step 2: Headquarters & Geocoding
+  const [townQuery, setTownQuery] = useState('Johannesburg');
+  const [headquartersProvince, setHeadquartersProvince] = useState('Gauteng');
+  const [headquartersCountry, setHeadquartersCountry] = useState('South Africa');
+  const [postalCode, setPostalCode] = useState('2000');
+  const [showTownSuggestions, setShowTownSuggestions] = useState(false);
+  const [suggestions, setSuggestions] = useState<GeoLocation[]>([]);
+
+  // Contact details
   const [website, setWebsite] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [contactPhone, setContactPhone] = useState('');
+
+  // Submission state
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async () => {
+  // Live town search for auto-cascading geocoding
+  useEffect(() => {
+    if (townQuery.trim().length >= 2) {
+      searchTownsOnline(townQuery).then((results) => {
+        setSuggestions(results);
+      });
+    } else {
+      setSuggestions([]);
+    }
+  }, [townQuery]);
+
+  const handleSelectTown = (item: GeoLocation) => {
+    setTownQuery(item.town);
+    setHeadquartersProvince(item.province);
+    setHeadquartersCountry(item.country);
+    setPostalCode(item.postalCode);
+    setShowTownSuggestions(false);
+  };
+
+  const handleNextFromStep1 = () => {
     if (!name.trim()) {
       showAlert({
         title: 'Ministry Name Required',
-        message: 'Please enter the name of your church or ministry organization.',
+        message: 'Please provide your church or ministry name.',
         buttons: [{ text: 'OK' }],
       });
       return;
     }
-
     if (!founder.trim()) {
       showAlert({
-        title: 'Founder / Pastor Required',
+        title: 'Founder / Senior Pastor Required',
         message: 'Please specify the founder or senior pastor leading the ministry.',
         buttons: [{ text: 'OK' }],
       });
       return;
     }
+    setCurrentStep(2);
+  };
 
+  const handleNextFromStep2 = () => {
+    if (!townQuery.trim()) {
+      showAlert({
+        title: 'Headquarters City Required',
+        message: 'Please specify the headquarters city or town for your ministry.',
+        buttons: [{ text: 'OK' }],
+      });
+      return;
+    }
+    setCurrentStep(3);
+  };
+
+  const handleConfirmSubmit = async () => {
     setIsSubmitting(true);
     try {
       const created = await registerMinistry({
-        name,
-        founder,
-        headquarters: headquarters || 'Johannesburg',
-        headquartersCountry: headquartersCountry || 'South Africa',
-        description: description || `Global Christian ministry founded by ${founder}.`,
+        name: name.trim(),
+        founder: founder.trim(),
+        headquarters: townQuery.trim() || 'Johannesburg',
+        headquartersCountry: headquartersCountry.trim() || 'South Africa',
+        description:
+          description.trim() ||
+          `Global Christian ministry founded by ${founder.trim()}, headquartered in ${townQuery.trim()}, ${headquartersCountry.trim()}.`,
         category: selectedCategory,
-        website,
-        contactEmail,
-        contactPhone,
+        website: website.trim(),
+        contactEmail: contactEmail.trim(),
+        contactPhone: contactPhone.trim(),
       });
 
       setIsSubmitting(false);
 
       showAlert({
         title: 'Ministry Registered',
-        message: `${created.name} is now registered in the global directory. Let's add your first campus branch or homecell.`,
+        message: `${created.name} is now officially registered in the global directory. Let's add your first campus branch or homecell.`,
         buttons: [
           {
-            text: 'Add Branch / Homecell',
+            text: 'Add Campus / Homecell',
             onPress: () => {
               navigation.replace('RegisterBranch', {
                 ministryId: created.id,
@@ -110,20 +171,65 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Header */}
+      {/* Top Navigation Bar */}
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
+          onPress={() => {
+            if (currentStep > 1) {
+              setCurrentStep((s) => (s - 1) as 1 | 2 | 3);
+            } else {
+              navigation.goBack();
+            }
+          }}
           style={styles.closeBtn}
           accessibilityRole="button"
-          accessibilityLabel="Close register ministry screen"
+          accessibilityLabel={currentStep > 1 ? 'Go to previous step' : 'Close screen'}
         >
-          <CloseSvg size={20} color={colors.textPrimary} />
+          {currentStep > 1 ? (
+            <Text style={styles.backBtnText}>‹ Back</Text>
+          ) : (
+            <CloseSvg size={20} color={colors.textPrimary} />
+          )}
         </TouchableOpacity>
+
         <Text variant="h3" color={colors.textPrimary} style={styles.headerTitle}>
-          Register Your Ministry
+          Register Ministry
         </Text>
-        <View style={{ width: 36 }} />
+
+        <View style={{ width: 48 }} />
+      </View>
+
+      {/* Step Progress Line on Continuous Body */}
+      <View style={styles.stepProgressContainer}>
+        <View style={styles.stepLabelRow}>
+          <Text style={styles.stepProgressLabel}>
+            STEP {currentStep} OF 3
+          </Text>
+          <Text style={styles.stepTitleLabel}>
+            {currentStep === 1
+              ? 'Identity & Vision'
+              : currentStep === 2
+              ? 'Headquarters & Location'
+              : 'Review & Confirm'}
+          </Text>
+        </View>
+
+        {/* 2px Minimalist Progress Bar */}
+        <View style={styles.progressBarTrack}>
+          <View
+            style={[
+              styles.progressBarFill,
+              {
+                width:
+                  currentStep === 1
+                    ? '33.3%'
+                    : currentStep === 2
+                    ? '66.6%'
+                    : '100%',
+              },
+            ]}
+          />
+        </View>
       </View>
 
       <KeyboardAvoidingView
@@ -136,182 +242,365 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.introCard}>
-            <Text variant="body" color={colors.textSecondary}>
-              Connect your church family, campuses, and homecell networks across cities and nations.
-            </Text>
-          </View>
-
-          {/* Section 1: Basic Identity */}
-          <View style={styles.card}>
-            <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.cardSectionLabel}>
-              MINISTRY IDENTITY
-            </Text>
-
-            <View style={styles.inputGroup}>
-              <Text variant="caption" weight="700" color={colors.textSecondary}>
-                Ministry / Church Name *
-              </Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="e.g. Grace Fellowship International"
-                placeholderTextColor={colors.textTertiary}
-                value={name}
-                onChangeText={setName}
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text variant="caption" weight="700" color={colors.textSecondary}>
-                Founder / Senior Pastor *
-              </Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="e.g. Pastor John Doe"
-                placeholderTextColor={colors.textTertiary}
-                value={founder}
-                onChangeText={setFounder}
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text variant="caption" weight="700" color={colors.textSecondary}>
-                Ministry Vision & Description
-              </Text>
-              <TextInput
-                style={[styles.textInput, styles.textArea]}
-                placeholder="Describe your ministry's core vision, spiritual focus, and mission..."
-                placeholderTextColor={colors.textTertiary}
-                multiline
-                numberOfLines={3}
-                value={description}
-                onChangeText={setDescription}
-              />
-            </View>
-          </View>
-
-          {/* Section 2: Theological Focus & Category */}
-          <View style={styles.card}>
-            <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.cardSectionLabel}>
-              THEOLOGICAL FOCUS / CATEGORY
-            </Text>
-            <View style={styles.categoryGrid}>
-              {CATEGORY_OPTIONS.map((cat) => {
-                const isSelected = cat === selectedCategory;
-                return (
-                  <TouchableOpacity
-                    key={cat}
-                    style={[styles.categoryPill, isSelected && styles.categoryPillActive]}
-                    onPress={() => setSelectedCategory(cat)}
-                    activeOpacity={0.7}
-                  >
-                    <Text
-                      variant="caption"
-                      weight={isSelected ? '700' : '500'}
-                      color={isSelected ? '#0F172A' : colors.textSecondary}
-                    >
-                      {cat}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-
-          {/* Section 3: Headquarters & Contact */}
-          <View style={styles.card}>
-            <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.cardSectionLabel}>
-              HEADQUARTERS & CONTACT
-            </Text>
-
-            <View style={styles.rowInputs}>
-              <View style={[styles.inputGroup, { flex: 1 }]}>
-                <Text variant="caption" weight="700" color={colors.textSecondary}>
-                  Headquarters City
+          {/* ============================================================= */}
+          {/* STEP 1: IDENTITY & VISION                                    */}
+          {/* ============================================================= */}
+          {currentStep === 1 && (
+            <View style={styles.stepSection}>
+              <View style={styles.sectionHeading}>
+                <Text style={styles.sectionTitle}>Ministry Identity</Text>
+                <Text style={styles.sectionSubtitle}>
+                  Enter the primary church name, leadership, and theological focus.
                 </Text>
+              </View>
+
+              {/* Ministry Name */}
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>Church / Ministry Name *</Text>
                 <TextInput
-                  style={styles.textInput}
-                  placeholder="e.g. Johannesburg"
-                  placeholderTextColor={colors.textTertiary}
-                  value={headquarters}
-                  onChangeText={setHeadquarters}
+                  style={styles.inputField}
+                  placeholder="e.g. Grace Fellowship International"
+                  placeholderTextColor="#94A3B8"
+                  value={name}
+                  onChangeText={setName}
+                  autoCapitalize="words"
                 />
               </View>
 
-              <View style={[styles.inputGroup, { flex: 1 }]}>
-                <Text variant="caption" weight="700" color={colors.textSecondary}>
-                  Country
-                </Text>
+              {/* Founder / Senior Pastor */}
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>Founder / Senior Pastor *</Text>
                 <TextInput
-                  style={styles.textInput}
-                  placeholder="e.g. South Africa"
-                  placeholderTextColor={colors.textTertiary}
+                  style={styles.inputField}
+                  placeholder="e.g. Pastor John Doe"
+                  placeholderTextColor="#94A3B8"
+                  value={founder}
+                  onChangeText={setFounder}
+                  autoCapitalize="words"
+                />
+              </View>
+
+              {/* Theological Focus / Category (Text Selector, Zero Pills) */}
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>Theological Focus / Category</Text>
+                <View style={styles.categoryList}>
+                  {CATEGORY_OPTIONS.map((cat) => {
+                    const isSelected = cat === selectedCategory;
+                    return (
+                      <TouchableOpacity
+                        key={cat}
+                        style={[
+                          styles.categoryItem,
+                          isSelected && styles.categoryItemActive,
+                        ]}
+                        onPress={() => setSelectedCategory(cat)}
+                        activeOpacity={0.7}
+                      >
+                        <View style={styles.categoryRadio}>
+                          {isSelected && <View style={styles.categoryRadioInner} />}
+                        </View>
+                        <Text
+                          style={[
+                            styles.categoryText,
+                            isSelected && styles.categoryTextActive,
+                          ]}
+                        >
+                          {cat}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+
+              {/* Ministry Vision */}
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>Ministry Vision & Mission</Text>
+                <TextInput
+                  style={[styles.inputField, styles.textAreaField]}
+                  placeholder="Describe your ministry's core doctrine, commission, and spiritual calling..."
+                  placeholderTextColor="#94A3B8"
+                  multiline
+                  numberOfLines={4}
+                  value={description}
+                  onChangeText={setDescription}
+                />
+              </View>
+
+              {/* Next Action */}
+              <TouchableOpacity
+                style={styles.primaryActionButton}
+                onPress={handleNextFromStep1}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="Continue to headquarters location"
+              >
+                <Text style={styles.primaryActionText}>
+                  Continue to Headquarters ›
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* ============================================================= */}
+          {/* STEP 2: HEADQUARTERS & CONTACT                               */}
+          {/* ============================================================= */}
+          {currentStep === 2 && (
+            <View style={styles.stepSection}>
+              <View style={styles.sectionHeading}>
+                <Text style={styles.sectionTitle}>Headquarters Location</Text>
+                <Text style={styles.sectionSubtitle}>
+                  Type a city or town to auto-populate province, country, and postal code.
+                </Text>
+              </View>
+
+              {/* City / Town Auto-Cascade Geocoding Search */}
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>Headquarters Town / City *</Text>
+                <View style={styles.searchFieldWrapper}>
+                  <SearchSvg size={16} color="#64748B" />
+                  <TextInput
+                    style={styles.searchTextInput}
+                    placeholder="Search town, suburb or city (e.g. Sandton, Soweto)..."
+                    placeholderTextColor="#94A3B8"
+                    value={townQuery}
+                    onChangeText={(val) => {
+                      setTownQuery(val);
+                      setShowTownSuggestions(true);
+                    }}
+                    onFocus={() => setShowTownSuggestions(true)}
+                  />
+                </View>
+
+                {/* Live Suggestions Overlay on Body */}
+                {showTownSuggestions && suggestions.length > 0 && (
+                  <View style={styles.suggestionsList}>
+                    {suggestions.slice(0, 6).map((item, idx) => (
+                      <TouchableOpacity
+                        key={`${item.town}_${item.country}_${idx}`}
+                        style={styles.suggestionRow}
+                        onPress={() => handleSelectTown(item)}
+                        activeOpacity={0.7}
+                      >
+                        <View style={{ flex: 1 }}>
+                          <Text style={styles.suggestionTownText}>
+                            {item.town}
+                          </Text>
+                          <Text style={styles.suggestionMetaText}>
+                            {item.province}, {item.country} • Postal Code: {item.postalCode}
+                          </Text>
+                        </View>
+                        <CheckSvg size={14} color="#0F172A" />
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+              </View>
+
+              {/* Auto-Cascaded Details (Zero Divs / Integrated on Body) */}
+              <View style={styles.rowInputs}>
+                <View style={[styles.fieldGroup, { flex: 1 }]}>
+                  <Text style={styles.fieldLabel}>Province / State</Text>
+                  <TextInput
+                    style={styles.inputField}
+                    placeholder="Province"
+                    placeholderTextColor="#94A3B8"
+                    value={headquartersProvince}
+                    onChangeText={setHeadquartersProvince}
+                  />
+                </View>
+
+                <View style={[styles.fieldGroup, { flex: 1 }]}>
+                  <Text style={styles.fieldLabel}>Postal Code</Text>
+                  <TextInput
+                    style={styles.inputField}
+                    placeholder="Code"
+                    placeholderTextColor="#94A3B8"
+                    value={postalCode}
+                    onChangeText={setPostalCode}
+                    keyboardType="numeric"
+                  />
+                </View>
+              </View>
+
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>Country</Text>
+                <TextInput
+                  style={styles.inputField}
+                  placeholder="Country"
+                  placeholderTextColor="#94A3B8"
                   value={headquartersCountry}
                   onChangeText={setHeadquartersCountry}
                 />
               </View>
-            </View>
 
-            <View style={styles.inputGroup}>
-              <Text variant="caption" weight="700" color={colors.textSecondary}>
-                Official Website (Optional)
-              </Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="https://yourchurch.org"
-                placeholderTextColor={colors.textTertiary}
-                autoCapitalize="none"
-                keyboardType="url"
-                value={website}
-                onChangeText={setWebsite}
-              />
-            </View>
-
-            <View style={styles.rowInputs}>
-              <View style={[styles.inputGroup, { flex: 1 }]}>
-                <Text variant="caption" weight="700" color={colors.textSecondary}>
-                  Contact Phone
-                </Text>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="+27 11 000 0000"
-                  placeholderTextColor={colors.textTertiary}
-                  keyboardType="phone-pad"
-                  value={contactPhone}
-                  onChangeText={setContactPhone}
-                />
+              {/* Contact Information */}
+              <View style={[styles.sectionHeading, { marginTop: 16 }]}>
+                <Text style={styles.sectionTitle}>Contact & Digital Presence</Text>
               </View>
 
-              <View style={[styles.inputGroup, { flex: 1 }]}>
-                <Text variant="caption" weight="700" color={colors.textSecondary}>
-                  Official Email
-                </Text>
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>Official Website (Optional)</Text>
                 <TextInput
-                  style={styles.textInput}
-                  placeholder="office@yourchurch.org"
-                  placeholderTextColor={colors.textTertiary}
-                  keyboardType="email-address"
+                  style={styles.inputField}
+                  placeholder="https://yourchurch.org"
+                  placeholderTextColor="#94A3B8"
                   autoCapitalize="none"
-                  value={contactEmail}
-                  onChangeText={setContactEmail}
+                  keyboardType="url"
+                  value={website}
+                  onChangeText={setWebsite}
                 />
               </View>
-            </View>
-          </View>
 
-          {/* Submit CTA */}
-          <TouchableOpacity
-            style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
-            onPress={handleSubmit}
-            disabled={isSubmitting}
-            activeOpacity={0.8}
-            accessibilityRole="button"
-            accessibilityLabel="Register Ministry"
-          >
-            <Text variant="body" weight="700" style={styles.submitButtonText}>
-              {isSubmitting ? 'REGISTERING...' : 'REGISTER & PROCEED TO ADD BRANCH'}
-            </Text>
-          </TouchableOpacity>
+              <View style={styles.rowInputs}>
+                <View style={[styles.fieldGroup, { flex: 1 }]}>
+                  <Text style={styles.fieldLabel}>Contact Phone</Text>
+                  <TextInput
+                    style={styles.inputField}
+                    placeholder="+27 11 000 0000"
+                    placeholderTextColor="#94A3B8"
+                    keyboardType="phone-pad"
+                    value={contactPhone}
+                    onChangeText={setContactPhone}
+                  />
+                </View>
+
+                <View style={[styles.fieldGroup, { flex: 1 }]}>
+                  <Text style={styles.fieldLabel}>Official Email</Text>
+                  <TextInput
+                    style={styles.inputField}
+                    placeholder="office@church.org"
+                    placeholderTextColor="#94A3B8"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    value={contactEmail}
+                    onChangeText={setContactEmail}
+                  />
+                </View>
+              </View>
+
+              {/* Action Buttons */}
+              <View style={styles.wizardActionRow}>
+                <TouchableOpacity
+                  style={styles.secondaryActionButton}
+                  onPress={() => setCurrentStep(1)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.secondaryActionText}>‹ Back</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.primaryActionButton, { flex: 1 }]}
+                  onPress={handleNextFromStep2}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.primaryActionText}>Review Details ›</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
+          {/* ============================================================= */}
+          {/* STEP 3: REVIEW & CONFIRMATION                                */}
+          {/* ============================================================= */}
+          {currentStep === 3 && (
+            <View style={styles.stepSection}>
+              <View style={styles.sectionHeading}>
+                <Text style={styles.sectionTitle}>Review & Confirm Registration</Text>
+                <Text style={styles.sectionSubtitle}>
+                  Verify your church information before publishing to the directory.
+                </Text>
+              </View>
+
+              {/* Summary Details on Continuous Body Canvas */}
+              <View style={styles.summaryList}>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>Ministry Name</Text>
+                  <Text style={styles.summaryValueBold}>{name}</Text>
+                </View>
+
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>Founder / Pastor</Text>
+                  <Text style={styles.summaryValue}>{founder}</Text>
+                </View>
+
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>Theological Focus</Text>
+                  <Text style={styles.summaryValue}>{selectedCategory}</Text>
+                </View>
+
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>Headquarters</Text>
+                  <Text style={styles.summaryValue}>
+                    {townQuery}, {headquartersProvince}, {headquartersCountry} ({postalCode})
+                  </Text>
+                </View>
+
+                {website ? (
+                  <View style={styles.summaryRow}>
+                    <Text style={styles.summaryLabel}>Website</Text>
+                    <Text style={styles.summaryValue}>{website}</Text>
+                  </View>
+                ) : null}
+
+                {contactEmail ? (
+                  <View style={styles.summaryRow}>
+                    <Text style={styles.summaryLabel}>Email</Text>
+                    <Text style={styles.summaryValue}>{contactEmail}</Text>
+                  </View>
+                ) : null}
+
+                {contactPhone ? (
+                  <View style={styles.summaryRow}>
+                    <Text style={styles.summaryLabel}>Phone</Text>
+                    <Text style={styles.summaryValue}>{contactPhone}</Text>
+                  </View>
+                ) : null}
+
+                {description ? (
+                  <View style={[styles.summaryRow, { borderBottomWidth: 0 }]}>
+                    <Text style={styles.summaryLabel}>Vision & Mission</Text>
+                    <Text style={styles.summaryDescText}>{description}</Text>
+                  </View>
+                ) : null}
+              </View>
+
+              {/* Next Step Explanation */}
+              <View style={styles.reviewNextNote}>
+                <Text style={styles.reviewNextNoteText}>
+                  After registration, you will be taken to add your first campus branch,
+                  homecell, or prayer cluster.
+                </Text>
+              </View>
+
+              {/* Action Buttons */}
+              <View style={styles.wizardActionRow}>
+                <TouchableOpacity
+                  style={styles.secondaryActionButton}
+                  onPress={() => setCurrentStep(2)}
+                  activeOpacity={0.7}
+                  disabled={isSubmitting}
+                >
+                  <Text style={styles.secondaryActionText}>‹ Edit Location</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.primaryActionButton,
+                    { flex: 1 },
+                    isSubmitting && { opacity: 0.6 },
+                  ]}
+                  onPress={handleConfirmSubmit}
+                  disabled={isSubmitting}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.primaryActionText}>
+                    {isSubmitting ? 'Registering...' : 'Confirm & Register Ministry'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -336,87 +625,263 @@ const styles = StyleSheet.create({
   closeBtn: {
     padding: spacing.xs,
   },
+  backBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
   headerTitle: {
-    fontSize: 17,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  stepProgressContainer: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: 12,
+    paddingBottom: 8,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
+  },
+  stepLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  stepProgressLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#B45309',
+    letterSpacing: 0.5,
+  },
+  stepTitleLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#0F172A',
+  },
+  progressBarTrack: {
+    height: 3,
+    backgroundColor: 'rgba(15, 23, 42, 0.08)',
+    borderRadius: 1.5,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: '#0F172A',
   },
   container: {
     flex: 1,
   },
   contentContainer: {
-    padding: spacing.lg,
-    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xxl,
   },
-  introCard: {
-    backgroundColor: 'rgba(253, 210, 35, 0.15)',
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(180, 83, 9, 0.15)',
+  stepSection: {
+    gap: 16,
   },
-  card: {
+  sectionHeading: {
+    marginBottom: 4,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#0F172A',
+    marginBottom: 2,
+  },
+  sectionSubtitle: {
+    fontSize: 13,
+    color: '#64748B',
+    lineHeight: 18,
+  },
+  fieldGroup: {
+    marginBottom: 4,
+  },
+  fieldLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#334155',
+    marginBottom: 6,
+    letterSpacing: 0.2,
+  },
+  inputField: {
     backgroundColor: '#FFFFFF',
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    ...shadow.sm,
-  },
-  cardSectionLabel: {
-    fontSize: 11,
-    marginBottom: spacing.xs,
-  },
-  inputGroup: {
-    marginTop: spacing.sm,
-  },
-  rowInputs: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  textInput: {
-    backgroundColor: '#F8FAFC',
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.12)',
     borderRadius: radius.sm,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingVertical: 10,
     fontSize: 14,
-    color: colors.textPrimary,
-    marginTop: 4,
+    color: '#0F172A',
   },
-  textArea: {
-    minHeight: 70,
+  textAreaField: {
+    minHeight: 80,
     textAlignVertical: 'top',
   },
-  categoryGrid: {
+  rowInputs: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginTop: spacing.xs,
+    gap: 12,
   },
-  categoryPill: {
-    backgroundColor: '#F1F5F9',
+  categoryList: {
+    gap: 6,
+  },
+  categoryItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
     paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
+    borderRadius: radius.sm,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
+    gap: 10,
   },
-  categoryPillActive: {
-    backgroundColor: '#FDD223',
+  categoryItemActive: {
+    borderColor: '#0F172A',
+    backgroundColor: 'rgba(15, 23, 42, 0.03)',
   },
-  submitButton: {
-    backgroundColor: '#FDD223',
-    borderRadius: radius.md,
-    paddingVertical: spacing.md,
+  categoryRadio: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    borderWidth: 1.5,
+    borderColor: '#94A3B8',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: spacing.sm,
-    marginBottom: spacing.xl,
-    ...shadow.sm,
   },
-  submitButtonDisabled: {
-    opacity: 0.6,
+  categoryRadioInner: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#0F172A',
   },
-  submitButtonText: {
+  categoryText: {
+    fontSize: 13,
+    color: '#475569',
+    fontWeight: '500',
+  },
+  categoryTextActive: {
     color: '#0F172A',
+    fontWeight: '700',
+  },
+  searchFieldWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.14)',
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.md,
+    gap: 8,
+  },
+  searchTextInput: {
+    flex: 1,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: '#0F172A',
+  },
+  suggestionsList: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.12)',
+    borderRadius: radius.sm,
+    marginTop: 4,
+  },
+  suggestionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.md,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
+  },
+  suggestionTownText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0F172A',
+    marginBottom: 1,
+  },
+  suggestionMetaText: {
+    fontSize: 11,
+    color: '#64748B',
+  },
+  summaryList: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 4,
+  },
+  summaryRow: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
+  },
+  summaryLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#64748B',
+    textTransform: 'uppercase',
     letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  summaryValue: {
+    fontSize: 14,
+    color: '#0F172A',
+  },
+  summaryValueBold: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#0F172A',
+  },
+  summaryDescText: {
+    fontSize: 13,
+    color: '#334155',
+    lineHeight: 18,
+    marginTop: 2,
+  },
+  reviewNextNote: {
+    paddingVertical: 8,
+  },
+  reviewNextNoteText: {
+    fontSize: 12,
+    color: '#64748B',
+    lineHeight: 17,
+  },
+  wizardActionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 12,
+  },
+  primaryActionButton: {
+    backgroundColor: '#0F172A',
+    borderRadius: radius.sm,
+    paddingVertical: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  primaryActionText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+  },
+  secondaryActionButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: radius.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.15)',
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  secondaryActionText: {
+    color: '#0F172A',
+    fontSize: 13,
+    fontWeight: '700',
   },
 });
