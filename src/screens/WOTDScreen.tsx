@@ -554,7 +554,7 @@ export default function WOTDScreen({ route, navigation }: any) {
               <Text style={[styles.chapterHeadingBook, { color: theme.text }]}>{selectedBook.name.toUpperCase()}</Text>
               <Text style={[styles.chapterHeadingNumber, { color: colors.accent }]}>Chapter {selectedChapter}</Text>
               <Text style={[styles.chapterMeta, { color: theme.textSecondary }]}>
-                {translation === 'web' ? 'World English Bible' : translation === 'kjv' ? 'King James Version' : 'Bible in Basic English'}
+                {TRANSLATION_SOURCES[translation]?.name || TRANSLATION_META[translation]?.name || translation.toUpperCase()}
               </Text>
             </View>
 
@@ -922,7 +922,7 @@ export default function WOTDScreen({ route, navigation }: any) {
                   <View style={{ flex: 1 }}>
                     <Text style={[styles.aaSectionLabel, { color: theme.textSecondary }]}>SELECT TRANSLATION</Text>
                     <Text style={[styles.translationSubLabel, { color: theme.textSecondary }]}>
-                      10 public domain versions • 1-tap offline download
+                      {TRANSLATIONS.length} translations & African languages • 1-tap offline download
                     </Text>
                   </View>
                   {downloadedTranslations.length > 0 && (

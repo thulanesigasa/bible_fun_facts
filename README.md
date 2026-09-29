@@ -2021,6 +2021,26 @@ To permanently eliminate Android application crashes on startup ("exégeomai kee
 
 ---
 
+### 8. Native Android Release Compilation & Full Asset Embedding
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Native%20APK-v1.0.4%20Direct%20Compilation-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Native APK Direct Compilation" />
+  <img src="https://img.shields.io/badge/Churches%20%26%20Ministries-Native%20Pre--Loaded-0284C7?style=for-the-badge&logo=church&logoColor=white" alt="Churches Pre-Loaded" />
+  <img src="https://img.shields.io/badge/Bible%20Translations-32%20Integrated%20Catalogs-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="32 Integrated Catalogs" />
+</p>
+
+To guarantee that all devices immediately reflect the latest architecture without relying on asynchronous OTA downloads:
+1. **Direct GitHub Actions Runner Compilation**:
+   - Compiles standalone native binary (`exegeomai-v1.0.4.apk`) using Java 17 Temurin and Gradle directly on `ubuntu-latest`.
+   - Embeds the full pre-populated church and ministry directory (God Embassy, Christ Embassy, Spirit Embassy, ECG The Jesus Nation Church).
+   - Embeds all 32 translation registries (isiZulu, isiXhosa, Sepedi, Afrikaans, ChiShona, The Message, NIV, ESV, etc.).
+   - Embeds the flat, div-free biometric security screen with 0px border radius logo.
+   - Embeds Hermes AST stack-safe data loaders preventing cold boot crashes.
+2. **Distribution**:
+   - Published directly to GitHub Releases under tag `v1.0.4` as an asset ready for direct download and installation.
+
+---
+
 ### Verification Commands
 ```bash
 # Run unit test suite
