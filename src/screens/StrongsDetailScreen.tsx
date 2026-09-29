@@ -14,6 +14,7 @@ import {
   getAdjacentLexiconEntries,
   getLexiconEntryByStrongs,
 } from '../data/lexiconData';
+import { getEffectivePronunciation } from '../services/greekPronunciationService';
 import { Text } from '../components/Typography';
 import { colors, spacing } from '../theme';
 
@@ -30,6 +31,11 @@ export default function StrongsDetailScreen({
   const { prev: prevEntry, next: nextEntry } = useMemo(() => {
     return getAdjacentLexiconEntries(currentEntry.strongsNumber);
   }, [currentEntry.strongsNumber]);
+
+  // Authentic phonetic pronunciation resolution
+  const effectivePronunciation = useMemo(() => {
+    return getEffectivePronunciation(currentEntry);
+  }, [currentEntry]);
 
   // Set screen title dynamically in native header (Unified Dictionary title)
   useLayoutEffect(() => {
@@ -49,7 +55,7 @@ export default function StrongsDetailScreen({
         </TouchableOpacity>
       ),
     });
-  }, [navigation, currentEntry]);
+  }, [navigation, currentEntry, effectivePronunciation]);
 
   const handleShare = async () => {
     try {
@@ -59,7 +65,7 @@ export default function StrongsDetailScreen({
         `English: ${currentEntry.englishWord || currentEntry.transliteration}\n` +
         `Definition: ${currentEntry.shortDefinition}\n\n` +
         `Part of Speech: ${currentEntry.partOfSpeech}\n` +
-        `Pronunciation: /${currentEntry.pronunciation}/ ${currentEntry.phoneticSpelling || ''}\n` +
+        `Pronunciation: /${effectivePronunciation}/ ${currentEntry.phoneticSpelling || ''}\n` +
         (currentEntry.kjvTranslations ? `KJV Translations: ${currentEntry.kjvTranslations}\n` : '') +
         (currentEntry.nasbTranslations ? `NASB Translations: ${currentEntry.nasbTranslations}\n` : '') +
         `\nExhaustive Concordance:\n${currentEntry.exhaustiveDefinition}\n\n` +
@@ -224,14 +230,16 @@ export default function StrongsDetailScreen({
               </Text>
             </View>
 
-            <View style={styles.fieldRow}>
-              <Text variant="body" weight="700" style={styles.fieldLabel}>
-                Pronunciation:
-              </Text>
-              <Text variant="body" weight="600" color="#0F172A" style={styles.fieldValue}>
-                {currentEntry.pronunciation}
-              </Text>
-            </View>
+            {effectivePronunciation ? (
+              <View style={styles.fieldRow}>
+                <Text variant="body" weight="700" style={styles.fieldLabel}>
+                  Pronunciation:
+                </Text>
+                <Text variant="body" weight="600" color="#0F172A" style={styles.fieldValue}>
+                  {effectivePronunciation}
+                </Text>
+              </View>
+            ) : null}
 
             {currentEntry.phoneticSpelling ? (
               <View style={styles.fieldRow}>

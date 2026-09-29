@@ -14,6 +14,7 @@ import {
   isCanonicalHebrewLoaded,
   isCanonicalGreekLoaded,
 } from './strongs';
+import { getEffectivePronunciation } from '../services/greekPronunciationService';
 
 export interface LexiconEntry {
   strongsNumber: string;
@@ -1070,10 +1071,19 @@ export function getBaseHebrewEntries(): LexiconEntry[] {
       if (!existing.englishWord && item.englishWord) {
         idMap.set(item.strongsNumber, { ...existing, englishWord: item.englishWord });
       }
+      if (!existing.pronunciation && item.pronunciation) {
+        idMap.set(item.strongsNumber, { ...existing, pronunciation: item.pronunciation });
+      }
     }
   }
 
   const combined = Array.from(idMap.values());
+  for (let i = 0; i < combined.length; i++) {
+    const entry = combined[i];
+    if (!entry.pronunciation || entry.pronunciation.trim() === '') {
+      entry.pronunciation = getEffectivePronunciation(entry);
+    }
+  }
   combined.sort(fastAlphaSort);
 
   _cachedBaseHebrew = combined;
@@ -1123,10 +1133,19 @@ export function getBaseGreekEntries(): LexiconEntry[] {
       if (!existing.englishWord && item.englishWord) {
         idMap.set(item.strongsNumber, { ...existing, englishWord: item.englishWord });
       }
+      if (!existing.pronunciation && item.pronunciation) {
+        idMap.set(item.strongsNumber, { ...existing, pronunciation: item.pronunciation });
+      }
     }
   }
 
   const combined = Array.from(idMap.values());
+  for (let i = 0; i < combined.length; i++) {
+    const entry = combined[i];
+    if (!entry.pronunciation || entry.pronunciation.trim() === '') {
+      entry.pronunciation = getEffectivePronunciation(entry);
+    }
+  }
   combined.sort(fastAlphaSort);
 
   _cachedBaseGreek = combined;
