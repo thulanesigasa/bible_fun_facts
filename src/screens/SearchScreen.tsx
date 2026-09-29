@@ -30,7 +30,6 @@ import {
   BlockSvg,
   IncognitoSvg,
   HeartSvg,
-  ChurchSvg,
   MapPinSvg,
 } from '../components/SvgIcons';
 import { PastoralCareModal } from '../components/PastoralCareModal';
@@ -260,11 +259,7 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
         {/* Header */}
         <View style={styles.headerRow}>
           <View style={styles.searchIconCircle}>
-            {searchScope === 'believers' ? (
-              <UsersSvg size={22} color={colors.accent} />
-            ) : (
-              <ChurchSvg size={22} color={colors.accent} />
-            )}
+            <UsersSvg size={22} color={colors.accent} />
           </View>
           <View style={styles.headerTextWrap}>
             <Text variant="h2" style={styles.title}>
@@ -585,9 +580,6 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
         {/* Churches List on Screen Body Canvas (Zero Card Divs, Zero Pills, Zero Branch/Homecell Counts) */}
         {filteredMinistries.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <View style={styles.emptyCircle}>
-              <ChurchSvg size={36} color={colors.accent} />
-            </View>
             <Text variant="h2" style={styles.emptyTitle}>
               No Matching Churches Found
             </Text>

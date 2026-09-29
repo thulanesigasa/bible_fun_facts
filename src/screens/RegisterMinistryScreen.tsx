@@ -3,14 +3,15 @@
  *
  * Step-by-Step wizard on a continuous screen body canvas (zero card divs/boxes/pills).
  * - Step 1: Ministry Identity & Vision
- * - Step 2: Headquarters Location (with automated cascading geocoding via local database)
- * - Step 3: Structured Review & Confirmation
+ * - Step 2: Headquarters Location (auto-cascading geocoding) & Contact
+ * - Step 3: Review & Confirm
  *
- * Upon registration, seamlessly navigates to RegisterBranchScreen to register
- * campuses, branches, and homecells.
+ * Contact phone: country-code dropdown + number field (strips leading zero).
+ * Province and postal code are read-only — auto-populated when town is selected.
+ * KeyboardAvoidingView uses 'height' on Android to ensure no input is hidden.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   ScrollView,
@@ -34,20 +35,35 @@ import {
   CloseSvg,
   CheckSvg,
   SearchSvg,
-  ChevronRightSvg,
 } from '../components/SvgIcons';
 
-const CATEGORY_OPTIONS = [
-  'Apostolic & Kingdom Reformation',
-  'Word of Faith & Evangelism',
-  'Prophetic & Grace Revelation',
-  'Evangelical & Charismatic',
-  'Pentecostal Fellowship',
-  'Community Bible Church',
+// ── Country code list ────────────────────────────────────────────────────────
+const COUNTRY_CODES: { code: string; dial: string; flag: string }[] = [
+  { code: 'ZA', dial: '+27',  flag: '🇿🇦' },
+  { code: 'ZW', dial: '+263', flag: '🇿🇼' },
+  { code: 'NG', dial: '+234', flag: '🇳🇬' },
+  { code: 'GH', dial: '+233', flag: '🇬🇭' },
+  { code: 'KE', dial: '+254', flag: '🇰🇪' },
+  { code: 'TZ', dial: '+255', flag: '🇹🇿' },
+  { code: 'UG', dial: '+256', flag: '🇺🇬' },
+  { code: 'ZM', dial: '+260', flag: '🇿🇲' },
+  { code: 'MW', dial: '+265', flag: '🇲🇼' },
+  { code: 'MZ', dial: '+258', flag: '🇲🇿' },
+  { code: 'BW', dial: '+267', flag: '🇧🇼' },
+  { code: 'NA', dial: '+264', flag: '🇳🇦' },
+  { code: 'SZ', dial: '+268', flag: '🇸🇿' },
+  { code: 'LS', dial: '+266', flag: '🇱🇸' },
+  { code: 'US', dial: '+1',   flag: '🇺🇸' },
+  { code: 'GB', dial: '+44',  flag: '🇬🇧' },
+  { code: 'AU', dial: '+61',  flag: '🇦🇺' },
+  { code: 'IN', dial: '+91',  flag: '🇮🇳' },
+  { code: 'BR', dial: '+55',  flag: '🇧🇷' },
+  { code: 'DE', dial: '+49',  flag: '🇩🇪' },
 ];
 
 export default function RegisterMinistryScreen({ navigation }: { navigation: any }) {
   const { showAlert } = useThemedAlert();
+  const scrollRef = useRef<ScrollView>(null);
 
   // Wizard Step: 1 = Identity, 2 = Headquarters & Contact, 3 = Review & Confirm
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
@@ -55,7 +71,6 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
   // Step 1: Identity & Vision
   const [name, setName] = useState('');
   const [founder, setFounder] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState(CATEGORY_OPTIONS[0]);
   const [description, setDescription] = useState('');
 
   // Step 2: Headquarters & Geocoding
@@ -69,12 +84,14 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
   // Contact details
   const [website, setWebsite] = useState('');
   const [contactEmail, setContactEmail] = useState('');
-  const [contactPhone, setContactPhone] = useState('');
+  const [selectedDialCode, setSelectedDialCode] = useState<string>('+27');
+  const [showDialPicker, setShowDialPicker] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   // Submission state
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Live town search for auto-cascading geocoding
+  // Live town search
   useEffect(() => {
     if (townQuery.trim().length >= 2) {
       searchTownsOnline(townQuery).then((results) => {
@@ -93,36 +110,37 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
     setShowTownSuggestions(false);
   };
 
+  /** Strip leading 0 and non-digits then combine with dial code */
+  const buildFullPhone = (): string => {
+    const digits = phoneNumber.replace(/\D/g, '').replace(/^0+/, '');
+    return digits ? `${selectedDialCode}${digits}` : '';
+  };
+
+  const handlePhoneChange = (val: string) => {
+    // Allow only digits; leading zero is stripped at build time
+    setPhoneNumber(val.replace(/[^0-9]/g, ''));
+  };
+
   const handleNextFromStep1 = () => {
     if (!name.trim()) {
-      showAlert({
-        title: 'Ministry Name Required',
-        message: 'Please provide your church or ministry name.',
-        buttons: [{ text: 'OK' }],
-      });
+      showAlert({ title: 'Ministry Name Required', message: 'Please provide your church or ministry name.', buttons: [{ text: 'OK' }] });
       return;
     }
     if (!founder.trim()) {
-      showAlert({
-        title: 'Founder / Senior Pastor Required',
-        message: 'Please specify the founder or senior pastor leading the ministry.',
-        buttons: [{ text: 'OK' }],
-      });
+      showAlert({ title: 'Founder / Senior Pastor Required', message: 'Please specify the founder or senior pastor.', buttons: [{ text: 'OK' }] });
       return;
     }
     setCurrentStep(2);
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
   };
 
   const handleNextFromStep2 = () => {
     if (!townQuery.trim()) {
-      showAlert({
-        title: 'Headquarters City Required',
-        message: 'Please specify the headquarters city or town for your ministry.',
-        buttons: [{ text: 'OK' }],
-      });
+      showAlert({ title: 'Headquarters City Required', message: 'Please specify the headquarters city.', buttons: [{ text: 'OK' }] });
       return;
     }
     setCurrentStep(3);
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
   };
 
   const handleConfirmSubmit = async () => {
@@ -136,17 +154,17 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
         description:
           description.trim() ||
           `Global Christian ministry founded by ${founder.trim()}, headquartered in ${townQuery.trim()}, ${headquartersCountry.trim()}.`,
-        category: selectedCategory,
+        category: 'Christian Ministry',
         website: website.trim(),
         contactEmail: contactEmail.trim(),
-        contactPhone: contactPhone.trim(),
+        contactPhone: buildFullPhone(),
       });
 
       setIsSubmitting(false);
 
       showAlert({
         title: 'Ministry Registered',
-        message: `${created.name} is now officially registered in the global directory. Let's add your first campus branch or homecell.`,
+        message: `${created.name} is now registered in the global directory. Let's add your first campus or homecell.`,
         buttons: [
           {
             text: 'Add Campus / Homecell',
@@ -161,17 +179,15 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
       });
     } catch {
       setIsSubmitting(false);
-      showAlert({
-        title: 'Registration Error',
-        message: 'Could not register ministry at this time. Please try again.',
-        buttons: [{ text: 'OK' }],
-      });
+      showAlert({ title: 'Registration Error', message: 'Could not register at this time. Please try again.', buttons: [{ text: 'OK' }] });
     }
   };
 
+  const selectedCodeObj = COUNTRY_CODES.find((c) => c.dial === selectedDialCode) ?? COUNTRY_CODES[0];
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Top Navigation Bar */}
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => {
@@ -183,7 +199,6 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
           }}
           style={styles.closeBtn}
           accessibilityRole="button"
-          accessibilityLabel={currentStep > 1 ? 'Go to previous step' : 'Close screen'}
         >
           {currentStep > 1 ? (
             <Text style={styles.backBtnText}>‹ Back</Text>
@@ -199,58 +214,46 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
         <View style={{ width: 48 }} />
       </View>
 
-      {/* Step Progress Line on Continuous Body */}
+      {/* Step progress */}
       <View style={styles.stepProgressContainer}>
         <View style={styles.stepLabelRow}>
-          <Text style={styles.stepProgressLabel}>
-            STEP {currentStep} OF 3
-          </Text>
+          <Text style={styles.stepProgressLabel}>STEP {currentStep} OF 3</Text>
           <Text style={styles.stepTitleLabel}>
-            {currentStep === 1
-              ? 'Identity & Vision'
-              : currentStep === 2
-              ? 'Headquarters & Location'
-              : 'Review & Confirm'}
+            {currentStep === 1 ? 'Identity & Vision' : currentStep === 2 ? 'Headquarters & Contact' : 'Review & Confirm'}
           </Text>
         </View>
-
-        {/* 2px Minimalist Progress Bar */}
         <View style={styles.progressBarTrack}>
           <View
             style={[
               styles.progressBarFill,
-              {
-                width:
-                  currentStep === 1
-                    ? '33.3%'
-                    : currentStep === 2
-                    ? '66.6%'
-                    : '100%',
-              },
+              { width: currentStep === 1 ? '33.3%' : currentStep === 2 ? '66.6%' : '100%' },
             ]}
           />
         </View>
       </View>
 
+      {/* Keyboard-aware scroll — 'height' avoidance keeps inputs above keyboard on both platforms */}
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 24}
       >
         <ScrollView
+          ref={scrollRef}
           style={styles.container}
           contentContainerStyle={styles.contentContainer}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {/* ============================================================= */}
-          {/* STEP 1: IDENTITY & VISION                                    */}
-          {/* ============================================================= */}
+          {/* ================================================================ */}
+          {/* STEP 1: IDENTITY & VISION                                         */}
+          {/* ================================================================ */}
           {currentStep === 1 && (
             <View style={styles.stepSection}>
               <View style={styles.sectionHeading}>
                 <Text style={styles.sectionTitle}>Ministry Identity</Text>
                 <Text style={styles.sectionSubtitle}>
-                  Enter the primary church name, leadership, and theological focus.
+                  Enter the primary church name, leadership, and mission.
                 </Text>
               </View>
 
@@ -264,6 +267,7 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
                   value={name}
                   onChangeText={setName}
                   autoCapitalize="words"
+                  returnKeyType="next"
                 />
               </View>
 
@@ -272,45 +276,13 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
                 <Text style={styles.fieldLabel}>Founder / Senior Pastor *</Text>
                 <TextInput
                   style={styles.inputField}
-                  placeholder="e.g. Pastor John Doe"
+                  placeholder="e.g. Prophet John Doe"
                   placeholderTextColor="#94A3B8"
                   value={founder}
                   onChangeText={setFounder}
                   autoCapitalize="words"
+                  returnKeyType="next"
                 />
-              </View>
-
-              {/* Theological Focus / Category (Text Selector, Zero Pills) */}
-              <View style={styles.fieldGroup}>
-                <Text style={styles.fieldLabel}>Theological Focus / Category</Text>
-                <View style={styles.categoryList}>
-                  {CATEGORY_OPTIONS.map((cat) => {
-                    const isSelected = cat === selectedCategory;
-                    return (
-                      <TouchableOpacity
-                        key={cat}
-                        style={[
-                          styles.categoryItem,
-                          isSelected && styles.categoryItemActive,
-                        ]}
-                        onPress={() => setSelectedCategory(cat)}
-                        activeOpacity={0.7}
-                      >
-                        <View style={styles.categoryRadio}>
-                          {isSelected && <View style={styles.categoryRadioInner} />}
-                        </View>
-                        <Text
-                          style={[
-                            styles.categoryText,
-                            isSelected && styles.categoryTextActive,
-                          ]}
-                        >
-                          {cat}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
               </View>
 
               {/* Ministry Vision */}
@@ -324,44 +296,41 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
                   numberOfLines={4}
                   value={description}
                   onChangeText={setDescription}
+                  textAlignVertical="top"
                 />
               </View>
 
-              {/* Next Action */}
               <TouchableOpacity
                 style={styles.primaryActionButton}
                 onPress={handleNextFromStep1}
                 activeOpacity={0.8}
                 accessibilityRole="button"
-                accessibilityLabel="Continue to headquarters location"
               >
-                <Text style={styles.primaryActionText}>
-                  Continue to Headquarters ›
-                </Text>
+                <Text style={styles.primaryActionText}>Continue to Headquarters ›</Text>
               </TouchableOpacity>
             </View>
           )}
 
-          {/* ============================================================= */}
-          {/* STEP 2: HEADQUARTERS & CONTACT                               */}
-          {/* ============================================================= */}
+          {/* ================================================================ */}
+          {/* STEP 2: HEADQUARTERS & CONTACT                                    */}
+          {/* ================================================================ */}
           {currentStep === 2 && (
             <View style={styles.stepSection}>
               <View style={styles.sectionHeading}>
                 <Text style={styles.sectionTitle}>Headquarters Location</Text>
                 <Text style={styles.sectionSubtitle}>
-                  Type a city or town to auto-populate province, country, and postal code.
+                  Search a city or town — province and postal code fill automatically.
                 </Text>
               </View>
 
-              {/* City / Town Auto-Cascade Geocoding Search */}
+              {/* Town search */}
               <View style={styles.fieldGroup}>
                 <Text style={styles.fieldLabel}>Headquarters Town / City *</Text>
                 <View style={styles.searchFieldWrapper}>
                   <SearchSvg size={16} color="#64748B" />
                   <TextInput
                     style={styles.searchTextInput}
-                    placeholder="Search town, suburb or city (e.g. Sandton, Soweto)..."
+                    placeholder="Search town or city (e.g. Sandton, Harare)..."
                     placeholderTextColor="#94A3B8"
                     value={townQuery}
                     onChangeText={(val) => {
@@ -369,10 +338,10 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
                       setShowTownSuggestions(true);
                     }}
                     onFocus={() => setShowTownSuggestions(true)}
+                    returnKeyType="search"
                   />
                 </View>
 
-                {/* Live Suggestions Overlay on Body */}
                 {showTownSuggestions && suggestions.length > 0 && (
                   <View style={styles.suggestionsList}>
                     {suggestions.slice(0, 6).map((item, idx) => (
@@ -383,11 +352,9 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
                         activeOpacity={0.7}
                       >
                         <View style={{ flex: 1 }}>
-                          <Text style={styles.suggestionTownText}>
-                            {item.town}
-                          </Text>
+                          <Text style={styles.suggestionTownText}>{item.town}</Text>
                           <Text style={styles.suggestionMetaText}>
-                            {item.province}, {item.country} • Postal Code: {item.postalCode}
+                            {item.province}, {item.country} · {item.postalCode}
                           </Text>
                         </View>
                         <CheckSvg size={14} color="#0F172A" />
@@ -397,48 +364,39 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
                 )}
               </View>
 
-              {/* Auto-Cascaded Details (Zero Divs / Integrated on Body) */}
+              {/* Province & Postal — read-only, auto-populated */}
               <View style={styles.rowInputs}>
                 <View style={[styles.fieldGroup, { flex: 1 }]}>
                   <Text style={styles.fieldLabel}>Province / State</Text>
-                  <TextInput
-                    style={styles.inputField}
-                    placeholder="Province"
-                    placeholderTextColor="#94A3B8"
-                    value={headquartersProvince}
-                    onChangeText={setHeadquartersProvince}
-                  />
+                  <View style={[styles.inputField, styles.readonlyField]}>
+                    <Text style={styles.readonlyText} numberOfLines={1}>
+                      {headquartersProvince || '—'}
+                    </Text>
+                  </View>
                 </View>
 
-                <View style={[styles.fieldGroup, { flex: 1 }]}>
+                <View style={[styles.fieldGroup, { flex: 0.55 }]}>
                   <Text style={styles.fieldLabel}>Postal Code</Text>
-                  <TextInput
-                    style={styles.inputField}
-                    placeholder="Code"
-                    placeholderTextColor="#94A3B8"
-                    value={postalCode}
-                    onChangeText={setPostalCode}
-                    keyboardType="numeric"
-                  />
+                  <View style={[styles.inputField, styles.readonlyField]}>
+                    <Text style={styles.readonlyText}>{postalCode || '—'}</Text>
+                  </View>
                 </View>
               </View>
 
+              {/* Country — read-only from geocode */}
               <View style={styles.fieldGroup}>
                 <Text style={styles.fieldLabel}>Country</Text>
-                <TextInput
-                  style={styles.inputField}
-                  placeholder="Country"
-                  placeholderTextColor="#94A3B8"
-                  value={headquartersCountry}
-                  onChangeText={setHeadquartersCountry}
-                />
+                <View style={[styles.inputField, styles.readonlyField]}>
+                  <Text style={styles.readonlyText}>{headquartersCountry || '—'}</Text>
+                </View>
               </View>
 
-              {/* Contact Information */}
-              <View style={[styles.sectionHeading, { marginTop: 16 }]}>
+              {/* ── Contact ── */}
+              <View style={[styles.sectionHeading, { marginTop: 8 }]}>
                 <Text style={styles.sectionTitle}>Contact & Digital Presence</Text>
               </View>
 
+              {/* Website */}
               <View style={styles.fieldGroup}>
                 <Text style={styles.fieldLabel}>Official Website (Optional)</Text>
                 <TextInput
@@ -449,37 +407,93 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
                   keyboardType="url"
                   value={website}
                   onChangeText={setWebsite}
+                  returnKeyType="next"
                 />
               </View>
 
-              <View style={styles.rowInputs}>
-                <View style={[styles.fieldGroup, { flex: 1 }]}>
-                  <Text style={styles.fieldLabel}>Contact Phone</Text>
+              {/* Contact phone: country code dropdown + number */}
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>Contact Phone (Optional)</Text>
+                <View style={styles.phoneRow}>
+                  {/* Dial code picker toggle */}
+                  <TouchableOpacity
+                    style={styles.dialCodeButton}
+                    onPress={() => setShowDialPicker((v) => !v)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.dialCodeText}>
+                      {selectedCodeObj.flag} {selectedCodeObj.dial}
+                    </Text>
+                    <Text style={styles.dialChevron}>{showDialPicker ? '▲' : '▼'}</Text>
+                  </TouchableOpacity>
+
+                  {/* Number input — strips leading 0 on change */}
                   <TextInput
-                    style={styles.inputField}
-                    placeholder="+27 11 000 0000"
+                    style={[styles.inputField, styles.phoneNumberInput]}
+                    placeholder="11 000 0000"
                     placeholderTextColor="#94A3B8"
-                    keyboardType="phone-pad"
-                    value={contactPhone}
-                    onChangeText={setContactPhone}
+                    keyboardType="number-pad"
+                    value={phoneNumber}
+                    onChangeText={handlePhoneChange}
+                    returnKeyType="next"
+                    maxLength={15}
                   />
                 </View>
 
-                <View style={[styles.fieldGroup, { flex: 1 }]}>
-                  <Text style={styles.fieldLabel}>Official Email</Text>
-                  <TextInput
-                    style={styles.inputField}
-                    placeholder="office@church.org"
-                    placeholderTextColor="#94A3B8"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    value={contactEmail}
-                    onChangeText={setContactEmail}
-                  />
-                </View>
+                {/* Dial code dropdown list */}
+                {showDialPicker && (
+                  <ScrollView
+                    style={styles.dialPickerList}
+                    nestedScrollEnabled
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator
+                  >
+                    {COUNTRY_CODES.map((c) => (
+                      <TouchableOpacity
+                        key={c.code}
+                        style={[
+                          styles.dialPickerRow,
+                          c.dial === selectedDialCode && styles.dialPickerRowActive,
+                        ]}
+                        onPress={() => {
+                          setSelectedDialCode(c.dial);
+                          setShowDialPicker(false);
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.dialPickerText}>
+                          {c.flag}  {c.dial}
+                        </Text>
+                        {c.dial === selectedDialCode && (
+                          <CheckSvg size={12} color="#0F172A" />
+                        )}
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                )}
+
+                {phoneNumber.length > 0 && (
+                  <Text style={styles.phonePreview}>
+                    Full number: {buildFullPhone()}
+                  </Text>
+                )}
               </View>
 
-              {/* Action Buttons */}
+              {/* Email */}
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>Official Email (Optional)</Text>
+                <TextInput
+                  style={styles.inputField}
+                  placeholder="office@church.org"
+                  placeholderTextColor="#94A3B8"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  value={contactEmail}
+                  onChangeText={setContactEmail}
+                  returnKeyType="done"
+                />
+              </View>
+
               <View style={styles.wizardActionRow}>
                 <TouchableOpacity
                   style={styles.secondaryActionButton}
@@ -500,19 +514,18 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
             </View>
           )}
 
-          {/* ============================================================= */}
-          {/* STEP 3: REVIEW & CONFIRMATION                                */}
-          {/* ============================================================= */}
+          {/* ================================================================ */}
+          {/* STEP 3: REVIEW & CONFIRM                                          */}
+          {/* ================================================================ */}
           {currentStep === 3 && (
             <View style={styles.stepSection}>
               <View style={styles.sectionHeading}>
-                <Text style={styles.sectionTitle}>Review & Confirm Registration</Text>
+                <Text style={styles.sectionTitle}>Review & Confirm</Text>
                 <Text style={styles.sectionSubtitle}>
                   Verify your church information before publishing to the directory.
                 </Text>
               </View>
 
-              {/* Summary Details on Continuous Body Canvas */}
               <View style={styles.summaryList}>
                 <View style={styles.summaryRow}>
                   <Text style={styles.summaryLabel}>Ministry Name</Text>
@@ -522,11 +535,6 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
                 <View style={styles.summaryRow}>
                   <Text style={styles.summaryLabel}>Founder / Pastor</Text>
                   <Text style={styles.summaryValue}>{founder}</Text>
-                </View>
-
-                <View style={styles.summaryRow}>
-                  <Text style={styles.summaryLabel}>Theological Focus</Text>
-                  <Text style={styles.summaryValue}>{selectedCategory}</Text>
                 </View>
 
                 <View style={styles.summaryRow}>
@@ -550,10 +558,10 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
                   </View>
                 ) : null}
 
-                {contactPhone ? (
+                {buildFullPhone() ? (
                   <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>Phone</Text>
-                    <Text style={styles.summaryValue}>{contactPhone}</Text>
+                    <Text style={styles.summaryValue}>{buildFullPhone()}</Text>
                   </View>
                 ) : null}
 
@@ -565,15 +573,12 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
                 ) : null}
               </View>
 
-              {/* Next Step Explanation */}
               <View style={styles.reviewNextNote}>
                 <Text style={styles.reviewNextNoteText}>
-                  After registration, you will be taken to add your first campus branch,
-                  homecell, or prayer cluster.
+                  After registration you will be taken to add your first campus branch, homecell, or prayer cluster.
                 </Text>
               </View>
 
-              {/* Action Buttons */}
               <View style={styles.wizardActionRow}>
                 <TouchableOpacity
                   style={styles.secondaryActionButton}
@@ -585,11 +590,7 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[
-                    styles.primaryActionButton,
-                    { flex: 1 },
-                    isSubmitting && { opacity: 0.6 },
-                  ]}
+                  style={[styles.primaryActionButton, { flex: 1 }, isSubmitting && { opacity: 0.6 }]}
                   onPress={handleConfirmSubmit}
                   disabled={isSubmitting}
                   activeOpacity={0.8}
@@ -608,10 +609,7 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#F8FAFC',
-  },
+  safeArea: { flex: 1, backgroundColor: '#F8FAFC' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -622,18 +620,9 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(15, 23, 42, 0.08)',
     backgroundColor: '#FFFFFF',
   },
-  closeBtn: {
-    padding: spacing.xs,
-  },
-  backBtnText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#0F172A',
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-  },
+  closeBtn: { padding: spacing.xs },
+  backBtnText: { fontSize: 14, fontWeight: '700', color: '#0F172A' },
+  headerTitle: { fontSize: 16, fontWeight: '700', flex: 1, textAlign: 'center' },
   stepProgressContainer: {
     paddingHorizontal: spacing.lg,
     paddingTop: 12,
@@ -648,62 +637,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 6,
   },
-  stepProgressLabel: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#B45309',
-    letterSpacing: 0.5,
-  },
-  stepTitleLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#0F172A',
-  },
-  progressBarTrack: {
-    height: 3,
-    backgroundColor: 'rgba(15, 23, 42, 0.08)',
-    borderRadius: 1.5,
-    overflow: 'hidden',
-  },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: '#0F172A',
-  },
-  container: {
-    flex: 1,
-  },
-  contentContainer: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.xxl,
-  },
-  stepSection: {
-    gap: 16,
-  },
-  sectionHeading: {
-    marginBottom: 4,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#0F172A',
-    marginBottom: 2,
-  },
-  sectionSubtitle: {
-    fontSize: 13,
-    color: '#64748B',
-    lineHeight: 18,
-  },
-  fieldGroup: {
-    marginBottom: 4,
-  },
-  fieldLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#334155',
-    marginBottom: 6,
-    letterSpacing: 0.2,
-  },
+  stepProgressLabel: { fontSize: 10, fontWeight: '800', color: '#B45309', letterSpacing: 0.5 },
+  stepTitleLabel: { fontSize: 12, fontWeight: '600', color: '#0F172A' },
+  progressBarTrack: { height: 3, backgroundColor: 'rgba(15, 23, 42, 0.08)', borderRadius: 1.5, overflow: 'hidden' },
+  progressBarFill: { height: '100%', backgroundColor: '#0F172A' },
+  container: { flex: 1 },
+  contentContainer: { paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: 120 },
+  stepSection: { gap: 16 },
+  sectionHeading: { marginBottom: 4 },
+  sectionTitle: { fontSize: 18, fontWeight: '800', color: '#0F172A', marginBottom: 2 },
+  sectionSubtitle: { fontSize: 13, color: '#64748B', lineHeight: 18 },
+  fieldGroup: { marginBottom: 4 },
+  fieldLabel: { fontSize: 12, fontWeight: '700', color: '#334155', marginBottom: 6, letterSpacing: 0.2 },
   inputField: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
@@ -714,56 +659,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#0F172A',
   },
-  textAreaField: {
-    minHeight: 80,
-    textAlignVertical: 'top',
-  },
-  rowInputs: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  categoryList: {
-    gap: 6,
-  },
-  categoryItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    borderRadius: radius.sm,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    gap: 10,
-  },
-  categoryItemActive: {
-    borderColor: '#0F172A',
+  textAreaField: { minHeight: 80, textAlignVertical: 'top' },
+  readonlyField: {
     backgroundColor: 'rgba(15, 23, 42, 0.03)',
-  },
-  categoryRadio: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    borderWidth: 1.5,
-    borderColor: '#94A3B8',
-    alignItems: 'center',
+    borderColor: 'rgba(15, 23, 42, 0.07)',
     justifyContent: 'center',
   },
-  categoryRadioInner: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#0F172A',
-  },
-  categoryText: {
-    fontSize: 13,
-    color: '#475569',
-    fontWeight: '500',
-  },
-  categoryTextActive: {
-    color: '#0F172A',
-    fontWeight: '700',
-  },
+  readonlyText: { fontSize: 14, color: '#475569' },
+  rowInputs: { flexDirection: 'row', gap: 12 },
   searchFieldWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -774,12 +677,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     gap: 8,
   },
-  searchTextInput: {
-    flex: 1,
-    paddingVertical: 10,
-    fontSize: 14,
-    color: '#0F172A',
-  },
+  searchTextInput: { flex: 1, paddingVertical: 10, fontSize: 14, color: '#0F172A' },
   suggestionsList: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
@@ -796,66 +694,64 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(15, 23, 42, 0.06)',
   },
-  suggestionTownText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#0F172A',
-    marginBottom: 1,
-  },
-  suggestionMetaText: {
-    fontSize: 11,
-    color: '#64748B',
-  },
-  summaryList: {
+  suggestionTownText: { fontSize: 13, fontWeight: '700', color: '#0F172A', marginBottom: 1 },
+  suggestionMetaText: { fontSize: 11, color: '#64748B' },
+
+  // Phone
+  phoneRow: { flexDirection: 'row', gap: 8, alignItems: 'stretch' },
+  dialCodeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
+    borderColor: 'rgba(15, 23, 42, 0.12)',
     borderRadius: radius.sm,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    minWidth: 90,
+  },
+  dialCodeText: { fontSize: 13, fontWeight: '700', color: '#0F172A' },
+  dialChevron: { fontSize: 9, color: '#64748B' },
+  phoneNumberInput: { flex: 1 },
+  dialPickerList: {
+    maxHeight: 200,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.12)',
+    borderRadius: radius.sm,
+    marginTop: 4,
+  },
+  dialPickerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
-    paddingVertical: 4,
+    paddingVertical: 9,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.05)',
+  },
+  dialPickerRowActive: { backgroundColor: 'rgba(15, 23, 42, 0.04)' },
+  dialPickerText: { fontSize: 13, color: '#0F172A' },
+  phonePreview: { fontSize: 11, color: '#64748B', marginTop: 4, fontStyle: 'italic' },
+
+  // Summary
+  summaryList: {
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(15, 23, 42, 0.07)',
   },
   summaryRow: {
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(15, 23, 42, 0.06)',
   },
-  summaryLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#64748B',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 2,
-  },
-  summaryValue: {
-    fontSize: 14,
-    color: '#0F172A',
-  },
-  summaryValueBold: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#0F172A',
-  },
-  summaryDescText: {
-    fontSize: 13,
-    color: '#334155',
-    lineHeight: 18,
-    marginTop: 2,
-  },
-  reviewNextNote: {
-    paddingVertical: 8,
-  },
-  reviewNextNoteText: {
-    fontSize: 12,
-    color: '#64748B',
-    lineHeight: 17,
-  },
-  wizardActionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginTop: 12,
-  },
+  summaryLabel: { fontSize: 10, fontWeight: '700', color: '#64748B', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 2 },
+  summaryValue: { fontSize: 14, color: '#0F172A' },
+  summaryValueBold: { fontSize: 15, fontWeight: '800', color: '#0F172A' },
+  summaryDescText: { fontSize: 13, color: '#334155', lineHeight: 18, marginTop: 2 },
+  reviewNextNote: { paddingVertical: 8 },
+  reviewNextNoteText: { fontSize: 12, color: '#64748B', lineHeight: 17 },
+  wizardActionRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 12 },
   primaryActionButton: {
     backgroundColor: '#0F172A',
     borderRadius: radius.sm,
@@ -863,12 +759,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  primaryActionText: {
-    color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '700',
-    letterSpacing: 0.3,
-  },
+  primaryActionText: { color: '#FFFFFF', fontSize: 13, fontWeight: '700', letterSpacing: 0.3 },
   secondaryActionButton: {
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -879,9 +770,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  secondaryActionText: {
-    color: '#0F172A',
-    fontSize: 13,
-    fontWeight: '700',
-  },
+  secondaryActionText: { color: '#0F172A', fontSize: 13, fontWeight: '700' },
 });
