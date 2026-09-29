@@ -1152,6 +1152,34 @@ export function getBaseGreekEntries(): LexiconEntry[] {
   return _cachedBaseGreek;
 }
 
+let _letterBucketsAll: Map<string, LexiconEntry[]> | null = null;
+
+function getLetterBucketsForSource(source: LexiconEntry[]): Map<string, LexiconEntry[]> {
+  if (source === _cachedAllConcordance && _letterBucketsAll) {
+    return _letterBucketsAll;
+  }
+  const buckets = new Map<string, LexiconEntry[]>();
+  for (let i = 0; i < source.length; i++) {
+    const entry = source[i];
+    const letter = (entry.englishWord || entry.transliteration).trim().charAt(0).toUpperCase();
+    let bucket = buckets.get(letter);
+    if (!bucket) {
+      bucket = [];
+      buckets.set(letter, bucket);
+    }
+    bucket.push(entry);
+  }
+  if (source === _cachedAllConcordance) {
+    _letterBucketsAll = buckets;
+  }
+  return buckets;
+}
+
+export function getCuratedStarterConcordance(): LexiconEntry[] {
+  if (_cachedAllConcordance) return _cachedAllConcordance;
+  return STRONGS_A_TO_Z_ENTRIES;
+}
+
 export function getAllConcordanceEntries(): LexiconEntry[] {
   if (_cachedAllConcordance) return _cachedAllConcordance;
 
@@ -1168,6 +1196,9 @@ export function getAllConcordanceEntries(): LexiconEntry[] {
   for (let i = 0; i < combined.length; i++) {
     _strongsNumberMap.set(combined[i].strongsNumber.toUpperCase(), combined[i]);
   }
+
+  // Pre-build letter buckets for instantaneous O(1) letter filtering
+  getLetterBucketsForSource(combined);
 
   return _cachedAllConcordance;
 }
@@ -1192,6 +1223,12 @@ export function searchConcordance(
   // Instant O(1) return when no search or letter filter is active
   if (!q && !targetLetter) {
     return source;
+  }
+
+  // Instant O(1) letter bucket retrieval when no search query is typed
+  if (!q && targetLetter) {
+    const buckets = getLetterBucketsForSource(source);
+    return buckets.get(targetLetter) || [];
   }
 
   return source.filter((entry) => {

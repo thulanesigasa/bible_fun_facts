@@ -30,10 +30,13 @@ import {
   BlockSvg,
   IncognitoSvg,
   HeartSvg,
+  ChurchSvg,
+  MapPinSvg,
 } from '../components/SvgIcons';
 import { PastoralCareModal } from '../components/PastoralCareModal';
 import { PastoralCareService } from '../services/pastoralCareService';
 import { ContentModerationService } from '../services/contentModerationService';
+import { getAllMinistries, Ministry } from '../services/ministryService';
 
 type FilterCategory = 'All' | 'Scholars' | 'Pastors' | 'Exegesis' | 'Linguistics';
 
@@ -48,6 +51,8 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
   const [reportingUser, setReportingUser] = useState<CommunityUser | null>(null);
   const [selectedReportReason, setSelectedReportReason] = useState<'harassment' | 'inappropriate' | 'spam' | 'impersonation' | 'other'>('harassment');
   const [showPastoralModal, setShowPastoralModal] = useState<boolean>(false);
+  const [searchScope, setSearchScope] = useState<'believers' | 'ministries'>('believers');
+  const [ministries, setMinistries] = useState<Ministry[]>([]);
 
   const distressAnalysis = useMemo(() => {
     return PastoralCareService.checkQueryForDistress(searchText);
@@ -66,6 +71,33 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
     isPrivateStudyMode,
     showStreaksPublicly,
   } = useUser();
+
+  const loadMinistries = async () => {
+    const list = await getAllMinistries();
+    setMinistries(list);
+  };
+
+  useEffect(() => {
+    loadMinistries();
+    if (navigation?.addListener) {
+      const unsub = navigation.addListener('focus', loadMinistries);
+      return unsub;
+    }
+  }, [navigation]);
+
+  const filteredMinistries = useMemo(() => {
+    const q = searchText.trim().toLowerCase();
+    if (!q) return ministries;
+    return ministries.filter(
+      (m) =>
+        m.name.toLowerCase().includes(q) ||
+        m.founder.toLowerCase().includes(q) ||
+        m.headquarters.toLowerCase().includes(q) ||
+        m.headquartersCountry.toLowerCase().includes(q) ||
+        m.category.toLowerCase().includes(q) ||
+        m.description.toLowerCase().includes(q)
+    );
+  }, [ministries, searchText]);
 
   const fetchLiveProfiles = async () => {
     setLoading(true);
@@ -228,14 +260,65 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
         {/* Header */}
         <View style={styles.headerRow}>
           <View style={styles.searchIconCircle}>
-            <UsersSvg size={22} color={colors.accent} />
+            {searchScope === 'believers' ? (
+              <UsersSvg size={22} color={colors.accent} />
+            ) : (
+              <ChurchSvg size={22} color={colors.accent} />
+            )}
           </View>
           <View style={styles.headerTextWrap}>
-            <Text variant="h2" style={styles.title}>Believers & Scholars</Text>
+            <Text variant="h2" style={styles.title}>
+              {searchScope === 'believers' ? 'Believers & Scholars' : 'Ministries & Churches'}
+            </Text>
             <Text variant="body" color={colors.textSecondary} style={styles.subtitle}>
-              Search, follow, and discover students of the Word
+              {searchScope === 'believers'
+                ? 'Search, follow, and discover students of the Word'
+                : 'Discover church families, campuses, and registered homecells'}
             </Text>
           </View>
+        </View>
+
+        {/* Search Scope Switcher Segmented Control */}
+        <View style={styles.scopeToggleContainer}>
+          <TouchableOpacity
+            style={[styles.scopeBtn, searchScope === 'believers' && styles.scopeBtnActive]}
+            onPress={() => setSearchScope('believers')}
+            activeOpacity={0.7}
+            accessibilityRole="tab"
+            accessibilityLabel="Believers and Scholars Search"
+          >
+            <UsersSvg
+              size={14}
+              color={searchScope === 'believers' ? '#0F172A' : colors.textSecondary}
+            />
+            <Text
+              variant="caption"
+              weight={searchScope === 'believers' ? '800' : '600'}
+              color={searchScope === 'believers' ? '#0F172A' : colors.textSecondary}
+            >
+              BELIEVERS
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.scopeBtn, searchScope === 'ministries' && styles.scopeBtnActive]}
+            onPress={() => setSearchScope('ministries')}
+            activeOpacity={0.7}
+            accessibilityRole="tab"
+            accessibilityLabel="Ministries and Churches Directory"
+          >
+            <ChurchSvg
+              size={14}
+              color={searchScope === 'ministries' ? '#0F172A' : colors.textSecondary}
+            />
+            <Text
+              variant="caption"
+              weight={searchScope === 'ministries' ? '800' : '600'}
+              color={searchScope === 'ministries' ? '#0F172A' : colors.textSecondary}
+            >
+              MINISTRIES & CHURCHES
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Incognito Study Mode Active Banner */}
@@ -260,7 +343,11 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
           <SearchSvg size={18} color={colors.accent} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search scholars, @handles, Greek, Hebrew..."
+            placeholder={
+              searchScope === 'believers'
+                ? 'Search scholars, @handles, Greek, Hebrew...'
+                : 'Search churches, pastors, towns (e.g. God Embassy, Sandton)...'
+            }
             placeholderTextColor={colors.textTertiary}
             value={searchText}
             onChangeText={setSearchText}
@@ -306,13 +393,16 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
           </View>
         )}
 
-        {/* Filter Categories */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filterTabsScroll}
-          style={styles.filterRow}
-        >
+        {/* Scope Branch: Believers vs Ministries */}
+        {searchScope === 'believers' ? (
+          <>
+            {/* Filter Categories */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.filterTabsScroll}
+              style={styles.filterRow}
+            >
           {FILTER_CATEGORIES.map((cat) => {
             const isActive = activeCategory === cat;
             return (
@@ -453,7 +543,140 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
             })}
           </View>
         )}
-      </ScrollView>
+      </>
+    ) : (
+      /* Scope 2: Ministries & Churches Directory */
+      <View style={styles.ministriesScopeContainer}>
+        {/* Action Banner: Register Your Ministry */}
+        <View style={styles.registerMinistryHeroCard}>
+          <View style={styles.regCardHeader}>
+            <View style={styles.churchIconBadge}>
+              <ChurchSvg size={22} color="#B45309" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text variant="body" weight="700" color={colors.textPrimary}>
+                Register Your Ministry
+              </Text>
+              <Text variant="caption" color={colors.textSecondary}>
+                Connect your church family, regional branches, and homecell clusters.
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.regCardActionRow}>
+            <TouchableOpacity
+              style={styles.regActionBtn}
+              onPress={() => navigation.navigate('RegisterMinistry')}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel="Register Your Ministry"
+            >
+              <Text variant="caption" weight="700" style={styles.regActionBtnText}>
+                + REGISTER YOUR MINISTRY
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.mapActionBtn}
+              onPress={() => navigation.navigate('BranchMap', {})}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel="Explore Church Map"
+            >
+              <MapPinSvg size={14} color="#0F172A" />
+              <Text variant="caption" weight="700" style={styles.mapActionBtnText}>
+                RADAR MAP
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Results Counter */}
+        <View style={styles.resultsMetaRow}>
+          <Text variant="caption" color={colors.textSecondary}>
+            {filteredMinistries.length} church organization{filteredMinistries.length !== 1 ? 's' : ''} active
+          </Text>
+        </View>
+
+        {/* Ministry Cards List */}
+        {filteredMinistries.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <View style={styles.emptyCircle}>
+              <ChurchSvg size={36} color={colors.accent} />
+            </View>
+            <Text variant="h2" style={styles.emptyTitle}>
+              No Matching Churches Found
+            </Text>
+            <Text variant="body" color={colors.textSecondary} align="center" style={styles.emptySub}>
+              Is your church or ministry not listed yet? Tap above to register your ministry and pin your campuses.
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.ministryCardsList}>
+            {filteredMinistries.map((m) => (
+              <TouchableOpacity
+                key={m.id}
+                style={[styles.ministryCard, shadow.sm]}
+                onPress={() => navigation.navigate('MinistryDetail', { ministryId: m.id })}
+                activeOpacity={0.85}
+                accessibilityRole="button"
+                accessibilityLabel={`View details for ${m.name}`}
+              >
+                <View style={styles.ministryCardTop}>
+                  <View style={styles.minCategoryBadge}>
+                    <Text variant="caption" weight="700" style={styles.minCategoryBadgeText}>
+                      {m.category.toUpperCase()}
+                    </Text>
+                  </View>
+                  <Text variant="caption" color={colors.textSecondary}>
+                    {m.headquarters}
+                  </Text>
+                </View>
+
+                <Text variant="h3" color={colors.textPrimary} style={styles.ministryCardName}>
+                  {m.name}
+                </Text>
+
+                <Text variant="caption" weight="700" color="#B45309" style={styles.ministryCardFounder}>
+                  Senior Pastor / Founder: {m.founder}
+                </Text>
+
+                <Text
+                  variant="caption"
+                  color={colors.textSecondary}
+                  numberOfLines={2}
+                  style={styles.ministryCardDesc}
+                >
+                  {m.description}
+                </Text>
+
+                <View style={styles.ministryCardFooter}>
+                  <View style={styles.statCounters}>
+                    <Text variant="caption" weight="700" color={colors.textPrimary}>
+                      {m.branchesCount} Branches
+                    </Text>
+                    <Text variant="caption" color={colors.textSecondary}>
+                      {' '}•{' '}
+                    </Text>
+                    <Text variant="caption" weight="700" color={colors.textPrimary}>
+                      {m.homecellsCount} Homecells
+                    </Text>
+                  </View>
+
+                  <View style={styles.exploreLink}>
+                    <Text variant="caption" weight="700" style={styles.exploreLinkText}>
+                      EXPLORE BRANCHES
+                    </Text>
+                    <ChevronRightSvg size={14} color="#0F172A" />
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </View>
+    )}
+  </ScrollView>
 
       {/* Slide-Up Profile Inspection Modal */}
       <Modal
@@ -1197,5 +1420,148 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.08)',
+  },
+  // Scope Switcher Styles
+  scopeToggleContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    borderRadius: radius.md,
+    padding: 4,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
+    gap: 6,
+  },
+  scopeBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    borderRadius: 8,
+    gap: 6,
+  },
+  scopeBtnActive: {
+    backgroundColor: '#FDD223',
+  },
+  // Ministry Directory Styles
+  ministriesScopeContainer: {
+    gap: spacing.sm,
+  },
+  registerMinistryHeroCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: radius.md,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
+    marginBottom: spacing.xs,
+    ...shadow.sm,
+  },
+  regCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  churchIconBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: 'rgba(253, 210, 35, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  regCardActionRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  regActionBtn: {
+    flex: 1,
+    backgroundColor: '#FDD223',
+    paddingVertical: 9,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  regActionBtnText: {
+    fontSize: 11,
+    color: '#0F172A',
+  },
+  mapActionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 8,
+  },
+  mapActionBtnText: {
+    fontSize: 11,
+    color: '#0F172A',
+  },
+  ministryCardsList: {
+    gap: spacing.sm,
+  },
+  ministryCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: radius.md,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
+  },
+  ministryCardTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  minCategoryBadge: {
+    backgroundColor: 'rgba(253, 210, 35, 0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  minCategoryBadgeText: {
+    fontSize: 9,
+    color: '#B45309',
+  },
+  ministryCardName: {
+    fontSize: 17,
+    marginVertical: 2,
+  },
+  ministryCardFounder: {
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  ministryCardDesc: {
+    fontSize: 12,
+    lineHeight: 17,
+    marginBottom: spacing.sm,
+  },
+  ministryCardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: spacing.xs,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(15, 23, 42, 0.05)',
+  },
+  statCounters: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  exploreLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#FDD223',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  exploreLinkText: {
+    fontSize: 10,
+    color: '#0F172A',
   },
 });
