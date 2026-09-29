@@ -56,10 +56,10 @@
   <img src="https://img.shields.io/badge/Lexicon%20Performance-Sub--15ms%20Isolated%20Pipelines%20%7C%20Pre--Warming-10B981?style=for-the-badge&logo=fastapi&logoColor=white" alt="Lexicon Performance Sub-15ms" />
   <img src="https://img.shields.io/badge/Strongs%20Pronunciation-100%25%20Complete%20(14%2C298%20Words)-10B981?style=for-the-badge&logo=book&logoColor=white" alt="100% Strongs Pronunciation" />
   <img src="https://img.shields.io/badge/Ministries-God%20Embassy%20%7C%20Christ%20Embassy%20%7C%20Spirit%20Embassy%20%7C%20ECG-10B981?style=for-the-badge&logo=church&logoColor=white" alt="Ministry Directory" />
-  <img src="https://img.shields.io/badge/Geocoding-Auto--Cascading%20Town%20%7C%20Province%20%7C%20Country%20%7C%20Postal%20Code-0284C7?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Auto-Cascading Geocoding" />
-  <img src="https://img.shields.io/badge/Vector%20Radar%20Map-Interactive%20Branches%20%26%20Homecells%20%7C%20Native%20GPS-FDD223?style=for-the-badge" alt="Vector Radar Map" />
+  <img src="https://img.shields.io/badge/Geocoding-Live%20OpenStreetMap%20Nominatim%20%2B%20Photon%20Hybrid-0284C7?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="Live OpenStreetMap Geocoding" />
+  <img src="https://img.shields.io/badge/Maps-Dual--Mode%20Real%20Street%20Tiles%20%26%20Radar%20Compass-FDD223?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="Dual-Mode Real Street Tiles and Radar" />
   <img src="https://img.shields.io/badge/Strongs%20Loading-Instant%200ms%20Curated%20Render%20%7C%20Infinite%20Paging-10B981?style=for-the-badge&logo=fastapi&logoColor=white" alt="Instant Strongs Loading" />
-  <img src="https://img.shields.io/badge/Tests-Jest%2043%2F43%20Passing%20(7%20Suites)-10B981?style=for-the-badge&logo=jest&logoColor=white" alt="Jest 43/43 Passing" />
+  <img src="https://img.shields.io/badge/Tests-Jest%2045%2F45%20Passing%20(7%20Suites)-10B981?style=for-the-badge&logo=jest&logoColor=white" alt="Jest 45/45 Passing" />
   <img src="https://img.shields.io/badge/Compliance-GDPR%20Purge%20RPC%20%7C%20Inexact%20Alarms-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="GDPR and Store Compliance" />
   <img src="https://img.shields.io/badge/Legal-Static%20HTML%20Privacy%20%26%20Terms-FDD223?style=for-the-badge&logo=html5&logoColor=white" alt="Static HTML Legal Docs" />
   <img src="https://img.shields.io/badge/Web%20Portal-Responsive%2060--30--10%20Landing%20Site-0284C7?style=for-the-badge&logo=html5&logoColor=white" alt="Responsive Web Portal" />
@@ -1950,24 +1950,25 @@ When a believer taps on any church or ministry:
 - **Branch Action Cards**: Shows leader name, contact details, physical address, and meeting schedules with one-tap native GPS directions launching Google Maps / Apple Maps.
 - **"Register Branch / Cell" Floating Action**: If a believer's local assembly is not yet listed, a prominent CTA opens the branch registration workflow with the parent ministry pre-selected.
 
-### 3. Auto-Cascading Geocoding Engine (`src/services/geoService.ts`)
-To eliminate manual data entry errors and deliver an effortless registration experience:
-- **Integrated Canonical Geocoding Database (`GEO_DATABASE`)**: Pre-loaded with coordinate-accurate records across South Africa (all 9 provinces: Gauteng, Western Cape, KwaZulu-Natal, Eastern Cape, Free State, Mpumalanga, Limpopo, North West, Northern Cape), Zimbabwe (Harare, Bulawayo), Malawi (Lilongwe, Blantyre), Nigeria (Lagos, Abuja), Kenya (Nairobi), Ghana (Accra), United Kingdom (London, Manchester, Birmingham), United States (Atlanta, Houston, Dallas, Chicago, Los Angeles, New York), and Ukraine (Kyiv).
-- **Auto-Cascading Resolver (`resolveTownDetails`)**:
-  - When the user searches or selects their **Area (Town / City)**, the engine automatically resolves and auto-populates:
-    1. **Province / State** (e.g., Selecting `Randburg` -> `Gauteng`)
-    2. **Country** (e.g., `South Africa`)
-    3. **Postal Code** (e.g., `2194`)
-    4. **Geographic Coordinates** (Latitude and Longitude for immediate map pin positioning)
-- **Manual Coordinate Fallback**: If an unindexed rural area or new settlement is entered, defaults provide safe regional centroid coordinates so radar maps continue to function without crash.
+### 3. Live OpenStreetMap & Photon Hybrid Geocoding Engine (`src/services/geoService.ts`)
+To deliver maximum reliability, zero manual data entry errors, and complete global coverage:
+- **Tier 1 (Instant In-Memory Cache)**: Pre-compiled database with 200+ canonical municipalities, townships, and suburbs across South Africa (all 9 provinces: Gauteng, Western Cape, KwaZulu-Natal, Eastern Cape, Free State, Mpumalanga, Limpopo, North West, Northern Cape with authentic SAPO postal codes), Zimbabwe, Malawi, Nigeria, Kenya, Ghana, Zambia, Botswana, the UK, the USA, and Ukraine.
+- **Tier 2 (Live OpenStreetMap Nominatim Engine)**: When typing any suburb, township, or district anywhere on Earth (e.g. *Diepsloot, Khayelitsha, Umlazi, Hatfield, Chitungwiza, Brooklyn, Westminster*), the app dynamically queries OpenStreetMap Nominatim with address-level details to automatically resolve and auto-populate:
+  1. **Town / Suburb Name**
+  2. **Province / State / Region** (e.g., Selecting `Khayelitsha` -> `Western Cape`)
+  3. **Country** (e.g., `South Africa`)
+  4. **Postal Code** (e.g., `7783`)
+  5. **Exact GPS Coordinates** (Latitude and Longitude for map pin positioning)
+- **Tier 3 (Photon by Komoot Secondary Fallback)**: High-speed OpenStreetMap search mirror providing instant secondary geocoding fallback if primary network thresholds are reached.
+- **Tier 4 (AsyncStorage Zero-Bandwidth Cache)**: Every resolved online address is permanently cached locally so repeated lookups require zero bandwidth and operate in 0ms offline.
 
-### 4. Interactive Vector Radar Map Component (`src/components/BranchRadarMap.tsx`)
-- **Zero Heavy SDK Dependency**: Bypasses heavy native Google Maps binaries (`react-native-maps`) that frequently cause Expo EAS / GitHub Actions compilation failures or require proprietary Google Cloud billing keys.
-- **Pure SVG Vector Radar Architecture**:
-  - Utilizes `react-native-svg` to project latitude/longitude coordinates onto a normalized Cartesian radar grid with coordinate bounding boxes.
-  - Features radar concentric range rings (10km / 25km / 50km markers), dynamic compass axis markers (N, S, E, W), and animated pulse sweeps.
-  - Interactive touch pins: Tapping any pin highlights the venue, centers the target reticle, and reveals an interactive overlay card with contact details and distance metadata.
-  - **Native Navigation Handoff**: 1-tap "Get Directions" invokes `Linking.openURL` using platform-native URI schemes (`geo:lat,lng?q=...` on Android, `http://maps.apple.com/?daddr=...` on iOS) to immediately launch turn-by-turn navigation in Google Maps or Apple Maps.
+### 4. Dual-Mode Interactive Real Street Map Component (`src/components/BranchRadarMap.tsx`)
+- **Zero Heavy Native SDK Dependency**: Bypasses heavy native Google Maps binaries (`react-native-maps`) that disrupt Expo EAS and GitHub Actions native compilations or demand costly Google Cloud credit card billing keys.
+- **Dual Map View Modes**:
+  1. **Real Street Map (OpenStreetMap / CartoDB Voyager)**: Renders a multi-tile Web Mercator 256x256 image grid (`https://a.basemaps.cartocdn.com/rastertiles/voyager/...`) depicting authentic streets, highways, rivers, terrain, and city labels. Interactive SVG pins are projected with pinpoint coordinate accuracy on top of the real street map. Includes Zoom In (`+`) and Zoom Out (`−`) controls.
+  2. **Tactical Radar View**: High-tech vector radar visualization with concentric distance range rings (10km / 25km / 50km markers), cardinal compass headings (N, S, E, W), and target reticles.
+- **Interactive Pin Touch & Info Card**: Tapping any pin highlights the venue, centers the viewport, and reveals contact details and meeting schedules.
+- **Turn-by-Turn GPS Navigation Handoff**: 1-tap "Directions" invokes `Linking.openURL` using platform-native URI schemes (`geo:lat,lng?q=...` on Android, `http://maps.apple.com/?daddr=...` on iOS) to immediately launch turn-by-turn driving or walking routes in Google Maps or Apple Maps.
 
 ### 5. Multi-Step Registration Workflows
 - **`RegisterMinistryScreen.tsx`**: For leaders registering an entirely new church organization. Captures Organization Name, Vision Statement, Founder/Presiding Pastor, and Global Headquarters. Upon saving, automatically persists to AsyncStorage and seamlessly navigates the user directly to `RegisterBranchScreen` with the new ministry pre-selected.

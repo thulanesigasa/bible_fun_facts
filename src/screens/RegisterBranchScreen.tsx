@@ -27,6 +27,7 @@ import {
 } from '../components/BranchRadarMap';
 import {
   searchTowns,
+  searchTownsOnline,
   resolveTownDetails,
   GeoLocation,
 } from '../services/geoService';
@@ -96,9 +97,36 @@ export default function RegisterBranchScreen({
     return ministries.find((m) => m.id === selectedMinistryId) || null;
   }, [ministries, selectedMinistryId]);
 
-  const townSuggestions = useMemo(() => {
-    if (!townQuery || townQuery.trim().length === 0) return [];
-    return searchTowns(townQuery).slice(0, 5);
+  const [liveSuggestions, setLiveSuggestions] = useState<GeoLocation[]>([]);
+  const [isSearchingOnline, setIsSearchingOnline] = useState(false);
+
+  useEffect(() => {
+    const q = townQuery.trim();
+    if (!q) {
+      setLiveSuggestions([]);
+      return;
+    }
+
+    // Instant local matches
+    const local = searchTowns(q).slice(0, 6);
+    setLiveSuggestions(local);
+
+    // Debounced online search via OpenStreetMap Nominatim & Photon
+    const timer = setTimeout(async () => {
+      if (q.length >= 2) {
+        setIsSearchingOnline(true);
+        try {
+          const online = await searchTownsOnline(q);
+          setLiveSuggestions(online.slice(0, 8));
+        } catch {
+          // Keep local matches
+        } finally {
+          setIsSearchingOnline(false);
+        }
+      }
+    }, 280);
+
+    return () => clearTimeout(timer);
   }, [townQuery]);
 
   // Automated cascade resolution when user selects a town
@@ -115,7 +143,7 @@ export default function RegisterBranchScreen({
     setTownQuery(text);
     setShowTownSuggestions(true);
 
-    // Try live resolution on typed input
+    // Try instant local resolution
     const match = resolveTownDetails(text);
     if (match) {
       setProvince(match.province);
@@ -415,20 +443,27 @@ export default function RegisterBranchScreen({
               </View>
 
               {/* Autocomplete Suggestion Dropdown */}
-              {showTownSuggestions && townSuggestions.length > 0 && (
+              {showTownSuggestions && liveSuggestions.length > 0 && (
                 <View style={styles.suggestionsContainer}>
-                  {townSuggestions.map((item) => (
+                  {liveSuggestions.map((item, idx) => (
                     <TouchableOpacity
-                      key={`${item.town}-${item.province}`}
+                      key={`${item.town}-${item.province}-${item.country}-${idx}`}
                       style={styles.suggestionItem}
                       onPress={() => handleSelectTown(item)}
                       activeOpacity={0.7}
                     >
-                      <Text variant="body" weight="700" color={colors.textPrimary}>
-                        {item.town}
-                      </Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Text variant="body" weight="700" color={colors.textPrimary}>
+                          {item.town}
+                        </Text>
+                        {item.postalCode ? (
+                          <Text variant="caption" weight="700" color="#B45309">
+                            {item.postalCode}
+                          </Text>
+                        ) : null}
+                      </View>
                       <Text variant="caption" color={colors.textSecondary}>
-                        {item.province}, {item.country} ({item.postalCode})
+                        {item.province ? `${item.province}, ` : ''}{item.country}
                       </Text>
                     </TouchableOpacity>
                   ))}
