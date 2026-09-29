@@ -13,6 +13,8 @@ on:
       - 'app.json'
       - 'package.json'
       - 'package-lock.json'
+      - 'jest.config.js'
+      - '__tests__/**'
   workflow_dispatch:
     inputs:
       action:
@@ -102,7 +104,7 @@ jobs:
       - name: Publish OTA Update to Production Channel
         if: github.event_name == 'push' || inputs.ota_channel == 'production' || inputs.ota_channel == 'both'
         run: |
-          eas update --branch production --message "${{ github.event.head_commit.message || 'Automated OTA production update from GitHub' }}" --non-interactive
+          eas update --branch production --environment production --message "${{ github.event.head_commit.message || 'Automated OTA production update from GitHub' }}" --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
@@ -110,7 +112,7 @@ jobs:
       - name: Publish OTA Update to Preview Channel
         if: github.event_name == 'push' || inputs.ota_channel == 'preview' || inputs.ota_channel == 'both'
         run: |
-          eas update --branch preview --message "${{ github.event.head_commit.message || 'Automated OTA preview update from GitHub' }}" --non-interactive
+          eas update --branch preview --environment preview --message "${{ github.event.head_commit.message || 'Automated OTA preview update from GitHub' }}" --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
