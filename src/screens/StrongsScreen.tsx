@@ -7,6 +7,8 @@ import {
   TextInput,
   Share,
   ActivityIndicator,
+  InteractionManager,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemedAlert } from '../context/AlertContext';
@@ -25,6 +27,8 @@ import {
 import {
   LexiconEntry,
   searchConcordance,
+  getAllConcordanceEntries,
+  isConcordanceCached,
 } from '../data/lexiconData';
 import {
   OfflineDictionaryMeta,
@@ -46,19 +50,41 @@ const ALPHABET_LETTERS = [
 export default function StrongsScreen({ navigation }: StrongsScreenProps) {
   const { showAlert } = useThemedAlert();
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [selectedLetter, setSelectedLetter] = useState<string>('All');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [offlineMeta, setOfflineMeta] = useState<OfflineDictionaryMeta | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isReady, setIsReady] = useState<boolean>(isConcordanceCached());
 
   useEffect(() => {
     getOfflineDictionaryStatus().then(setOfflineMeta);
   }, []);
 
+  // Debounce search query input (150ms) to preserve 60fps scrolling
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Non-blocking background initialization on first mount
+  useEffect(() => {
+    if (!isReady) {
+      const interaction = InteractionManager.runAfterInteractions(() => {
+        getAllConcordanceEntries();
+        setIsReady(true);
+      });
+      return () => interaction.cancel();
+    }
+  }, [isReady]);
+
   // Single unified dictionary search across all biblical entries
   const filteredEntries = useMemo(() => {
-    return searchConcordance(searchQuery, 'all', selectedLetter);
-  }, [searchQuery, selectedLetter]);
+    if (!isReady) return [];
+    return searchConcordance(debouncedQuery, 'all', selectedLetter);
+  }, [debouncedQuery, selectedLetter, isReady]);
 
   const handleDownload = async () => {
     try {
@@ -369,36 +395,52 @@ export default function StrongsScreen({ navigation }: StrongsScreenProps) {
         }
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+        initialNumToRender={12}
+        maxToRenderPerBatch={12}
+        windowSize={5}
+        removeClippedSubviews={Platform.OS !== 'web'}
+        updateCellsBatchingPeriod={50}
+        keyboardShouldPersistTaps="handled"
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <StrongsIconSvg size={40} color="#FDD223" />
-            <Text variant="h3" color={colors.textPrimary}>
-              No Words Found
-            </Text>
-            <Text
-              variant="body"
-              color={colors.textSecondary}
-              style={styles.emptyMessage}
-            >
-              No entries match "{searchQuery || selectedLetter}". Try searching for another biblical word (e.g. life, love, faith, peace) or Strong's ID.
-            </Text>
-            {(searchQuery.length > 0 || selectedLetter !== 'All') && (
-              <TouchableOpacity
-                style={styles.resetFilterBtn}
-                onPress={() => {
-                  setSearchQuery('');
-                  setSelectedLetter('All');
-                }}
-                activeOpacity={0.7}
-                accessibilityRole="button"
-                accessibilityLabel="Reset Search and Letter Filter"
+          !isReady ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="small" color="#B45309" />
+              <Text variant="caption" color={colors.textSecondary} style={styles.loadingText}>
+                Loading Strong's Exhaustive Concordance...
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.emptyContainer}>
+              <StrongsIconSvg size={40} color="#FDD223" />
+              <Text variant="h3" color={colors.textPrimary}>
+                No Words Found
+              </Text>
+              <Text
+                variant="body"
+                color={colors.textSecondary}
+                style={styles.emptyMessage}
               >
-                <Text variant="caption" weight="800" color="#B45309" style={styles.resetFilterText}>
-                  Reset All Filters ›
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
+                No entries match "{debouncedQuery || selectedLetter}". Try searching for another biblical word (e.g. life, love, faith, peace) or Strong's ID.
+              </Text>
+              {(debouncedQuery.length > 0 || selectedLetter !== 'All') && (
+                <TouchableOpacity
+                  style={styles.resetFilterBtn}
+                  onPress={() => {
+                    setSearchQuery('');
+                    setDebouncedQuery('');
+                    setSelectedLetter('All');
+                  }}
+                  activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel="Reset Search and Letter Filter"
+                >
+                  <Text variant="caption" weight="800" color="#B45309" style={styles.resetFilterText}>
+                    Reset All Filters ›
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )
         }
       />
     </SafeAreaView>
@@ -603,5 +645,18 @@ const styles = StyleSheet.create({
   },
   resetFilterText: {
     fontSize: 13,
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 80,
+    gap: 8,
+    paddingHorizontal: spacing.xl,
+  },
+  loadingText: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    fontWeight: '600',
+    marginTop: spacing.sm,
   },
 });
