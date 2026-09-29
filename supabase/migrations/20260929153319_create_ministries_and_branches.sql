@@ -173,7 +173,7 @@ VALUES
   (
     '00000000-0000-0000-0000-000000000001',
     'God Embassy',
-    'Pastor Sunday Adelaja',
+    'Prophet Isaiah Sovi',
     'Kyiv',
     'Ukraine',
     'Embassy of the Blessed Kingdom of God for All Nations. Founded in 1994, focusing on apostolic kingdom discipleship, spiritual reformation, and active societal transformation.',
