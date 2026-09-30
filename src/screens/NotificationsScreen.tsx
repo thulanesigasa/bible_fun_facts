@@ -310,52 +310,36 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
   };
 
   const renderListHeader = () => {
+    if (notifications.length === 0) return null;
+
     return (
       <View style={styles.headerSection}>
-        <View style={styles.subHeaderTopRow}>
-          <Text style={styles.screenSubtitle}>
-            {unreadNotificationsCount > 0 ? (
-              <>
-                You have{' '}
-                <Text weight="800" color="#2563EB" style={styles.unreadCountHighlight}>
-                  {unreadNotificationsCount} {unreadNotificationsCount === 1 ? 'Notification' : 'Notifications'}
-                </Text>{' '}
-                today.
-              </>
-            ) : (
-              "You're all caught up today."
-            )}
-          </Text>
+        <View style={styles.headerActionsRow}>
+          {unreadNotificationsCount > 0 && (
+            <TouchableOpacity
+              onPress={markAllNotificationsAsRead}
+              style={styles.markAllReadBtn}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="Mark all as read"
+            >
+              <Text variant="caption" weight="700" color="#0F172A">
+                Mark all as read
+              </Text>
+            </TouchableOpacity>
+          )}
 
-          <View style={styles.headerActionsRow}>
-            {unreadNotificationsCount > 0 && (
-              <TouchableOpacity
-                onPress={markAllNotificationsAsRead}
-                style={styles.markAllReadBtn}
-                activeOpacity={0.7}
-                accessibilityRole="button"
-                accessibilityLabel="Mark all as read"
-              >
-                <Text variant="caption" weight="700" color="#2563EB" style={styles.markAllReadText}>
-                  Mark all as read
-                </Text>
-              </TouchableOpacity>
-            )}
-
-            {notifications.length > 0 && (
-              <TouchableOpacity
-                onPress={handleClearAllConfirm}
-                style={styles.clearAllBtn}
-                activeOpacity={0.7}
-                accessibilityRole="button"
-                accessibilityLabel="Clear all notifications"
-              >
-                <Text variant="caption" weight="600" color="#94A3B8" style={styles.clearAllText}>
-                  Clear all
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
+          <TouchableOpacity
+            onPress={handleClearAllConfirm}
+            style={styles.clearAllBtn}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Clear all notifications"
+          >
+            <Text variant="caption" weight="600" color="#94A3B8">
+              Clear all
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -402,42 +386,25 @@ const styles = StyleSheet.create({
   headerSection: {
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 10,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(15, 23, 42, 0.05)',
-  },
-  subHeaderTopRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 8,
-  },
-  screenSubtitle: {
-    fontSize: 13,
-    color: '#64748B',
-    flex: 1,
-  },
-  unreadCountHighlight: {
-    color: '#2563EB',
   },
   headerActionsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    justifyContent: 'space-between',
   },
   markAllReadBtn: {
-    paddingVertical: 5,
-    paddingHorizontal: 9,
-    borderRadius: 14,
-    backgroundColor: 'rgba(37, 99, 235, 0.08)',
-  },
-  markAllReadText: {
-    fontSize: 11.5,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+    backgroundColor: 'rgba(15, 23, 42, 0.04)',
   },
   clearAllBtn: {
-    paddingVertical: 5,
-    paddingHorizontal: 6,
+    marginLeft: 'auto',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
   },
   clearAllText: {
     fontSize: 11.5,
