@@ -170,7 +170,9 @@ export default function RegisterBranchScreen({
   const [addingService, setAddingService] = useState(false);
   const [draftDay, setDraftDay] = useState('Sunday');
   const [draftTime, setDraftTime] = useState('09:00');
+  const [draftCustomTime, setDraftCustomTime] = useState('');
   const [draftLabel, setDraftLabel] = useState('Main Service');
+  const [draftCustomLabel, setDraftCustomLabel] = useState('');
 
   // Submission
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -280,17 +282,21 @@ export default function RegisterBranchScreen({
   };
 
   const handleAddService = () => {
+    const finalLabel = draftCustomLabel.trim() || draftLabel;
+    const finalTime  = draftCustomTime.trim()  || draftTime;
     const newSlot: ServiceSlot = {
       id: Date.now().toString(),
       day: draftDay,
-      time: draftTime,
-      label: draftLabel,
+      time: finalTime,
+      label: finalLabel,
     };
     setServices((prev) => [...prev, newSlot]);
     setAddingService(false);
     setDraftDay('Sunday');
     setDraftTime('09:00');
+    setDraftCustomTime('');
     setDraftLabel('Main Service');
+    setDraftCustomLabel('');
   };
 
   const handleRemoveService = (id: string) => {
@@ -612,7 +618,7 @@ export default function RegisterBranchScreen({
               </Text>
 
               <View style={styles.fieldGroup}>
-                <Text style={styles.fieldLabel}>Leader / Pastor Name *</Text>
+                <Text style={styles.fieldLabel}>Resident Pastor *</Text>
                 <TextInput
                   style={styles.input}
                   placeholder="e.g. Pastor John Dlamini"
@@ -720,6 +726,7 @@ export default function RegisterBranchScreen({
               {/* Add service form */}
               {addingService ? (
                 <View style={styles.addServiceForm}>
+                  {/* Service type chips + custom text */}
                   <Text style={styles.fieldLabel}>Service Type</Text>
                   <ScrollView
                     horizontal
@@ -731,14 +738,14 @@ export default function RegisterBranchScreen({
                     {SERVICE_LABELS.map((lbl) => (
                       <TouchableOpacity
                         key={lbl}
-                        onPress={() => setDraftLabel(lbl)}
+                        onPress={() => { setDraftLabel(lbl); setDraftCustomLabel(''); }}
                         activeOpacity={0.7}
                         style={styles.serviceLabelChip}
                       >
                         <Text
                           style={[
                             styles.serviceLabelChipText,
-                            draftLabel === lbl && styles.serviceLabelChipTextActive,
+                            draftLabel === lbl && !draftCustomLabel && styles.serviceLabelChipTextActive,
                           ]}
                         >
                           {lbl}
@@ -746,8 +753,18 @@ export default function RegisterBranchScreen({
                       </TouchableOpacity>
                     ))}
                   </ScrollView>
+                  <TextInput
+                    style={[styles.input, { marginTop: 8 }]}
+                    placeholder="Or type a custom service name..."
+                    placeholderTextColor="#94A3B8"
+                    value={draftCustomLabel}
+                    onChangeText={setDraftCustomLabel}
+                    autoCapitalize="words"
+                    returnKeyType="next"
+                  />
 
-                  <Text style={[styles.fieldLabel, { marginTop: 12 }]}>Day</Text>
+                  {/* Day chips */}
+                  <Text style={[styles.fieldLabel, { marginTop: 16 }]}>Day</Text>
                   <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -774,7 +791,8 @@ export default function RegisterBranchScreen({
                     ))}
                   </ScrollView>
 
-                  <Text style={[styles.fieldLabel, { marginTop: 12 }]}>Time</Text>
+                  {/* Time chips + custom time text input */}
+                  <Text style={[styles.fieldLabel, { marginTop: 16 }]}>Time</Text>
                   <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -785,14 +803,14 @@ export default function RegisterBranchScreen({
                     {TIME_SLOTS.map((t) => (
                       <TouchableOpacity
                         key={t}
-                        onPress={() => setDraftTime(t)}
+                        onPress={() => { setDraftTime(t); setDraftCustomTime(''); }}
                         activeOpacity={0.7}
                         style={styles.serviceLabelChip}
                       >
                         <Text
                           style={[
                             styles.serviceLabelChipText,
-                            draftTime === t && styles.serviceLabelChipTextActive,
+                            draftTime === t && !draftCustomTime && styles.serviceLabelChipTextActive,
                           ]}
                         >
                           {t}
@@ -800,6 +818,16 @@ export default function RegisterBranchScreen({
                       </TouchableOpacity>
                     ))}
                   </ScrollView>
+                  <TextInput
+                    style={[styles.input, { marginTop: 8 }]}
+                    placeholder="Or type a custom time (e.g. 10:45)"
+                    placeholderTextColor="#94A3B8"
+                    value={draftCustomTime}
+                    onChangeText={setDraftCustomTime}
+                    keyboardType="numbers-and-punctuation"
+                    returnKeyType="done"
+                    maxLength={8}
+                  />
 
                   <View style={[styles.actionRow, { marginTop: 16 }]}>
                     <TouchableOpacity
@@ -856,16 +884,25 @@ export default function RegisterBranchScreen({
                   { label: 'NAME', value: branchName },
                   { label: 'LOCATION', value: `${townQuery}, ${province}, ${country} (${postalCode})` },
                   { label: 'ADDRESS', value: address || '—' },
-                  { label: 'LEADER', value: leaderName },
+                  { label: 'RESIDENT PASTOR', value: leaderName },
                   { label: 'PHONE', value: buildPhone() || '—' },
                   { label: 'EMAIL', value: contactEmail || '—' },
-                  { label: 'SERVICES', value: buildMeetingTimesString() },
                 ].map((row) => (
                   <View key={row.label} style={styles.reviewRow}>
                     <Text style={styles.reviewLabel}>{row.label}</Text>
                     <Text style={styles.reviewValue}>{row.value}</Text>
                   </View>
                 ))}
+
+                {/* Services — each on its own line */}
+                <View style={styles.reviewRow}>
+                  <Text style={styles.reviewLabel}>SERVICES</Text>
+                  {services.map((s) => (
+                    <Text key={s.id} style={styles.reviewValue}>
+                      {s.label} — {s.day} {s.time}
+                    </Text>
+                  ))}
+                </View>
               </View>
 
               <View style={[styles.actionRow, { marginTop: 24 }]}>
