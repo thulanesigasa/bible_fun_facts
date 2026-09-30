@@ -408,7 +408,7 @@ exegeomai/
 │   │   ├── HomeScreen.tsx                # Alternate home showcase
 │   │   ├── InactivityLockScreen.tsx      # Dedicated auto-lock timeout selector (Immediately / 1m / 5m / 15m)
 │   │   ├── MinistryDetailScreen.tsx      # Ministry leadership, vision, and branch/homecell hierarchy directory
-│   │   ├── NotificationsScreen.tsx       # Modern notifications center (Today/This Week timeline, filter tabs, unread indicators, avatars with action badges, swipe-to-dismiss)
+│   │   ├── NotificationsScreen.tsx       # Modern notifications center (Today/This Week timeline, filter tabs, unread indicators, exact achievement badges, text-driven 60-30-10 styling)
 │   │   ├── PastoralCareScreen.tsx        # 24/7 Lifelines, SADAG, and Scripture promises (seamless body canvas, zero icons)
 │   │   ├── PrivacyPolicyScreen.tsx       # 11-section privacy policy modal screen
 │   │   ├── PrivacyScreen.tsx             # Modular privacy settings (Study mode, directory, streak visibility, private notes)

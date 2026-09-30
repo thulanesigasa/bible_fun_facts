@@ -17,22 +17,7 @@ import { colors } from '../theme/colors';
 import { spacing } from '../theme';
 import { Text } from '../components/Typography';
 import { useUser } from '../context/UserContext';
-import {
-  AwardSvg,
-  BookOpenSvg,
-  CheckDoubleSvg,
-  CloseSvg,
-  TrashSvg,
-  HeartSvg,
-  UsersSvg,
-  MoonSvg,
-  SparklesSvg,
-  ChevronLeftSvg,
-  TuneSvg,
-  QuoteSvg,
-  CheckSvg,
-  WotdSvg,
-} from '../components/SvgIcons';
+import { CategoryBadge } from '../components/CategoryBadge';
 import { InAppNotificationItem } from '../types/inAppNotifications';
 import { parseScriptureCoordinates } from '../services/inAppNotifications';
 
@@ -48,10 +33,12 @@ interface NotificationVisualConfig {
   metaText: string;
   quoteSnippet?: string;
   avatarBg: string;
-  badgeType: 'heart' | 'book' | 'award' | 'quote' | 'sparkles' | 'user';
+  themeColor: string;
+  avatarInitials: string;
   thumbnailBg: string;
-  thumbnailIcon: 'heart' | 'book' | 'award' | 'quote' | 'sparkles';
+  thumbnailLabel: string;
   actionButtonLabel?: string;
+  isAchievement: boolean;
 }
 
 function getRelativeTime(isoString?: string): string {
@@ -113,10 +100,12 @@ function getNotificationVisuals(item: InAppNotificationItem): NotificationVisual
       metaText: `Achievement · ${relativeTime}`,
       quoteSnippet: item.body || item.verseQuote,
       avatarBg: '#FEF9C3',
-      badgeType: 'award',
+      themeColor: '#B45309',
+      avatarInitials: `${item.achievementTarget || '1'}`,
       thumbnailBg: '#FEF9C3',
-      thumbnailIcon: 'award',
+      thumbnailLabel: `DAY ${item.achievementTarget || '1'}`,
       actionButtonLabel: 'View in Achievements ›',
+      isAchievement: true,
     };
   }
 
@@ -128,10 +117,12 @@ function getNotificationVisuals(item: InAppNotificationItem): NotificationVisual
       metaText: `${item.scriptureRef || 'Sacred Truth'} · ${relativeTime}`,
       quoteSnippet: item.body?.replace(/^"|"$/g, '').trim(),
       avatarBg: '#FFF1F2',
-      badgeType: 'heart',
+      themeColor: '#E11D48',
+      avatarInitials: 'LOVE',
       thumbnailBg: '#FEE2E2',
-      thumbnailIcon: 'heart',
+      thumbnailLabel: 'LOVE',
       actionButtonLabel: 'Open in Reader ›',
+      isAchievement: false,
     };
   }
 
@@ -143,10 +134,12 @@ function getNotificationVisuals(item: InAppNotificationItem): NotificationVisual
       metaText: `${item.scriptureRef || 'Sacred Scripture'} · ${relativeTime}`,
       quoteSnippet: item.verseQuote || item.body?.replace(/^"|"$/g, '').trim(),
       avatarBg: '#FEF3C7',
-      badgeType: 'book',
+      themeColor: '#B45309',
+      avatarInitials: 'WORD',
       thumbnailBg: '#FEF9C3',
-      thumbnailIcon: 'book',
+      thumbnailLabel: 'WORD',
       actionButtonLabel: 'Open in Reader ›',
+      isAchievement: false,
     };
   }
 
@@ -158,10 +151,12 @@ function getNotificationVisuals(item: InAppNotificationItem): NotificationVisual
       metaText: `${item.scriptureRef || 'Fellowship'} · ${relativeTime}`,
       quoteSnippet: item.body?.replace(/^"|"$/g, '').trim(),
       avatarBg: '#EDE9FE',
-      badgeType: 'quote',
+      themeColor: '#7C3AED',
+      avatarInitials: 'REST',
       thumbnailBg: '#EDE9FE',
-      thumbnailIcon: 'quote',
+      thumbnailLabel: 'REST',
       actionButtonLabel: 'Open in Reader ›',
+      isAchievement: false,
     };
   }
 
@@ -173,10 +168,12 @@ function getNotificationVisuals(item: InAppNotificationItem): NotificationVisual
       metaText: `${item.scriptureRef || 'Peace'} · ${relativeTime}`,
       quoteSnippet: item.verseQuote || item.body?.replace(/^"|"$/g, '').trim(),
       avatarBg: '#E0F2FE',
-      badgeType: 'book',
+      themeColor: '#0284C7',
+      avatarInitials: 'PEACE',
       thumbnailBg: '#E0F2FE',
-      thumbnailIcon: 'book',
+      thumbnailLabel: 'PEACE',
       actionButtonLabel: 'Open in Reader ›',
+      isAchievement: false,
     };
   }
 
@@ -186,10 +183,12 @@ function getNotificationVisuals(item: InAppNotificationItem): NotificationVisual
     metaText: `${item.scriptureRef || 'Daily Word'} · ${relativeTime}`,
     quoteSnippet: item.verseQuote || item.body?.replace(/^"|"$/g, '').trim(),
     avatarBg: '#F1F5F9',
-    badgeType: 'sparkles',
+    themeColor: '#475569',
+    avatarInitials: 'DAILY',
     thumbnailBg: '#F1F5F9',
-    thumbnailIcon: 'sparkles',
+    thumbnailLabel: 'DAILY',
     actionButtonLabel: 'Open in Reader ›',
+    isAchievement: false,
   };
 }
 
@@ -266,69 +265,19 @@ function SwipeableNotificationRow({
     })
   ).current;
 
-  const renderBadgeIcon = (type: NotificationVisualConfig['badgeType']) => {
-    switch (type) {
-      case 'heart':
-        return <HeartSvg size={10} color="#E11D48" fill="#E11D48" />;
-      case 'award':
-        return <AwardSvg size={10} color="#D97706" />;
-      case 'quote':
-        return <QuoteSvg size={10} color="#7C3AED" />;
-      case 'user':
-        return <UsersSvg size={10} color="#2563EB" />;
-      case 'book':
-      default:
-        return <BookOpenSvg size={10} color="#2563EB" />;
-    }
-  };
-
-  const renderAvatarIcon = (type: NotificationVisualConfig['badgeType']) => {
-    switch (type) {
-      case 'heart':
-        return <HeartSvg size={20} color="#E11D48" fill="#FFE4E6" />;
-      case 'award':
-        return <AwardSvg size={22} color="#D97706" />;
-      case 'quote':
-        return <QuoteSvg size={19} color="#7C3AED" />;
-      case 'user':
-        return <UsersSvg size={20} color="#2563EB" />;
-      case 'book':
-      default:
-        return <BookOpenSvg size={20} color="#2563EB" />;
-    }
-  };
-
-  const renderThumbnailIcon = (type: NotificationVisualConfig['thumbnailIcon']) => {
-    switch (type) {
-      case 'heart':
-        return <HeartSvg size={18} color="#E11D48" fill="#E11D48" />;
-      case 'award':
-        return <AwardSvg size={18} color="#D97706" />;
-      case 'quote':
-        return <QuoteSvg size={16} color="#7C3AED" />;
-      case 'sparkles':
-        return <SparklesSvg size={18} color="#2563EB" />;
-      case 'book':
-      default:
-        return <BookOpenSvg size={18} color="#2563EB" />;
-    }
-  };
-
   return (
     <View style={styles.swipeContainer}>
-      {/* Background Action Shelf revealing during swipe */}
+      {/* Background Action Shelf revealing during swipe - Text only, Zero SVGs */}
       <View style={styles.swipeBackgroundShelf}>
         <View style={styles.swipeShelfActionLeft}>
-          <TrashSvg size={16} color="#DC2626" />
-          <Text variant="caption" weight="700" color="#DC2626" style={styles.swipeShelfText}>
-            Dismiss
+          <Text variant="caption" weight="800" color="#DC2626" style={styles.swipeShelfText}>
+            DISMISS
           </Text>
         </View>
         <View style={styles.swipeShelfActionRight}>
-          <Text variant="caption" weight="700" color="#DC2626" style={styles.swipeShelfText}>
-            Dismiss
+          <Text variant="caption" weight="800" color="#DC2626" style={styles.swipeShelfText}>
+            DISMISS
           </Text>
-          <TrashSvg size={16} color="#DC2626" />
         </View>
       </View>
 
@@ -355,14 +304,22 @@ function SwipeableNotificationRow({
             {!item.isRead ? <View style={styles.unreadDot} /> : <View style={styles.unreadDotPlaceholder} />}
           </View>
 
-          {/* Avatar with Overlay Action Badge (Image 1 style) */}
+          {/* Avatar: Exact Achievement Image for achievements; Themed Text Monogram for devotions */}
           <View style={styles.avatarWrapper}>
-            <View style={[styles.avatarCircle, { backgroundColor: visuals.avatarBg }]}>
-              {renderAvatarIcon(visuals.badgeType)}
-            </View>
-            <View style={styles.avatarBadgeCircle}>
-              {renderBadgeIcon(visuals.badgeType)}
-            </View>
+            {visuals.isAchievement ? (
+              <CategoryBadge
+                category={item.achievementCategory || 'streak'}
+                days={item.achievementTarget || 1}
+                size={44}
+                showText={true}
+              />
+            ) : (
+              <View style={[styles.avatarCircle, { backgroundColor: visuals.avatarBg }]}>
+                <Text style={[styles.avatarInitialsText, { color: visuals.themeColor }]}>
+                  {visuals.avatarInitials}
+                </Text>
+              </View>
+            )}
           </View>
 
           {/* Main Text Content Column */}
@@ -389,7 +346,7 @@ function SwipeableNotificationRow({
               </View>
             ) : null}
 
-            {/* Action Buttons Row (Image 2 style) */}
+            {/* Action Buttons Row (Image 2 style) - Text only */}
             <View style={styles.actionButtonsRow}>
               <TouchableOpacity
                 style={styles.dismissActionBtn}
@@ -423,9 +380,20 @@ function SwipeableNotificationRow({
             </View>
           </View>
 
-          {/* Right Thumbnail Preview Card (Image 1 style) */}
+          {/* Right Thumbnail: Exact Achievement Image or Themed Text Card (Zero Icons/SVGs) */}
           <View style={[styles.thumbnailCard, { backgroundColor: visuals.thumbnailBg }]}>
-            {renderThumbnailIcon(visuals.thumbnailIcon)}
+            {visuals.isAchievement ? (
+              <CategoryBadge
+                category={item.achievementCategory || 'streak'}
+                days={item.achievementTarget || 1}
+                size={38}
+                showText={false}
+              />
+            ) : (
+              <Text style={[styles.thumbnailText, { color: visuals.themeColor }]}>
+                {visuals.thumbnailLabel}
+              </Text>
+            )}
           </View>
         </TouchableOpacity>
       </Animated.View>
@@ -472,7 +440,7 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
     }
   }, [notifications, activeTab]);
 
-  // Group notifications into temporal sections (Image 1 style: Today, This Week, Earlier)
+  // Group notifications into temporal sections (Today, This Week, Earlier)
   const groupedSections = useMemo(() => {
     const todayItems: InAppNotificationItem[] = [];
     const thisWeekItems: InAppNotificationItem[] = [];
@@ -558,7 +526,7 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Top Header Bar (Fused Image 1 & Image 2) */}
+      {/* Top Header Bar - Text only, zero SVGs */}
       <View style={styles.headerContainer}>
         <View style={styles.topBarRow}>
           <View style={styles.topBarLeft}>
@@ -570,7 +538,7 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
                 accessibilityRole="button"
                 accessibilityLabel="Go back"
               >
-                <ChevronLeftSvg size={20} color="#0F172A" />
+                <Text style={styles.backBtnText}>Back</Text>
               </TouchableOpacity>
             )}
             <Text variant="h1" style={styles.screenTitle}>
@@ -587,27 +555,26 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
                 accessibilityRole="button"
                 accessibilityLabel="Mark all as read"
               >
-                <CheckDoubleSvg size={14} color="#2563EB" />
                 <Text variant="caption" weight="700" color="#2563EB" style={styles.markAllReadText}>
                   Mark all as read
                 </Text>
               </TouchableOpacity>
             )}
 
-            {/* Filter / Tune circular button (Image 1) */}
+            {/* Options button - Text only */}
             <TouchableOpacity
               onPress={() => setShowFilterModal(true)}
-              style={styles.tuneCircleBtn}
+              style={styles.optionsBtn}
               activeOpacity={0.75}
               accessibilityRole="button"
-              accessibilityLabel="Filter notifications"
+              accessibilityLabel="Notification options"
             >
-              <TuneSvg size={18} color="#2563EB" />
+              <Text style={styles.optionsBtnText}>Options</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Subtitle with dynamic unread count (Image 1) */}
+        {/* Subtitle with dynamic unread count */}
         <Text style={styles.screenSubtitle}>
           {counts.unread > 0 ? (
             <>
@@ -622,7 +589,7 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
           )}
         </Text>
 
-        {/* Filter Tabs Bar (Image 2) */}
+        {/* Filter Tabs Bar (Image 2 style) */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -711,7 +678,6 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <SparklesSvg size={36} color="#94A3B8" />
             <Text variant="h3" style={styles.emptyTitle}>
               {activeTab === 'unread'
                 ? 'All Caught Up'
@@ -739,7 +705,7 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
         }
       />
 
-      {/* Quick Settings / Filter Modal triggered by Tune button */}
+      {/* Quick Settings / Options Modal - Text only, Zero SVGs */}
       <Modal
         visible={showFilterModal}
         transparent
@@ -757,11 +723,11 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
                 Notification Options
               </Text>
               <TouchableOpacity
-                style={styles.modalCloseBtn}
+                style={styles.modalDoneBtn}
                 onPress={() => setShowFilterModal(false)}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <CloseSvg size={16} color="#64748B" />
+                <Text style={styles.modalDoneText}>Done</Text>
               </TouchableOpacity>
             </View>
 
@@ -773,7 +739,6 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
               }}
               activeOpacity={0.7}
             >
-              <CheckDoubleSvg size={18} color="#2563EB" />
               <View style={styles.modalOptionTextWrap}>
                 <Text style={styles.modalOptionTitle}>Mark all as read</Text>
                 <Text variant="caption" color={colors.textSecondary}>
@@ -787,7 +752,6 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
               onPress={handleClearReadConfirm}
               activeOpacity={0.7}
             >
-              <CheckSvg size={18} color="#16A34A" />
               <View style={styles.modalOptionTextWrap}>
                 <Text style={styles.modalOptionTitle}>Clear read items</Text>
                 <Text variant="caption" color={colors.textSecondary}>
@@ -801,7 +765,6 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
               onPress={handleClearAllConfirm}
               activeOpacity={0.7}
             >
-              <TrashSvg size={18} color="#DC2626" />
               <View style={styles.modalOptionTextWrap}>
                 <Text style={[styles.modalOptionTitle, { color: '#DC2626' }]}>
                   Clear entire tray
@@ -846,12 +809,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 8,
     backgroundColor: '#F8FAFC',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  backBtnText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0F172A',
   },
   screenTitle: {
     fontSize: 26,
@@ -865,9 +833,6 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   markAllReadBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 16,
@@ -876,15 +841,18 @@ const styles = StyleSheet.create({
   markAllReadText: {
     fontSize: 12,
   },
-  tuneCircleBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+  optionsBtn: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
     backgroundColor: '#EFF6FF',
-    alignItems: 'center',
-    justifyContent: 'center',
     borderWidth: 1,
     borderColor: 'rgba(37, 99, 235, 0.12)',
+  },
+  optionsBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#2563EB',
   },
   screenSubtitle: {
     fontSize: 13,
@@ -988,12 +956,10 @@ const styles = StyleSheet.create({
   swipeShelfActionLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
   },
   swipeShelfActionRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
   },
   swipeShelfText: {
     fontSize: 12,
@@ -1029,10 +995,13 @@ const styles = StyleSheet.create({
     height: 7,
   },
 
-  // Avatar + Corner Badge (Image 1 style)
+  // Avatar: Exact Achievement Image or Themed Text Monogram
   avatarWrapper: {
-    position: 'relative',
     marginRight: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 44,
+    height: 44,
   },
   avatarCircle: {
     width: 44,
@@ -1043,23 +1012,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.06)',
   },
-  avatarBadgeCircle: {
-    position: 'absolute',
-    bottom: -2,
-    right: -2,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: '#FFFFFF',
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+  avatarInitialsText: {
+    fontSize: 10.5,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
 
   // Content Column
@@ -1106,7 +1062,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
 
-  // Action Buttons Row (Image 2 style)
+  // Action Buttons Row (Image 2 style) - Pure Text
   actionButtonsRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1134,7 +1090,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 
-  // Right Side Thumbnail Preview Card (Image 1 style)
+  // Right Side Thumbnail Preview Card: Exact Achievement Image or Themed Text Card
   thumbnailCard: {
     width: 44,
     height: 44,
@@ -1144,8 +1100,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.05)',
   },
+  thumbnailText: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+    textAlign: 'center',
+  },
 
-  // Empty State
+  // Empty State - Pure Typography
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -1174,7 +1136,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(37, 99, 235, 0.08)',
   },
 
-  // Filter / Options Modal
+  // Filter / Options Modal - Text only
   modalBackdrop: {
     flex: 1,
     backgroundColor: 'rgba(15, 23, 42, 0.45)',
@@ -1199,21 +1161,23 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#0F172A',
   },
-  modalCloseBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+  modalDoneBtn: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 14,
     backgroundColor: '#F1F5F9',
-    alignItems: 'center',
-    justifyContent: 'center',
+  },
+  modalDoneText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0F172A',
   },
   modalOptionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 14,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(15, 23, 42, 0.05)',
-    gap: 12,
   },
   modalOptionRowDestructive: {
     borderBottomWidth: 0,
