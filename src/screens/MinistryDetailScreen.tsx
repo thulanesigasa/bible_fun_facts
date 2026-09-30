@@ -151,10 +151,6 @@ export default function MinistryDetailScreen({
       >
         {/* — Ministry overview — */}
         <View style={styles.overviewSection}>
-          <Text variant="caption" weight="700" color="#B45309" style={styles.categoryLabel}>
-            {ministry.category.toUpperCase()}
-          </Text>
-
           <Text variant="h2" color={colors.textPrimary} style={styles.ministryName}>
             {ministry.name}
           </Text>
