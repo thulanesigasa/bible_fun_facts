@@ -238,7 +238,18 @@ function DiscoverStack() {
         name="Notifications"
         component={NotificationsScreen}
         options={{
-          headerShown: false,
+          headerShown: true,
+          title: 'Notifications',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
         }}
       />
       <Stack.Screen
@@ -455,7 +466,18 @@ function ProfileStack() {
         name="Notifications"
         component={NotificationsScreen}
         options={{
-          headerShown: false,
+          headerShown: true,
+          title: 'Notifications',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#0F172A',
+            fontSize: 18,
+            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'SpaceMono',
+          },
+          headerTintColor: '#0F172A',
         }}
       />
       <Stack.Screen
