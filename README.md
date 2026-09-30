@@ -37,7 +37,7 @@
   <img src="https://img.shields.io/badge/Auth-Username%20%7C%20Email%20Login-10B981?style=for-the-badge&logo=supabase&logoColor=white" alt="Username and Email Login" />
   <img src="https://img.shields.io/badge/Unfolded%20Metric-Verified%20Read%20Facts%20Only-FDD223?style=for-the-badge" alt="Truthful Unfolded Count" />
   <img src="https://img.shields.io/badge/Daily%20Streak-Deterministic%20Calendar%20Day%20%7C%20Feedback%20Loop%20Immune-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Deterministic Daily Streak Engine" />
-  <img src="https://img.shields.io/badge/Notification%20Center-Sectional%20Timeline%20%7C%20Filter%20Tabs%20%26%20Read%20States-10B981?style=for-the-badge" alt="Modern Notification Center" />
+  <img src="https://img.shields.io/badge/Notification%20Center-Continuous%20Direct--Body%20%7C%20CategoryBadge%20Achievements-10B981?style=for-the-badge" alt="Modern Notification Center" />
   <img src="https://img.shields.io/badge/The%20Word-Strongs%20Biblical%20Dictionary-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="Strong's Biblical Dictionary" />
   <img src="https://img.shields.io/badge/Offline%20Dictionary-100%25%20Offline%20Download-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Offline Dictionary Download" />
   <img src="https://img.shields.io/badge/Strongs%20Canon-14%2C298%20Words%20%7C%20Batch%20Architecture-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="14,298 Strongs Words Batch Architecture" />
@@ -408,7 +408,7 @@ exegeomai/
 │   │   ├── HomeScreen.tsx                # Alternate home showcase
 │   │   ├── InactivityLockScreen.tsx      # Dedicated auto-lock timeout selector (Immediately / 1m / 5m / 15m)
 │   │   ├── MinistryDetailScreen.tsx      # Ministry leadership, vision, and branch/homecell hierarchy directory
-│   │   ├── NotificationsScreen.tsx       # Modern notifications center (Today/This Week timeline, filter tabs, unread indicators, exact achievement badges, text-driven 60-30-10 styling)
+│   │   ├── NotificationsScreen.tsx       # Continuous direct-body notifications center (CategoryBadge achievements, unread indicators, zero pills/badges, text-driven 60-30-10 styling)
 │   │   ├── PastoralCareScreen.tsx        # 24/7 Lifelines, SADAG, and Scripture promises (seamless body canvas, zero icons)
 │   │   ├── PrivacyPolicyScreen.tsx       # 11-section privacy policy modal screen
 │   │   ├── PrivacyScreen.tsx             # Modular privacy settings (Study mode, directory, streak visibility, private notes)
