@@ -1221,7 +1221,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const notifications = useMemo<InAppNotificationItem[]>(() => {
-    const scheduled = getDispatchedScheduledNotifications(1);
+    const scheduled = getDispatchedScheduledNotifications(7);
     const achievements = getUnlockedAchievementNotifications(
       {
         streak: state.streak || 1,
@@ -1240,18 +1240,18 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     const combined = Array.from(idMap.values());
-    // Auto-clear: Read notifications and dismissed notifications are never kept in the active notification tray
+    // Active notifications tray: Only dismissed notifications are excluded
     const filtered = combined.filter(
-      (item) => !dismissedNotificationIds.includes(item.id) && !readNotificationIds.includes(item.id)
+      (item) => !dismissedNotificationIds.includes(item.id)
     );
 
     return filtered
       .map((item) => ({
         ...item,
-        isRead: false,
+        isRead: readNotificationIds.includes(item.id),
       }))
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 15); // Cap to 15 most recent items to prevent notification tray piling up
+      .slice(0, 30); // Cap to 30 items across Today and This Week
   }, [
     state.streak,
     state.favoritesScriptures,
@@ -1265,7 +1265,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   ]);
 
   const unreadNotificationsCount = useMemo(() => {
-    return notifications.length;
+    return notifications.filter((n) => !n.isRead).length;
   }, [notifications]);
 
   // Real-time achievement unlock detection while in-app
@@ -1310,13 +1310,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       saveReadNotificationIds(next);
       return next;
     });
-    // Auto-clear immediately upon marking as read
-    setDismissedNotificationIds(prev => {
-      if (prev.includes(id)) return prev;
-      const next = [...prev, id];
-      saveDismissedNotificationIds(next);
-      return next;
-    });
   }, []);
 
   const markAllNotificationsAsRead = useCallback(() => {
@@ -1324,12 +1317,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setReadNotificationIds(prev => {
       const next = Array.from(new Set([...prev, ...allIds]));
       saveReadNotificationIds(next);
-      return next;
-    });
-    // Auto-clear all immediately upon marking all as read
-    setDismissedNotificationIds(prev => {
-      const next = Array.from(new Set([...prev, ...allIds]));
-      saveDismissedNotificationIds(next);
       return next;
     });
   }, [notifications]);
