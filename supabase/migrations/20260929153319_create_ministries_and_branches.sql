@@ -173,14 +173,14 @@ VALUES
   (
     '00000000-0000-0000-0000-000000000001',
     'God Embassy',
-    'Prophet Isaiah Sovi',
-    'Kyiv',
-    'Ukraine',
-    'Embassy of the Blessed Kingdom of God for All Nations. Founded in 1994, focusing on apostolic kingdom discipleship, spiritual reformation, and active societal transformation.',
+    'Prophet Isaiah Brian Sovi & Pastor Shanna Sovi',
+    'Pretoria',
+    'South Africa',
+    'God Embassy is a global ministry led by Prophet Isaiah Brian Sovi and Pastor Shanna Sovi, commissioned to raise a generation that encounters God, walks in authority and impacts nations through the power of Jesus Christ.',
     'Apostolic & Kingdom Reformation',
-    18, 64,
-    'https://godembassy.org', 'contact@godembassy.org', '+380 44 501 0101',
-    TRUE, '1994-02-06T00:00:00Z'
+    0, 0,
+    'https://godembassy.org', 'contact@godembassy.org', '+27 12 000 0000',
+    TRUE, NOW()
   ),
   (
     '00000000-0000-0000-0000-000000000002',
@@ -188,23 +188,23 @@ VALUES
     'Rev. Dr. Chris Oyakhilome',
     'Lagos',
     'Nigeria',
-    'Believers LoveWorld Inc. Global Christian ministry dedicated to giving lives a divine meaning and demonstrating the character of the Holy Spirit through God''s Word.',
+    'Christ Embassy (Believers LoveWorld Inc.) is a global Christian ministry founded by Rev. Dr. Chris Oyakhilome, dedicated to giving lives a divine meaning and demonstrating the character of the Holy Spirit through the Word of God.',
     'Word of Faith & Evangelism',
-    145, 420,
+    0, 0,
     'https://christembassy.org', 'info@loveworld360.com', '+234 1 888 8888',
-    TRUE, '1987-05-10T00:00:00Z'
+    TRUE, NOW()
   ),
   (
     '00000000-0000-0000-0000-000000000003',
     'Spirit Embassy',
-    'Prophet Uebert Angel',
+    'Prophet Uebert Angel & Prophetess Beverly Angel',
     'London',
     'United Kingdom',
-    'The GoodNews Church. A worldwide prophetic and teaching movement proclaiming the gospel of Jesus Christ, unmerited grace, and spiritual revelation across all continents.',
+    'Spirit Embassy the GoodNews Church is a global ministry founded by Prophet Uebert Angel and Prophetess Beverly Angel, with over 3.2 million registered citizens worldwide. Recognized as a leading voice in the prophetic movement, the ministry preaches the Good News of the Grace of God — the source of supernatural power that empowers every believer to live a victorious life.',
     'Prophetic & Grace Revelation',
-    52, 180,
+    0, 0,
     'https://spiritembassy.org', 'info@spiritembassy.com', '+44 207 123 4567',
-    TRUE, '2007-03-15T00:00:00Z'
+    TRUE, NOW()
   ),
   (
     '00000000-0000-0000-0000-000000000004',
@@ -212,11 +212,11 @@ VALUES
     'Prophet Shepherd Bushiri',
     'Lilongwe',
     'Malawi',
-    'Enlightened Christian Gathering (The Jesus Nation Church). A global prophetic family operating in apostolic signs and wonders, kingdom wealth creation, and massive evangelism.',
+    'Founded solidly on the gospel of Jesus Christ, ECG The Jesus Nation Church is a global entity setting the pace in fulfilling the Great Commission. A church without borders, ECG exists in more than 70 countries through branches, clusters, homecells, and online congregations — bringing the message of salvation through the prophetic voice as the world prepares for the second coming of our Lord Jesus Christ.',
     'Prophetic & Apostolic Community',
-    96, 310,
+    0, 0,
     'https://jesusnation.org', 'info@ecgchurch.org', '+265 1 777 999',
-    TRUE, '2010-09-24T00:00:00Z'
+    TRUE, NOW()
   )
 ON CONFLICT (name) DO NOTHING;
 

@@ -604,11 +604,11 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
                   </Text>
 
                   <Text variant="caption" color={colors.textSecondary} style={styles.ministryRowMeta}>
-                    {m.headquarters} • {m.category}
+                    {m.headquarters}, {m.headquartersCountry}
                   </Text>
 
                   <Text variant="caption" weight="600" color="#B45309" style={styles.ministryRowFounder}>
-                    Senior Pastor / Founder: {m.founder}
+                    {m.founder}
                   </Text>
 
                   <Text
