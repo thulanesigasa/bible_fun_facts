@@ -998,6 +998,21 @@ export const MapPinSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B'
   </Svg>
 );
 
+export const TuneSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#2563EB', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M4 8h10M18 8h2M4 16h4M12 16h8" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+    <Circle cx="16" cy="8" r="2.5" stroke={color} strokeWidth={strokeWidth} />
+    <Circle cx="10" cy="16" r="2.5" stroke={color} strokeWidth={strokeWidth} />
+  </Svg>
+);
+
+export const SlidersSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#0F172A', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+
 
 
 
