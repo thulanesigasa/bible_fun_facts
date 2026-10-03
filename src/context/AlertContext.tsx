@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { Alert } from 'react-native';
 import ThemedAlertModal, { AlertIconType, ThemedAlertButton } from '../components/ThemedAlertModal';
 
 export interface AlertOptions {
@@ -40,6 +41,28 @@ export const AlertProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const hideAlert = () => {
     setModalVisible(false);
   };
+
+  // Intercept standard React Native Alert.alert calls across the app to guarantee all popups
+  // smoothly slide up from the bottom as themed sheets with the app logo.
+  useEffect(() => {
+    const originalAlert = Alert.alert;
+    Alert.alert = (title: string, message?: string, buttons?: any[]) => {
+      showAlert({
+        title: title || '',
+        message: typeof message === 'string' ? message : undefined,
+        buttons: buttons && buttons.length > 0
+          ? buttons.map((b) => ({
+              text: b.text || 'OK',
+              style: b.style,
+              onPress: b.onPress,
+            }))
+          : [{ text: 'OK' }],
+      });
+    };
+    return () => {
+      Alert.alert = originalAlert;
+    };
+  }, []);
 
   return (
     <AlertContext.Provider value={{ showAlert, hideAlert }}>

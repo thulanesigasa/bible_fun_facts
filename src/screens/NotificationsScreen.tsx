@@ -17,6 +17,7 @@ import { useUser } from '../context/UserContext';
 import { CategoryBadge } from '../components/CategoryBadge';
 import { InAppNotificationItem } from '../types/inAppNotifications';
 import { parseScriptureCoordinates } from '../services/inAppNotifications';
+import { useThemedAlert } from '../context/AlertContext';
 
 interface NotificationsScreenProps {
   navigation: any;
@@ -259,6 +260,7 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
     deleteNotification,
     clearAllNotifications,
   } = useUser();
+  const { showAlert } = useThemedAlert();
 
   const handleOpenNotification = useCallback(
     (item: InAppNotificationItem) => {
@@ -295,18 +297,18 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
 
   const handleClearAllConfirm = () => {
     if (notifications.length === 0) return;
-    Alert.alert(
-      'Clear All Notifications',
-      'Are you sure you want to clear all notifications from your tray?',
-      [
+    showAlert({
+      title: 'Clear All Notifications',
+      message: 'Are you sure you want to clear all notifications from your tray?',
+      buttons: [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Clear All',
           style: 'destructive',
           onPress: () => clearAllNotifications(),
         },
-      ]
-    );
+      ],
+    });
   };
 
   const renderListHeader = () => {

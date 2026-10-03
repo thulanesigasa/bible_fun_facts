@@ -779,8 +779,9 @@ exégeomai integrates complete, authentic 66-book canonical translations for Sou
 - **Zero-Latency In-Memory & Local Disk Storage**: Downloaded Bibles are saved to `expo-file-system` (`offline_bibles/`) and loaded into high-speed memory caches (`Map<string, RawBibleBook[]>`) for instantaneous 0ms chapter and verse lookups even with zero cellular data or Wi-Fi.
 
 ### 4. Dedicated Offline Downloads Hub (`DownloadedVersesScreen.tsx`)
+- **Clean Borderless Icon CTAs**: Download and delete buttons are styled as clean, borderless icons without background fills or trailing text, providing unobstructed focus on translation titles.
 - **Non-Blocking Concurrent Downloads**: Tapping download on one translation leaves all other available versions active and actionable, allowing users to queue or download multiple versions concurrently.
-- **Batch "Download All" Action**: 1-tap download trigger to fetch all remaining available scripture versions concurrently.
+- **Streamlined Header Architecture**: Removed unnecessary batch action buttons in favor of an elegant, distraction-free section header.
 - **Separated Offline Library**: Isolates downloaded offline Bibles from available versions with direct 1-tap jump to the Word Reader (`translationOverride`).
 - **Unified Available Catalog**: Clean, unified continuous list of all available scripture translations with zero category pills or sub-header clutter.
 - **Live Percentage Progress Tracking**: Provides immediate visual feedback per card during multi-megabyte package downloads with background download resilience.
@@ -822,6 +823,23 @@ To eliminate visual header stacking and duplicate headers across nested navigato
    - Eliminated the custom duplicated `<View style={styles.headerBar}>` and replaced it with unified React Navigation native stack headers across both `AuthStack` and `ProfileStack`.
    - Removed all icons and SVGs (`BookOpenSvg`, `ShieldCheckSvg`, header logo images, and back chevrons) from the legal screens, delivering a pristine, distraction-free typographic layout strictly focused on theological and legal exposition.
    - Dynamic tab bar hiding (`display: 'none'`) during policy reading to prevent floating UI elements from obstructing legal content.
+
+---
+
+## Bottom-Sliding Themed Pop-Up Architecture & Uniform App Logo Branding
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Popups-Bottom--Sliding%20Sheets-FDD223?style=for-the-badge" alt="Bottom Sliding Sheets" />
+  <img src="https://img.shields.io/badge/Branding-Calibrated%20App%20Logo%20Only-10B981?style=for-the-badge" alt="Calibrated App Logo" />
+  <img src="https://img.shields.io/badge/Dismissal-Tap--Outside%20Slide--Down-0284C7?style=for-the-badge" alt="Tap Outside Slide Down" />
+  <img src="https://img.shields.io/badge/Interception-Universal%20Alert.alert%20Hook-000000?style=for-the-badge" alt="Universal Alert Interception" />
+</p>
+
+All alert dialogues, action confirmations, and system notifications across the application have been transformed into a unified bottom sheet architecture:
+1. **Fluid Bottom-Sliding Motion**: Pop-up sheets slide up smoothly from the bottom screen edge with spring dynamics upon presentation, creating a modern native experience.
+2. **Interactive Tap-Outside Dismissal**: Tapping anywhere on the darkened backdrop scrim outside the sheet smoothly animates the sheet downward off-screen before unmounting.
+3. **Decoupled Uniform Brand Identity**: Arbitrary status icons (e.g. checkmarks, tick icons, trash icons, or warning symbols) have been eliminated from pop-up headers. Every alert uniformly renders the in-app brand logo calibrated at 50x50 inside a 68x68 rounded container with `#FEF9C3` surface and `#FDE047` border per Rules 15 & 19.
+4. **Universal Alert Interception**: `AlertContext` hooks standard React Native `Alert.alert` calls at the application root, guaranteeing that any alert triggered anywhere in the app automatically adopts this bottom-sliding themed sheet design.
 
 ---
 
