@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
   metaNotice: {
     fontSize: 9,
     fontWeight: '800',
-    color: '#B45309',
+    color: colors.accent,
     letterSpacing: 0.5,
   },
   metaSubNotice: {
@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
   locationTypeLabel: {
     fontSize: 10,
     fontWeight: '800',
-    color: '#B45309',
+    color: colors.accent,
     letterSpacing: 0.4,
   },
   locationCityLabel: {

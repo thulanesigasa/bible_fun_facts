@@ -286,7 +286,7 @@ export default function MinistryDetailScreen({
             filteredBranches.map((b, index) => (
               <View key={b.id} style={[styles.branchRow, index === 0 && styles.branchRowFirst]}>
                 {/* Type label as plain text, not a pill */}
-                <Text variant="caption" weight="700" color="#B45309" style={styles.branchTypeText}>
+                <Text variant="caption" weight="700" color={colors.accent} style={styles.branchTypeText}>
                   {getBranchTypeLabel(b.type).toUpperCase()}
                 </Text>
 
