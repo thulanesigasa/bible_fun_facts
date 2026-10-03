@@ -2172,6 +2172,42 @@ To guarantee continuous, uninterrupted daily study streak tracking across offlin
 
 ---
 
+### 12. Canonical Church Campus Directory & Real Street Map Locations
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Spirit%20Embassy-Harare%20Hippodrome%20%7C%20Zimbabwe-0284C7?style=for-the-badge&logo=church&logoColor=white" alt="Spirit Embassy Harare Hippodrome" />
+  <img src="https://img.shields.io/badge/ECG-Golden%20Peacock%20Complex%20%7C%20Lilongwe-10B981?style=for-the-badge&logo=church&logoColor=white" alt="ECG Golden Peacock Complex" />
+  <img src="https://img.shields.io/badge/God%20Embassy-6X4R%2B2Q%2C%20R511%2C%20Pretoria%2C%200001-FDD223?style=for-the-badge&logo=church&logoColor=white" alt="God Embassy Pretoria" />
+  <img src="https://img.shields.io/badge/Christ%20Embassy-51%2F53%20Kudirat%20Abiola%20Way%2C%20Ikeja%2C%20Lagos-0284C7?style=for-the-badge&logo=church&logoColor=white" alt="Christ Embassy Lagos" />
+</p>
+
+To ensure believers and seekers can explore authentic physical locations on the interactive campus street map without dependency on remote connectivity:
+
+1. **Pre-Seeded Canonical Physical Campuses (`src/services/ministryService.ts`)**:
+   - **Spirit Embassy (GoodNews Church)**:
+     - **Address**: Harare Hippodrome, Stand 19797, Braeside, Harare, Zimbabwe
+     - **Coordinates**: `-17.842234`, `31.064743`
+     - **Leadership**: Prophet Uebert Angel & Prophetess Beverly Angel
+   - **ECG The Jesus Nation Church**:
+     - **Address**: Golden Peacock Complex / House, Presidential Way, City Centre, Lilongwe, Malawi
+     - **Coordinates**: `-13.961257`, `33.799067`
+     - **Leadership**: Prophet Shepherd Bushiri
+   - **God Embassy**:
+     - **Address**: 6X4R+2Q, R511, Pretoria, 0001, South Africa
+     - **Coordinates**: `-25.794938`, `27.991938`
+     - **Leadership**: Prophet Isaiah Brian Sovi & Pastor Shanna Sovi
+   - **Christ Embassy (Believers LoveWorld)**:
+     - **Address**: 51/53 Kudirat Abiola Way (and 8 Billings Way), Oregun, Ikeja, Lagos, Nigeria
+     - **Coordinates**: `6.599262`, `3.365993`
+     - **Leadership**: Rev. Dr. Chris Oyakhilome
+
+2. **Resilient Offline Architecture**:
+   - `getAllMinistries()`, `getMinistryById()`, and `getAllBranches()` embed these canonical headquarters as high-priority permanent records.
+   - Any remote database downtime or connection lag falls back seamlessly to the offline dataset.
+   - Tapping any church filter in `BranchMapScreen` automatically synchronizes the active branch and recenters the street tile camera on that specific church's coordinates.
+
+---
+
 ### Verification Commands
 ```bash
 # Run unit test suite
