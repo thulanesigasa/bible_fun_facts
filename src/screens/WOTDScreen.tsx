@@ -27,6 +27,9 @@ import {
   downloadTranslation,
   deleteDownloadedTranslation,
   subscribeOfflineUpdates,
+  subscribeDownloadEvents,
+  getActiveDownloadingIds,
+  getTranslationDownloadProgress,
   TRANSLATION_SOURCES,
 } from '../services/bibleService';
 import {
@@ -168,7 +171,7 @@ export default function WOTDScreen({ route, navigation }: any) {
   // ── Translation picker & Offline Download State ─────────────────────
   const [isTranslationPickerOpen, setIsTranslationPickerOpen] = useState(false);
   const [downloadedTranslations, setDownloadedTranslations] = useState<string[]>([]);
-  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [downloadingIds, setDownloadingIds] = useState<Record<string, boolean>>({});
   const [downloadProgress, setDownloadProgress] = useState<Record<string, number>>({});
 
   useEffect(() => {
@@ -184,12 +187,47 @@ export default function WOTDScreen({ route, navigation }: any) {
       }
     };
     loadDownloaded();
-    const unsubscribe = subscribeOfflineUpdates(() => {
+    const unsubscribeOffline = subscribeOfflineUpdates(() => {
       loadDownloaded();
     });
+
+    // Sync any downloads currently in-flight
+    const active = getActiveDownloadingIds();
+    if (active.length > 0) {
+      const activeMap: Record<string, boolean> = {};
+      const progressMap: Record<string, number> = {};
+      active.forEach((id) => {
+        activeMap[id] = true;
+        progressMap[id] = getTranslationDownloadProgress(id);
+      });
+      setDownloadingIds((prev) => ({ ...prev, ...activeMap }));
+      setDownloadProgress((prev) => ({ ...prev, ...progressMap }));
+    }
+
+    const unsubscribeEvents = subscribeDownloadEvents((id, pct, isFinished) => {
+      if (!isMounted) return;
+      if (isFinished) {
+        setDownloadingIds((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+        setDownloadProgress((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+        loadDownloaded();
+      } else {
+        setDownloadingIds((prev) => ({ ...prev, [id]: true }));
+        setDownloadProgress((prev) => ({ ...prev, [id]: pct }));
+      }
+    });
+
     return () => {
       isMounted = false;
-      unsubscribe();
+      unsubscribeOffline();
+      unsubscribeEvents();
     };
   }, []);
 
@@ -205,9 +243,9 @@ export default function WOTDScreen({ route, navigation }: any) {
   }, [route?.params?.translationOverride]);
 
   const handleDownloadTranslation = async (key: BibleTranslation) => {
-    if (downloadingId) return;
+    if (downloadingIds[key]) return;
     try {
-      setDownloadingId(key);
+      setDownloadingIds((prev) => ({ ...prev, [key]: true }));
       setDownloadProgress((prev) => ({ ...prev, [key]: 10 }));
       await downloadTranslation(key, (pct) => {
         setDownloadProgress((prev) => ({ ...prev, [key]: pct }));
@@ -221,7 +259,11 @@ export default function WOTDScreen({ route, navigation }: any) {
         [{ text: 'OK' }]
       );
     } finally {
-      setDownloadingId(null);
+      setDownloadingIds((prev) => {
+        const copy = { ...prev };
+        delete copy[key];
+        return copy;
+      });
       setDownloadProgress((prev) => {
         const copy = { ...prev };
         delete copy[key];
@@ -937,7 +979,7 @@ export default function WOTDScreen({ route, navigation }: any) {
                     const isActive = translation === key;
                     const meta = TRANSLATION_META[key];
                     const isDownloaded = downloadedTranslations.includes(key);
-                    const isDownloading = downloadingId === key;
+                    const isDownloading = Boolean(downloadingIds[key]);
                     const progress = downloadProgress[key] || 0;
 
                     return (
@@ -1007,7 +1049,8 @@ export default function WOTDScreen({ route, navigation }: any) {
                           ) : (
                             <TouchableOpacity
                               onPress={() => handleDownloadTranslation(key)}
-                              style={styles.downloadActionBtn}
+                              disabled={isDownloading}
+                              style={[styles.downloadActionBtn, isDownloading && { opacity: 0.6 }]}
                               activeOpacity={0.8}
                               accessibilityLabel={`Download ${TRANSLATION_LABELS[key]} for offline reading`}
                             >

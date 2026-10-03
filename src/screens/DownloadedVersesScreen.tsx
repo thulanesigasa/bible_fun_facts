@@ -15,7 +15,11 @@ import {
   getDownloadedTranslations,
   deleteDownloadedTranslation,
   downloadTranslation,
+  downloadMultipleTranslations,
   subscribeOfflineUpdates,
+  subscribeDownloadEvents,
+  getActiveDownloadingIds,
+  getTranslationDownloadProgress,
   DownloadedTranslationMeta,
   TRANSLATION_SOURCES,
   TranslationSourceConfig,
@@ -30,7 +34,7 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
   const [downloaded, setDownloaded] = useState<DownloadedTranslationMeta[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [downloadingIds, setDownloadingIds] = useState<Record<string, boolean>>({});
   const [downloadProgress, setDownloadProgress] = useState<Record<string, number>>({});
 
   const loadDownloaded = useCallback(async () => {
@@ -47,7 +51,43 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
   useEffect(() => {
     loadDownloaded();
     const unsubscribe = subscribeOfflineUpdates(loadDownloaded);
-    return unsubscribe;
+
+    // Initial sync with active background downloads
+    const activeIds = getActiveDownloadingIds();
+    if (activeIds.length > 0) {
+      const activeMap: Record<string, boolean> = {};
+      const progMap: Record<string, number> = {};
+      activeIds.forEach((id) => {
+        activeMap[id] = true;
+        progMap[id] = getTranslationDownloadProgress(id);
+      });
+      setDownloadingIds((prev) => ({ ...prev, ...activeMap }));
+      setDownloadProgress((prev) => ({ ...prev, ...progMap }));
+    }
+
+    const unsubEvents = subscribeDownloadEvents((id, pct, isFinished) => {
+      if (isFinished) {
+        setDownloadingIds((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+        setDownloadProgress((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+        loadDownloaded();
+      } else {
+        setDownloadingIds((prev) => ({ ...prev, [id]: true }));
+        setDownloadProgress((prev) => ({ ...prev, [id]: pct }));
+      }
+    });
+
+    return () => {
+      unsubscribe();
+      unsubEvents();
+    };
   }, [loadDownloaded]);
 
   const handleOpen = (item: DownloadedTranslationMeta) => {
@@ -82,8 +122,8 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
   };
 
   const handleDownload = async (source: TranslationSourceConfig) => {
-    if (downloadingId) return;
-    setDownloadingId(source.id);
+    if (downloadingIds[source.id]) return;
+    setDownloadingIds((prev) => ({ ...prev, [source.id]: true }));
     setDownloadProgress((prev) => ({ ...prev, [source.id]: 5 }));
 
     try {
@@ -98,13 +138,27 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
         `Unable to download ${source.name}. Please check your internet connection and try again.`
       );
     } finally {
-      setDownloadingId(null);
+      setDownloadingIds((prev) => {
+        const next = { ...prev };
+        delete next[source.id];
+        return next;
+      });
       setDownloadProgress((prev) => {
         const next = { ...prev };
         delete next[source.id];
         return next;
       });
     }
+  };
+
+  const handleDownloadAll = async () => {
+    const pending = availableTranslations.filter((t) => !downloadingIds[t.id]);
+    if (pending.length === 0) return;
+
+    // Launch all available downloads in parallel
+    pending.forEach((source) => {
+      handleDownload(source);
+    });
   };
 
   const formatSize = (bytes?: number): string => {
@@ -198,13 +252,29 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
           {/* 2. AVAILABLE TRANSLATIONS (PLAIN UNIFIED LIST) */}
           {availableTranslations.length > 0 && (
             <View style={styles.sectionWrap}>
-              <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
-                AVAILABLE TRANSLATIONS ({availableTranslations.length})
-              </Text>
+              <View style={styles.sectionHeaderRow}>
+                <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+                  AVAILABLE TRANSLATIONS ({availableTranslations.length})
+                </Text>
+                {availableTranslations.length > 1 && (
+                  <TouchableOpacity
+                    style={styles.downloadAllBtn}
+                    onPress={handleDownloadAll}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel="Download all available translations simultaneously"
+                  >
+                    <DownloadSvg size={12} color="#0F172A" strokeWidth={2} />
+                    <Text variant="caption" weight="700" color="#0F172A" style={styles.downloadAllBtnText}>
+                      Download All
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
               <View style={styles.cardContainer}>
                 {availableTranslations.map((source, index) => {
                   const isLast = index === availableTranslations.length - 1;
-                  const isDownloading = downloadingId === source.id;
+                  const isDownloading = Boolean(downloadingIds[source.id]);
                   const progress = downloadProgress[source.id] || 0;
 
                   return (
@@ -242,13 +312,18 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
                       <TouchableOpacity
                         style={[styles.downloadBtn, isDownloading && styles.downloadBtnDisabled]}
                         onPress={() => handleDownload(source)}
-                        disabled={Boolean(downloadingId)}
+                        disabled={isDownloading}
                         activeOpacity={0.8}
                         accessibilityRole="button"
                         accessibilityLabel={`Download ${source.name} for offline reading`}
                       >
                         {isDownloading ? (
-                          <ActivityIndicator size="small" color="#0F172A" />
+                          <View style={styles.downloadingBtnContent}>
+                            <ActivityIndicator size="small" color="#0F172A" />
+                            <Text variant="caption" weight="700" color="#0F172A">
+                              {progress}%
+                            </Text>
+                          </View>
                         ) : (
                           <>
                             <DownloadSvg size={14} color="#0F172A" strokeWidth={2} />
@@ -291,13 +366,30 @@ const styles = StyleSheet.create({
   sectionWrap: {
     marginTop: spacing.md,
   },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.lg,
+    marginBottom: 4,
+  },
   sectionHeader: {
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 0.8,
     textTransform: 'uppercase',
-    paddingHorizontal: spacing.lg,
-    marginBottom: 4,
+  },
+  downloadAllBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(253, 210, 35, 0.25)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: radius.full,
+  },
+  downloadAllBtnText: {
+    fontSize: 11,
   },
   cardContainer: {
     backgroundColor: '#FFFFFF',
@@ -373,5 +465,10 @@ const styles = StyleSheet.create({
   progressText: {
     fontSize: 11,
     marginTop: 4,
+  },
+  downloadingBtnContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
 });

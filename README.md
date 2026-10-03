@@ -19,6 +19,7 @@
   <img src="https://img.shields.io/badge/Streak%20Milestones-3D%20Hexagonal%20Badges-F59E0B?style=for-the-badge" alt="3D Streak Milestone Badges" />
   <img src="https://img.shields.io/badge/Achievements-Streak%20%7C%20Bookmarks%20%7C%20Highlights%20%7C%20Shares-FDD223?style=for-the-badge" alt="Multi-Category Achievements" />
   <img src="https://img.shields.io/badge/Offline%20Bibles-32%20Full%20Translations%20%7C%20The%20Message%20(MSG)%20%7C%20All%20Official%20South%20African%20Languages%20%7C%20Shona%20(Zimbabwe)-10B981?style=for-the-badge" alt="Offline Bible Translations" />
+  <img src="https://img.shields.io/badge/Downloads-Concurrent%20Multi--Version%20%7C%20Mutex%20Registry-FDD223?style=for-the-badge" alt="Concurrent Multi-Version Downloads" />
   <img src="https://img.shields.io/badge/African%20Languages-isiZulu%20%7C%20isiXhosa%20%7C%20Sepedi%20%7C%20Sesotho%20%7C%20Setswana%20%7C%20Xitsonga%20%7C%20Tshivenda%20%7C%20siSwati%20%7C%20isiNdebele%20%7C%20ChiShona-FDD223?style=for-the-badge" alt="African Languages Holy Scripture" />
   <img src="https://img.shields.io/badge/Share%20Engine-Zero%20Blank%20%7C%20High--Fidelity%20PNG-10B981?style=for-the-badge" alt="Zero Blank Share Engine" />
   <img src="https://img.shields.io/badge/Security-Android%20Keystore%20%7C%20iOS%20Keychain-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Keystore and Keychain" />
@@ -769,15 +770,20 @@ exégeomai integrates complete, authentic 66-book canonical translations for Sou
 - **Modern English**: New International Version (NIV), English Standard Version (ESV), New Living Translation (NLT), New King James Version (NKJV), Amplified Bible (AMP), Berean Standard Bible (BSB), New American Standard Bible (NASB), Christian Standard Bible (CSB).
 - **Classic & Historic**: World English Bible (WEB), King James Version (KJV), American Standard Version (ASV), Bible in Basic English (BBE), Darby Bible (DARBY), Douay-Rheims 1899 (DRA), Young's Literal Translation (YLT), Geneva Bible 1599 (GNV), World English Bible British Edition (WEBBE), Open English Bible US (OEB-US), Open English Bible Commonwealth (OEB-CW).
 
-### 3. Multi-CDN Resilient Pipeline & Dynamic Schema Normalization (`offlineBibleService.ts`)
+### 3. Multi-CDN Resilient Pipeline, Concurrency Engine & Mutex Registry (`offlineBibleService.ts`)
+- **Parallel Multi-Version Downloading**: Users can download multiple Bible translations simultaneously in parallel. In-flight promises are pooled to eliminate bottlenecks and avoid duplicate network requests.
+- **Mutex-Protected Registry Persistence (`registryMutex`)**: Ensures thread-safe read-modify-write operations on AsyncStorage registry when multiple parallel downloads complete concurrently, eliminating race-condition data loss.
+- **Event-Driven Download Broadcasting (`subscribeDownloadEvents`)**: Global publish-subscribe broadcast bus streams live download progress per translation ID to multiple listening screens without polling.
 - **Triple-Mirror CDN Redundancy**: Every translation is backed by three independent, global mirrors (jsDelivr CDN, GitHub Raw, Fastly CDN) with automatic failover to prevent download stalls.
 - **Dynamic Schema Normalization (`normalizeBibleJson`)**: Intelligently parses diverse digital scripture schemas (both standard array formats and deep `{ Book: [ { Chapter: [ { Verse: string } ] } ] }` structures), normalizing all translations into the unified canonical `RawBibleBook[]` standard upon download.
 - **Zero-Latency In-Memory & Local Disk Storage**: Downloaded Bibles are saved to `expo-file-system` (`offline_bibles/`) and loaded into high-speed memory caches (`Map<string, RawBibleBook[]>`) for instantaneous 0ms chapter and verse lookups even with zero cellular data or Wi-Fi.
 
 ### 4. Dedicated Offline Downloads Hub (`DownloadedVersesScreen.tsx`)
+- **Non-Blocking Concurrent Downloads**: Tapping download on one translation leaves all other available versions active and actionable, allowing users to queue or download multiple versions concurrently.
+- **Batch "Download All" Action**: 1-tap download trigger to fetch all remaining available scripture versions concurrently.
 - **Separated Offline Library**: Isolates downloaded offline Bibles from available versions with direct 1-tap jump to the Word Reader (`translationOverride`).
-- **Unified Available Catalog**: Clean, unified continuous list of all 24 available scripture translations with zero category pills or sub-header clutter.
-- **Live Percentage Progress Tracking**: Provides immediate visual feedback during multi-megabyte package downloads with background download resilience.
+- **Unified Available Catalog**: Clean, unified continuous list of all available scripture translations with zero category pills or sub-header clutter.
+- **Live Percentage Progress Tracking**: Provides immediate visual feedback per card during multi-megabyte package downloads with background download resilience.
 - **Clean Flat Body Standard**: Completely devoid of indicator badges, tags, or pills in strict adherence to Rule 16 and the 60-30-10 design system.
 
 ---

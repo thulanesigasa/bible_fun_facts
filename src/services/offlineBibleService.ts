@@ -638,6 +638,100 @@ function notifySubscribers() {
   });
 }
 
+// ── Registry Mutex (Guarantees atomic persistence during concurrent downloads) ──
+let registryMutex: Promise<any> = Promise.resolve();
+
+export async function saveMetaToRegistry(meta: DownloadedTranslationMeta): Promise<DownloadedTranslationMeta[]> {
+  const previous = registryMutex;
+  let release: () => void = () => {};
+  registryMutex = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  try {
+    await previous;
+    const currentList = await getDownloadedTranslations();
+    const updatedList = currentList.filter((item) => item.id !== meta.id);
+    updatedList.push(meta);
+    cachedRegistry = updatedList;
+    await AsyncStorage.setItem(REGISTRY_KEY, JSON.stringify(updatedList));
+    notifySubscribers();
+    return updatedList;
+  } finally {
+    release();
+  }
+}
+
+export async function removeMetaFromRegistry(translationId: string): Promise<DownloadedTranslationMeta[]> {
+  const previous = registryMutex;
+  let release: () => void = () => {};
+  registryMutex = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  try {
+    await previous;
+    const currentList = await getDownloadedTranslations();
+    const updatedList = currentList.filter((item) => item.id !== translationId);
+    cachedRegistry = updatedList;
+    await AsyncStorage.setItem(REGISTRY_KEY, JSON.stringify(updatedList));
+    notifySubscribers();
+    return updatedList;
+  } finally {
+    release();
+  }
+}
+
+// ── In-Flight Download Tracking & Concurrency Broadcast ─────────────────────
+export type DownloadEventListener = (
+  translationId: string,
+  progress: number,
+  isFinished: boolean,
+  error?: Error
+) => void;
+
+const activeDownloadPromises = new Map<string, Promise<DownloadedTranslationMeta>>();
+const activeDownloadProgress = new Map<string, number>();
+const downloadEventListeners = new Set<DownloadEventListener>();
+
+export function subscribeDownloadEvents(listener: DownloadEventListener): () => void {
+  downloadEventListeners.add(listener);
+  return () => {
+    downloadEventListeners.delete(listener);
+  };
+}
+
+function broadcastDownloadEvent(
+  translationId: string,
+  progress: number,
+  isFinished: boolean,
+  error?: Error
+) {
+  if (isFinished) {
+    activeDownloadProgress.delete(translationId);
+  } else {
+    activeDownloadProgress.set(translationId, progress);
+  }
+  downloadEventListeners.forEach((fn) => {
+    try {
+      fn(translationId, progress, isFinished, error);
+    } catch (e) {
+      console.warn('Error in downloadEventListener:', e);
+    }
+  });
+}
+
+export function isTranslationDownloading(translationId: string): boolean {
+  return activeDownloadPromises.has(translationId);
+}
+
+export function getActiveDownloadingIds(): string[] {
+  return Array.from(activeDownloadPromises.keys());
+}
+
+export function getTranslationDownloadProgress(translationId: string): number {
+  return activeDownloadProgress.get(translationId) || 0;
+}
+
+
 /**
  * Format bytes to readable string (e.g. 4.1 MB)
  */
@@ -742,9 +836,9 @@ async function loadTranslationIntoMemory(translationId: string): Promise<RawBibl
 }
 
 /**
- * Download a full translation package with multi-CDN fallback, progress tracking, and BOM resilience
+ * Internal execution worker for downloading a translation package
  */
-export async function downloadTranslation(
+async function executeDownloadTranslation(
   translationId: string,
   onProgress?: (progressPercent: number) => void
 ): Promise<DownloadedTranslationMeta> {
@@ -894,17 +988,10 @@ export async function downloadTranslation(
     isComplete: true,
   };
 
-  // Update persistent registry
-  const currentList = await getDownloadedTranslations();
-  const updatedList = currentList.filter((item) => item.id !== translationId);
-  updatedList.push(meta);
-
-  cachedRegistry = updatedList;
-  await AsyncStorage.setItem(REGISTRY_KEY, JSON.stringify(updatedList));
+  // Update persistent registry via mutex to ensure concurrent safety
+  await saveMetaToRegistry(meta);
 
   if (onProgress) onProgress(100);
-  notifySubscribers();
-
   return meta;
 }
 
@@ -923,13 +1010,74 @@ export async function deleteDownloadedTranslation(translationId: string): Promis
   }
 
   memoryTranslationData.delete(translationId);
+  await removeMetaFromRegistry(translationId);
+}
 
-  const currentList = await getDownloadedTranslations();
-  const updatedList = currentList.filter((item) => item.id !== translationId);
-  cachedRegistry = updatedList;
-  await AsyncStorage.setItem(REGISTRY_KEY, JSON.stringify(updatedList));
+/**
+ * Download a full translation package with multi-CDN fallback, progress tracking, and BOM resilience.
+ * Supports concurrent downloads without blocking or clobbering other in-flight downloads.
+ */
+export async function downloadTranslation(
+  translationId: string,
+  onProgress?: (progressPercent: number) => void
+): Promise<DownloadedTranslationMeta> {
+  const existingPromise = activeDownloadPromises.get(translationId);
+  if (existingPromise) {
+    if (onProgress) {
+      const currentPct = activeDownloadProgress.get(translationId) || 5;
+      onProgress(currentPct);
+      const unsub = subscribeDownloadEvents((id, pct, isFinished) => {
+        if (id === translationId) {
+          onProgress(pct);
+          if (isFinished) unsub();
+        }
+      });
+    }
+    return existingPromise;
+  }
 
-  notifySubscribers();
+  const downloadPromise = (async () => {
+    try {
+      broadcastDownloadEvent(translationId, 5, false);
+      if (onProgress) onProgress(5);
+      const result = await executeDownloadTranslation(translationId, (pct) => {
+        broadcastDownloadEvent(translationId, pct, false);
+        if (onProgress) onProgress(pct);
+      });
+      broadcastDownloadEvent(translationId, 100, true);
+      return result;
+    } catch (err: any) {
+      broadcastDownloadEvent(translationId, 0, true, err);
+      throw err;
+    } finally {
+      activeDownloadPromises.delete(translationId);
+    }
+  })();
+
+  activeDownloadPromises.set(translationId, downloadPromise);
+  return downloadPromise;
+}
+
+/**
+ * Concurrently download multiple translation packages in parallel.
+ * Returns results when all finish (settled).
+ */
+export async function downloadMultipleTranslations(
+  translationIds: string[],
+  onProgressUpdate?: (progressMap: Record<string, number>) => void
+): Promise<PromiseSettledResult<DownloadedTranslationMeta>[]> {
+  const progressMap: Record<string, number> = {};
+
+  const promises = translationIds.map((id) =>
+    downloadTranslation(id, (pct) => {
+      progressMap[id] = pct;
+      if (onProgressUpdate) {
+        onProgressUpdate({ ...progressMap });
+      }
+    })
+  );
+
+  return Promise.allSettled(promises);
 }
 
 /**
