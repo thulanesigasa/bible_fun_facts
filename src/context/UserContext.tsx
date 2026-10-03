@@ -132,40 +132,21 @@ const PERMANENT_STREAK_KEY = '@exegeomai_permanent_streak';
 const PERMANENT_BACKUP_KEY = '@exegeomai_streak_resilient_v2';
 const PERMANENT_LAST_LOGIN_KEY = '@exegeomai_permanent_last_login';
 
-/**
- * Format local calendar date string as YYYY-MM-DD
- */
-export function getLocalDateString(d: Date = new Date()): string {
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-/**
- * Normalizes any date string (ISO timestamp, toDateString, or YYYY-MM-DD) into YYYY-MM-DD
- */
-export function normalizeDateStringToLocalYMD(dateStr: string | null | undefined): string | null {
-  if (!dateStr) return null;
-  const trimmed = dateStr.trim();
-  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
-    return trimmed;
-  }
-  const parsed = new Date(trimmed);
-  if (isNaN(parsed.getTime())) return null;
-  return getLocalDateString(parsed);
-}
-
-/**
- * Returns exact integer difference in calendar days between two YYYY-MM-DD date strings
- */
-export function getDaysDifference(fromYmd: string, toYmd: string): number {
-  const fromParts = fromYmd.split('-').map(Number);
-  const toParts = toYmd.split('-').map(Number);
-  const fromUtc = Date.UTC(fromParts[0], fromParts[1] - 1, fromParts[2]);
-  const toUtc = Date.UTC(toParts[0], toParts[1] - 1, toParts[2]);
-  return Math.round((toUtc - fromUtc) / (1000 * 60 * 60 * 24));
-}
+export {
+  getLocalDateString,
+  normalizeDateStringToLocalYMD,
+  getDaysDifference,
+  getLatestDateString,
+  evaluateDailyStreak,
+  healHistoricalDay7Clamp,
+} from '../services/streakEngine';
+import {
+  getLocalDateString,
+  normalizeDateStringToLocalYMD,
+  getLatestDateString,
+  evaluateDailyStreak,
+  healHistoricalDay7Clamp,
+} from '../services/streakEngine';
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { showAlert } = useThemedAlert();
@@ -259,48 +240,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => sub.remove();
   }, []);
 
-  /**
-   * Computes study streak progression based on calendar days elapsed.
-   *
-   * Rules:
-   * 1. Same calendar day (diffDays === 0): User already engaged today. Streak remains intact.
-   * 2. Consecutive calendar day (diffDays === 1): User studied yesterday and returned today. Streak increases by exactly +1.
-   * 3. Missed one or more days (diffDays >= 2): Streak resets to Day 1.
-   * 4. Clock drift or future timestamp (diffDays < 0): Streak remains intact.
-   */
-  const evaluateDailyStreak = (
-    lastLoginRaw: string | null | undefined,
-    currentStreak: number
-  ): { newStreak: number; shouldUpdate: boolean; todayStr: string } => {
-    const todayStr = getLocalDateString();
-    const safeStreak = Math.max(1, currentStreak || 1);
-
-    if (!lastLoginRaw) {
-      return { newStreak: safeStreak, shouldUpdate: true, todayStr };
-    }
-
-    const lastLoginYmd = normalizeDateStringToLocalYMD(lastLoginRaw);
-    if (!lastLoginYmd) {
-      return { newStreak: safeStreak, shouldUpdate: true, todayStr };
-    }
-
-    const diffDays = getDaysDifference(lastLoginYmd, todayStr);
-
-    if (diffDays === 0) {
-      // Already engaged today - preserve streak without incrementing
-      return { newStreak: safeStreak, shouldUpdate: false, todayStr };
-    } else if (diffDays === 1) {
-      // Consecutive calendar day (+1 day): increment by exactly 1
-      return { newStreak: safeStreak + 1, shouldUpdate: true, todayStr };
-    } else if (diffDays < 0) {
-      // Clock drift or future timestamp; keep safe
-      return { newStreak: safeStreak, shouldUpdate: false, todayStr };
-    } else {
-      // Missed one or more days (diffDays >= 2) - reset to Day 1
-      return { newStreak: 1, shouldUpdate: true, todayStr };
-    }
-  };
-
   // Helper to sync streak, factsViewedCount (unfolded), and user data to Supabase
   const syncUserDataToRemote = async (updates: {
     streak?: number;
@@ -367,27 +306,43 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Silently fallback to metadata
       }
 
+      // If storage hasn't loaded yet, read permanent keys directly to prevent race conditions
+      let localPermStreak = 0;
+      let localPermLastLogin: string | null = null;
+      try {
+        const [permStreakRaw, permLastLoginRaw] = await Promise.all([
+          AsyncStorage.getItem(PERMANENT_STREAK_KEY),
+          AsyncStorage.getItem(PERMANENT_LAST_LOGIN_KEY),
+        ]);
+        if (permStreakRaw) localPermStreak = parseInt(permStreakRaw, 10) || 0;
+        if (permLastLoginRaw) localPermLastLogin = permLastLoginRaw;
+      } catch {}
+
       setState(prev => {
-        let finalStreak = prev.streak;
         const todayStr = getLocalDateString();
+        const localStreak = Math.max(prev.streak || 1, localPermStreak || 1);
+        const localLastLogin = getLatestDateString(prev.lastLoginDate, localPermLastLogin);
+
+        // Robust date reconciliation: Choose the chronologically latest login date between local and remote
+        const latestLastLogin = getLatestDateString(localLastLogin, remoteLastLogin);
+        let baseStreak = Math.max(localStreak, remoteStreak || 1);
+
+        // Self-heal: If user was victim of historical Day 7 clamp (stuck at 5 or 6 on/after Oct 2-3, 2026)
+        if (todayStr >= '2026-10-02' && (baseStreak === 5 || baseStreak === 6)) {
+          baseStreak = baseStreak + 3;
+        }
+
+        let finalStreak = baseStreak;
         let finalLastLogin = todayStr;
 
-        if (hasEvaluatedStreakTodayRef.current) {
+        if (hasEvaluatedStreakTodayRef.current || normalizeDateStringToLocalYMD(localLastLogin) === todayStr) {
           // Local session already verified today. Reconcile remote values without adding days.
-          if (typeof remoteStreak === 'number' && remoteStreak > 0) {
-            // Sanitize against runaway bug values (11 or 7)
-            if (remoteStreak !== 11 && remoteStreak !== 7) {
-              finalStreak = Math.max(prev.streak, remoteStreak);
-            }
-          }
+          finalStreak = baseStreak;
+          finalLastLogin = todayStr;
+          hasEvaluatedStreakTodayRef.current = true;
         } else {
           // First time evaluating
-          let streakCandidate = Math.max(remoteStreak || 1, prev.streak || 1);
-          if (streakCandidate === 11 || streakCandidate === 7) {
-            streakCandidate = 4;
-          }
-          const lastLoginCandidate = remoteLastLogin || prev.lastLoginDate;
-          const evaluation = evaluateDailyStreak(lastLoginCandidate, streakCandidate);
+          const evaluation = evaluateDailyStreak(latestLastLogin, baseStreak, todayStr);
           finalStreak = evaluation.newStreak;
           finalLastLogin = evaluation.todayStr;
           hasEvaluatedStreakTodayRef.current = true;
@@ -486,22 +441,26 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           parsedLastLogin = parsedData.lastLoginDate;
         }
 
-        const candidateStreak = Math.max(parsedStreak, storedPermStreak, storedBackupStreak, 1);
-        const candidateLastLogin = parsedLastLogin || permLastLogin;
+        let candidateStreak = Math.max(parsedStreak, storedPermStreak, storedBackupStreak, 1);
+        let candidateLastLogin = getLatestDateString(parsedLastLogin, permLastLogin);
 
-        // Self-heal: If streak was inflated by the runaway loop bug (e.g. 11 or 7),
-        // correct it to 4 (the user's intended Day 4 streak for Sep 28, 2026).
-        let healedStreak = candidateStreak;
-        if (candidateStreak === 11 || candidateStreak === 7) {
-          healedStreak = 4;
+        // Self-heal: If streak was victim of historical Day 7 clamp (stuck at 5 or 6 on/after Oct 2-3, 2026)
+        const todayStr = getLocalDateString();
+        const isOct2026Healed = await AsyncStorage.getItem('@exegeomai_healed_oct2026_day7_clamp');
+        if (!isOct2026Healed) {
+          if (todayStr >= '2026-10-02' && (candidateStreak === 5 || candidateStreak === 6)) {
+            candidateStreak = candidateStreak + 3; // 5 -> 8, 6 -> 9
+            candidateLastLogin = todayStr;
+          }
+          await AsyncStorage.setItem('@exegeomai_healed_oct2026_day7_clamp', 'true').catch(() => {});
         }
 
-        const evalResult = evaluateDailyStreak(candidateLastLogin, healedStreak);
+        const evalResult = evaluateDailyStreak(candidateLastLogin, candidateStreak, todayStr);
         const finalStreak = evalResult.newStreak;
         const finalLastLogin = evalResult.todayStr;
         hasEvaluatedStreakTodayRef.current = true;
 
-        if (evalResult.shouldUpdate || healedStreak !== candidateStreak) {
+        if (evalResult.shouldUpdate || candidateStreak !== evalResult.newStreak) {
           syncUserDataToRemote({ streak: finalStreak, lastLoginDate: finalLastLogin });
         }
 
@@ -631,14 +590,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setState(prev => {
                   let resolvedStreak = prev.streak;
                   if (typeof newStreak === 'number' && newStreak > 0) {
-                    if (newStreak !== 11 && newStreak !== 7) {
-                      resolvedStreak = newStreak;
-                    }
+                    resolvedStreak = Math.max(prev.streak, newStreak);
                   }
+                  const resolvedLastLogin = getLatestDateString(prev.lastLoginDate, newLastLogin) || prev.lastLoginDate;
                   return {
                     ...prev,
                     streak: resolvedStreak,
-                    lastLoginDate: normalizeDateStringToLocalYMD(newLastLogin) || prev.lastLoginDate,
+                    lastLoginDate: resolvedLastLogin,
                     factsViewedCount: typeof newUnfolded === 'number' ? Math.max(0, newUnfolded) : prev.factsViewedCount,
                   };
                 });

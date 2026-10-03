@@ -36,7 +36,7 @@
   <img src="https://img.shields.io/badge/Content%20Filter-Fellowship%20Moderation%20%7C%20Eph%204%3A29-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Fellowship Content Moderation" />
   <img src="https://img.shields.io/badge/Auth-Username%20%7C%20Email%20Login-10B981?style=for-the-badge&logo=supabase&logoColor=white" alt="Username and Email Login" />
   <img src="https://img.shields.io/badge/Unfolded%20Metric-Verified%20Read%20Facts%20Only-FDD223?style=for-the-badge" alt="Truthful Unfolded Count" />
-  <img src="https://img.shields.io/badge/Daily%20Streak-Deterministic%20Calendar%20Day%20%7C%20Feedback%20Loop%20Immune-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Deterministic Daily Streak Engine" />
+  <img src="https://img.shields.io/badge/Daily%20Streak-Deterministic%20Calendar%20Day%20%7C%20Offline--Online%20Reconciliation-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Deterministic Daily Streak Engine" />
   <img src="https://img.shields.io/badge/Notification%20Center-Continuous%20Direct--Body%20%7C%20CategoryBadge%20Achievements-10B981?style=for-the-badge" alt="Modern Notification Center" />
   <img src="https://img.shields.io/badge/The%20Word-Strongs%20Biblical%20Dictionary-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="Strong's Biblical Dictionary" />
   <img src="https://img.shields.io/badge/Offline%20Dictionary-100%25%20Offline%20Download-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Offline Dictionary Download" />
@@ -61,7 +61,7 @@
   <img src="https://img.shields.io/badge/Strongs%20Loading-Instant%200ms%20Curated%20Render%20%7C%20Infinite%20Paging-10B981?style=for-the-badge&logo=fastapi&logoColor=white" alt="Instant Strongs Loading" />
   <img src="https://img.shields.io/badge/Hermes%20Optimization-Zero--Crash%20AST%20Stack%20Protection-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Hermes Zero-Crash AST Stack Protection" />
   <img src="https://img.shields.io/badge/Cold%20Boot%20Stability-Decoupled%20Warmup%20%7C%20Zero%20OOM-FDD223?style=for-the-badge&logo=android&logoColor=white" alt="Cold Boot Stability" />
-  <img src="https://img.shields.io/badge/Tests-Jest%2045%2F45%20Passing%20(7%20Suites)-10B981?style=for-the-badge&logo=jest&logoColor=white" alt="Jest 45/45 Passing" />
+  <img src="https://img.shields.io/badge/Tests-Jest%2067%2F67%20Passing%20(8%20Suites)-10B981?style=for-the-badge&logo=jest&logoColor=white" alt="Jest 67/67 Passing" />
   <img src="https://img.shields.io/badge/Compliance-GDPR%20Purge%20RPC%20%7C%20Inexact%20Alarms-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="GDPR and Store Compliance" />
   <img src="https://img.shields.io/badge/Legal-Static%20HTML%20Privacy%20%26%20Terms-FDD223?style=for-the-badge&logo=html5&logoColor=white" alt="Static HTML Legal Docs" />
   <img src="https://img.shields.io/badge/Web%20Portal-Responsive%2060--30--10%20Landing%20Site-0284C7?style=for-the-badge&logo=html5&logoColor=white" alt="Responsive Web Portal" />
@@ -2062,6 +2062,42 @@ To guarantee that all devices immediately reflect the latest architecture withou
    - Embeds Hermes AST stack-safe data loaders preventing cold boot crashes.
 2. **Distribution**:
    - Published directly to GitHub Releases under tag `v1.0.4` as an asset ready for direct download and installation.
+
+---
+
+### 9. Study Streak Engine & Offline-Online Reconciliation Architecture (`src/services/streakEngine.ts`)
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Streak%20Math-Pure%20UTC%20Calendar%20Day%20Delta-10B981?style=for-the-badge&logo=fastapi&logoColor=white" alt="Pure UTC Calendar Math" />
+  <img src="https://img.shields.io/badge/Reconciliation-Chronologically%20Latest%20Active%20Date-0284C7?style=for-the-badge&logo=react&logoColor=white" alt="Chronologically Latest Date" />
+  <img src="https://img.shields.io/badge/Resilience-Zero--Clamp%20Continuous%20Progression-FDD223?style=for-the-badge&logo=shield&logoColor=white" alt="Zero-Clamp Continuous Progression" />
+  <img src="https://img.shields.io/badge/Self--Healing-Automated%20Historical%20Repair-10B981?style=for-the-badge&logo=supabase&logoColor=white" alt="Automated Historical Repair" />
+</p>
+
+To guarantee continuous, uninterrupted daily study streak tracking across offline and online environments:
+
+1. **Deterministic Calendar Day Arithmetic (`getDaysDifference`)**:
+   - Calculates exact calendar day differences using UTC timestamps derived from YYYY-MM-DD calendar components (`Date.UTC(year, month - 1, day)`).
+   - Immune to device timezone switches, daylight savings shifts, and background loop re-triggers.
+   - `diffDays === 0`: Same day return; streak is preserved without premature increment.
+   - `diffDays === 1`: Consecutive calendar day return; streak increments by exactly `+1`.
+   - `diffDays >= 2`: Genuinely missed days; streak safely resets to `1`.
+   - `diffDays < 0`: Clock drift or future date timestamps; streak is preserved safely.
+
+2. **Chronologically Latest Date Reconciliation (`getLatestDateString`)**:
+   - Resolves offline-to-online transitions where a user studies offline (recording e.g. `2026-10-02` in local `AsyncStorage`) and reconnects online the next day (`2026-10-03`) while remote Supabase state holds an older date (`2026-10-01`).
+   - Compares normalized YYYY-MM-DD timestamps and selects the chronologically latest active date. Stale remote cloud dates can never overwrite local offline activity or trigger an erroneous multi-day reset.
+
+3. **Removal of Hardcoded Streak Clamps**:
+   - Completely eliminated legacy magic number clamps (`=== 7`, `=== 11`) that historically reset streaks to Day 4.
+   - User streaks advance without artificial ceilings across Day 7, Day 8, Day 9, Day 11, and beyond.
+
+4. **Automated One-Time Historical Self-Healing (`healHistoricalDay7Clamp`)**:
+   - Idempotent migration key (`@exegeomai_healed_oct2026_day7_clamp`) automatically identifies users whose streaks were historically clamped from Day 7 to Day 4 (landing on Day 5/6 on Oct 2-3, 2026).
+   - Restores the lost `+3` days (returning Day 5 to Day 8 and Day 6 to Day 9), synchronizing verified progress across `AsyncStorage` permanent storage keys and Supabase `profiles`.
+
+5. **Multi-Tier Storage Redundancy**:
+   - Simultaneous persistence across `@exegeomai_user_data`, `@exegeomai_permanent_streak`, `@exegeomai_streak_resilient_v2`, `@exegeomai_permanent_last_login`, Supabase `profiles` table, and Supabase `auth.user_metadata`.
 
 ---
 
