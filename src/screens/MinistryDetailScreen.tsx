@@ -201,7 +201,7 @@ export default function MinistryDetailScreen({
         {/* — Radar map — */}
         <View style={styles.mapSection}>
           <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.sectionLabel}>
-            CAMPUS RADAR LOCATIONS
+            CAMPUS MAP LOCATIONS
           </Text>
           <BranchRadarMap
             branches={branches}

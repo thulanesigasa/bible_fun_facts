@@ -96,7 +96,7 @@ export default function BranchMapScreen({
           <CloseSvg size={20} color={colors.textPrimary} />
         </TouchableOpacity>
         <Text variant="h3" color={colors.textPrimary} style={styles.headerTitle}>
-          Church & Campus Radar
+          Church & Campus Map
         </Text>
         <View style={{ width: 36 }} />
       </View>
@@ -109,7 +109,7 @@ export default function BranchMapScreen({
         {/* Zero-API-Key Informative Meta Bar */}
         <View style={styles.metaInfoRow}>
           <Text style={styles.metaNotice}>
-            OPEN-SOURCE VECTOR RADAR • ZERO EXTERNAL API KEYS REQUIRED
+            OPEN-SOURCE STREET MAP • ZERO EXTERNAL API KEYS REQUIRED
           </Text>
           <Text style={styles.metaSubNotice}>
             Uses bundled in-memory database and open OpenStreetMap / CARTO street tiles.
@@ -213,11 +213,11 @@ export default function BranchMapScreen({
           </ScrollView>
         </View>
 
-        {/* Continuous Body Vector Radar Map (Zero Outer Card Wrapper) */}
+        {/* Continuous Body Real Street Map (Zero Outer Card Wrapper) */}
         <View style={styles.mapCanvasWrapper}>
           <View style={styles.mapCanvasHeader}>
             <Text style={styles.mapCanvasHeaderTitle}>
-              GEOGRAPHIC RADAR PROJECTION
+              CAMPUS LOCATIONS MAP
             </Text>
             <Text style={styles.mapCanvasHeaderCount}>
               {filteredBranches.length} Markers Plotted
