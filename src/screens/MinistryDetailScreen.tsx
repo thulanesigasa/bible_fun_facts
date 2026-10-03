@@ -96,14 +96,38 @@ export default function MinistryDetailScreen({
   }, [branches, activeTab, searchQuery]);
 
   const handleOpenDirections = (b: Branch) => {
+    const hasCoords =
+      b.coordinates &&
+      typeof b.coordinates.latitude === 'number' &&
+      typeof b.coordinates.longitude === 'number' &&
+      (b.coordinates.latitude !== 0 || b.coordinates.longitude !== 0);
+
+    const lat = b.coordinates?.latitude;
+    const lng = b.coordinates?.longitude;
+    const label = encodeURIComponent(b.name);
     const query = encodeURIComponent(`${b.name}, ${b.address}, ${b.town}, ${b.country}`);
-    const url =
-      Platform.select({
-        ios: `maps:0,0?q=${query}`,
-        android: `geo:0,0?q=${query}`,
-      }) || `https://www.google.com/maps/search/?api=1&query=${query}`;
+
+    let url: string;
+    if (hasCoords) {
+      url =
+        Platform.select({
+          ios: `maps:0,0?q=${label}&ll=${lat},${lng}`,
+          android: `geo:0,0?q=${lat},${lng}(${label})`,
+        }) || `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+    } else {
+      url =
+        Platform.select({
+          ios: `maps:0,0?q=${query}`,
+          android: `geo:0,0?q=${query}`,
+        }) || `https://www.google.com/maps/search/?api=1&query=${query}`;
+    }
+
+    const fallbackUrl = hasCoords
+      ? `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
+      : `https://www.google.com/maps/search/?api=1&query=${query}`;
+
     Linking.openURL(url).catch(() => {
-      Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${query}`);
+      Linking.openURL(fallbackUrl);
     });
   };
 
@@ -179,6 +203,21 @@ export default function MinistryDetailScreen({
           >
             <Text variant="caption" weight="700" style={styles.actionLink}>
               + Register Branch or Cell
+            </Text>
+          </TouchableOpacity>
+
+          <View style={styles.actionDividerDot} />
+
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('BranchMap', {
+                ministryId: ministry.id,
+              })
+            }
+            activeOpacity={0.7}
+          >
+            <Text variant="caption" weight="700" style={styles.actionLinkSecondary}>
+              Global Directory View ›
             </Text>
           </TouchableOpacity>
         </View>
@@ -392,6 +431,18 @@ const styles = StyleSheet.create({
   actionLink: {
     fontSize: 12,
     color: '#0F172A',
+    textDecorationLine: 'underline',
+  },
+  actionDividerDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: '#94A3B8',
+    marginHorizontal: spacing.sm,
+  },
+  actionLinkSecondary: {
+    fontSize: 12,
+    color: colors.textSecondary,
     textDecorationLine: 'underline',
   },
 

@@ -47,8 +47,8 @@ const BRANCH_TYPE_OPTIONS: {
 }[] = [
   {
     type: 'branch',
-    label: 'Main Campus / Branch',
-    description: 'A full-service church building or campus with regular Sunday and midweek services.',
+    label: 'Main Branch',
+    description: 'A full-service church building or assembly with regular Sunday and midweek services.',
   },
   {
     type: 'homecell',
@@ -233,7 +233,7 @@ export default function RegisterBranchScreen({
         return true;
       case 3:
         if (!branchName.trim()) {
-          showAlert({ title: 'Branch Name Required', message: 'Please give this campus, branch, or homecell a name.' });
+          showAlert({ title: 'Branch Name Required', message: 'Please give this branch or homecell a name.' });
           return false;
         }
         if (!townQuery.trim()) {
@@ -416,7 +416,7 @@ export default function RegisterBranchScreen({
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>What are you registering?</Text>
               <Text style={styles.sectionSubtitle}>
-                Choose the type that best describes this campus or gathering.
+                Choose the type that best describes this branch or gathering.
               </Text>
 
               {BRANCH_TYPE_OPTIONS.map((opt) => {
@@ -513,7 +513,7 @@ export default function RegisterBranchScreen({
                 <Text style={styles.fieldLabel}>{getBranchTypeLabel(selectedType)} Name *</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder={`e.g. ${activeMinistry?.name || ''} Sandton Campus`}
+                  placeholder={`e.g. ${activeMinistry?.name || ''} Sandton Branch`}
                   placeholderTextColor="#94A3B8"
                   value={branchName}
                   onChangeText={setBranchName}

@@ -164,10 +164,10 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
 
       showAlert({
         title: 'Ministry Registered',
-        message: `${created.name} is now registered in the global directory. Let's add your first campus or homecell.`,
+        message: `${created.name} is now registered in the global directory. Let's add your first branch or homecell.`,
         buttons: [
           {
-            text: 'Add Campus / Homecell',
+            text: 'Add Branch or Cell',
             onPress: () => {
               navigation.replace('RegisterBranch', {
                 ministryId: created.id,
@@ -575,7 +575,7 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
 
               <View style={styles.reviewNextNote}>
                 <Text style={styles.reviewNextNoteText}>
-                  After registration you will be taken to add your first campus branch, homecell, or prayer cluster.
+                  After registration you will be taken to add your first branch, homecell, or prayer cluster.
                 </Text>
               </View>
 

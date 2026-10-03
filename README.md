@@ -2012,13 +2012,18 @@ To deliver maximum reliability, zero manual data entry errors, and complete glob
 - **Tier 3 (Photon by Komoot Secondary Fallback)**: High-speed OpenStreetMap search mirror providing instant secondary geocoding fallback if primary network thresholds are reached.
 - **Tier 4 (AsyncStorage Zero-Bandwidth Cache)**: Every resolved online address is permanently cached locally so repeated lookups require zero bandwidth and operate in 0ms offline.
 
-### 4. Dual-Mode Interactive Real Street Map Component (`src/components/BranchRadarMap.tsx`)
-- **Zero Heavy Native SDK Dependency**: Bypasses heavy native Google Maps binaries (`react-native-maps`) that disrupt Expo EAS and GitHub Actions native compilations or demand costly Google Cloud credit card billing keys.
-- **Dual Map View Modes**:
-  1. **Real Street Map (OpenStreetMap / CartoDB Voyager)**: Renders a multi-tile Web Mercator 256x256 image grid (`https://a.basemaps.cartocdn.com/rastertiles/voyager/...`) depicting authentic streets, highways, rivers, terrain, and city labels. Interactive SVG pins are projected with pinpoint coordinate accuracy on top of the real street map. Includes Zoom In (`+`) and Zoom Out (`−`) controls.
-  2. **Tactical Radar View**: High-tech vector radar visualization with concentric distance range rings (10km / 25km / 50km markers), cardinal compass headings (N, S, E, W), and target reticles.
-- **Interactive Pin Touch & Info Card**: Tapping any pin highlights the venue, centers the viewport, and reveals contact details and meeting schedules.
-- **Turn-by-Turn GPS Navigation Handoff**: 1-tap "Directions" invokes `Linking.openURL` using platform-native URI schemes (`geo:lat,lng?q=...` on Android, `http://maps.apple.com/?daddr=...` on iOS) to immediately launch turn-by-turn driving or walking routes in Google Maps or Apple Maps.
+### 4. Clean Global Branch Directory & 1-Tap Native GPS Directions (`src/screens/BranchMapScreen.tsx`)
+- **Zero Heavy Native SDK / External Tile Canvas Dependency**: Bypasses heavy native Google Maps binaries (`react-native-maps`) and fragile web tile canvases that disrupt Expo EAS and GitHub Actions native compilations, consume mobile data, or demand costly billing keys.
+- **Editorial Global Branch Directory**:
+  - Filterable by ministry tab (All Churches, God Embassy, Christ Embassy, Spirit Embassy, ECG, plus user-registered ministries) and structure type (Main Branches, Homecells, Cell Branches, Sub-Clusters, Clusters).
+  - Displays church type, assembly name, town, province, country, pastoral leader, direct contact phone, meeting times, and exact physical address.
+- **1-Tap Coordinate-First Native GPS Navigation**:
+  - Prioritizes exact latitude and longitude coordinates for pinpoint accuracy.
+  - Seamlessly launches the user's preferred native navigation app via `Linking.openURL`:
+    - **Android**: `geo:0,0?q=lat,lng(label)` or coordinate intent.
+    - **iOS**: `maps:0,0?q=label&ll=lat,lng` launching Apple Maps directly onto the coordinates.
+    - **Web / Fallback**: Direct Google Maps URL (`https://www.google.com/maps/search/?api=1&query=lat,lng`).
+  - Supports Google Plus Code resolution (e.g. Pretoria God Embassy `6X4R+2Q`), ensuring reliable routing worldwide without ambiguous query results.
 
 ### 5. Multi-Step Registration Workflows
 - **`RegisterMinistryScreen.tsx`**: For leaders registering an entirely new church organization. Captures Organization Name, Vision Statement, Founder/Presiding Pastor, and Global Headquarters. Upon saving, automatically persists to AsyncStorage and seamlessly navigates the user directly to `RegisterBranchScreen` with the new ministry pre-selected.
@@ -2145,30 +2150,26 @@ To guarantee continuous, uninterrupted daily study streak tracking across offlin
 
 ---
 
-### 11. Dedicated Real Street Map Architecture (Zero API Keys Required)
+### 11. Clean Branch Directory Architecture & Zero-API-Key Native GPS Directions
 
 <p align="left">
-  <img src="https://img.shields.io/badge/Renderer-React%20Native%20Mercator%20Grid%20Engine-10B981?style=for-the-badge&logo=react&logoColor=white" alt="React Native Mercator Grid Engine" />
-  <img src="https://img.shields.io/badge/Tile%20Source-OpenStreetMap%20%7C%20CARTO%20Voyager-0284C7?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="OpenStreetMap and CARTO Voyager" />
+  <img src="https://img.shields.io/badge/Directory-Editorial%20Branch%20%26%20Cell%20Directory-10B981?style=for-the-badge&logo=church&logoColor=white" alt="Editorial Branch Directory" />
+  <img src="https://img.shields.io/badge/Navigation-1--Tap%20Native%20GPS%20Directions-0284C7?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Native GPS Directions" />
   <img src="https://img.shields.io/badge/API%20Keys-Zero%20Keys%20%7C%20Zero%20Subscriptions-FDD223?style=for-the-badge&logo=shield&logoColor=white" alt="Zero Keys Zero Subscriptions" />
-  <img src="https://img.shields.io/badge/GPS%20Routing-Native%20Apple%20%26%20Google%20Maps%20Linking-10B981?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Native Apple & Google Maps Linking" />
+  <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Pure%20Light-F8FAFC?style=for-the-badge" alt="60-30-10 Design System" />
 </p>
 
-1. **Elimination of Mock Radar Canvas**:
-   - Removed the secondary tactical radar view toggle and mock concentric circle overlay.
-   - The church campus map is now purely a dedicated, high-resolution real street tile map with interactive markers.
-   - Screen headers, navigation buttons, and captions standardized from "Radar Map" to "Campus Street Map".
+1. **Elimination of Fragile Web Tile Canvas**:
+   - Decommissioned slow web tile canvases in favor of a responsive, editorial directory list with direct native GPS routing.
+   - Screen headers, navigation buttons, and captions standardized to "Branch Directory" with intuitive text-tab filters.
 
-2. **100% Free Open-Source Tile Stack (Zero External API Keys)**:
-   - Direct Web Mercator tile projection (`latLngToTile`) calculating continuous tile coordinates from latitude/longitude and zoom levels (z4 to z18).
-   - Powered by public open-source high-resolution raster tile CDNs (`basemaps.cartocdn.com/rastertiles/voyager`), providing rich street-level detail, highways, districts, and English labels globally.
-   - Completely bypasses commercial wrappers that charge fees or require API keys (Mapbox, MapTiler, Stadia Maps).
-   - Zero proprietary Google billing keys, zero OpenAI API keys, and zero OSM developer accounts required.
+2. **Zero External API Keys & Zero Mobile Data Waste**:
+   - Zero proprietary Google billing keys, zero Mapbox tokens, and zero external tile bandwidth overhead.
+   - 100% offline availability for pre-seeded canonical directories (God Embassy, Christ Embassy, Spirit Embassy, ECG The Jesus Nation Church).
 
-3. **Interactive Markers & Turn-by-Turn Directions**:
-   - Dynamic SVG branch pin markers with 60-30-10 gold/slate styling.
-   - Tapping any branch centers the street map on that campus and displays a summary footer card.
-   - One-tap "Directions" button opens the user's native navigation app (`maps.apple.com` on iOS, `geo:` intent on Android, Google Maps fallback).
+3. **Coordinate-First Native Navigation Intent**:
+   - Exact latitude and longitude coordinates are prioritized to resolve locations with precision (including Google Plus Codes like Pretoria `6X4R+2Q`).
+   - One-tap "Directions & Map" button opens the user's native navigation app (`geo:` URI with coordinates and church name on Android, Apple Maps on iOS, and Google Maps browser fallback).
 
 ---
 
