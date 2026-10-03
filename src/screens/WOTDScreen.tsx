@@ -20,6 +20,7 @@ import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
 import { wotd, LENS_TABS, Scripture } from '../data/mockDatabase';
 import { useUser } from '../context/UserContext';
+import { useThemedAlert } from '../context/AlertContext';
 import { BIBLE_BOOKS, BibleBook, BibleChapterData, BibleVerse } from '../data/bibleCanon';
 import {
   fetchChapter,
@@ -143,6 +144,7 @@ export default function WOTDScreen({ route, navigation }: any) {
     setReaderTheme,
     incrementSharesCount,
   } = useUser();
+  const { showAlert } = useThemedAlert();
 
   // ── Bible Reader State ────────────────────────────────────────────────────
   const initialBook = useMemo(() =>
@@ -253,11 +255,11 @@ export default function WOTDScreen({ route, navigation }: any) {
       setDownloadedTranslations((prev) => [...new Set([...prev, key])]);
     } catch (e: any) {
       console.warn('Failed to download translation:', e);
-      Alert.alert(
-        'Download Incomplete',
-        `Unable to complete download for ${TRANSLATION_LABELS[key] || key.toUpperCase()}. Please check your connection and tap Download to retry.`,
-        [{ text: 'OK' }]
-      );
+      showAlert({
+        title: 'Download Incomplete',
+        message: `Unable to complete download for ${TRANSLATION_LABELS[key] || key.toUpperCase()}. Please check your connection and tap Download to retry.`,
+        buttons: [{ text: 'OK' }],
+      });
     } finally {
       setDownloadingIds((prev) => {
         const copy = { ...prev };
@@ -272,13 +274,26 @@ export default function WOTDScreen({ route, navigation }: any) {
     }
   };
 
-  const handleDeleteTranslation = async (key: BibleTranslation) => {
-    try {
-      await deleteDownloadedTranslation(key);
-      setDownloadedTranslations((prev) => prev.filter((id) => id !== key));
-    } catch (e) {
-      console.warn('Failed to delete translation:', e);
-    }
+  const handleDeleteTranslation = (key: BibleTranslation) => {
+    showAlert({
+      title: 'Remove Translation',
+      message: `Remove ${TRANSLATION_LABELS[key] || key.toUpperCase()} from offline storage? You can re-download it at any time.`,
+      buttons: [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteDownloadedTranslation(key);
+              setDownloadedTranslations((prev) => prev.filter((id) => id !== key));
+            } catch (e) {
+              console.warn('Failed to delete translation:', e);
+            }
+          },
+        },
+      ],
+    });
   };
 
   // ── Aa Settings Sheet (Synchronized with UserContext userProfile) ───────────
@@ -1050,12 +1065,12 @@ export default function WOTDScreen({ route, navigation }: any) {
                             <TouchableOpacity
                               onPress={() => handleDownloadTranslation(key)}
                               disabled={isDownloading}
-                              style={[styles.downloadActionBtn, isDownloading && { opacity: 0.6 }]}
-                              activeOpacity={0.8}
+                              style={styles.downloadActionBtn}
+                              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                              activeOpacity={0.7}
                               accessibilityLabel={`Download ${TRANSLATION_LABELS[key]} for offline reading`}
                             >
-                              <DownloadSvg size={14} color={colors.accent} />
-                              <Text style={styles.downloadActionBtnText}>Download</Text>
+                              <DownloadSvg size={16} color={colors.accent} strokeWidth={2.2} />
                             </TouchableOpacity>
                           )}
                         </View>
@@ -1711,20 +1726,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   downloadActionBtn: {
-    flexDirection: 'row',
+    padding: 6,
+    backgroundColor: 'transparent',
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: colors.accent,
-  },
-  downloadActionBtnText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: colors.accent,
+    justifyContent: 'center',
   },
   downloadedActionsRow: {
     flexDirection: 'row',
@@ -1733,7 +1738,9 @@ const styles = StyleSheet.create({
   },
   deleteTranslationIconBtn: {
     padding: 6,
-    borderRadius: 6,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   // ── Daily Exegesis ──────────────────────────────────────────────────────────

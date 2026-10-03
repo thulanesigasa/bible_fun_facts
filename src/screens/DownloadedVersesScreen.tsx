@@ -11,6 +11,7 @@ import {
 import { colors } from '../theme/colors';
 import { spacing, radius } from '../theme';
 import { Text } from '../components/Typography';
+import { useThemedAlert } from '../context/AlertContext';
 import {
   getDownloadedTranslations,
   deleteDownloadedTranslation,
@@ -31,6 +32,7 @@ interface DownloadedVersesScreenProps {
 }
 
 export default function DownloadedVersesScreen({ navigation }: DownloadedVersesScreenProps) {
+  const { showAlert } = useThemedAlert();
   const [downloaded, setDownloaded] = useState<DownloadedTranslationMeta[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -97,10 +99,10 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
   const handleDelete = (item: DownloadedTranslationMeta) => {
     const meta = TRANSLATION_SOURCES[item.id];
     const displayName = meta?.name || item.id.toUpperCase();
-    Alert.alert(
-      'Remove Translation',
-      `Remove ${displayName} from offline storage? You can re-download it at any time.`,
-      [
+    showAlert({
+      title: 'Remove Translation',
+      message: `Remove ${displayName} from offline storage? You can re-download it at any time.`,
+      buttons: [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Remove',
@@ -117,8 +119,8 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
             }
           },
         },
-      ]
-    );
+      ],
+    });
   };
 
   const handleDownload = async (source: TranslationSourceConfig) => {
@@ -133,10 +135,11 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
       await loadDownloaded();
     } catch (err: any) {
       console.warn(`Failed to download ${source.name}:`, err);
-      Alert.alert(
-        'Download Failed',
-        `Unable to download ${source.name}. Please check your internet connection and try again.`
-      );
+      showAlert({
+        title: 'Download Failed',
+        message: `Unable to download ${source.name}. Please check your internet connection and try again.`,
+        buttons: [{ text: 'OK' }],
+      });
     } finally {
       setDownloadingIds((prev) => {
         const next = { ...prev };
@@ -149,16 +152,6 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
         return next;
       });
     }
-  };
-
-  const handleDownloadAll = async () => {
-    const pending = availableTranslations.filter((t) => !downloadingIds[t.id]);
-    if (pending.length === 0) return;
-
-    // Launch all available downloads in parallel
-    pending.forEach((source) => {
-      handleDownload(source);
-    });
   };
 
   const formatSize = (bytes?: number): string => {
@@ -252,25 +245,9 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
           {/* 2. AVAILABLE TRANSLATIONS (PLAIN UNIFIED LIST) */}
           {availableTranslations.length > 0 && (
             <View style={styles.sectionWrap}>
-              <View style={styles.sectionHeaderRow}>
-                <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
-                  AVAILABLE TRANSLATIONS ({availableTranslations.length})
-                </Text>
-                {availableTranslations.length > 1 && (
-                  <TouchableOpacity
-                    style={styles.downloadAllBtn}
-                    onPress={handleDownloadAll}
-                    activeOpacity={0.7}
-                    accessibilityRole="button"
-                    accessibilityLabel="Download all available translations simultaneously"
-                  >
-                    <DownloadSvg size={12} color="#0F172A" strokeWidth={2} />
-                    <Text variant="caption" weight="700" color="#0F172A" style={styles.downloadAllBtnText}>
-                      Download All
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </View>
+              <Text variant="label" weight="800" color={colors.textTertiary} style={styles.sectionHeader}>
+                AVAILABLE TRANSLATIONS ({availableTranslations.length})
+              </Text>
               <View style={styles.cardContainer}>
                 {availableTranslations.map((source, index) => {
                   const isLast = index === availableTranslations.length - 1;
@@ -308,29 +285,20 @@ export default function DownloadedVersesScreen({ navigation }: DownloadedVersesS
                         )}
                       </View>
 
-                      {/* Download CTA Button */}
+                      {/* Download CTA Button: Clean borderless icon without background and without text */}
                       <TouchableOpacity
-                        style={[styles.downloadBtn, isDownloading && styles.downloadBtnDisabled]}
+                        style={styles.downloadIconBtn}
                         onPress={() => handleDownload(source)}
                         disabled={isDownloading}
-                        activeOpacity={0.8}
+                        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                        activeOpacity={0.7}
                         accessibilityRole="button"
                         accessibilityLabel={`Download ${source.name} for offline reading`}
                       >
                         {isDownloading ? (
-                          <View style={styles.downloadingBtnContent}>
-                            <ActivityIndicator size="small" color="#0F172A" />
-                            <Text variant="caption" weight="700" color="#0F172A">
-                              {progress}%
-                            </Text>
-                          </View>
+                          <ActivityIndicator size="small" color={colors.accent} />
                         ) : (
-                          <>
-                            <DownloadSvg size={14} color="#0F172A" strokeWidth={2} />
-                            <Text variant="caption" weight="700" color="#0F172A">
-                              Download
-                            </Text>
-                          </>
+                          <DownloadSvg size={18} color="#0F172A" strokeWidth={2.2} />
                         )}
                       </TouchableOpacity>
                     </View>
@@ -366,30 +334,13 @@ const styles = StyleSheet.create({
   sectionWrap: {
     marginTop: spacing.md,
   },
-  sectionHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
-    marginBottom: 4,
-  },
   sectionHeader: {
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 0.8,
     textTransform: 'uppercase',
-  },
-  downloadAllBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(253, 210, 35, 0.25)',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: radius.full,
-  },
-  downloadAllBtnText: {
-    fontSize: 11,
+    paddingHorizontal: spacing.lg,
+    marginBottom: 6,
   },
   cardContainer: {
     backgroundColor: '#FFFFFF',
@@ -431,22 +382,16 @@ const styles = StyleSheet.create({
   deleteBtn: {
     width: 36,
     height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(15, 23, 42, 0.04)',
+    backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  downloadBtn: {
-    flexDirection: 'row',
+  downloadIconBtn: {
+    width: 36,
+    height: 36,
+    backgroundColor: 'transparent',
     alignItems: 'center',
-    backgroundColor: colors.accent,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: radius.full,
-    gap: 5,
-  },
-  downloadBtnDisabled: {
-    opacity: 0.7,
+    justifyContent: 'center',
   },
   progressWrap: {
     marginTop: 8,
@@ -465,10 +410,5 @@ const styles = StyleSheet.create({
   progressText: {
     fontSize: 11,
     marginTop: 4,
-  },
-  downloadingBtnContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
   },
 });

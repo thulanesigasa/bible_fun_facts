@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Modal,
   View,
@@ -9,20 +9,8 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Image,
+  Animated,
 } from 'react-native';
-import {
-  LogOutSvg,
-  TrashSvg,
-  ShieldLockSvg,
-  DevicesSvg,
-  AlertCircleSvg,
-  AlertTriangleSvg,
-  CheckCircleSvg,
-  InfoCircleSvg,
-  KeypadSvg,
-  BlockSvg,
-  FlagSvg,
-} from './SvgIcons';
 
 export type AlertIconType =
   | 'logout'
@@ -61,113 +49,96 @@ export default function ThemedAlertModal({
   visible,
   title,
   message,
-  icon = 'info',
+  icon = 'logo',
   buttons = [{ text: 'OK' }],
   onClose,
   isDestructive = false,
 }: ThemedAlertModalProps) {
-  if (!visible) return null;
+  const [modalVisible, setModalVisible] = useState(visible);
+  const slideAnim = useRef(new Animated.Value(400)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  // Icon calibration: 50x50 SVG inside a 68x68 rounded container (border radius 18px) per Rule 15 & 19
-  const renderIcon = () => {
-    switch (icon) {
-      case 'logout':
-        return (
-          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
-            <LogOutSvg size={36} color="#B45309" />
-          </View>
-        );
-      case 'trash':
-      case 'danger':
-        return (
-          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
-            <TrashSvg size={36} color="#B45309" />
-          </View>
-        );
-      case 'warning':
-        return (
-          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
-            <AlertTriangleSvg size={36} color="#B45309" />
-          </View>
-        );
-      case 'success':
-        return (
-          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
-            <CheckCircleSvg size={36} color="#B45309" />
-          </View>
-        );
-      case 'shield':
-        return (
-          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
-            <ShieldLockSvg size={36} color="#B45309" />
-          </View>
-        );
-      case 'device':
-      case 'devices':
-        return (
-          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
-            <DevicesSvg size={36} color="#B45309" />
-          </View>
-        );
-      case 'block':
-        return (
-          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
-            <BlockSvg size={36} color="#B45309" />
-          </View>
-        );
-      case 'flag':
-        return (
-          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
-            <FlagSvg size={36} color="#B45309" />
-          </View>
-        );
-      case 'keypad':
-        return (
-          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
-            <KeypadSvg size={36} color="#B45309" />
-          </View>
-        );
-      case 'logo':
-        return (
-          <Image
-            source={require('../../assets/logo-transparent.png')}
-            style={styles.alertLogoAlone}
-            resizeMode="contain"
-          />
-        );
-      case 'info':
-      default:
-        return (
-          <View style={[styles.iconContainer, styles.iconContainerTheme]}>
-            <InfoCircleSvg size={36} color="#B45309" />
-          </View>
-        );
+  useEffect(() => {
+    if (visible) {
+      setModalVisible(true);
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 220,
+          useNativeDriver: true,
+        }),
+        Animated.spring(slideAnim, {
+          toValue: 0,
+          damping: 24,
+          stiffness: 220,
+          mass: 0.8,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else if (modalVisible) {
+      animateDismiss();
     }
+  }, [visible]);
+
+  const animateDismiss = (onComplete?: () => void | Promise<void>) => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 400,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setModalVisible(false);
+      if (onClose) onClose();
+      if (onComplete) onComplete();
+    });
   };
 
-  const handleButtonPress = async (btn: ThemedAlertButton) => {
-    if (onClose) {
-      onClose();
-    }
-    if (btn.onPress) {
-      await btn.onPress();
-    }
+  const handleButtonPress = (btn: ThemedAlertButton) => {
+    animateDismiss(() => {
+      if (btn.onPress) {
+        btn.onPress();
+      }
+    });
   };
+
+  if (!modalVisible) return null;
 
   return (
     <Modal
       transparent
-      visible={visible}
-      animationType="fade"
-      onRequestClose={onClose}
+      visible={modalVisible}
+      animationType="none"
+      onRequestClose={() => animateDismiss()}
       statusBarTranslucent
     >
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.overlayScrim}>
-          <TouchableWithoutFeedback>
-            <View style={styles.dialogCard}>
-              {/* Rule 15/19 Calibrated 68x68 Icon Badge */}
-              <View style={styles.iconCenterWrapper}>{renderIcon()}</View>
+      <TouchableWithoutFeedback onPress={() => animateDismiss()}>
+        <Animated.View style={[styles.overlayScrim, { opacity: fadeAnim }]}>
+          <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+            <Animated.View
+              style={[
+                styles.bottomSheetCard,
+                { transform: [{ translateY: slideAnim }] },
+              ]}
+            >
+              {/* Sheet Drag Handle */}
+              <View style={styles.sheetHandle} />
+
+              {/* Rule 15/19 Calibrated In-App Logo Container */}
+              <View style={styles.iconCenterWrapper}>
+                <View style={styles.iconContainer}>
+                  <Image
+                    source={require('../../assets/logo-transparent.png')}
+                    style={styles.alertLogo}
+                    resizeMode="contain"
+                  />
+                </View>
+              </View>
 
               {/* Title & Message */}
               <Text style={styles.dialogTitle}>{title}</Text>
@@ -206,9 +177,9 @@ export default function ThemedAlertModal({
                   );
                 })}
               </View>
-            </View>
+            </Animated.View>
           </TouchableWithoutFeedback>
-        </View>
+        </Animated.View>
       </TouchableWithoutFeedback>
     </Modal>
   );
@@ -217,35 +188,44 @@ export default function ThemedAlertModal({
 const styles = StyleSheet.create({
   overlayScrim: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.65)',
-    justifyContent: 'center',
+    backgroundColor: 'rgba(15, 23, 42, 0.55)',
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    paddingHorizontal: 24,
   },
-  dialogCard: {
-    width: Math.min(width - 48, 360),
+  bottomSheetCard: {
+    width: '100%',
     backgroundColor: '#FFFFFF',
-    borderRadius: 24,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
     paddingHorizontal: 24,
-    paddingTop: 28,
-    paddingBottom: 24,
+    paddingTop: 12,
+    paddingBottom: Platform.OS === 'ios' ? 36 : 24,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.08)',
+    borderBottomWidth: 0,
     ...Platform.select({
       ios: {
         shadowColor: '#0F172A',
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 0.16,
-        shadowRadius: 24,
+        shadowOffset: { width: 0, height: -6 },
+        shadowOpacity: 0.1,
+        shadowRadius: 18,
       },
       android: {
-        elevation: 12,
+        elevation: 16,
       },
     }),
   },
+  sheetHandle: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'rgba(15, 23, 42, 0.12)',
+    alignSelf: 'center',
+    marginBottom: 16,
+  },
   iconCenterWrapper: {
-    marginBottom: 18,
+    marginBottom: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -257,30 +237,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-  },
-  iconContainerTheme: {
     backgroundColor: '#FEF9C3',
     borderColor: '#FDE047',
   },
-  iconContainerDestructive: {
-    backgroundColor: '#FEF9C3',
-    borderColor: '#FDE047',
-  },
-  iconContainerWarning: {
-    backgroundColor: '#FEF9C3',
-    borderColor: '#FDE047',
-  },
-  iconContainerSuccess: {
-    backgroundColor: '#FEF9C3',
-    borderColor: '#FDE047',
-  },
-  iconContainerNeutral: {
-    backgroundColor: '#FEF9C3',
-    borderColor: '#FDE047',
-  },
-  alertLogoAlone: {
-    width: 56,
-    height: 56,
+  alertLogo: {
+    width: 50,
+    height: 50,
+    borderRadius: 12,
   },
   dialogTitle: {
     fontSize: 18,
@@ -296,7 +259,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: '#64748B',
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
     paddingHorizontal: 4,
   },
   buttonRow: {

@@ -21,6 +21,7 @@ import { colors } from '../theme/colors';
 import { spacing, radius, shadow } from '../theme';
 import { Text } from '../components/Typography';
 import { useUser } from '../context/UserContext';
+import { useThemedAlert } from '../context/AlertContext';
 import {
   MailSvg,
   LockSvg,
@@ -58,6 +59,7 @@ const COUNTRY_CODES = [
 ];
 
 export default function AuthScreen({ route, navigation }: { route?: any; navigation?: any }) {
+  const { showAlert } = useThemedAlert();
   const { login, signupExtended, checkUsernameAvailability } = useUser();
   const initialMode: AuthMode = route?.params?.initialMode === 'signup' ? 'signup' : 'login';
   const [mode, setMode] = useState<AuthMode>(initialMode);
@@ -254,11 +256,19 @@ export default function AuthScreen({ route, navigation }: { route?: any; navigat
   const handleLoginSubmit = async () => {
     const trimmed = loginEmail.trim();
     if (!trimmed) {
-      Alert.alert('Required Field', 'Please enter your email address or username.');
+      showAlert({
+        title: 'Required Field',
+        message: 'Please enter your email address or username.',
+        buttons: [{ text: 'OK' }],
+      });
       return;
     }
     if (!loginPassword) {
-      Alert.alert('Required Field', 'Please enter your password.');
+      showAlert({
+        title: 'Required Field',
+        message: 'Please enter your password.',
+        buttons: [{ text: 'OK' }],
+      });
       return;
     }
     setIsSubmitting(true);
