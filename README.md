@@ -58,13 +58,13 @@
   <img src="https://img.shields.io/badge/Strongs%20Pronunciation-100%25%20Complete%20(14%2C298%20Words)-10B981?style=for-the-badge&logo=book&logoColor=white" alt="100% Strongs Pronunciation" />
   <img src="https://img.shields.io/badge/Ministries-God%20Embassy%20%7C%20Christ%20Embassy%20%7C%20Spirit%20Embassy%20%7C%20ECG-10B981?style=for-the-badge&logo=church&logoColor=white" alt="Ministry Directory" />
   <img src="https://img.shields.io/badge/Geocoding-Live%20OpenStreetMap%20Nominatim%20%2B%20Photon%20Hybrid-0284C7?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="Live OpenStreetMap Geocoding" />
-  <img src="https://img.shields.io/badge/Maps-High--Resolution%20Real%20Street%20Tiles%20%7C%20Zero%20API%20Keys-FDD223?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="High-Resolution Real Street Tiles Zero API Keys" />
+  <img src="https://img.shields.io/badge/Maps-Native%20Device%20Directions%20%7C%20Zero%20Tile%20Canvas-FDD223?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Native Device Directions Zero Tile Canvas" />
   <img src="https://img.shields.io/badge/Strongs%20Loading-Instant%200ms%20Curated%20Render%20%7C%20Infinite%20Paging-10B981?style=for-the-badge&logo=fastapi&logoColor=white" alt="Instant Strongs Loading" />
   <img src="https://img.shields.io/badge/Hermes%20Optimization-Zero--Crash%20AST%20Stack%20Protection-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Hermes Zero-Crash AST Stack Protection" />
   <img src="https://img.shields.io/badge/Cold%20Boot%20Stability-Decoupled%20Warmup%20%7C%20Zero%20OOM-FDD223?style=for-the-badge&logo=android&logoColor=white" alt="Cold Boot Stability" />
   <img src="https://img.shields.io/badge/Tests-Jest%2067%2F67%20Passing%20(8%20Suites)-10B981?style=for-the-badge&logo=jest&logoColor=white" alt="Jest 67/67 Passing" />
   <img src="https://img.shields.io/badge/Compliance-GDPR%20Purge%20RPC%20%7C%20Inexact%20Alarms-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="GDPR and Store Compliance" />
-  <img src="https://img.shields.io/badge/Legal-Static%20HTML%20Privacy%20%26%20Terms-FDD223?style=for-the-badge&logo=html5&logoColor=white" alt="Static HTML Legal Docs" />
+  <img src="https://img.shields.io/badge/Legal-Privacy%20(12%20Sections)%20%7C%20Terms%20(14%20Sections)%20%7C%20GDPR%20%7C%20POPIA-FDD223?style=for-the-badge&logo=html5&logoColor=white" alt="Privacy 12 Sections Terms 14 Sections GDPR POPIA" />
   <img src="https://img.shields.io/badge/Web%20Portal-Responsive%2060--30--10%20Landing%20Site-0284C7?style=for-the-badge&logo=html5&logoColor=white" alt="Responsive Web Portal" />
   <img src="https://img.shields.io/badge/SEO-JSON--LD%20%7C%20OpenGraph%20%7C%20Sitemap-10B981?style=for-the-badge&logo=google&logoColor=white" alt="SEO Optimized" />
   <img src="https://img.shields.io/badge/Deletion%20Portal-Google%20Play%20Policy%20Compliant-DC2626?style=for-the-badge&logo=shield&logoColor=white" alt="Account Deletion Portal" />
@@ -112,10 +112,10 @@ graph TD
     HistoryStack --> WriterDetails["WriterDetailsScreen (PageSheet Biography & Manuscripts)"]
     
     SearchStack --> SearchMain["SearchScreen (Dual Believers & Ministries Hub)"]
-    SearchStack --> MinistryDetail["MinistryDetailScreen (Vision, Branches, Homecells & Campus Street Map)"]
+    SearchStack --> MinistryDetail["MinistryDetailScreen (Vision, Branches, Homecells & 1-Tap Native Directions)"]
     SearchStack --> RegisterMinistry["RegisterMinistryScreen (Register Church & Auto-Route)"]
     SearchStack --> RegisterBranch["RegisterBranchScreen (Auto-Cascading Town/Province/Country & Map Preview)"]
-    SearchStack --> BranchMap["BranchMapScreen (Interactive Real Street Map with Native GPS)"]
+    SearchStack --> BranchMap["BranchMapScreen (Branch Directory — Ministry/Type Filters, Directions & Register Branch or Cell)"]
     SearchStack --> PastoralCareScreen["PastoralCareScreen (24/7 Lifelines, SADAG & Scriptures)"]
     ProfileStack --> ProfileMain["ProfileScreen (Modular Hub, Saved Collection & Account)"]
     ProfileStack --> StrongsScreen["StrongsScreen (Instant Curated Concordance, Infinite Paging & Offline Download)"]
@@ -397,7 +397,7 @@ exegeomai/
 │   │   ├── AuthScreen.tsx                # Dedicated Login & Sign Up with 28x28 calibrated logo
 │   │   ├── BlockedUsersScreen.tsx        # Fellowship moderation and blocked scholars manager
 │   │   ├── BookmarksScreen.tsx           # Dedicated Bookmarks continuous body view (flat rows, dotted underlines)
-│   │   ├── BranchMapScreen.tsx           # Full-screen global church, branch, and homecell radar map
+│   │   ├── BranchMapScreen.tsx           # Branch Directory screen (no tile canvas) — ministry & type filters, flat address rows, 1-tap native Directions, Register Branch or Cell CTAs
 │   │   ├── DeleteAccountScreen.tsx       # GDPR / POPIA Account & Data Purge (direct-body canvas, zero card divs)
 │   │   ├── DeviceSessionsScreen.tsx      # Device hardware info, security audit log, and global session revocation
 │   │   ├── DiscoverScreen.tsx            # Daily 1-message calendar exegesis view with top-right bell header
@@ -411,7 +411,7 @@ exegeomai/
 │   │   ├── MinistryDetailScreen.tsx      # Ministry leadership, vision, and branch/homecell hierarchy directory
 │   │   ├── NotificationsScreen.tsx       # Continuous direct-body notifications center (CategoryBadge achievements, unread indicators, zero pills/badges, text-driven 60-30-10 styling)
 │   │   ├── PastoralCareScreen.tsx        # 24/7 Lifelines, SADAG, and Scripture promises (seamless body canvas, zero icons)
-│   │   ├── PrivacyPolicyScreen.tsx       # 11-section privacy policy modal screen
+│   │   ├── PrivacyPolicyScreen.tsx       # 12-section privacy policy — includes Section 12 Ministerial & Church Leadership Data Governance (GDPR Art.6, POPIA s.11, delisting rights)
 │   │   ├── PrivacyScreen.tsx             # Modular privacy settings (Study mode, directory, streak visibility, private notes)
 │   │   ├── ProfileScreen.tsx             # Profile tab (Modular hub, reading settings, privacy, and account security)
 │   │   ├── QuietHoursScreen.tsx          # Digital Sabbath and custom quiet hours scheduler
@@ -423,7 +423,7 @@ exegeomai/
 │   │   ├── SearchScreen.tsx              # Unified search and community scholar interface (Believers / Churches text switcher)
 │   │   ├── SecurityPinScreen.tsx         # Dedicated 4-digit Security PIN management screen with in-screen keypad
 │   │   ├── SecurityScreen.tsx            # Safety & Security hub (Inactivity lock, 4-digit PIN, biometrics & app shield)
-│   │   ├── TermsOfServiceScreen.tsx      # 13-section terms of service modal screen
+│   │   ├── TermsOfServiceScreen.tsx      # 14-section terms of service — includes Section 14 Church & Assembly Directory Participation (authority, accuracy, prohibited conduct, moderation)
 │   │   ├── WelcomeScreen.tsx             # 3-step onboarding flow with custom vector art & dual CTAs
 │   │   ├── WOTDDetailsScreen.tsx         # Deep-dive view for Word of the Day
 │   │   ├── WOTDScreen.tsx                # Daily devotional with 4 analytical lenses & full Bible reader
@@ -944,12 +944,12 @@ bible_fun_facts/
 │   │   ├── DownloadedVersesScreen.tsx # Dedicated offline downloads & available 24-translation library
 │   │   ├── FactDetailsScreen.tsx    # Modal sheet fact inspection
 │   │   ├── FavoritesScreen.tsx      # Saved collections persisted offline
-│   │   ├── PrivacyPolicyScreen.tsx  # 11-section GDPR/CCPA privacy policy screen
+│   │   ├── PrivacyPolicyScreen.tsx  # 12-section GDPR/CCPA/POPIA privacy policy — Section 12 covers ministerial data governance, delisting rights, and pastoral contact data
 │   │   ├── ProfileScreen.tsx        # Profile management, reader font (1-24px), streak milestone row
 │   │   ├── ScriptureDetailsScreen.tsx # In-depth chapter & linguistic breakdown
 │   │   ├── ScripturesScreen.tsx     # Compact scripture hub with search categories (50% card reduction)
 │   │   ├── SearchScreen.tsx         # Believer & scholar discovery hub with follow state & profile modal
-│   │   ├── TermsOfServiceScreen.tsx # 13-section theological & service terms screen
+│   │   ├── TermsOfServiceScreen.tsx # 14-section theological & service terms — Section 14 covers church directory authority, accuracy obligations, prohibited conduct, and dispute resolution
 │   │   ├── UnfoldedScreen.tsx       # Continuous body catalog of unlocked daily calendar exegeses
 │   │   ├── WelcomeScreen.tsx        # 3-step onboarding introduction
 │   │   ├── WOTDDetailsScreen.tsx    # Full 4-lens exegesis & prayer focus

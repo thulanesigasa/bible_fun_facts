@@ -254,6 +254,94 @@ export default function TermsOfServiceScreen() {
             </Text>
           </View>
         </View>
+
+        {/* Section 14: Church & Assembly Directory Participation */}
+        <View style={styles.sectionBlock}>
+          <Text variant="h3" weight="800" color={colors.textPrimary} style={styles.sectionHeading}>
+            14. Church &amp; Assembly Directory Participation
+          </Text>
+          <Text variant="body" color={colors.textSecondary} style={styles.sectionBody}>
+            The exégeomai global fellowship directory allows ordained ministers, church elders, and their authorized representatives to register their assemblies, branches, homecells, and cell clusters for discovery within the application community. By submitting any registration to the directory, you agree to be fully bound by the following terms.
+          </Text>
+
+          <Text variant="body" weight="700" color={colors.textPrimary} style={[styles.sectionBody, { marginTop: 12 }]}>
+            14.1 Authority to Register
+          </Text>
+          <View style={styles.bulletList}>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Ordained or Delegated Representation:</Text> Only ordained ministers, licensed pastors, appointed elders, church board members, or individuals with explicit written delegation from senior church leadership may submit a church, branch, or homecell registration on behalf of an assembly.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>No Self-Appointment:</Text> Individuals may not register a church, assembly, or ministry under a leader's name without that leader's knowledge, consent, and express authorization.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Personal Accountability:</Text> The individual who submits the registration takes personal responsibility for the accuracy of all information provided, including the leader name, contact details, address, and service times.
+            </Text>
+          </View>
+
+          <Text variant="body" weight="700" color={colors.textPrimary} style={[styles.sectionBody, { marginTop: 12 }]}>
+            14.2 Accuracy of Assembly Information
+          </Text>
+          <View style={styles.bulletList}>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Truthful Locations:</Text> All submitted street addresses, building names, town/city, province, country, and postal codes must accurately reflect the physical or primary meeting location of the registered assembly.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Current Service Times:</Text> Meeting schedules must reflect the actual current gathering times of the assembly and must be updated promptly if times change.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Valid Contact Information:</Text> All phone numbers and email addresses submitted must be actively monitored and belong to the listed leadership or their authorized administrative team.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>GPS Precision:</Text> Where GPS coordinates are provided or auto-derived from submitted addresses, the submitting party is responsible for verifying their accuracy before submission.
+            </Text>
+          </View>
+
+          <Text variant="body" weight="700" color={colors.textPrimary} style={[styles.sectionBody, { marginTop: 12 }]}>
+            14.3 Prohibited Conduct
+          </Text>
+          <Text variant="body" color={colors.textSecondary} style={styles.sectionBody}>
+            The following acts constitute serious violations of these Terms and may result in immediate and permanent delisting, account suspension, and referral to relevant authorities:
+          </Text>
+          <View style={styles.bulletList}>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Fraudulent Church Representations:</Text> Registering a fictitious, dissolved, non-existent, or impersonated church or assembly with the intent to mislead or deceive users of the exégeomai directory.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Unauthorized Clergy Listing:</Text> Publishing the name, photograph, contact number, or email address of any ordained minister or church leader without their explicit written consent or verified delegation.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Defamation of Ministries:</Text> Submitting descriptions, service time details, or location data that contain false, malicious, or defamatory statements about any church, denomination, leader, or member of the body of Christ.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Duplicate Manipulation:</Text> Intentionally registering multiple conflicting records for the same assembly to create confusion, suppress competing listings, or manipulate search results.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Commercial Misuse:</Text> Using the directory listing for the purpose of commercial solicitation, unsolicited marketing, or any non-spiritual commercial activity not disclosed at the time of registration.
+            </Text>
+          </View>
+
+          <Text variant="body" weight="700" color={colors.textPrimary} style={[styles.sectionBody, { marginTop: 12 }]}>
+            14.4 Delisting, Dispute Resolution &amp; Moderation
+          </Text>
+          <View style={styles.bulletList}>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Right to Delist:</Text> Any registered leader or authorized administrator may request the immediate removal of their assembly's listing by contacting ministry-care@exegeomai.org. Requests will be actioned within 72 hours of receipt and identity verification.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Community Reporting:</Text> Users of the application may report suspected fraudulent, inaccurate, or abusive directory entries through the in-app reporting mechanism. All reports are reviewed by the exégeomai moderation team within 7 business days.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Administrative Moderation:</Text> The exégeomai team reserves the right to temporarily suspend, correct, or permanently remove any directory listing that is reported as inaccurate, violates these Terms, or is reasonably believed to be fraudulent — without prior notice to the submitting party if urgency warrants immediate action.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Dispute Escalation:</Text> Disputes between two parties claiming authority over the same assembly listing will be resolved through the exégeomai moderation team acting as a neutral arbitrator. Both parties will be given equal opportunity to submit supporting documentation before a final listing decision is made.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Appeals:</Text> Any listing decision may be appealed within 14 calendar days of notification by writing to legal@exegeomai.org with supporting documentation of ecclesiastical authority.
+            </Text>
+          </View>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

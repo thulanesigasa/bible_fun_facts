@@ -1,11 +1,11 @@
 /**
- * Global Branch & Homecell Radar Map Screen
+ * Branch & Homecell Directory Screen
  *
- * Full-screen interactive vector map plotting churches, branches, homecells,
- * and clusters globally with ministry filtering and 1-tap native map navigation.
- *
- * Rendered directly on the continuous screen body canvas (zero card divs/boxes/pills).
- * 100% free open-source map tiles and in-memory offline database: ZERO external API key needed.
+ * Converted from tile-canvas map view to a clean, editorial flat directory.
+ * Zero card wrappers · Zero external map API calls · Zero pills or badges.
+ * Ministries and structure-type filters via plain text tabs.
+ * Each row: type label, name, town/province, leader, contact, meeting times,
+ * street address, and a 1-tap native Directions link (Google Maps / Apple Maps / Geo URI).
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -14,15 +14,13 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Dimensions,
   Platform,
   Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
-import { spacing, radius } from '../theme';
+import { spacing } from '../theme';
 import { Text } from '../components/Typography';
-import { BranchRadarMap } from '../components/BranchRadarMap';
 import {
   getAllBranches,
   getAllMinistries,
@@ -31,9 +29,7 @@ import {
   BranchType,
   getBranchTypeLabel,
 } from '../services/ministryService';
-import { CloseSvg, MapPinSvg, ChevronRightSvg } from '../components/SvgIcons';
-
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+import { CloseSvg, ChevronRightSvg } from '../components/SvgIcons';
 
 export default function BranchMapScreen({
   navigation,
@@ -48,15 +44,11 @@ export default function BranchMapScreen({
   const [branches, setBranches] = useState<Branch[]>([]);
   const [selectedMinistryId, setSelectedMinistryId] = useState<string>(initialMinistryId);
   const [selectedType, setSelectedType] = useState<BranchType | 'all'>('all');
-  const [activeBranch, setActiveBranch] = useState<Branch | null>(null);
 
   useEffect(() => {
     Promise.all([getAllMinistries(), getAllBranches()]).then(([minList, branchList]) => {
       setMinistries(minList);
       setBranches(branchList);
-      if (branchList.length > 0) {
-        setActiveBranch(branchList[0]);
-      }
     });
   }, []);
 
@@ -71,27 +63,27 @@ export default function BranchMapScreen({
     return list;
   }, [branches, selectedMinistryId, selectedType]);
 
-  useEffect(() => {
-    if (filteredBranches.length > 0) {
-      if (!activeBranch || !filteredBranches.some((b) => b.id === activeBranch.id)) {
-        setActiveBranch(filteredBranches[0]);
-      }
-    } else {
-      setActiveBranch(null);
-    }
-  }, [filteredBranches, activeBranch]);
-
   const handleOpenDirections = (b: Branch) => {
     const query = encodeURIComponent(`${b.name}, ${b.address}, ${b.town}, ${b.country}`);
-    const url = Platform.select({
-      ios: `maps:0,0?q=${query}`,
-      android: `geo:0,0?q=${query}`,
-    }) || `https://www.google.com/maps/search/?api=1&query=${query}`;
+    const url =
+      Platform.select({
+        ios: `maps:0,0?q=${query}`,
+        android: `geo:0,0?q=${query}`,
+      }) || `https://www.google.com/maps/search/?api=1&query=${query}`;
 
     Linking.openURL(url).catch(() => {
       Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${query}`);
     });
   };
+
+  const TYPE_FILTERS: { key: BranchType | 'all'; label: string }[] = [
+    { key: 'all', label: 'All Structures' },
+    { key: 'branch', label: 'Main Branches' },
+    { key: 'homecell', label: 'Homecells' },
+    { key: 'cell_branch', label: 'Cell Branches' },
+    { key: 'sub_cluster', label: 'Sub-Clusters' },
+    { key: 'cluster', label: 'Clusters' },
+  ];
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -106,9 +98,17 @@ export default function BranchMapScreen({
           <CloseSvg size={20} color={colors.textPrimary} />
         </TouchableOpacity>
         <Text variant="h3" color={colors.textPrimary} style={styles.headerTitle}>
-          Church & Campus Map
+          Branch Directory
         </Text>
-        <View style={{ width: 36 }} />
+        <TouchableOpacity
+          style={styles.registerHeaderBtn}
+          onPress={() => navigation.navigate('RegisterBranch', {})}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Register Branch or Cell"
+        >
+          <Text style={styles.registerHeaderBtnText}>+ Register</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -116,23 +116,12 @@ export default function BranchMapScreen({
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        {/* Zero-API-Key Informative Meta Bar */}
-        <View style={styles.metaInfoRow}>
-          <Text style={styles.metaNotice}>
-            OPEN-SOURCE STREET MAP • ZERO EXTERNAL API KEYS REQUIRED
-          </Text>
-          <Text style={styles.metaSubNotice}>
-            Uses bundled in-memory database and open OpenStreetMap / CARTO street tiles.
-          </Text>
-        </View>
-
-        {/* Ministry Text Filter on Screen Body */}
+        {/* Ministry Filter — plain text tabs */}
         <View style={styles.filterSection}>
           <Text style={styles.filterSectionTitle}>MINISTRIES</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={styles.horizontalScroll}
             contentContainerStyle={styles.textFilterContainer}
           >
             <TouchableOpacity
@@ -176,159 +165,148 @@ export default function BranchMapScreen({
           </ScrollView>
         </View>
 
-        {/* Location Type Filter on Screen Body */}
+        {/* Structure Type Filter — plain text tabs */}
         <View style={styles.filterSection}>
           <Text style={styles.filterSectionTitle}>STRUCTURE TYPE</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={styles.horizontalScroll}
             contentContainerStyle={styles.textFilterContainer}
           >
-            {(['all', 'branch', 'homecell', 'cell_branch', 'sub_cluster', 'cluster'] as const).map(
-              (type) => {
-                const isSelected = selectedType === type;
-                const label =
-                  type === 'all'
-                    ? 'All Structures'
-                    : type === 'branch'
-                    ? 'Main Branches'
-                    : type === 'homecell'
-                    ? 'Homecells'
-                    : type === 'cell_branch'
-                    ? 'Cell Branches'
-                    : type === 'sub_cluster'
-                    ? 'Sub-Clusters'
-                    : 'Clusters';
-                return (
-                  <TouchableOpacity
-                    key={type}
-                    style={styles.textFilterItem}
-                    onPress={() => setSelectedType(type)}
-                    activeOpacity={0.7}
+            {TYPE_FILTERS.map(({ key, label }) => {
+              const isSelected = selectedType === key;
+              return (
+                <TouchableOpacity
+                  key={key}
+                  style={styles.textFilterItem}
+                  onPress={() => setSelectedType(key)}
+                  activeOpacity={0.7}
+                >
+                  <Text
+                    style={[
+                      styles.filterText,
+                      isSelected && styles.filterTextActive,
+                    ]}
                   >
-                    <Text
-                      style={[
-                        styles.filterText,
-                        isSelected && styles.filterTextActive,
-                      ]}
-                    >
-                      {label}
-                    </Text>
-                    {isSelected && <View style={styles.activeUnderline} />}
-                  </TouchableOpacity>
-                );
-              }
-            )}
+                    {label}
+                  </Text>
+                  {isSelected && <View style={styles.activeUnderline} />}
+                </TouchableOpacity>
+              );
+            })}
           </ScrollView>
         </View>
 
-        {/* Continuous Body Real Street Map (Zero Outer Card Wrapper) */}
-        <View style={styles.mapCanvasWrapper}>
-          <View style={styles.mapCanvasHeader}>
-            <Text style={styles.mapCanvasHeaderTitle}>
-              CAMPUS LOCATIONS MAP
-            </Text>
-            <Text style={styles.mapCanvasHeaderCount}>
-              {filteredBranches.length} Markers Plotted
-            </Text>
-          </View>
-
-          <BranchRadarMap
-            branches={filteredBranches}
-            selectedBranchId={activeBranch?.id}
-            onSelectBranch={setActiveBranch}
-            height={SCREEN_HEIGHT * 0.42}
-            showFooter={false}
-          />
+        {/* Results meta */}
+        <View style={styles.resultsMetaRow}>
+          <Text style={styles.resultsMetaText}>
+            {filteredBranches.length} location{filteredBranches.length !== 1 ? 's' : ''} found
+          </Text>
         </View>
 
-        {/* Selected Branch Details Directly on Body Canvas */}
-        {activeBranch ? (
-          <View style={styles.activeLocationSection}>
-            <View style={styles.locationHeaderRow}>
-              <Text style={styles.locationTypeLabel}>
-                {getBranchTypeLabel(activeBranch.type).toUpperCase()}
-              </Text>
-              <Text style={styles.locationCityLabel}>
-                {activeBranch.town}, {activeBranch.province}
-              </Text>
-            </View>
-
-            <Text style={styles.locationName}>
-              {activeBranch.name}
+        {/* Directory List */}
+        {filteredBranches.length === 0 ? (
+          <View style={styles.emptySection}>
+            <Text variant="body" weight="700" color={colors.textPrimary}>
+              No locations found
             </Text>
-
-            <View style={styles.locationMetaRow}>
-              <MapPinSvg size={14} color="#64748B" />
-              <Text style={styles.locationAddressText}>
-                {activeBranch.address || `${activeBranch.town}, ${activeBranch.country} (${activeBranch.postalCode})`}
+            <Text variant="caption" color={colors.textSecondary} style={{ marginTop: 4 }}>
+              Is your branch or cell not listed? Register it to appear in the global directory.
+            </Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('RegisterBranch', {})}
+              style={{ marginTop: spacing.sm }}
+            >
+              <Text variant="caption" weight="700" style={styles.actionLink}>
+                + Register Branch or Cell
               </Text>
-            </View>
-
-            {activeBranch.leaderName ? (
-              <Text style={styles.locationDetailText}>
-                Leader in charge: {activeBranch.leaderName}
-              </Text>
-            ) : null}
-
-            {activeBranch.meetingTimes ? (
-              <Text style={styles.locationDetailText}>
-                Services: {activeBranch.meetingTimes}
-              </Text>
-            ) : null}
-
-            {/* Direct Action Links on Body */}
-            <View style={styles.locationActionRow}>
-              <TouchableOpacity
-                style={styles.directionsLink}
-                onPress={() => handleOpenDirections(activeBranch)}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.directionsLinkText}>
-                  Get Directions in Native Maps ›
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.addHereLink}
-                onPress={() =>
-                  navigation.navigate('RegisterBranch', {
-                    ministryId: activeBranch.ministryId,
-                  })
-                }
-                activeOpacity={0.7}
-              >
-                <Text style={styles.addHereLinkText}>
-                  + Add Nearby Branch
-                </Text>
-              </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           </View>
         ) : (
-          <View style={styles.noLocationSelected}>
-            <Text style={styles.noLocationText}>
-              Tap any pin on the map to view campus details and get directions.
-            </Text>
-          </View>
+          filteredBranches.map((b, index) => (
+            <View
+              key={b.id}
+              style={[styles.branchRow, index === 0 && styles.branchRowFirst]}
+            >
+              {/* Type label — plain text, not a pill */}
+              <Text variant="caption" weight="700" color={colors.accent} style={styles.branchTypeText}>
+                {getBranchTypeLabel(b.type).toUpperCase()}
+              </Text>
+
+              <Text variant="h3" color={colors.textPrimary} style={styles.branchName}>
+                {b.name}
+              </Text>
+
+              <Text variant="caption" color={colors.textSecondary} style={styles.branchMeta}>
+                {b.town}, {b.province}{b.country ? ` · ${b.country}` : ''}
+              </Text>
+
+              <Text variant="caption" color={colors.textSecondary} style={styles.branchMeta}>
+                Leader:{' '}
+                <Text variant="caption" weight="700" color={colors.textPrimary}>
+                  {b.leaderName}
+                </Text>
+                {'  ·  '}
+                <Text variant="caption" weight="700" color={colors.textPrimary}>
+                  {b.contactNumber}
+                </Text>
+              </Text>
+
+              {b.meetingTimes ? (
+                <Text variant="caption" color={colors.textSecondary} style={styles.branchMeta}>
+                  {b.meetingTimes}
+                </Text>
+              ) : null}
+
+              <Text variant="caption" color={colors.textTertiary} style={styles.branchAddress}>
+                {b.address}
+              </Text>
+
+              <View style={styles.branchActions}>
+                <TouchableOpacity
+                  onPress={() => handleOpenDirections(b)}
+                  activeOpacity={0.7}
+                >
+                  <Text variant="caption" weight="700" style={styles.directionsLinkText}>
+                    Directions &amp; Map {'>'}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('RegisterBranch', {
+                      ministryId: b.ministryId,
+                    })
+                  }
+                  activeOpacity={0.7}
+                >
+                  <Text variant="caption" color={colors.textTertiary} style={styles.registerNearbyText}>
+                    + Register Branch or Cell
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))
         )}
 
-        {/* Register New Location Link on Body Canvas */}
-        <View style={styles.bottomActionContainer}>
-          <TouchableOpacity
-            style={styles.registerLocationLink}
-            onPress={() => navigation.navigate('RegisterBranch', {})}
-            activeOpacity={0.7}
-            accessibilityRole="button"
-            accessibilityLabel="Register a new location on this map"
-          >
-            <Text style={styles.registerLocationPlus}>+</Text>
-            <Text style={styles.registerLocationText}>
-              Register a New Location on this Map
+        {/* Footer CTA */}
+        <TouchableOpacity
+          onPress={() => navigation.navigate('RegisterBranch', {})}
+          activeOpacity={0.7}
+          style={styles.footerCta}
+          accessibilityRole="button"
+          accessibilityLabel="Register a new branch or cell"
+        >
+          <Text variant="caption" weight="700" color={colors.textTertiary}>
+            LEADING A NEW BRANCH OR CELL?
+          </Text>
+          <View style={styles.footerCtaLinkRow}>
+            <Text variant="body" weight="700" color={colors.textPrimary}>
+              Register and appear in the global directory
             </Text>
-            <ChevronRightSvg size={14} color="#0F172A" />
-          </TouchableOpacity>
-        </View>
+            <ChevronRightSvg size={16} color={colors.textPrimary} />
+          </View>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -356,47 +334,40 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
+  registerHeaderBtn: {
+    paddingVertical: 4,
+    paddingHorizontal: spacing.sm,
+  },
+  registerHeaderBtnText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0F172A',
+    textDecorationLine: 'underline',
+  },
   container: {
     flex: 1,
   },
   contentContainer: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.xxl,
-    gap: 12,
+    paddingBottom: spacing.xxl + spacing.nav,
   },
-  metaInfoRow: {
-    paddingVertical: 4,
+
+  // Filters
+  filterSection: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(15, 23, 42, 0.06)',
-    paddingBottom: 8,
-  },
-  metaNotice: {
-    fontSize: 9,
-    fontWeight: '800',
-    color: colors.accent,
-    letterSpacing: 0.5,
-  },
-  metaSubNotice: {
-    fontSize: 11,
-    color: '#64748B',
-    marginTop: 2,
-  },
-  filterSection: {
-    paddingVertical: 2,
   },
   filterSectionTitle: {
     fontSize: 10,
     fontWeight: '800',
     color: '#64748B',
     letterSpacing: 0.5,
-    marginBottom: 6,
-  },
-  horizontalScroll: {
-    flexDirection: 'row',
+    marginBottom: spacing.sm,
   },
   textFilterContainer: {
-    gap: 16,
+    gap: 20,
     paddingBottom: 4,
   },
   textFilterItem: {
@@ -419,129 +390,90 @@ const styles = StyleSheet.create({
     marginTop: 3,
     borderRadius: 1,
   },
-  mapCanvasWrapper: {
-    marginTop: 4,
-  },
-  mapCanvasHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  mapCanvasHeaderTitle: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#64748B',
-    letterSpacing: 0.5,
-  },
-  mapCanvasHeaderCount: {
-    fontSize: 11,
-    color: '#64748B',
-    fontWeight: '600',
-  },
-  activeLocationSection: {
-    paddingVertical: 12,
-    borderTopWidth: 1,
+
+  // Results meta
+  resultsMetaRow: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-    gap: 4,
+    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
   },
-  locationHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  locationTypeLabel: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: colors.accent,
-    letterSpacing: 0.4,
-  },
-  locationCityLabel: {
+  resultsMetaText: {
     fontSize: 11,
-    color: '#64748B',
-    fontWeight: '600',
-  },
-  locationName: {
-    fontSize: 17,
-    fontWeight: '800',
-    color: '#0F172A',
-    marginTop: 2,
-  },
-  locationMetaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 2,
-  },
-  locationAddressText: {
-    fontSize: 13,
-    color: '#475569',
-  },
-  locationDetailText: {
-    fontSize: 12,
-    color: '#64748B',
-    marginTop: 2,
-  },
-  locationActionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 8,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(15, 23, 42, 0.05)',
-  },
-  directionsLink: {
-    paddingVertical: 4,
-  },
-  directionsLinkText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#0F172A',
-  },
-  addHereLink: {
-    paddingVertical: 4,
-  },
-  addHereLinkText: {
-    fontSize: 12,
-    color: '#64748B',
-    fontWeight: '600',
-  },
-  noLocationSelected: {
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  noLocationText: {
-    fontSize: 12,
     color: '#94A3B8',
-    textAlign: 'center',
+    fontWeight: '500',
   },
-  bottomActionContainer: {
-    paddingVertical: 8,
+
+  // Branch rows
+  branchRow: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     borderTopWidth: 1,
     borderTopColor: 'rgba(15, 23, 42, 0.06)',
   },
-  registerLocationLink: {
+  branchRowFirst: {
+    borderTopWidth: 0,
+  },
+  branchTypeText: {
+    fontSize: 9,
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  branchName: {
+    fontSize: 15,
+    marginBottom: 4,
+  },
+  branchMeta: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+  branchAddress: {
+    fontSize: 11,
+    marginTop: 4,
+    fontStyle: 'italic',
+  },
+  branchActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.12)',
-    borderRadius: radius.sm,
+    justifyContent: 'space-between',
+    marginTop: spacing.sm,
+    paddingTop: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(15, 23, 42, 0.05)',
   },
-  registerLocationPlus: {
-    fontSize: 16,
-    fontWeight: '700',
+  directionsLinkText: {
+    fontSize: 12,
     color: '#0F172A',
+    textDecorationLine: 'underline',
   },
-  registerLocationText: {
-    fontSize: 13,
-    fontWeight: '700',
+  registerNearbyText: {
+    fontSize: 11,
+  },
+
+  // Empty
+  emptySection: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
+  },
+  actionLink: {
+    fontSize: 12,
     color: '#0F172A',
-    letterSpacing: 0.2,
+    textDecorationLine: 'underline',
+  },
+
+  // Footer
+  footerCta: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(15, 23, 42, 0.06)',
+    marginTop: spacing.md,
+  },
+  footerCtaLinkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 4,
   },
 });
+

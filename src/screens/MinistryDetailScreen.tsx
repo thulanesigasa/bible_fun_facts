@@ -20,7 +20,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme';
 import { Text } from '../components/Typography';
-import { BranchRadarMap } from '../components/BranchRadarMap';
+
 import {
   getMinistryById,
   getBranchesByMinistry,
@@ -58,16 +58,14 @@ export default function MinistryDetailScreen({
   const [branches, setBranches] = useState<Branch[]>([]);
   const [activeTab, setActiveTab] = useState<StructureTab>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
+
 
   const loadData = async () => {
     const min = await getMinistryById(ministryId);
     setMinistry(min);
     const branchList = await getBranchesByMinistry(ministryId);
     setBranches(branchList);
-    if (branchList.length > 0) {
-      setSelectedBranch(branchList[0]);
-    }
+
   };
 
   useEffect(() => {
@@ -180,41 +178,9 @@ export default function MinistryDetailScreen({
             activeOpacity={0.7}
           >
             <Text variant="caption" weight="700" style={styles.actionLink}>
-              + Register Campus or Cell
+              + Register Branch or Cell
             </Text>
           </TouchableOpacity>
-
-          <Text variant="caption" color={colors.textTertiary}> · </Text>
-
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('BranchMap', { ministryId: ministry.id })
-            }
-            activeOpacity={0.7}
-          >
-            <Text variant="caption" weight="700" style={styles.actionLinkSecondary}>
-              Full Map View
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* — Radar map — */}
-        <View style={styles.mapSection}>
-          <Text variant="caption" weight="700" color={colors.textSecondary} style={styles.sectionLabel}>
-            CAMPUS MAP LOCATIONS
-          </Text>
-          <BranchRadarMap
-            branches={branches}
-            selectedBranchId={selectedBranch?.id}
-            onSelectBranch={setSelectedBranch}
-            height={240}
-            showFooter={false}
-          />
-          {branches.length > 0 && (
-            <Text variant="caption" color={colors.textTertiary} style={styles.radarCaption}>
-              {branches.length} location{branches.length !== 1 ? 's' : ''} plotted
-            </Text>
-          )}
         </View>
 
         {/* — Filter: plain text tabs — */}
@@ -266,7 +232,7 @@ export default function MinistryDetailScreen({
                 No locations found
               </Text>
               <Text variant="caption" color={colors.textSecondary} style={{ marginTop: 4 }}>
-                Is your campus or cell not listed? Register it to appear in the global directory.
+                Is your branch or cell not listed? Register it to appear in the global directory.
               </Text>
               <TouchableOpacity
                 onPress={() =>
@@ -338,7 +304,7 @@ export default function MinistryDetailScreen({
           style={styles.footerCta}
         >
           <Text variant="caption" weight="700" color={colors.textTertiary}>
-            LEADING A NEW CELL OR CAMPUS?
+            LEADING A NEW BRANCH OR CELL?
           </Text>
           <Text variant="body" weight="700" color={colors.textPrimary} style={{ marginTop: 2 }}>
             Register and appear in the global directory
@@ -428,28 +394,7 @@ const styles = StyleSheet.create({
     color: '#0F172A',
     textDecorationLine: 'underline',
   },
-  actionLinkSecondary: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
 
-  // Radar map
-  mapSection: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(15, 23, 42, 0.06)',
-  },
-  sectionLabel: {
-    fontSize: 10,
-    letterSpacing: 0.5,
-    marginBottom: spacing.sm,
-  },
-  radarCaption: {
-    fontSize: 11,
-    marginTop: spacing.xs,
-  },
 
   // Filter tabs
   tabsScroll: {
