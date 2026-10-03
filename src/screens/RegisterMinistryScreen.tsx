@@ -637,7 +637,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 6,
   },
-  stepProgressLabel: { fontSize: 10, fontWeight: '800', color: '#B45309', letterSpacing: 0.5 },
+  stepProgressLabel: { fontSize: 10, fontWeight: '800', color: colors.accent, letterSpacing: 0.5 },
   stepTitleLabel: { fontSize: 12, fontWeight: '600', color: '#0F172A' },
   progressBarTrack: { height: 3, backgroundColor: 'rgba(15, 23, 42, 0.08)', borderRadius: 1.5, overflow: 'hidden' },
   progressBarFill: { height: '100%', backgroundColor: '#0F172A' },

@@ -614,7 +614,7 @@ const styles = StyleSheet.create({
   typeBadgeText: {
     fontSize: 9,
     fontWeight: '700',
-    color: '#B45309',
+    color: colors.accent,
     textTransform: 'uppercase',
   },
   locationText: {

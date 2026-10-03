@@ -2125,6 +2125,26 @@ To guarantee continuous, uninterrupted daily study streak tracking across offlin
 
 ---
 
+### 10. Modern Alert Sheets & Search Directory Brand Calibration
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Pop--Up%20Alerts-Unboxed%20Transparent%20Logo-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="Unboxed Transparent Logo" />
+  <img src="https://img.shields.io/badge/Logo%20Geometry-Zero%20Border%20Radius%20%7C%20Zero%20Background-FDD223?style=for-the-badge&logo=expo&logoColor=white" alt="Zero Border Radius Zero Background" />
+  <img src="https://img.shields.io/badge/Churches%20Directory-Brand%20Logo%20Yellow%20(%23FDD223)-0284C7?style=for-the-badge&logo=church&logoColor=white" alt="Brand Logo Yellow Church Styling" />
+  <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Strict%20Compliance-10B981?style=for-the-badge&logo=react&logoColor=white" alt="60-30-10 Strict Compliance" />
+</p>
+
+1. **Unboxed Transparent Alert Logo (`src/components/ThemedAlertModal.tsx`)**:
+   - Eliminated the surrounding container box, yellow background (`#FEF9C3`), and yellow border (`#FDE047`).
+   - Removed container border radius (`borderRadius: 18`) and image border radius (`borderRadius: 12`).
+   - Directly renders the high-resolution transparent brand mark (`logo-transparent.png`) with clean, natural breathing room above sheet titles.
+
+2. **Churches & Branch Text Brand Yellow Calibration (`SearchScreen.tsx`, `MinistryDetailScreen.tsx`, `BranchMapScreen.tsx`)**:
+   - Replaced legacy amber-brown text (`#B45309`) with the official brand logo yellow (`#FDD223` / `colors.accent`).
+   - Standardized church founder names, branch type labels, radar map metadata headers, and registration progress step indicators to strictly match the canonical brand yellow colorway.
+
+---
+
 ### Verification Commands
 ```bash
 # Run unit test suite

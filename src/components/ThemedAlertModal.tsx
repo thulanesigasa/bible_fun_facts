@@ -129,15 +129,13 @@ export default function ThemedAlertModal({
               {/* Sheet Drag Handle */}
               <View style={styles.sheetHandle} />
 
-              {/* Rule 15/19 Calibrated In-App Logo Container */}
+              {/* Pop-up Brand Logo: Unboxed transparent mark, zero container background, zero border radius */}
               <View style={styles.iconCenterWrapper}>
-                <View style={styles.iconContainer}>
-                  <Image
-                    source={require('../../assets/logo-transparent.png')}
-                    style={styles.alertLogo}
-                    resizeMode="contain"
-                  />
-                </View>
+                <Image
+                  source={require('../../assets/logo-transparent.png')}
+                  style={styles.alertLogo}
+                  resizeMode="contain"
+                />
               </View>
 
               {/* Title & Message */}
@@ -225,25 +223,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   iconCenterWrapper: {
-    marginBottom: 14,
+    marginBottom: 16,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  // Rule 15/19: 50x50 icon inside 68x68 rounded container with border radius 18px
-  iconContainer: {
-    width: 68,
-    height: 68,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    backgroundColor: '#FEF9C3',
-    borderColor: '#FDE047',
   },
   alertLogo: {
-    width: 50,
-    height: 50,
-    borderRadius: 12,
+    width: 56,
+    height: 56,
+    backgroundColor: 'transparent',
   },
   dialogTitle: {
     fontSize: 18,

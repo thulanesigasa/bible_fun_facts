@@ -607,7 +607,7 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
                     {m.headquarters}, {m.headquartersCountry}
                   </Text>
 
-                  <Text variant="caption" weight="600" color="#B45309" style={styles.ministryRowFounder}>
+                  <Text variant="caption" weight="700" color={colors.accent} style={styles.ministryRowFounder}>
                     {m.founder}
                   </Text>
 
