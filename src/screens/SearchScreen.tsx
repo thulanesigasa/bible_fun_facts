@@ -566,6 +566,18 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
             <Text style={styles.actionPlusGlyph}>+</Text>
             <Text style={styles.actionLinkText}>Register Branch or Cell</Text>
           </TouchableOpacity>
+
+          <View style={styles.actionDividerDot} />
+
+          <TouchableOpacity
+            style={styles.ministryActionLink}
+            onPress={() => navigation?.navigate('BranchMap')}
+            activeOpacity={0.65}
+            accessibilityRole="button"
+            accessibilityLabel="Branch Directory"
+          >
+            <Text style={styles.actionLinkText}>Branch Directory</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Results Counter */}
