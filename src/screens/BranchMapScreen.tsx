@@ -71,6 +71,16 @@ export default function BranchMapScreen({
     return list;
   }, [branches, selectedMinistryId, selectedType]);
 
+  useEffect(() => {
+    if (filteredBranches.length > 0) {
+      if (!activeBranch || !filteredBranches.some((b) => b.id === activeBranch.id)) {
+        setActiveBranch(filteredBranches[0]);
+      }
+    } else {
+      setActiveBranch(null);
+    }
+  }, [filteredBranches, activeBranch]);
+
   const handleOpenDirections = (b: Branch) => {
     const query = encodeURIComponent(`${b.name}, ${b.address}, ${b.town}, ${b.country}`);
     const url = Platform.select({

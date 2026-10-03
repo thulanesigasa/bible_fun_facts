@@ -60,6 +60,17 @@ export const BranchMapView: React.FC<BranchRadarMapProps> = ({
     selectedBranchId || (branches.length > 0 ? branches[0].id : null)
   );
 
+  React.useEffect(() => {
+    if (selectedBranchId) {
+      setActiveBranchId(selectedBranchId);
+    } else if (
+      branches.length > 0 &&
+      (!activeBranchId || !branches.some((b) => b.id === activeBranchId))
+    ) {
+      setActiveBranchId(branches[0].id);
+    }
+  }, [selectedBranchId, branches]);
+
   const activeBranch = useMemo(() => {
     return branches.find((b) => b.id === activeBranchId) || branches[0] || null;
   }, [branches, activeBranchId]);
