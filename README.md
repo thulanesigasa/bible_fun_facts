@@ -58,7 +58,7 @@
   <img src="https://img.shields.io/badge/Strongs%20Pronunciation-100%25%20Complete%20(14%2C298%20Words)-10B981?style=for-the-badge&logo=book&logoColor=white" alt="100% Strongs Pronunciation" />
   <img src="https://img.shields.io/badge/Ministries-God%20Embassy%20%7C%20Christ%20Embassy%20%7C%20Spirit%20Embassy%20%7C%20ECG-10B981?style=for-the-badge&logo=church&logoColor=white" alt="Ministry Directory" />
   <img src="https://img.shields.io/badge/Geocoding-Live%20OpenStreetMap%20Nominatim%20%2B%20Photon%20Hybrid-0284C7?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="Live OpenStreetMap Geocoding" />
-  <img src="https://img.shields.io/badge/Maps-Dual--Mode%20Real%20Street%20Tiles%20%26%20Radar%20Compass-FDD223?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="Dual-Mode Real Street Tiles and Radar" />
+  <img src="https://img.shields.io/badge/Maps-High--Resolution%20Real%20Street%20Tiles%20%7C%20Zero%20API%20Keys-FDD223?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="High-Resolution Real Street Tiles Zero API Keys" />
   <img src="https://img.shields.io/badge/Strongs%20Loading-Instant%200ms%20Curated%20Render%20%7C%20Infinite%20Paging-10B981?style=for-the-badge&logo=fastapi&logoColor=white" alt="Instant Strongs Loading" />
   <img src="https://img.shields.io/badge/Hermes%20Optimization-Zero--Crash%20AST%20Stack%20Protection-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Hermes Zero-Crash AST Stack Protection" />
   <img src="https://img.shields.io/badge/Cold%20Boot%20Stability-Decoupled%20Warmup%20%7C%20Zero%20OOM-FDD223?style=for-the-badge&logo=android&logoColor=white" alt="Cold Boot Stability" />
@@ -112,10 +112,10 @@ graph TD
     HistoryStack --> WriterDetails["WriterDetailsScreen (PageSheet Biography & Manuscripts)"]
     
     SearchStack --> SearchMain["SearchScreen (Dual Believers & Ministries Hub)"]
-    SearchStack --> MinistryDetail["MinistryDetailScreen (Vision, Branches, Homecells & Embedded Radar Map)"]
+    SearchStack --> MinistryDetail["MinistryDetailScreen (Vision, Branches, Homecells & Campus Street Map)"]
     SearchStack --> RegisterMinistry["RegisterMinistryScreen (Register Church & Auto-Route)"]
     SearchStack --> RegisterBranch["RegisterBranchScreen (Auto-Cascading Town/Province/Country & Map Preview)"]
-    SearchStack --> BranchMap["BranchMapScreen (Interactive Vector Radar Map with Native GPS)"]
+    SearchStack --> BranchMap["BranchMapScreen (Interactive Real Street Map with Native GPS)"]
     SearchStack --> PastoralCareScreen["PastoralCareScreen (24/7 Lifelines, SADAG & Scriptures)"]
     ProfileStack --> ProfileMain["ProfileScreen (Modular Hub, Saved Collection & Account)"]
     ProfileStack --> StrongsScreen["StrongsScreen (Instant Curated Concordance, Infinite Paging & Offline Download)"]
@@ -2142,6 +2142,33 @@ To guarantee continuous, uninterrupted daily study streak tracking across offlin
 2. **Churches & Branch Text Brand Yellow Calibration (`SearchScreen.tsx`, `MinistryDetailScreen.tsx`, `BranchMapScreen.tsx`)**:
    - Replaced legacy amber-brown text (`#B45309`) with the official brand logo yellow (`#FDD223` / `colors.accent`).
    - Standardized church founder names, branch type labels, radar map metadata headers, and registration progress step indicators to strictly match the canonical brand yellow colorway.
+
+---
+
+### 11. Dedicated Real Street Map Architecture (Zero API Keys Required)
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Renderer-React%20Native%20Mercator%20Grid%20Engine-10B981?style=for-the-badge&logo=react&logoColor=white" alt="React Native Mercator Grid Engine" />
+  <img src="https://img.shields.io/badge/Tile%20Source-OpenStreetMap%20%7C%20CARTO%20Voyager-0284C7?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="OpenStreetMap and CARTO Voyager" />
+  <img src="https://img.shields.io/badge/API%20Keys-Zero%20Keys%20%7C%20Zero%20Subscriptions-FDD223?style=for-the-badge&logo=shield&logoColor=white" alt="Zero Keys Zero Subscriptions" />
+  <img src="https://img.shields.io/badge/GPS%20Routing-Native%20Apple%20%26%20Google%20Maps%20Linking-10B981?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Native Apple & Google Maps Linking" />
+</p>
+
+1. **Elimination of Mock Radar Canvas**:
+   - Removed the secondary tactical radar view toggle and mock concentric circle overlay.
+   - The church campus map is now purely a dedicated, high-resolution real street tile map with interactive markers.
+   - Screen headers, navigation buttons, and captions standardized from "Radar Map" to "Campus Street Map".
+
+2. **100% Free Open-Source Tile Stack (Zero External API Keys)**:
+   - Direct Web Mercator tile projection (`latLngToTile`) calculating continuous tile coordinates from latitude/longitude and zoom levels (z4 to z18).
+   - Powered by public open-source high-resolution raster tile CDNs (`basemaps.cartocdn.com/rastertiles/voyager`), providing rich street-level detail, highways, districts, and English labels globally.
+   - Completely bypasses commercial wrappers that charge fees or require API keys (Mapbox, MapTiler, Stadia Maps).
+   - Zero proprietary Google billing keys, zero OpenAI API keys, and zero OSM developer accounts required.
+
+3. **Interactive Markers & Turn-by-Turn Directions**:
+   - Dynamic SVG branch pin markers with 60-30-10 gold/slate styling.
+   - Tapping any branch centers the street map on that campus and displays a summary footer card.
+   - One-tap "Directions" button opens the user's native navigation app (`maps.apple.com` on iOS, `geo:` intent on Android, Google Maps fallback).
 
 ---
 

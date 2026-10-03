@@ -562,10 +562,10 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
             onPress={() => navigation?.navigate('BranchMap')}
             activeOpacity={0.65}
             accessibilityRole="button"
-            accessibilityLabel="Explore Radar Map"
+            accessibilityLabel="Explore Campus Map"
           >
             <MapPinSvg size={14} color="#0F172A" />
-            <Text style={styles.actionLinkText}>Radar Map</Text>
+            <Text style={styles.actionLinkText}>Campus Map</Text>
             <ChevronRightSvg size={12} color="#64748B" />
           </TouchableOpacity>
         </View>
