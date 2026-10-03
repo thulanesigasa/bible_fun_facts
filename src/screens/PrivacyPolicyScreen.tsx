@@ -244,6 +244,112 @@ export default function PrivacyPolicyScreen() {
             </Text>
           </View>
         </View>
+
+        {/* Section 12: Ministerial & Church Leadership Data Governance */}
+        <View style={styles.sectionBlock}>
+          <Text variant="h3" weight="800" color={colors.textPrimary} style={styles.sectionHeading}>
+            12. Ministerial &amp; Church Leadership Data Governance
+          </Text>
+          <Text variant="body" color={colors.textSecondary} style={styles.sectionBody}>
+            The exégeomai application includes a global church and assembly directory feature that allows ordained leaders, church administrators, and their authorized representatives to register their ministry headquarters, branch locations, homecells, and cell clusters in our fellowship database. This section governs the collection, processing, and display of all ministerial and ecclesiastical identity information.
+          </Text>
+
+          <Text variant="body" weight="700" color={colors.textPrimary} style={[styles.sectionBody, { marginTop: 12 }]}>
+            12.1 Categories of Ministerial Data Collected
+          </Text>
+          <View style={styles.bulletList}>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Pastor &amp; Clergy Identity:</Text> First and last names of branch leaders, elders, cell group overseers, and their designated pastoral representatives as voluntarily submitted.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Official Contact Numbers:</Text> Mobile and landline telephone numbers of branch leadership for pastoral care and assembly coordination purposes.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Email Addresses:</Text> Pastoral and administrative email addresses of church leadership where voluntarily provided.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Physical Assembly Locations:</Text> Street addresses, building names, town/city, province/state, country, and postal codes of church premises, campuses, branch venues, and homecell meeting points.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>GPS Coordinates:</Text> Latitude/longitude coordinates associated with registered church locations, used to power native device map navigation (Google Maps, Apple Maps) — never stored as background telemetry.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Service Times &amp; Meeting Schedules:</Text> Days of the week, service hours, and gathering frequencies for each registered assembly or cell group.
+            </Text>
+          </View>
+
+          <Text variant="body" weight="700" color={colors.textPrimary} style={[styles.sectionBody, { marginTop: 12 }]}>
+            12.2 Purpose of Processing Church &amp; Leadership Data
+          </Text>
+          <Text variant="body" color={colors.textSecondary} style={styles.sectionBody}>
+            All ministerial data is collected and processed exclusively for the following legitimate faith-community purposes:
+          </Text>
+          <View style={styles.bulletList}>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Fellowship Discovery:</Text> Enabling believers to locate churches, branches, and homecells in their geographical area for the purpose of fellowship, worship, and communal Scripture study.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Pastoral Care Access:</Text> Connecting individuals seeking spiritual counselling, prayer support, or pastoral guidance with verified local church leadership.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Turn-by-Turn Navigation:</Text> Passing verified location coordinates to your device's native mapping application (Google Maps, Apple Maps, or equivalent) to provide accurate physical directions to church premises. We do not retain navigation session data.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Global Directory Transparency:</Text> Providing the global body of Christ with an open, searchable, and verifiable record of active churches and assemblies for cross-denominational awareness.
+            </Text>
+          </View>
+
+          <Text variant="body" weight="700" color={colors.textPrimary} style={[styles.sectionBody, { marginTop: 12 }]}>
+            12.3 Lawful Basis for Processing
+          </Text>
+          <View style={styles.bulletList}>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>GDPR (EU/EEA):</Text> Processing is based on Article 6(1)(a) — Consent of the data subject (the leader or administrator who voluntarily submits the registration) and Article 6(1)(f) — Legitimate Interests, being the legitimate interest of the faith community in locating and connecting with verified local assemblies.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>POPIA (South Africa):</Text> Processing is lawful under Section 11 of the Protection of Personal Information Act 4 of 2013 on the basis of (a) consent of the data subject and (f) the legitimate interests of the responsible party (exégeomai) or the third-party community beneficiaries, where such interests are not overridden by the data subject's rights.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Representation Authority:</Text> By submitting a church or branch registration, the submitting individual warrants and represents that they have the authority, mandate, or delegation of their church leadership to provide the information submitted and consent to its display in the exégeomai directory.
+            </Text>
+          </View>
+
+          <Text variant="body" weight="700" color={colors.textPrimary} style={[styles.sectionBody, { marginTop: 12 }]}>
+            12.4 Rights of Church Leadership &amp; Administrators
+          </Text>
+          <Text variant="body" color={colors.textSecondary} style={styles.sectionBody}>
+            Pastors, elders, church administrators, and any person whose identity appears in the exégeomai assembly directory have the following enforceable rights, exercisable at any time without penalty:
+          </Text>
+          <View style={styles.bulletList}>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Right to Rectification:</Text> You may request the immediate correction of any inaccurate church name, address, leader name, contact number, email address, service times, or GPS location data associated with your assembly.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Right to Erasure (Delisting):</Text> Any registered church, branch, homecell, or cell cluster may be permanently removed from the exégeomai directory upon written request. Delisting will be processed within 72 hours of receipt and verification of authority.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Right to Access:</Text> You may request a complete export of all data held about your ministry or assembly in the exégeomai database.
+            </Text>
+            <Text variant="body" color={colors.textSecondary} style={styles.bulletItem}>
+              • <Text weight="700" color={colors.textPrimary}>Right to Object:</Text> You may object to the display of your personal clerical identity or contact information at any time without requiring justification.
+            </Text>
+          </View>
+
+          <Text variant="body" color={colors.textSecondary} style={[styles.sectionBody, { marginTop: 8 }]}>
+            To exercise any of these rights, please contact our Ministry Care team directly:
+          </Text>
+          <View style={styles.contactDetails}>
+            <Text variant="body" weight="700" color={colors.textPrimary}>
+              Ministry Care &amp; Directory Rights
+            </Text>
+            <Text variant="body" color={colors.textSecondary}>
+              Email: ministry-care@exegeomai.org
+            </Text>
+            <Text variant="body" color={colors.textSecondary}>
+              Data Protection: dpo@exegeomai.org
+            </Text>
+          </View>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

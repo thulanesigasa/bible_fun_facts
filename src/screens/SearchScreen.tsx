@@ -30,7 +30,6 @@ import {
   BlockSvg,
   IncognitoSvg,
   HeartSvg,
-  MapPinSvg,
 } from '../components/SvgIcons';
 import { PastoralCareModal } from '../components/PastoralCareModal';
 import { PastoralCareService } from '../services/pastoralCareService';
@@ -559,14 +558,13 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
 
           <TouchableOpacity
             style={styles.ministryActionLink}
-            onPress={() => navigation?.navigate('BranchMap')}
+            onPress={() => navigation?.navigate('RegisterBranch')}
             activeOpacity={0.65}
             accessibilityRole="button"
-            accessibilityLabel="Explore Campus Map"
+            accessibilityLabel="Register Branch or Cell"
           >
-            <MapPinSvg size={14} color="#0F172A" />
-            <Text style={styles.actionLinkText}>Campus Map</Text>
-            <ChevronRightSvg size={12} color="#64748B" />
+            <Text style={styles.actionPlusGlyph}>+</Text>
+            <Text style={styles.actionLinkText}>Register Branch or Cell</Text>
           </TouchableOpacity>
         </View>
 
