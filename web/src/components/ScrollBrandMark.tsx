@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
 export interface ScrollSection {
@@ -28,56 +27,33 @@ export interface ScrollBrandMarkProps {
   className?: string;
 }
 
+// Alternating coordinates so the pure transparent logo glides opposite each section's editorial text
 const defaultBrandPositions = [
-  { top: '50%', left: '74%', scale: 1.25, opacity: 0.95 },  // Section 0: Hero — Right side
-  { top: '48%', left: '26%', scale: 1.15, opacity: 0.9 },   // Section 1: Strong's — Left side
-  { top: '50%', left: '74%', scale: 1.2, opacity: 0.92 },   // Section 2: Translations — Right side
-  { top: '52%', left: '26%', scale: 1.15, opacity: 0.9 },   // Section 3: Devotionals — Left side
-  { top: '48%', left: '74%', scale: 1.2, opacity: 0.92 },   // Section 4: Security — Right side
-  { top: '50%', left: '50%', scale: 1.55, opacity: 0.22 },  // Section 5: Community/Download — Center backdrop
+  { top: '50%', left: '76%', scale: 1.35, opacity: 0.95 },  // Section 0 (Hero, align left) -> Logo Right
+  { top: '50%', left: '24%', scale: 1.25, opacity: 0.95 },  // Section 1 (Strong's, align right) -> Logo Left
+  { top: '50%', left: '76%', scale: 1.3, opacity: 0.95 },   // Section 2 (32 Canons, align left) -> Logo Right
+  { top: '50%', left: '24%', scale: 1.25, opacity: 0.95 },  // Section 3 (Devotionals, align right) -> Logo Left
+  { top: '50%', left: '76%', scale: 1.3, opacity: 0.95 },   // Section 4 (Security, align left) -> Logo Right
+  { top: '50%', left: '50%', scale: 1.75, opacity: 0.22 },  // Section 5 (Community, align center) -> Center Backdrop
 ];
 
 const parsePercent = (str: string): number => parseFloat(str.replace('%', ''));
 
 /**
- * Interactive Focal Brand Mark (Replaces the generic wireframe globe)
- * Built with semantic HTML5 <figure>, <picture>, and <figcaption>.
+ * Pure Free-Floating Brand Mark (No card enclosure, zero border-radius)
+ * Renders exégeomai's golden transparent brand emblem floating with natural ease.
  */
-function BrandMark({ activeSection }: { activeSection: number }) {
-  const sectionLabels = [
-    'ἐξηγέομαι · Strong\'s G1834',
-    'Concordance · 14,298 Lemmas',
-    '32 Offline Canons · Zero Quotas',
-    '365 Devotionals · Triple Lens',
-    'Hardware Keystore · AES-256',
-    'Kingdom Community · Native GPS',
-  ];
-
+function BrandMark() {
   return (
-    <figure className="brandmark-focal-wrap" aria-label="exégeomai Interactive Brand Mark">
-      {/* Outer subtle orbital ring with 12 cardinal theological ticks */}
-      <span className="brandmark-orbit-ring" aria-hidden="true" />
-      
-      {/* Secondary concentric aura ring */}
-      <span className="brandmark-aura-ring" aria-hidden="true" />
-
-      {/* Surface enclosure housing the transparent brand mark */}
-      <picture className="brandmark-core-enclosure">
-        <Image
-          src="/assets/logo-transparent.png"
-          alt="exégeomai Sacred Brand Mark"
-          width={280}
-          height={280}
-          priority
-          className="brandmark-emblem-image"
-        />
-      </picture>
-
-      {/* Floating active theological badge */}
-      <figcaption className="brandmark-floating-tag">
-        <span className="brandmark-tag-dot" aria-hidden="true" />
-        <span className="brandmark-tag-label">{sectionLabels[activeSection] || sectionLabels[0]}</span>
-      </figcaption>
+    <figure className="brandmark-focal-wrap" aria-label="exégeomai Sacred Brand Emblem">
+      <Image
+        src="/assets/logo-transparent.png"
+        alt="exégeomai Sacred Brand Emblem"
+        width={380}
+        height={380}
+        priority
+        className="brandmark-emblem-image"
+      />
     </figure>
   );
 }
@@ -105,16 +81,35 @@ export function ScrollBrandMark({
     }));
   }, [brandPositions]);
 
+  // Jump to section with reliable coordinate math accounting for fixed top header (64px)
+  const scrollToSection = useCallback((index: number) => {
+    const el = sectionRefs.current[index];
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      const currentScrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+      const targetTop = rect.top + currentScrollY - 75;
+      window.scrollTo({
+        top: Math.max(0, targetTop),
+        behavior: 'smooth',
+      });
+      setActiveSection(index);
+    }
+  }, []);
+
   // Update position on scroll
   const updateScrollPosition = useCallback(() => {
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop || window.scrollY || 0;
+    const scrollHeight = Math.max(
+      document.body.scrollHeight,
+      document.documentElement.scrollHeight
+    );
+    const docHeight = scrollHeight - window.innerHeight;
     const progress = docHeight > 0 ? Math.min(Math.max(scrollTop / docHeight, 0), 1) : 0;
 
     setScrollProgress(progress);
 
     const viewportCenter = window.innerHeight / 2;
-    let newActiveSection = 0;
+    let closestIndex = 0;
     let minDistance = Infinity;
 
     sectionRefs.current.forEach((ref, index) => {
@@ -125,20 +120,22 @@ export function ScrollBrandMark({
 
         if (distance < minDistance) {
           minDistance = distance;
-          newActiveSection = index;
+          closestIndex = index;
         }
       }
     });
 
-    const safeIndex = Math.min(newActiveSection, calculatedPositions.length - 1);
+    const safeIndex = Math.min(closestIndex, calculatedPositions.length - 1);
     const currentPos = calculatedPositions[safeIndex];
-    const transform = `translate3d(${currentPos.left}vw, ${currentPos.top}vh, 0) translate3d(-50%, -50%, 0) scale3d(${currentPos.scale}, ${currentPos.scale}, 1)`;
-
-    setBrandTransform(transform);
-    setBrandOpacity(currentPos.opacity);
-    setActiveSection(newActiveSection);
+    if (currentPos) {
+      const transform = `translate3d(${currentPos.left}vw, ${currentPos.top}vh, 0) translate3d(-50%, -50%, 0) scale3d(${currentPos.scale}, ${currentPos.scale}, 1)`;
+      setBrandTransform(transform);
+      setBrandOpacity(currentPos.opacity);
+      setActiveSection(safeIndex);
+    }
   }, [calculatedPositions]);
 
+  // Scroll and resize listener with capture
   useEffect(() => {
     let ticking = false;
 
@@ -152,20 +149,60 @@ export function ScrollBrandMark({
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', handleScroll, { passive: true, capture: true });
+    document.addEventListener('scroll', handleScroll, { passive: true, capture: true });
     window.addEventListener('resize', handleScroll, { passive: true });
+
+    // Initial position trigger
     updateScrollPosition();
+    const timeout = setTimeout(updateScrollPosition, 100);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('scroll', handleScroll, true);
+      document.removeEventListener('scroll', handleScroll, true);
       window.removeEventListener('resize', handleScroll);
+      clearTimeout(timeout);
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
       }
     };
   }, [updateScrollPosition]);
 
-  // Set initial position
+  // Native IntersectionObserver for 100% reliable active section detection
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = sectionRefs.current.findIndex(ref => ref === entry.target);
+            if (index !== -1) {
+              const currentPos = calculatedPositions[index];
+              if (currentPos) {
+                const transform = `translate3d(${currentPos.left}vw, ${currentPos.top}vh, 0) translate3d(-50%, -50%, 0) scale3d(${currentPos.scale}, ${currentPos.scale}, 1)`;
+                setBrandTransform(transform);
+                setBrandOpacity(currentPos.opacity);
+                setActiveSection(index);
+              }
+            }
+          }
+        });
+      },
+      {
+        rootMargin: '-25% 0px -25% 0px',
+        threshold: 0,
+      }
+    );
+
+    sectionRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => observer.disconnect();
+  }, [calculatedPositions]);
+
+  // Initial position fallback
   useEffect(() => {
     if (calculatedPositions.length > 0) {
       const initialPos = calculatedPositions[0];
@@ -194,46 +231,53 @@ export function ScrollBrandMark({
         />
       </nav>
 
-      {/* ── Floating Side Navigation with Semantic Nav & List ── */}
+      {/* ── Floating Side Navigation with Generous Hit Areas & Clickable Labels ── */}
       <nav className="scroll-side-nav" aria-label="Section quick navigation">
         <ol className="scroll-dots-column" role="list">
-          {sections.map((section, index) => (
-            <li key={section.id} className="scroll-dot-wrapper">
-              {/* Auto-revealing section label on active state or hover */}
-              <span
-                className={cn(
-                  'scroll-nav-label',
-                  activeSection === index ? 'scroll-label-active' : 'scroll-label-hidden'
-                )}
+          {sections.map((section, index) => {
+            const isCurrent = activeSection === index;
+            return (
+              <li
+                key={section.id}
+                className="scroll-dot-wrapper"
               >
-                <span className="scroll-label-dot" aria-hidden="true" />
-                <span className="scroll-label-text">
-                  {section.badge || `Section ${index + 1}`}
-                </span>
-              </span>
+                {/* Clickable section badge label */}
+                <button
+                  type="button"
+                  onClick={() => scrollToSection(index)}
+                  className={cn(
+                    'scroll-nav-label',
+                    isCurrent ? 'scroll-label-active' : 'scroll-label-hidden'
+                  )}
+                  aria-label={`Navigate to ${section.badge || section.title}`}
+                >
+                  <span className="scroll-label-dot" aria-hidden="true" />
+                  <span className="scroll-label-text">
+                    {section.badge || `Section ${index + 1}`}
+                  </span>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  sectionRefs.current[index]?.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center',
-                  });
-                }}
-                className={cn(
-                  'scroll-dot-button',
-                  activeSection === index && 'scroll-dot-active'
-                )}
-                aria-label={`Jump to ${section.badge || section.title}`}
-                title={section.badge || section.title}
-              />
-            </li>
-          ))}
+                {/* Generous 36x36px clickable target button */}
+                <button
+                  type="button"
+                  onClick={() => scrollToSection(index)}
+                  className={cn(
+                    'scroll-dot-button',
+                    isCurrent && 'scroll-dot-active'
+                  )}
+                  aria-label={`Jump to ${section.badge || section.title}`}
+                  title={section.badge || section.title}
+                >
+                  <span className="scroll-dot-circle" />
+                </button>
+              </li>
+            );
+          })}
         </ol>
         <span className="scroll-nav-line" aria-hidden="true" />
       </nav>
 
-      {/* ── Ultra-Smooth Interactive Focal Brand Mark in Semantic Aside ── */}
+      {/* ── Pure Free-Floating Brand Emblem (No Border Radius, No Card Box) ── */}
       <aside
         className="scroll-focal-brandmark"
         style={{
@@ -242,10 +286,10 @@ export function ScrollBrandMark({
         }}
         aria-hidden="true"
       >
-        <BrandMark activeSection={activeSection} />
+        <BrandMark />
       </aside>
 
-      {/* ── Dynamic Sections with Rich Scholarly & Architectural Content ── */}
+      {/* ── Dynamic Sections with Rich Scholarly Content ── */}
       <article className="scroll-sections-container">
         {sections.map((section, index) => (
           <section
@@ -317,7 +361,7 @@ export function ScrollBrandMark({
                 </ul>
               )}
 
-              {/* Optional Custom Extra Node (e.g. Strong's preview card, translations pill matrix) */}
+              {/* Custom Extra Showcase Slot */}
               {section.extraNode && (
                 <aside className="section-extra-wrap" aria-label={`${section.title} Details`}>
                   {section.extraNode}
