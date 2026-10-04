@@ -1,128 +1,78 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service',
+  title: 'Terms of Service — exégeomai',
   description:
-    'exégeomai Terms of Service — usage conditions, intellectual property, disclaimers, and governing law.',
+    'Terms of service and software license agreement for the exégeomai open-source Bible study application.',
+  robots: { index: true, follow: true },
 };
 
 export default function TermsPage() {
   return (
     <>
       <Header />
-      <main className="legal-main">
-        <article className="legal-body">
-          <h1>Terms of Service</h1>
-          <span className="legal-meta">
-            Last updated: October 2026 · Effective: October 1, 2026
-          </span>
 
-          <section className="legal-section">
-            <h2>1. Acceptance of Terms</h2>
-            <p>
-              By downloading, installing, or using exégeomai (the &quot;Application&quot;)
-              or visiting this website, you agree to be bound by these Terms of Service.
-              If you do not agree, please uninstall the application and discontinue use.
-            </p>
-          </section>
+      <main id="main">
+        <header className="subpage-hero">
+          <div className="wrap">
+            <span className="section-kicker">Terms of Agreement</span>
+            <h1>Terms of Service</h1>
+            <p>Last updated: October 2026 · Effective: October 1, 2026</p>
+          </div>
+        </header>
 
-          <section className="legal-section">
-            <h2>2. License</h2>
-            <p>
-              exégeomai is released under the MIT License. You are free to use, copy,
-              modify, merge, publish, distribute, sublicense, and/or sell copies of the
-              software, subject to the conditions of the MIT License included with the
-              source code.
-            </p>
-            <p>
-              All biblical text content is sourced from translations in the public domain
-              or licensed under Creative Commons. See in-app attribution for per-translation
-              details.
-            </p>
-          </section>
+        <section className="subpage-content">
+          <div className="wrap">
+            <div className="prose-card">
+              <h2>1. Agreement to Terms</h2>
+              <p>
+                By downloading, installing, or using the exégeomai mobile application or website,
+                you agree to be bound by these Terms of Service. If you do not agree, do not use the application.
+              </p>
 
-          <section className="legal-section">
-            <h2>3. Acceptable Use</h2>
-            <p>You agree not to:</p>
-            <ul>
-              <li>Use the application to infringe upon any intellectual property rights</li>
-              <li>Attempt to reverse-engineer or extract proprietary components</li>
-              <li>Use the application for any unlawful purpose</li>
-              <li>Distribute modified versions without complying with the MIT License terms</li>
-            </ul>
-          </section>
+              <h2>2. Open Source License (MIT)</h2>
+              <p>
+                The source code of exégeomai is licensed under the permissive <strong>MIT License</strong>.
+                You are free to inspect, fork, modify, compile, and distribute the code, provided that the original
+                copyright notice and permission notice are included in all copies or substantial portions of the software.
+              </p>
 
-          <section className="legal-section">
-            <h2>4. Bible Content &amp; Copyright</h2>
-            <p>
-              The application includes Bible translations in the public domain (KJV, ASV,
-              WEB, and others) and translations distributed under open licenses.
-              Translations that carry commercial restrictions are not included. Strong&apos;s
-              Concordance (1890) is fully in the public domain.
-            </p>
-          </section>
+              <h2>3. Public Domain Biblical Texts</h2>
+              <p>
+                The Scripture texts, Strong&apos;s Greek and Hebrew lexicons, and historical concordances packaged
+                within exégeomai are in the public domain or distributed under open permissive licenses.
+                All rights to translations belong to their respective historical publishers or public heritage trusts.
+              </p>
 
-          <section className="legal-section">
-            <h2>5. Disclaimer of Warranties</h2>
-            <p>
-              THE APPLICATION IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
-              EXPRESS OR IMPLIED. THE DEVELOPER DOES NOT WARRANT THAT THE APPLICATION WILL BE
-              ERROR-FREE, UNINTERRUPTED, OR THAT ALL DEFECTS WILL BE CORRECTED. USE IS AT
-              YOUR OWN RISK.
-            </p>
-          </section>
+              <h2>4. Acceptable Use &amp; Fellowship</h2>
+              <p>
+                When submitting church listings, translation errata, or communicating in community spaces,
+                you agree to adhere to our <Link href="/community-guidelines" style={{ color: 'var(--ink)', fontWeight: 700, textDecoration: 'underline' }}>Community Guidelines</Link>.
+                You may not use the app to distribute malware, engage in harassment, or commit fraud.
+              </p>
 
-          <section className="legal-section">
-            <h2>6. Limitation of Liability</h2>
-            <p>
-              To the maximum extent permitted by law, the developers of exégeomai shall not
-              be liable for any indirect, incidental, special, consequential, or punitive
-              damages arising from your use of the application or this website.
-            </p>
-          </section>
+              <h2>5. Disclaimer of Warranties</h2>
+              <p>
+                THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+                INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
+                AND NONINFRINGEMENT.
+              </p>
 
-          <section className="legal-section">
-            <h2>7. Data &amp; Privacy</h2>
-            <p>
-              Your use of the application is also governed by our{' '}
-              <a href="/privacy" style={{ color: 'var(--accent-hover)' }}>
-                Privacy Policy
-              </a>
-              , which is incorporated by reference into these Terms.
-            </p>
-          </section>
-
-          <section className="legal-section">
-            <h2>8. Governing Law</h2>
-            <p>
-              These Terms shall be governed by the laws of South Africa, without regard
-              to its conflict of law provisions. Any disputes shall be resolved in the
-              courts of South Africa.
-            </p>
-          </section>
-
-          <section className="legal-section">
-            <h2>9. Changes to Terms</h2>
-            <p>
-              We reserve the right to update these Terms at any time. Material changes
-              will be communicated via an in-app notification. Continued use of the
-              application after changes become effective constitutes acceptance of the
-              revised Terms.
-            </p>
-          </section>
-
-          <section className="legal-section">
-            <h2>10. Contact</h2>
-            <p>
-              For legal inquiries: <a href="mailto:legal@exegeomai.app" style={{ color: 'var(--accent-hover)' }}>legal@exegeomai.app</a>
-              <br />
-              GitHub Issues: <a href="https://github.com/thulanesigasa/bible_fun_facts/issues" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-hover)' }}>github.com/thulanesigasa/bible_fun_facts/issues</a>
-            </p>
-          </section>
-        </article>
+              <h2>6. Contact Information</h2>
+              <p>
+                For questions regarding these Terms, contact us at{' '}
+                <a href="mailto:legal@exegeomai.app" style={{ color: 'var(--ink)', fontWeight: 700 }}>
+                  legal@exegeomai.app
+                </a>.
+              </p>
+            </div>
+          </div>
+        </section>
       </main>
+
       <Footer />
     </>
   );
