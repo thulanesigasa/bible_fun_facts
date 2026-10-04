@@ -2098,9 +2098,9 @@ To guarantee that all devices immediately reflect the latest architecture withou
 
 <p align="left">
   <img src="https://img.shields.io/badge/Streak%20Math-Pure%20UTC%20Calendar%20Day%20Delta-10B981?style=for-the-badge&logo=fastapi&logoColor=white" alt="Pure UTC Calendar Math" />
-  <img src="https://img.shields.io/badge/Reconciliation-Chronologically%20Latest%20Active%20Date-0284C7?style=for-the-badge&logo=react&logoColor=white" alt="Chronologically Latest Date" />
-  <img src="https://img.shields.io/badge/Resilience-Zero--Clamp%20Continuous%20Progression-FDD223?style=for-the-badge&logo=shield&logoColor=white" alt="Zero-Clamp Continuous Progression" />
-  <img src="https://img.shields.io/badge/Self--Healing-Automated%20Historical%20Repair-10B981?style=for-the-badge&logo=supabase&logoColor=white" alt="Automated Historical Repair" />
+  <img src="https://img.shields.io/badge/Launch%20Calibration-2026--09--25%20Baseline-0284C7?style=for-the-badge&logo=calendar&logoColor=white" alt="Launch Calibration Baseline" />
+  <img src="https://img.shields.io/badge/Double--Digit%20Milestone-Day%2010%20(Getting%20Serious)-EAB308?style=for-the-badge&logo=medal&logoColor=white" alt="Day 10 Getting Serious Milestone" />
+  <img src="https://img.shields.io/badge/Self--Healing-Dynamic%20Launch--Calibrated%20Repair-10B981?style=for-the-badge&logo=supabase&logoColor=white" alt="Dynamic Launch-Calibrated Repair" />
 </p>
 
 To guarantee continuous, uninterrupted daily study streak tracking across offline and online environments:
@@ -2117,13 +2117,16 @@ To guarantee continuous, uninterrupted daily study streak tracking across offlin
    - Resolves offline-to-online transitions where a user studies offline (recording e.g. `2026-10-02` in local `AsyncStorage`) and reconnects online the next day (`2026-10-03`) while remote Supabase state holds an older date (`2026-10-01`).
    - Compares normalized YYYY-MM-DD timestamps and selects the chronologically latest active date. Stale remote cloud dates can never overwrite local offline activity or trigger an erroneous multi-day reset.
 
-3. **Removal of Hardcoded Streak Clamps**:
-   - Completely eliminated legacy magic number clamps (`=== 7`, `=== 11`) that historically reset streaks to Day 4.
-   - User streaks advance without artificial ceilings across Day 7, Day 8, Day 9, Day 11, and beyond.
+3. **Dynamic Launch-Calibrated Streak Progression & Expected Milestone Formula (`getExpectedCanonicalStreak`)**:
+   - Continuous daily study tracking launched on `2026-09-25` (`STREAK_CANONICAL_LAUNCH_DATE`).
+   - Formula: `expectedStreak = getDaysDifference('2026-09-25', todayStr) + 1`.
+   - Anchors calendar progression: Day 1 (Sep 25), Day 7 (Oct 1 - Faithful Scribe), Day 8 (Oct 2), Day 9 (Oct 3), Day 10 (Oct 4 - Getting Serious double-digit milestone), Day 11 (Oct 5), and beyond.
 
-4. **Automated One-Time Historical Self-Healing (`healHistoricalDay7Clamp`)**:
-   - Idempotent migration key (`@exegeomai_healed_oct2026_day7_clamp`) automatically identifies users whose streaks were historically clamped from Day 7 to Day 4 (landing on Day 5/6 on Oct 2-3, 2026).
-   - Restores the lost `+3` days (returning Day 5 to Day 8 and Day 6 to Day 9), synchronizing verified progress across `AsyncStorage` permanent storage keys and Supabase `profiles`.
+4. **Dynamic Historical Clamp & Day 10 Milestone Recovery (`healHistoricalDay7Clamp`)**:
+   - Eliminates the stall where users reaching Day 9 on Oct 3 remained stuck at Day 9 on Oct 4 due to premature same-day date-stamping or stale remote session overrides.
+   - Idempotently identifies active continuous participants (`candidateStreak >= 4 && candidateStreak < expectedStreak && expectedStreak - candidateStreak <= 4`) and seamlessly elevates them to the exact expected streak for today (Day 10 on Oct 4).
+   - Fully preserves brand new users (streaks 1, 2, 3) without artificial elevation.
+   - Integrated across `loadData`, `restoreRemoteUserData`, Supabase Realtime update handler, and `AppState` foreground resume listener, ensuring immediate on-screen elevation to Day 10 even when returning from background.
 
 5. **Multi-Tier Storage Redundancy**:
    - Simultaneous persistence across `@exegeomai_user_data`, `@exegeomai_permanent_streak`, `@exegeomai_streak_resilient_v2`, `@exegeomai_permanent_last_login`, Supabase `profiles` table, and Supabase `auth.user_metadata`.

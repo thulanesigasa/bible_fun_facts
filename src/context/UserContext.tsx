@@ -139,6 +139,8 @@ export {
   getLatestDateString,
   evaluateDailyStreak,
   healHistoricalDay7Clamp,
+  STREAK_CANONICAL_LAUNCH_DATE,
+  getExpectedCanonicalStreak,
 } from '../services/streakEngine';
 import {
   getLocalDateString,
@@ -146,6 +148,8 @@ import {
   getLatestDateString,
   evaluateDailyStreak,
   healHistoricalDay7Clamp,
+  STREAK_CANONICAL_LAUNCH_DATE,
+  getExpectedCanonicalStreak,
 } from '../services/streakEngine';
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -326,24 +330,20 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Robust date reconciliation: Choose the chronologically latest login date between local and remote
         const latestLastLogin = getLatestDateString(localLastLogin, remoteLastLogin);
         let baseStreak = Math.max(localStreak, remoteStreak || 1);
-
-        // Self-heal: If user was victim of historical Day 7 clamp (stuck at 5 or 6 on/after Oct 2-3, 2026)
-        if (todayStr >= '2026-10-02' && (baseStreak === 5 || baseStreak === 6)) {
-          baseStreak = baseStreak + 3;
-        }
-
         let finalStreak = baseStreak;
         let finalLastLogin = todayStr;
 
         if (hasEvaluatedStreakTodayRef.current || normalizeDateStringToLocalYMD(localLastLogin) === todayStr) {
-          // Local session already verified today. Reconcile remote values without adding days.
-          finalStreak = baseStreak;
+          // Already evaluated today: heal baseStreak if lagging (e.g. Day 9 on Oct 4)
+          const healed = healHistoricalDay7Clamp(baseStreak, todayStr);
+          finalStreak = healed.healedStreak;
           finalLastLogin = todayStr;
           hasEvaluatedStreakTodayRef.current = true;
         } else {
           // First time evaluating
           const evaluation = evaluateDailyStreak(latestLastLogin, baseStreak, todayStr);
-          finalStreak = evaluation.newStreak;
+          const healed = healHistoricalDay7Clamp(evaluation.newStreak, todayStr);
+          finalStreak = Math.max(evaluation.newStreak, healed.healedStreak);
           finalLastLogin = evaluation.todayStr;
           hasEvaluatedStreakTodayRef.current = true;
         }
@@ -443,21 +443,15 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         let candidateStreak = Math.max(parsedStreak, storedPermStreak, storedBackupStreak, 1);
         let candidateLastLogin = getLatestDateString(parsedLastLogin, permLastLogin);
-
-        // Self-heal: If streak was victim of historical Day 7 clamp (stuck at 5 or 6 on/after Oct 2-3, 2026)
         const todayStr = getLocalDateString();
-        const isOct2026Healed = await AsyncStorage.getItem('@exegeomai_healed_oct2026_day7_clamp');
-        if (!isOct2026Healed) {
-          if (todayStr >= '2026-10-02' && (candidateStreak === 5 || candidateStreak === 6)) {
-            candidateStreak = candidateStreak + 3; // 5 -> 8, 6 -> 9
-            candidateLastLogin = todayStr;
-          }
-          await AsyncStorage.setItem('@exegeomai_healed_oct2026_day7_clamp', 'true').catch(() => {});
-        }
 
         const evalResult = evaluateDailyStreak(candidateLastLogin, candidateStreak, todayStr);
-        const finalStreak = evalResult.newStreak;
-        const finalLastLogin = evalResult.todayStr;
+        let finalStreak = evalResult.newStreak;
+
+        // Apply dynamic launch-calibrated healing post-evaluation (recovers Day 10 stall and historical clamps)
+        const healed = healHistoricalDay7Clamp(finalStreak, todayStr);
+        finalStreak = Math.max(finalStreak, healed.healedStreak);
+        const finalLastLogin = evalResult.todayStr || todayStr;
         hasEvaluatedStreakTodayRef.current = true;
 
         if (evalResult.shouldUpdate || candidateStreak !== evalResult.newStreak) {
@@ -592,6 +586,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
                   if (typeof newStreak === 'number' && newStreak > 0) {
                     resolvedStreak = Math.max(prev.streak, newStreak);
                   }
+                  const todayStr = getLocalDateString();
+                  const healed = healHistoricalDay7Clamp(resolvedStreak, todayStr);
+                  resolvedStreak = healed.healedStreak;
+
                   const resolvedLastLogin = getLatestDateString(prev.lastLoginDate, newLastLogin) || prev.lastLoginDate;
                   return {
                     ...prev,
@@ -621,21 +619,37 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const todayStr = getLocalDateString();
         setState(prev => {
           const lastLoginYmd = normalizeDateStringToLocalYMD(prev.lastLoginDate);
-          // If already checked today, do nothing!
+
+          // Check if streak needs dynamic healing (e.g. Day 9 -> Day 10 on Oct 4)
+          const healed = healHistoricalDay7Clamp(prev.streak, todayStr);
+          if (healed.wasHealed && healed.healedStreak > prev.streak) {
+            syncUserDataToRemote({ streak: healed.healedStreak, lastLoginDate: todayStr });
+            AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(healed.healedStreak)).catch(() => {});
+            AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(healed.healedStreak)).catch(() => {});
+            AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, todayStr).catch(() => {});
+            return {
+              ...prev,
+              streak: healed.healedStreak,
+              lastLoginDate: todayStr,
+            };
+          }
+
+          // If already checked today and not lagging, do nothing!
           if (lastLoginYmd === todayStr) return prev;
 
           // Midnight crossed into a new calendar day
           const evalResult = evaluateDailyStreak(prev.lastLoginDate, prev.streak);
           if (!evalResult.shouldUpdate) return prev;
 
-          syncUserDataToRemote({ streak: evalResult.newStreak, lastLoginDate: todayStr });
-          AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(evalResult.newStreak)).catch(() => {});
-          AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(evalResult.newStreak)).catch(() => {});
+          const updatedStreak = Math.max(evalResult.newStreak, healHistoricalDay7Clamp(evalResult.newStreak, todayStr).healedStreak);
+          syncUserDataToRemote({ streak: updatedStreak, lastLoginDate: todayStr });
+          AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(updatedStreak)).catch(() => {});
+          AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(updatedStreak)).catch(() => {});
           AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, todayStr).catch(() => {});
 
           return {
             ...prev,
-            streak: evalResult.newStreak,
+            streak: updatedStreak,
             lastLoginDate: todayStr,
           };
         });
@@ -669,16 +683,18 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const checkStreak = (lastLogin: string | null, currentStreak: number) => {
     const todayStr = getLocalDateString();
+    const healed = healHistoricalDay7Clamp(currentStreak, todayStr);
+    const resolvedStreak = healed.healedStreak;
     const lastLoginYmd = normalizeDateStringToLocalYMD(lastLogin);
-    if (lastLoginYmd === todayStr) return;
+    if (lastLoginYmd === todayStr && !healed.wasHealed) return;
 
-    const evaluation = evaluateDailyStreak(lastLogin, currentStreak);
-    if (!evaluation.shouldUpdate) return;
+    const evaluation = evaluateDailyStreak(lastLogin, resolvedStreak);
+    const finalStreak = Math.max(resolvedStreak, evaluation.newStreak);
 
-    setState(prev => ({ ...prev, streak: evaluation.newStreak, lastLoginDate: todayStr }));
-    syncUserDataToRemote({ streak: evaluation.newStreak, lastLoginDate: todayStr });
-    AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(evaluation.newStreak)).catch(() => {});
-    AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(evaluation.newStreak)).catch(() => {});
+    setState(prev => ({ ...prev, streak: finalStreak, lastLoginDate: todayStr }));
+    syncUserDataToRemote({ streak: finalStreak, lastLoginDate: todayStr });
+    AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(finalStreak)).catch(() => {});
+    AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(finalStreak)).catch(() => {});
     AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, todayStr).catch(() => {});
   };
 
