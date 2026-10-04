@@ -2212,6 +2212,39 @@ To ensure believers and seekers can explore authentic physical locations on the 
 
 ---
 
+### 13. Next.js Companion Web Portal & Portal Launch Commands (`web/`)
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Framework-Next.js%2015%20App%20Router-black?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js 15 App Router" />
+  <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Vanilla%20CSS-0284C7?style=for-the-badge&logo=css3&logoColor=white" alt="60-30-10 Vanilla CSS" />
+  <img src="https://img.shields.io/badge/Compliance-Google%20Play%20Account%20Deletion%20Portal-10B981?style=for-the-badge&logo=googleplay&logoColor=white" alt="Google Play Account Deletion Portal" />
+  <img src="https://img.shields.io/badge/Hero%20Design-Clean%20Pill--Free%20Typography-FDD223?style=for-the-badge&logo=shield&logoColor=white" alt="Clean Pill-Free Typography" />
+</p>
+
+The official companion web portal provides full web access to exégeomai's core offerings:
+
+1. **Architecture & Routes**:
+   - `/` — Flagship landing page with 365 daily devotional calendar, Strong's lexicon highlights, and direct APK download CTAs.
+   - `/features` — Deep-dive into 365 devotionals, 32 translations, and offline SQLite storage.
+   - `/strongs` — 14,298 Strong's concordance search demo with instant FTS5 offline lookup.
+   - `/security` — AES-256 hardware keystore encryption and zero cloud telemetry guarantees.
+   - `/privacy` & `/terms` — GDPR/POPIA compliant legal documentation.
+   - `/deletion` & `/api/deletion-request` — Dedicated account and data deletion request pipeline required for Google Play compliance.
+
+2. **Web Portal Startup Commands**:
+```bash
+# Launch Next.js web portal development server (http://localhost:3000)
+npm run web:portal
+
+# Build Next.js web portal for production
+npm run web:build
+
+# Start production server
+npm run web:start
+```
+
+---
+
 ### Verification Commands
 ```bash
 # Run unit test suite
