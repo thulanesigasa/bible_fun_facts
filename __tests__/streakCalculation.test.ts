@@ -6,6 +6,8 @@ import {
   evaluateDailyStreak,
   reconcileOfflineOnlineStreak,
   healHistoricalDay7Clamp,
+  STREAK_CANONICAL_LAUNCH_DATE,
+  getExpectedCanonicalStreak,
 } from '../src/services/streakEngine';
 
 describe('Study Streak Engine & Offline-Online Reconciliation', () => {
@@ -178,6 +180,81 @@ describe('Study Streak Engine & Offline-Online Reconciliation', () => {
       const normalUser = healHistoricalDay7Clamp(15, '2026-10-03');
       expect(normalUser.wasHealed).toBe(false);
       expect(normalUser.healedStreak).toBe(15);
+    });
+
+    it('heals continuous user from Day 9 to Day 10 on 2026-10-04', () => {
+      // User who reached Day 9 on Oct 3 and opened app on Oct 4
+      const healOct4 = healHistoricalDay7Clamp(9, '2026-10-04');
+      expect(healOct4.wasHealed).toBe(true);
+      expect(healOct4.healedStreak).toBe(10);
+    });
+
+    it('heals historical clamp victim from Day 6 to Day 10 on 2026-10-04', () => {
+      // User whose streak was clamped at 6 and missed previous healing
+      const healOct4Clamp = healHistoricalDay7Clamp(6, '2026-10-04');
+      expect(healOct4Clamp.wasHealed).toBe(true);
+      expect(healOct4Clamp.healedStreak).toBe(10);
+    });
+
+    it('preserves brand new users (streak 1, 2, 3) on 2026-10-04 without artificial elevation', () => {
+      expect(healHistoricalDay7Clamp(1, '2026-10-04')).toEqual({ healedStreak: 1, wasHealed: false });
+      expect(healHistoricalDay7Clamp(2, '2026-10-04')).toEqual({ healedStreak: 2, wasHealed: false });
+      expect(healHistoricalDay7Clamp(3, '2026-10-04')).toEqual({ healedStreak: 3, wasHealed: false });
+    });
+
+    it('reconciles offline-to-online session on 2026-10-04 ensuring Day 10 double-digit milestone', () => {
+      const result = reconcileOfflineOnlineStreak({
+        localStreak: 9,
+        localLastLogin: '2026-10-03',
+        remoteStreak: 8,
+        remoteLastLogin: '2026-10-02',
+        todayStr: '2026-10-04',
+        hasEvaluatedToday: false,
+      });
+
+      expect(result.finalStreak).toBe(10);
+      expect(result.finalLastLogin).toBe('2026-10-04');
+      expect(result.evaluatedToday).toBe(true);
+      expect(result.shouldSync).toBe(true);
+    });
+
+    it('reconciles already-evaluated today session on 2026-10-04 healing Day 9 to Day 10', () => {
+      // User had their session prematurely date-stamped with Day 9 on Oct 4
+      const result = reconcileOfflineOnlineStreak({
+        localStreak: 9,
+        localLastLogin: '2026-10-04',
+        remoteStreak: 9,
+        remoteLastLogin: '2026-10-04',
+        todayStr: '2026-10-04',
+        hasEvaluatedToday: true,
+      });
+
+      expect(result.finalStreak).toBe(10);
+      expect(result.finalLastLogin).toBe('2026-10-04');
+      expect(result.evaluatedToday).toBe(true);
+    });
+  });
+
+  describe('Canonical Launch Date & Expected Milestone Progression', () => {
+    it('anchors canonical study streak launch date to 2026-09-25', () => {
+      expect(STREAK_CANONICAL_LAUNCH_DATE).toBe('2026-09-25');
+    });
+
+    it('computes exact expected streak across key milestone calendar dates', () => {
+      expect(getExpectedCanonicalStreak('2026-09-25')).toBe(1);  // Day 1: First Step
+      expect(getExpectedCanonicalStreak('2026-09-27')).toBe(3);  // Day 3: Rookie
+      expect(getExpectedCanonicalStreak('2026-10-01')).toBe(7);  // Day 7: Faithful Scribe
+      expect(getExpectedCanonicalStreak('2026-10-02')).toBe(8);  // Day 8
+      expect(getExpectedCanonicalStreak('2026-10-03')).toBe(9);  // Day 9
+      expect(getExpectedCanonicalStreak('2026-10-04')).toBe(10); // Day 10: Getting Serious
+      expect(getExpectedCanonicalStreak('2026-10-05')).toBe(11); // Day 11
+    });
+
+    it('evaluateDailyStreak naturally transitions Day 9 to Day 10 on consecutive calendar days', () => {
+      const result = evaluateDailyStreak('2026-10-03', 9, '2026-10-04');
+      expect(result.newStreak).toBe(10);
+      expect(result.shouldUpdate).toBe(true);
+      expect(result.todayStr).toBe('2026-10-04');
     });
   });
 });

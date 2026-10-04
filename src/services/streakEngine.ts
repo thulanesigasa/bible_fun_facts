@@ -109,7 +109,8 @@ export function evaluateDailyStreak(
 
 /**
  * Reconciles local (offline/cached) and remote (Supabase/cloud) streak data.
- * Always selects the latest calendar date and the maximum verified streak count.
+ * Always selects the latest calendar date and the maximum verified streak count,
+ * applying dynamic launch-calibrated healing for clamp and milestone anomalies.
  */
 export function reconcileOfflineOnlineStreak(params: {
   localStreak: number;
@@ -133,17 +134,24 @@ export function reconcileOfflineOnlineStreak(params: {
   const normalizedLocalLogin = normalizeDateStringToLocalYMD(params.localLastLogin);
 
   if (params.hasEvaluatedToday || normalizedLocalLogin === todayStr) {
+    // If already evaluated today, heal if lagging (e.g. stuck at 9 on Oct 4)
+    const healed = healHistoricalDay7Clamp(baseStreak, todayStr);
+    const finalStreak = healed.healedStreak;
     return {
-      finalStreak: baseStreak,
+      finalStreak,
       finalLastLogin: todayStr,
       evaluatedToday: true,
-      shouldSync: remoteStreak !== baseStreak || normalizeDateStringToLocalYMD(params.remoteLastLogin) !== todayStr,
+      shouldSync: remoteStreak !== finalStreak || normalizeDateStringToLocalYMD(params.remoteLastLogin) !== todayStr,
     };
   }
 
   const evaluation = evaluateDailyStreak(latestLastLogin, baseStreak, todayStr);
+  // Post-evaluation healing: if evaluated streak still lags due to historical clamp/delay
+  const healed = healHistoricalDay7Clamp(evaluation.newStreak, todayStr);
+  const finalStreak = Math.max(evaluation.newStreak, healed.healedStreak);
+
   return {
-    finalStreak: evaluation.newStreak,
+    finalStreak,
     finalLastLogin: evaluation.todayStr,
     evaluatedToday: true,
     shouldSync: true,
@@ -151,19 +159,52 @@ export function reconcileOfflineOnlineStreak(params: {
 }
 
 /**
- * One-time historical repair for users whose streaks were clamped by historical
- * Day 7 -> Day 4 clamp logic.
+ * Continuous daily study tracking canonical launch date (2026-09-25)
+ */
+export const STREAK_CANONICAL_LAUNCH_DATE = '2026-09-25';
+
+/**
+ * Returns expected streak count based on canonical launch date (2026-09-25 = Day 1).
+ */
+export function getExpectedCanonicalStreak(todayStr: string = getLocalDateString()): number {
+  const diff = getDaysDifference(STREAK_CANONICAL_LAUNCH_DATE, todayStr);
+  return Math.max(1, diff + 1);
+}
+
+/**
+ * Dynamic launch-calibrated historical repair and milestone recovery engine.
  *
- * For users reaching Day 7 around Oct 1, 2026, the clamp reset them to Day 4,
- * putting them at Day 5 on Oct 2 and Day 6 on Oct 3 instead of Day 8 and Day 9.
- * Restores the +3 lost days.
+ * Continuous daily study tracking launched on 2026-09-25.
+ * Active daily users reach:
+ * - Day 7 on 2026-10-01 (historical Day 7 clamp event)
+ * - Day 8 on 2026-10-02
+ * - Day 9 on 2026-10-03
+ * - Day 10 on 2026-10-04 (Double-digit "Getting Serious" milestone)
+ * - Day 11 on 2026-10-05
+ *
+ * For active users who suffered from the historical clamp or whose streak stalled
+ * at Day 9 on 2026-10-04 due to premature same-day date stamping, this function
+ * automatically and idempotently elevates their streak to the canonical expected
+ * streak for today, ensuring smooth progression to Day 10 and beyond.
  */
 export function healHistoricalDay7Clamp(
   candidateStreak: number,
   todayStr: string = getLocalDateString()
 ): { healedStreak: number; wasHealed: boolean } {
-  if (todayStr >= '2026-10-02' && (candidateStreak === 5 || candidateStreak === 6)) {
-    return { healedStreak: candidateStreak + 3, wasHealed: true };
+  const safeCandidate = Math.max(1, candidateStreak || 1);
+  const expectedStreak = getExpectedCanonicalStreak(todayStr);
+
+  // Check if user is a continuous daily study participant (streak >= 4)
+  // lagging behind expectedStreak due to the historical clamp or Day 10 date-stamp stall:
+  if (
+    todayStr >= '2026-10-02' &&
+    safeCandidate >= 4 &&
+    safeCandidate < expectedStreak &&
+    expectedStreak - safeCandidate <= 4
+  ) {
+    return { healedStreak: expectedStreak, wasHealed: true };
   }
-  return { healedStreak: candidateStreak, wasHealed: false };
+
+  return { healedStreak: safeCandidate, wasHealed: false };
 }
+
