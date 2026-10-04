@@ -2212,26 +2212,37 @@ To ensure believers and seekers can explore authentic physical locations on the 
 
 ---
 
-### 13. Next.js Companion Web Portal & Portal Launch Commands (`web/`)
+### 13. Next.js Companion Web Portal & Interactive Scroll Experience (`web/`)
 
 <p align="left">
   <img src="https://img.shields.io/badge/Framework-Next.js%2015%20App%20Router-black?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js 15 App Router" />
   <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Vanilla%20CSS-0284C7?style=for-the-badge&logo=css3&logoColor=white" alt="60-30-10 Vanilla CSS" />
+  <img src="https://img.shields.io/badge/Interactive-Scroll--Driven%20Focal%20Brand%20Mark-FDD223?style=for-the-badge&logo=react&logoColor=black" alt="Scroll-Driven Focal Brand Mark" />
+  <img src="https://img.shields.io/badge/Content%20Pillars-6%20Scholarly%20Dimensions-10B981?style=for-the-badge&logo=book&logoColor=white" alt="6 Scholarly Dimensions" />
+  <img src="https://img.shields.io/badge/Navigation-Side%20Dot%20Auto--Revealing%20Indicator-0284C7?style=for-the-badge" alt="Side Dot Auto-Revealing Indicator" />
+  <img src="https://img.shields.io/badge/Aesthetics-Zero%20Hover%20Glow%20Strict-FDD223?style=for-the-badge&logo=shield&logoColor=white" alt="Zero Hover Glow Strict" />
   <img src="https://img.shields.io/badge/Compliance-Google%20Play%20Account%20Deletion%20Portal-10B981?style=for-the-badge&logo=googleplay&logoColor=white" alt="Google Play Account Deletion Portal" />
   <img src="https://img.shields.io/badge/Hero%20Design-Clean%20Pill--Free%20Typography-FDD223?style=for-the-badge&logo=shield&logoColor=white" alt="Clean Pill-Free Typography" />
 </p>
 
-The official companion web portal provides full web access to exégeomai's core offerings:
+The official companion web portal provides full web access to exégeomai's core offerings, redesigned with an immersive scroll-driven brand mark focal experience:
 
-1. **Architecture & Routes**:
-   - `/` — Flagship landing page with 365 daily devotional calendar, Strong's lexicon highlights, and direct APK download CTAs.
-   - `/features` — Deep-dive into 365 devotionals, 32 translations, and offline SQLite storage.
-   - `/strongs` — 14,298 Strong's concordance search demo with instant FTS5 offline lookup.
-   - `/security` — AES-256 hardware keystore encryption and zero cloud telemetry guarantees.
-   - `/privacy` & `/terms` — GDPR/POPIA compliant legal documentation.
-   - `/deletion` & `/api/deletion-request` — Dedicated account and data deletion request pipeline required for Google Play compliance.
+1. **Interactive Focal Brand Mark Architecture (`ScrollBrandMark.tsx`)**:
+   - Replaced generic 3D wireframe globe with the authentic high-resolution app brand mark (`logo-transparent.png`) housed in a sacred geometric enclosure with brand yellow border styling (`#FDD223`).
+   - Dynamic viewport collision physics that calculate section midpoints via requestAnimationFrame and smoothly interpolate 3D transform coordinates (`translate3d(left, top, 0) scale3d(...)`) across desktop viewports.
+   - Ultra-responsive mobile adaptation: scales down to an ambient backdrop (`0.12` opacity) on viewports below 900px, guaranteeing zero layout obstruction on mobile devices.
+   - Auto-revealing side dot indicator navigation with pulsing active section dots and glassmorphic badge tooltips.
+   - Full-width top scroll progress bar dynamically tracking viewport reading depth without layout shift.
 
-2. **Web Portal Startup Commands**:
+2. **6 Scholarly & Theological Content Pillars**:
+   - **Pillar 1: Sacred Biblical Exegesis**: Hero presentation of Greek lemma G1834 *ἐξηγέομαι* with direct production APK download and web portal exploration CTAs.
+   - **Pillar 2: Strong's Exhaustive Concordance**: Deep lexical breakdown of 14,298 biblical lemmas, transliterations, and a live interactive G1834 preview card.
+   - **Pillar 3: 32 Offline Canons**: Complete African language preservation matrix (isiZulu, isiXhosa, Sesotho, Sepedi, Setswana, Xitsonga, Tshivenda, siSwati, isiNdebele, ChiShona) alongside scholarly English canons.
+   - **Pillar 4: 365 Exegetical Devotionals**: Deterministic calendar daily exegesis powered by a 3-lens theological suite (Original Intent, Theological Truth, Daily Walk).
+   - **Pillar 5: Hardware Keystore Privacy**: Hardware-backed AES-256 local encrypted storage, biometric authentication, and strict zero-telemetry architectural guarantees.
+   - **Pillar 6: Kingdom Community & Branch Directory**: Pre-seeded directory of canonical ministries (God Embassy, Christ Embassy, Spirit Embassy, ECG) with 1-tap coordinate-based native GPS routing.
+
+3. **Web Portal Startup Commands**:
 ```bash
 # Launch Next.js web portal development server (http://localhost:3000)
 npm run web:portal
