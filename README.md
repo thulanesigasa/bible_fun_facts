@@ -2212,58 +2212,66 @@ To ensure believers and seekers can explore authentic physical locations on the 
 
 ---
 
-### 13. Next.js Companion Web Portal & Interactive Scroll Experience (`web/`)
+### 13. Next.js Companion Web Portal — Plugu Architecture Redesign (`web/`)
 
 <p align="left">
   <img src="https://img.shields.io/badge/Framework-Next.js%2015%20App%20Router-black?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js 15 App Router" />
-  <img src="https://img.shields.io/badge/HTML5-100%25%20Semantic%20%7C%20Zero%20Divs-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="100% Semantic Zero Divs" />
-  <img src="https://img.shields.io/badge/Brand%20Mark-Pure%20Free--Floating%20PNG-FDD223?style=for-the-badge&logo=react&logoColor=black" alt="Pure Free-Floating PNG" />
-  <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Vanilla%20CSS-0284C7?style=for-the-badge&logo=css3&logoColor=white" alt="60-30-10 Vanilla CSS" />
-  <img src="https://img.shields.io/badge/Navigation-36px%20Hit%20Target%20Side%20Dots-10B981?style=for-the-badge&logo=googlemaps&logoColor=white" alt="36px Hit Target Side Dots" />
-  <img src="https://img.shields.io/badge/Physics-IntersectionObserver%20Sync-0284C7?style=for-the-badge&logo=fastapi&logoColor=white" alt="IntersectionObserver Sync" />
+  <img src="https://img.shields.io/badge/Design%20Architecture-Plugu.co.za%20Inspired%20Layout-0284C7?style=for-the-badge&logo=css3&logoColor=white" alt="Plugu Inspired Layout" />
+  <img src="https://img.shields.io/badge/Color%20Rule-60--30--10%20Strict-FDD223?style=for-the-badge" alt="60-30-10 Strict" />
+  <img src="https://img.shields.io/badge/Dominant%2060%25-%23F8FAFC%20%7C%20%230F172A%20Midnight-0F172A?style=for-the-badge" alt="Dominant 60%" />
+  <img src="https://img.shields.io/badge/Surface%2030%25-%23FFFFFF%20Pure%20White-FFFFFF?style=for-the-badge" alt="Surface 30%" />
+  <img src="https://img.shields.io/badge/Accent%2010%25-%23FDD223%20Golden%20Yellow-FDD223?style=for-the-badge" alt="Accent 10%" />
+  <img src="https://img.shields.io/badge/Hero%20Mockups-Triple%20Pure%20CSS%20Mobile%20Devices-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Triple Mobile Mockups" />
+  <img src="https://img.shields.io/badge/Mobile%20Tabs-Rule%2020%20%2Ftabs%20Floating%20Pill-FDD223?style=for-the-badge" alt="Rule 20 Mobile Tab Pill" />
+  <img src="https://img.shields.io/badge/Routes-18%20Dedicated%20Pages-0284C7?style=for-the-badge&logo=html5&logoColor=white" alt="18 Dedicated Pages" />
   <img src="https://img.shields.io/badge/Aesthetics-Zero%20Hover%20Glow%20Strict-FDD223?style=for-the-badge&logo=shield&logoColor=white" alt="Zero Hover Glow Strict" />
-  <img src="https://img.shields.io/badge/Compliance-Google%20Play%20Account%20Deletion%20Portal-10B981?style=for-the-badge&logo=googleplay&logoColor=white" alt="Google Play Account Deletion Portal" />
-  <img src="https://img.shields.io/badge/Hero%20Design-Clean%20Pill--Free%20Typography-FDD223?style=for-the-badge&logo=shield&logoColor=white" alt="Clean Pill-Free Typography" />
+  <img src="https://img.shields.io/badge/SVGs-100%25%20Pure%20Vector%20%7C%20No%20Emojis-10B981?style=for-the-badge&logo=svg&logoColor=white" alt="100% Pure SVGs" />
+  <img src="https://img.shields.io/badge/Compliance-Google%20Play%20%7C%20GDPR%20%7C%20POPIA-10B981?style=for-the-badge&logo=googleplay&logoColor=white" alt="Compliance" />
 </p>
 
-The official companion web portal provides full web access to exégeomai's core offerings, redesigned with an immersive scroll-driven brand mark focal experience and a strict zero-div semantic HTML5 architecture:
+The official companion web portal (`web/`) provides full web access to exégeomai's core offerings, redesigned to mirror the high-conversion structural architecture, crisp floating device mockups, and layout rhythm of `plugu.co.za` while strictly adhering to exégeomai's **60-30-10 brand color palette**:
 
-1. **Pure Free-Floating Brand Mark Physics (`ScrollBrandMark.tsx`)**:
-   - Replaced generic 3D wireframe globe with the authentic high-resolution app brand mark (`logo-transparent.png`).
-   - Stripped away extraneous card boxes, artificial border-radii, backgrounds, and borders, allowing the golden emblem to float freely with natural elegance.
-   - Fixed viewport coordinates with explicit `top: 0; left: 0` origin, smoothly gliding between alternate left/right/center positions as the user scrolls through each section.
-   - Dual-engine tracking combining captured window scroll listener with native `IntersectionObserver` (`rootMargin: -25%`) to guarantee instantaneous active section synchronization.
+1. **Hero Section with Simulated In-App Mobile Devices (`HeroPhoneMockups.tsx`)**:
+   - **Background Grid Lines & Floating Geometry**: Subtle vertical grid lines with floating geometric rings, morphing shapes, and squares.
+   - **Triple Simulated Mobile Devices**: Three CSS-rendered mobile viewports with hardware device bezels, side buttons, gloss reflection, and Android status bar:
+     - **Left Phone (Exegesis Feed)**: Daily devotional view with Greek root breakdown, phonetic pronunciation audio chip, and reflection notes.
+     - **Center Phone (Scripture Reader)**: Interlinear view with live Strong's Concordance popover card detailing **G1834 - ἐξηγέομαι** (pronunciation, definition, etymology, and KJV occurrences).
+     - **Right Phone (Churches & Canons)**: Verified local assembly directory (GPS coordinates, meeting times) and 32 offline canons switcher.
+   - **Floating Pill Tab Bar Standard (Rule 20)**: Each simulated device features the canonical 50px floating pill tab bar with 16px Lucide SVGs, dynamic active label, and focused indicator dot.
 
-2. **Enhanced Side Indicator Navigation**:
-   - Generous 36x36px clickable hit targets centered around 10px circular indicators with active brand yellow accent (`#FDD223`).
-   - Clickable glassmorphic section badges that double as navigation triggers.
-   - Foolproof `scrollToSection` calculation accounting for the fixed top navbar offset (64px) for seamless jumping without browser smooth-scroll collisions.
-   - Elevated to `z-index: 999` with explicit pointer-event enablement across all viewport sizes.
+2. **18 Fully Implemented Dedicated Pages & Routes**:
+   - `/`: Flagship homepage featuring Hero, Problem/Solution Split, Features Grid, 3-Step Walkthrough, Safety Callout, Pricing Tiers, FAQ Accordion, and Download Banner.
+   - `/features`: Deep catalog of all 6 core pillars (14,298 Strong's, 32 Canons, 365 Devotionals, Author Timelines, Sound Churches, Hardware Keystore) and architectural comparison matrix.
+   - `/how-it-works`: 6-step visual guide from APK sideloading to original Greek interlinear study and biometric vault setup.
+   - `/pricing`: 100% Free & Open Source MIT tier (zero ads, zero subscriptions, zero paywalls) vs Open Source Contributor tier.
+   - `/safety` & `/safety-and-trust`: In-depth breakdown of Android Keystore AES-256 GCM encryption, FLAG_SECURE window shield, and offline SQLite guarantees.
+   - `/about`: Theological foundation of *ἐξηγέομαι* (John 1:18), historical-grammatical hermeneutics, and public domain text stewardship.
+   - `/support`: Centralized help hub linking to user guides, FAQ, contact channels, problem reporting, and GitHub issue tracker.
+   - `/contact`: Dedicated contact form with category selector (General, Lexicon, Church, Technical, Security) and client-side confirmation.
+   - `/faq`: Comprehensive 8-question accordion covering offline functionality, translations, and security.
+   - `/community-guidelines`: Christian fellowship standards grounded in Ephesians 4:29 and Colossians 4:6.
+   - `/report-a-problem`: Structured issue reporting form for bug reports, lexical errata, and security disclosures.
+   - `/help`: Detailed user manual for APK installation, translation switching, and biometric locking.
+   - `/deletion` & `/account-deletion`: Self-service account & data eradication portal complying with GDPR Article 17 and Google Play Developer policies.
+   - `/privacy`: 6-section privacy policy detailing offline storage, zero telemetry, and POPIA/GDPR data rights.
+   - `/terms`: 6-section terms of service covering MIT open source licensing, public domain texts, and acceptable use.
+   - `/data-safety`: Official Google Play Store Data Safety declaration matrix confirming 0 bytes of collected or shared personal data.
 
-3. **Zero-Div Semantic HTML5 Standard**:
-   - The entire web portal eliminates generic `<div>` tags across all components in favor of meaningful, accessible HTML5 elements:
-     - Root portal shell: `<main>`
-     - Reading depth tracker: `<nav aria-label="Reading depth progress">` with `<span role="progressbar">`
-     - Quick section navigation: `<nav aria-label="Section quick navigation">` with `<ol role="list">` and `<li>` items
-     - Focal brand mark: `<figure>` enclosing `<Image priority />`
-     - Pillar showcases: `<article>` and `<section>` with semantic `<header>`, `<blockquote>`, `<cite>`, `<aside>`, and `<ul role="list">`
-     - Action callouts: `<nav aria-label="...">` with semantic `<a>` and `<button>` triggers
-   - Delivers superior screen reader accessibility (ARIA landmark roles) and clean SEO heading and landmark hierarchy.
+3. **Plugu-Style Multi-Column Footer (`Footer.tsx`)**:
+   - Structured 5-column navigation grid:
+     - **Brand Column**: Logo, theological vision, and MIT open-source license badge.
+     - **Product Column**: Features, How It Works, Pricing (Free), Download App, FAQ.
+     - **Company Column**: About exégeomai, Contact, Support & FAQ, GitHub Project.
+     - **Safety Column**: Safety & Trust, Security Architecture, Community Guidelines, Report a Problem.
+     - **Support Column**: Help Centre, Contact Support, Account Deletion, Issue Tracker.
+     - **Legal Column**: Privacy Policy, Terms of Service, Data Safety, MIT License.
 
-4. **6 Scholarly & Theological Content Pillars**:
-   - **Pillar 1: Sacred Biblical Exegesis**: Hero presentation of Greek lemma G1834 *ἐξηγέομαι* with direct production APK download and web portal exploration CTAs.
-   - **Pillar 2: Strong's Exhaustive Concordance**: Deep lexical breakdown of 14,298 biblical lemmas, transliterations, and a live interactive G1834 preview card.
-   - **Pillar 3: 32 Offline Canons**: Complete African language preservation matrix (isiZulu, isiXhosa, Sesotho, Sepedi, Setswana, Xitsonga, Tshivenda, siSwati, isiNdebele, ChiShona) alongside scholarly English canons.
-   - **Pillar 4: 365 Exegetical Devotionals**: Deterministic calendar daily exegesis powered by a 3-lens theological suite (Original Intent, Theological Truth, Daily Walk).
-   - **Pillar 5: Hardware Keystore Privacy**: Hardware-backed AES-256 local encrypted storage, biometric authentication, and strict zero-telemetry architectural guarantees.
-   - **Pillar 6: Kingdom Community & Branch Directory**: Pre-seeded directory of canonical ministries (God Embassy, Christ Embassy, Spirit Embassy, ECG) with 1-tap coordinate-based native GPS routing.
-
-4. **Web Portal Startup Commands**:
+4. **Web Portal Commands**:
 ```bash
 # Launch Next.js web portal development server (http://localhost:3000)
 npm run web:portal
 
-# Build Next.js web portal for production
+# Build Next.js web portal for production (24/24 static routes)
 npm run web:build
 
 # Start production server

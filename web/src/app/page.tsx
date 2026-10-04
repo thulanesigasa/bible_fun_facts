@@ -1,486 +1,589 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { ScrollBrandMark, ScrollSection } from '@/components/ScrollBrandMark';
+import { HeroPhoneMockups } from '@/components/HeroPhoneMockups';
 
-/**
- * ── Rich Interactive Sub-Components (100% Semantic HTML5, Zero Divs) ──
- */
+const FAQS = [
+  {
+    q: 'What does "exégeomai" mean?',
+    a: 'exégeomai (ἐξηγέομαι, Strong\'s G1834) is the classical Greek verb meaning "to lead out, draw forth in narrative, declare, or unfold divine mysteries". It is the biblical root from which we derive "exegesis" — letting Scripture speak for itself in its original historical, grammatical, and theological context.',
+  },
+  {
+    q: 'Does exégeomai work completely offline without internet?',
+    a: 'Yes! All 14,298 Strong\'s Greek and Hebrew definitions, 365 daily devotionals, and 32 full canonical Bible translations are stored in an optimized local SQLite database on your device. Once installed, zero internet access is required.',
+  },
+  {
+    q: 'Is the app really 100% free with no ads or paywalls?',
+    a: 'Absolutely. exégeomai is released under the permissive MIT Open Source license. There are no subscriptions, no locked features, no in-app purchases, and no third-party advertisements. As Matthew 10:8 teaches: "Freely you have received; freely give."',
+  },
+  {
+    q: 'How does the app protect my privacy and study notes?',
+    a: 'The application contains zero telemetry, zero analytics tracking, and zero advertising SDKs. All reading progress, private notes, and bookmarks are encrypted using Android Keystore AES-256 hardware encryption. Furthermore, FLAG_SECURE protects against background screen scrapers.',
+  },
+  {
+    q: 'How do I install the Android APK directly on my phone?',
+    a: 'Download the compiled APK directly from our GitHub Releases link below. Open the APK file on your Android device and tap "Install" (allowing installation from unknown sources if prompted). The app runs standalone on Android 8.0 through Android 15.',
+  },
+  {
+    q: 'Can I suggest a verified local church or submit a correction?',
+    a: 'Yes! You can submit sound, Christ-centered church assemblies or report lexical errata through our Contact portal or directly via GitHub Issues on our open repository.',
+  },
+];
 
-function StrongsPreviewCard() {
-  return (
-    <aside className="strongs-preview-box" aria-label="Strong's Concordance G1834 Preview">
-      <header className="strongs-preview-header">
-        <h3 className="strongs-lemma-wrap">
-          <span className="strongs-number-pill">G1834</span>
-          <span className="strongs-lemma-greek">ἐξηγέομαι</span>
-          <span className="strongs-translit">exēgéomai</span>
-        </h3>
-        <span className="strongs-speech-badge">Verb · Middle Voice</span>
-      </header>
+export default function HomePage() {
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
 
-      <p className="strongs-pronounce-row">
-        <span className="pronounce-label">Phonetics:</span>
-        <span className="pronounce-value">ex-ay-geh&apos;-om-ahee</span>
-        <span className="pronounce-root">From G1537 (ek) + G2233 (hēgeomai)</span>
-      </p>
-
-      <p className="strongs-def-text">
-        <strong>Definition:</strong> To lead out, unfold, declare, explain, and set forth with divine authority and thorough narrative clarity.
-      </p>
-
-      <blockquote className="strongs-quote-card">
-        <p className="strongs-verse-quote">
-          &ldquo;No man hath seen God at any time; the only begotten Son, which is in the bosom of the Father, he hath <em>declared [ἐξηγήσατο]</em> him.&rdquo;
-        </p>
-        <cite className="strongs-verse-cite">John 1:18 · King James Version (KJV 1611)</cite>
-      </blockquote>
-    </aside>
-  );
-}
-
-function TranslationsMatrixCard() {
-  const translations = [
-    { code: 'ZUL', name: 'IBhayibheli Elingcwele', region: 'isiZulu (1959)' },
-    { code: 'XHO', name: 'IBhayibhile Engcwele', region: 'isiXhosa (1996)' },
-    { code: 'NSO', name: 'Bibele Taba ye Botse', region: 'Sepedi / Northern Sotho' },
-    { code: 'AFR', name: 'Die Bybel', region: 'Afrikaans (1953 / 1983)' },
-    { code: 'SNA', name: 'Bhaibheri Dzvene', region: 'ChiShona (Zimbabwe)' },
-    { code: 'KJV', name: 'King James Version', region: 'Strong\'s Concordance (1611)' },
-    { code: 'ESV', name: 'English Standard', region: 'Scholarly Literal' },
-    { code: 'ASV', name: 'American Standard', region: 'Cross-Reference Edition' },
-    { code: 'YLT', name: 'Young\'s Literal', region: 'Hebrew / Greek Verbal Tenses' },
-    { code: 'WEB', name: 'World English Bible', region: 'Modern Public Domain' },
-  ];
-
-  return (
-    <section className="translations-matrix-box" aria-label="Embedded Translations Matrix">
-      <header className="translations-matrix-heading">
-        <span>Authentic African &amp; Global Translations (32 Embedded Offline)</span>
-        <span className="offline-verified-badge">100% Offline SQLite</span>
-      </header>
-      <ul className="translations-tags-grid" role="list">
-        {translations.map((t) => (
-          <li key={t.code} className="translation-tag-card">
-            <span className="trans-code">{t.code}</span>
-            <span className="trans-meta">
-              <span className="trans-name">{t.name}</span>
-              <span className="trans-region">{t.region}</span>
-            </span>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
-function TheologyLensesCard() {
-  return (
-    <section className="theology-lenses-box" aria-label="Three Scholarly Exegetical Lenses">
-      <article className="lens-item lens-historical">
-        <header className="lens-header">
-          <span className="lens-icon-marker" aria-hidden="true" />
-          <h4>1. Historical Lens</h4>
-          <span className="lens-tag">Context</span>
-        </header>
-        <p>
-          Archaeological discoveries, Second Temple Judaism, the Roman imperial hegemony, and Old Testament cultural chronology.
-        </p>
-      </article>
-
-      <article className="lens-item lens-customs">
-        <header className="lens-header">
-          <span className="lens-icon-marker" aria-hidden="true" />
-          <h4>2. Ancient Customs Lens</h4>
-          <span className="lens-tag">Culture</span>
-        </header>
-        <p>
-          Near Eastern marriage rituals, shepherd covenant pacts, Hebrew idioms, festival shadows, and biblical hospitality.
-        </p>
-      </article>
-
-      <article className="lens-item lens-theology">
-        <header className="lens-header">
-          <span className="lens-icon-marker" aria-hidden="true" />
-          <h4>3. Theology Lens</h4>
-          <span className="lens-tag">Christocentric</span>
-        </header>
-        <p>
-          Typological fulfillment in Christ, redemptive historical progression, apostolic doctrine, and practical personal devotion.
-        </p>
-      </article>
-    </section>
-  );
-}
-
-function SecurityPillarsCard() {
-  return (
-    <ul className="security-pillars-box" role="list" aria-label="Hardware Keystore Security Architecture">
-      <li className="sec-pillar">
-        <span className="sec-icon-circle" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-          </svg>
-        </span>
-        <header className="sec-info">
-          <h5>Hardware Keystore</h5>
-          <p>Keys isolated inside Android Keystore &amp; Apple Secure Enclave.</p>
-        </header>
-      </li>
-
-      <li className="sec-pillar">
-        <span className="sec-icon-circle" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-          </svg>
-        </span>
-        <header className="sec-info">
-          <h5>AES-256-CBC Encryption</h5>
-          <p>Every private note is ciphered client-side before touching disk.</p>
-        </header>
-      </li>
-
-      <li className="sec-pillar">
-        <span className="sec-icon-circle" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-          </svg>
-        </span>
-        <header className="sec-info">
-          <h5>Zero Telemetry or Ads</h5>
-          <p>Zero third-party tracking SDKs, data brokers, or commercial cookies.</p>
-        </header>
-      </li>
-    </ul>
-  );
-}
-
-function ChurchDirectoryCard() {
-  const churches = [
-    { name: 'Spirit Embassy (GoodNews Church)', loc: 'Harare, Zimbabwe', coords: '-17.842234, 31.064743' },
-    { name: 'ECG The Jesus Nation Church', loc: 'Lilongwe, Malawi', coords: '-13.961257, 33.799067' },
-    { name: 'God Embassy', loc: 'Pretoria, South Africa', coords: '-25.794938, 27.991938' },
-    { name: 'Christ Embassy (BLW)', loc: 'Lagos, Nigeria', coords: '6.599262, 3.365993' },
-  ];
-
-  return (
-    <section className="churches-directory-box" aria-label="Pre-Seeded Headquarters & Physical GPS Coordinates">
-      <header className="churches-header">
-        <span>Pre-Seeded Headquarters &amp; Physical GPS Coordinates</span>
-        <span className="gps-pill">Zero API Keys Required</span>
-      </header>
-      <ul className="churches-grid" role="list">
-        {churches.map((c) => (
-          <li key={c.name} className="church-card">
-            <header className="church-main">
-              <span className="church-title">{c.name}</span>
-              <span className="church-loc">{c.loc}</span>
-            </header>
-            <span className="church-coords">{c.coords}</span>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
-/**
- * ── Sections Composition for ScrollBrandMark ────────────────────
- */
-
-export default function Home() {
-  const sections: ScrollSection[] = [
-    // ── Section 1: Hero (Sacred Biblical Exegesis) ──
-    {
-      id: 'hero',
-      badge: 'Sacred Biblical Exegesis · Strong\'s G1834',
-      title: 'Unfold the Sacred',
-      subtitle: 'Depth of Scripture',
-      align: 'left',
-      description:
-        'exégeomai bridges original ancient Greek, Hebrew, and Aramaic manuscripts directly with your daily devotional contemplation. Named after Strong\'s Greek 1834 (ἐξηγέομαι — to declare, lead out, and reveal). 365 calendar-synchronized devotionals, 14,298 Strong\'s concordance entries, and 32 offline Bible translations secured by AES-256 hardware encryption.',
-      actions: [
-        {
-          label: 'Download APK — v1.0.4',
-          variant: 'primary',
-          href: 'https://github.com/thulanesigasa/bible_fun_facts/releases/latest',
-        },
-        {
-          label: 'Explore Features',
-          variant: 'secondary',
-          href: '/features',
-        },
-        {
-          label: 'View on GitHub',
-          variant: 'secondary',
-          href: 'https://github.com/thulanesigasa/bible_fun_facts',
-        },
-      ],
-      features: [
-        {
-          title: '100% Zero-Cloud Telemetry',
-          description: 'Zero commercial analytics, advertising trackers, or profiling algorithms. Your spiritual walk remains private.',
-          tag: 'Privacy First',
-        },
-        {
-          title: 'Compiled Offline SQLite Database',
-          description: 'All 14,298 Strong\'s entries and 32 complete Bible translations bundled natively with zero runtime quota.',
-          tag: 'Zero Quota',
-        },
-        {
-          title: 'Hardware-Backed AES-256',
-          description: 'Android Keystore and Apple Secure Enclave hardware cryptography protects all private study reflections.',
-          tag: 'AES-256',
-        },
-      ],
-    },
-
-    // ── Section 2: Strong's Lexicon (14,298 Lemmas) ──
-    {
-      id: 'strongs',
-      badge: 'Original Language Concordance',
-      title: '14,298 Lemmas',
-      subtitle: 'Sub-10ms Full-Text Search',
-      align: 'right',
-      description:
-        'Explore the original inspired languages without needing internet connectivity. Search 5,624 Greek entries and 8,674 Hebrew roots with morphology, etymology, phonetic pronunciation guides, and KJV canonical usage metrics.',
-      actions: [
-        {
-          label: 'Launch Strong\'s Explorer',
-          variant: 'primary',
-          href: '/strongs',
-        },
-        {
-          label: 'Read Lexicon Docs',
-          variant: 'secondary',
-          href: '/features',
-        },
-      ],
-      extraNode: <StrongsPreviewCard />,
-      features: [
-        {
-          title: 'Textus Receptus & Septuagint (LXX)',
-          description: 'Complete Greek lemma index with grammatical inflections and KJV cross-references.',
-          tag: 'Greek G1–G5624',
-        },
-        {
-          title: 'Masoretic Hebrew Roots',
-          description: 'Ancient Tanakh vocabulary indexed with primitive root etymologies and voweling.',
-          tag: 'Hebrew H1–H8674',
-        },
-        {
-          title: 'Sub-10ms SQLite FTS5 Match',
-          description: 'Full-text search virtual tables compile substring, prefix, and wildcard queries in under 10 milliseconds.',
-          tag: 'FTS5 Engine',
-        },
-        {
-          title: 'Syllabic Audio Phonetics',
-          description: 'Deterministic phonetic transcription (e.g. ex-ay-geh\'-om-ahee) calibrated to standard academic pronunciation.',
-          tag: 'Phonetics',
-        },
-      ],
-    },
-
-    // ── Section 3: 32 Offline Bible Translations ──
-    {
-      id: 'translations',
-      badge: 'Multilingual Global Canons',
-      title: '32 Translations',
-      subtitle: 'African & Scholarly Canons Offline',
-      align: 'left',
-      description:
-        'Read, compare, and study side-by-side without cellular data or Wi-Fi. Featuring complete South African and Zimbabwean indigenous translations alongside historical and scholarly English editions.',
-      actions: [
-        {
-          label: 'Compare Canons',
-          variant: 'primary',
-          href: '/features',
-        },
-        {
-          label: 'Download Standalone APK',
-          variant: 'secondary',
-          href: 'https://github.com/thulanesigasa/bible_fun_facts/releases/latest',
-        },
-      ],
-      extraNode: <TranslationsMatrixCard />,
-      features: [
-        {
-          title: 'Indigenous South African & Zimbabwean Canons',
-          description: 'IBhayibheli Elingcwele (isiZulu), isiXhosa 1996, Bibele (Sepedi), Afrikaans 1953/1983, Bhaibheri Dzvene (ChiShona).',
-          tag: 'Indigenous',
-        },
-        {
-          title: 'Scholarly English Editions',
-          description: 'King James Version (1611 with Strong\'s tags), ESV, American Standard Version (ASV), Young\'s Literal Translation (YLT), World English Bible (WEB).',
-          tag: 'Scholarly',
-        },
-        {
-          title: 'Parallel Interlinear Reader',
-          description: 'Synchronized dual-pane scrolling allows word-by-word comparison across translations and original languages.',
-          tag: 'Interlinear',
-        },
-        {
-          title: 'Zero Download Wait',
-          description: 'All 32 complete canons are pre-compiled into local device SQLite storage — ready immediately upon installation.',
-          tag: 'Offline First',
-        },
-      ],
-    },
-
-    // ── Section 4: 365 Exegetical Devotionals & Streak Engine ──
-    {
-      id: 'devotionals',
-      badge: 'Daily Exegetical Sanctuary',
-      title: '365 Devotionals',
-      subtitle: 'Triple Theological Lens',
-      align: 'right',
-      description:
-        'Each calendar day delivers an unbroken, in-depth scriptural journey examined through three scholarly lenses: Historical Context, Ancient Customs, and Deep Christocentric Theology.',
-      actions: [
-        {
-          label: 'Explore Devotional Lenses',
-          variant: 'primary',
-          href: '/features',
-        },
-        {
-          label: 'Learn About Streak Math',
-          variant: 'secondary',
-          href: '/faq',
-        },
-      ],
-      extraNode: <TheologyLensesCard />,
-      features: [
-        {
-          title: 'Historical Context Lens',
-          description: 'Roman imperial politics, Second Temple history, Babylonian exile chronology, and archaeological validation.',
-          tag: 'History',
-        },
-        {
-          title: 'Ancient Customs & Culture Lens',
-          description: 'Near Eastern marriage pacts, blood covenants, pastoral shepherd metaphors, and sacred festival rituals.',
-          tag: 'Customs',
-        },
-        {
-          title: 'Christocentric Theology Lens',
-          description: 'Typological fulfillment in Christ, redemptive historical progression, apostolic doctrine, and spiritual applications.',
-          tag: 'Theology',
-        },
-        {
-          title: 'Deterministic Streak Math Engine',
-          description: 'UTC-anchored daily consistency engine with automated clamp healing, Day 10 milestone recovery, and badge achievements.',
-          tag: 'Streak Engine',
-        },
-      ],
-    },
-
-    // ── Section 5: Hardware Keystore Cryptography ──
-    {
-      id: 'security',
-      badge: 'Hardware-Backed Privacy',
-      title: 'AES-256 Security',
-      subtitle: 'Zero Cloud Telemetry',
-      align: 'left',
-      description:
-        'Your study journal, prayer requests, and private theological notes are encrypted locally with hardware-level security chips. Even with physical access to your device, your private study remains mathematically unreadable.',
-      actions: [
-        {
-          label: 'View Security Architecture',
-          variant: 'primary',
-          href: '/security',
-        },
-        {
-          label: 'Account Deletion Portal',
-          variant: 'secondary',
-          href: '/deletion',
-        },
-      ],
-      extraNode: <SecurityPillarsCard />,
-      features: [
-        {
-          title: 'AES-256-CBC Payload Encryption',
-          description: 'Hardware-derived keys encrypt every study note before writing to local flash memory.',
-          tag: 'Hardware Crypto',
-        },
-        {
-          title: '4-Digit PIN & Biometric Lockout',
-          description: 'Secure Store lockout screen with fingerprint/FaceID hardware authentication fallback.',
-          tag: 'Biometric PIN',
-        },
-        {
-          title: 'Zero Third-Party Tracking',
-          description: 'No advertising SDKs, Facebook pixels, Google Analytics, or monetized telemetry libraries.',
-          tag: 'Zero SDKs',
-        },
-        {
-          title: 'GDPR & POPIA Compliance',
-          description: 'Full self-service account deletion portal with permanent record purging.',
-          tag: 'Compliance',
-        },
-      ],
-    },
-
-    // ── Section 6: Church Community & Branch Directory ──
-    {
-      id: 'community',
-      badge: 'Faith Community Directory',
-      title: 'Kingdom Community',
-      subtitle: 'Pre-Seeded Branch Directory & Native GPS',
-      align: 'center',
-      description:
-        'Locate authentic global ministries with exact GPS coordinates and drive directly using device-native Google Maps, Apple Maps, or Waze — requiring zero third-party billing keys.',
-      actions: [
-        {
-          label: 'Download Standalone APK — v1.0.4',
-          variant: 'primary',
-          href: 'https://github.com/thulanesigasa/bible_fun_facts/releases/latest',
-        },
-        {
-          label: 'Explore FAQ & Documentation',
-          variant: 'secondary',
-          href: '/faq',
-        },
-        {
-          label: 'View Open Source Repository',
-          variant: 'secondary',
-          href: 'https://github.com/thulanesigasa/bible_fun_facts',
-        },
-      ],
-      extraNode: <ChurchDirectoryCard />,
-      features: [
-        {
-          title: 'Pre-Seeded Canonical Campuses',
-          description: 'God Embassy (Pretoria), Christ Embassy (Lagos), Spirit Embassy (Harare), and ECG The Jesus Nation Church (Lilongwe).',
-          tag: 'Headquarters',
-        },
-        {
-          title: 'Direct Native GPS Navigation',
-          description: 'One-tap navigation launches device-native GPS apps using precision latitude and longitude coordinates.',
-          tag: 'Native GPS',
-        },
-        {
-          title: 'Zero API Key Quotas',
-          description: 'No Google Maps SDK keys or billable tile subscriptions; navigation works natively forever.',
-          tag: 'Free Forever',
-        },
-        {
-          title: '100% Free & Open Source',
-          description: 'Permissively licensed under MIT. Contributions, pull requests, and forks are warmly welcomed.',
-          tag: 'MIT License',
-        },
-      ],
-    },
-  ];
+  const toggleFaq = (index: number) => {
+    setOpenFaq(openFaq === index ? null : index);
+  };
 
   return (
     <>
       <Header />
-      <ScrollBrandMark sections={sections} />
+
+      <main id="main">
+        {/* HERO SECTION */}
+        <header className="hero" id="hero">
+          {/* Subtle Background Grid Lines */}
+          <div className="grid-lines" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          {/* Decorative Floating Geometry */}
+          <div className="deco-ring" aria-hidden="true"></div>
+          <div className="deco-morph" aria-hidden="true"></div>
+          <div className="deco-square" aria-hidden="true"></div>
+          <div className="deco-circle" aria-hidden="true"></div>
+
+          <div className="hero-inner">
+            <div className="pill-badge">
+              <span className="pill-dot"></span>
+              <span>Scholarly Scripture Exegesis</span>
+            </div>
+
+            <h1>
+              Every Root.<br />
+              <span className="text-accent">Every Sacred Truth.</span>
+            </h1>
+
+            <p className="hero-sub">
+              Unfold 14,298 Strong&apos;s Hebrew &amp; Greek lexical entries, 32 verified offline canons,
+              author chronologies, and sound church ministries — 100% private with zero cloud telemetry.
+            </p>
+
+            <div className="hero-actions">
+              <a href="#download" className="btn-primary">
+                <span>Download Android APK</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M12 4v12" />
+                  <path d="m7 11 5 5 5-5" />
+                  <path d="M4 20h16" />
+                </svg>
+              </a>
+              <Link href="/features" className="btn-outline">
+                <span>Explore Features</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Triple High-Fidelity Mobile App Screens */}
+          <HeroPhoneMockups />
+        </header>
+
+        {/* SECTION 2: PROBLEM & SOLUTION (About Section) */}
+        <section className="section" id="about-preview">
+          <div className="wrap">
+            <div className="split-grid">
+              <div className="split-copy">
+                <span className="section-kicker">Deep Biblical Scholarship</span>
+                <h3>Beyond Surface-Level Translations</h3>
+                <p>
+                  Modern English translations are invaluable, but Greek verb tenses, Hebrew wordplays,
+                  and cultural idioms often fade in translation. To grasp the fullness of apostolic doctrine,
+                  believers need direct access to original lemmas without seminary tuition.
+                </p>
+                <p>
+                  exégeomai bridges the gap between devotional warmth and rigorous scholarship. Every scripture
+                  is paired with interlinear roots, historical author context, and pronunciation guides.
+                </p>
+                <Link href="/about" className="cta-btn" style={{ display: 'inline-flex' }}>
+                  <span>Read Our Theological Vision</span>
+                </Link>
+              </div>
+
+              <div className="comparison-box">
+                <div className="comparison-row">
+                  <div className="comparison-icon check">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </div>
+                  <div className="comparison-text">
+                    <h4>14,298 Strong&apos;s Greek &amp; Hebrew Entries</h4>
+                    <p>Instant lexical definitions, pronunciations, morphology, and KJV concordance occurrences.</p>
+                  </div>
+                </div>
+
+                <div className="comparison-row">
+                  <div className="comparison-icon check">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </div>
+                  <div className="comparison-text">
+                    <h4>32 Complete Bibles in Local SQLite</h4>
+                    <p>KJV, ASV, Darby, Young&apos;s Literal, Vulgate, plus African vernaculars like isiZulu and Sepedi.</p>
+                  </div>
+                </div>
+
+                <div className="comparison-row">
+                  <div className="comparison-icon check">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </div>
+                  <div className="comparison-text">
+                    <h4>Hardware Keystore AES-256 Encryption</h4>
+                    <p>FLAG_SECURE screen protection and zero telemetry — no trackers, analytics, or surveillance.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 3: FEATURES GRID */}
+        <section className="section alt" id="features">
+          <div className="wrap">
+            <div className="section-head">
+              <span className="section-kicker">Engineered for Disciples</span>
+              <h2>Everything for Rigorous Study in One App</h2>
+              <p>
+                From devotional reading at dawn to deep midnight theological cross-referencing,
+                exégeomai provides the complete exegetical toolkit.
+              </p>
+            </div>
+
+            <div className="cards-grid">
+              {/* Feature 1 */}
+              <div className="feature-card">
+                <div className="feature-icon-box">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" />
+                    <path d="M6 6h10" />
+                    <path d="M6 10h10" />
+                  </svg>
+                </div>
+                <h3>Strong&apos;s Concordance</h3>
+                <p>
+                  Access 8,674 Hebrew and 5,624 Greek lemmas with phonetic pronunciations,
+                  root derivations, and complete biblical occurrences.
+                </p>
+                <Link href="/features" className="feature-tag">
+                  <span>Learn more</span>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6" /></svg>
+                </Link>
+              </div>
+
+              {/* Feature 2 */}
+              <div className="feature-card">
+                <div className="feature-icon-box">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="m4.93 4.93 4.24 4.24" />
+                    <path d="m14.83 9.17 4.24-4.24" />
+                    <path d="m14.83 14.83 4.24 4.24" />
+                    <path d="m9.17 14.83-4.24 4.24" />
+                    <circle cx="12" cy="12" r="4" />
+                  </svg>
+                </div>
+                <h3>32 Offline Canons</h3>
+                <p>
+                  Switch seamlessly between historical translations, Greek New Testament,
+                  Latin Vulgate, and South African mother-tongue bibles.
+                </p>
+                <Link href="/features" className="feature-tag">
+                  <span>View Canons</span>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6" /></svg>
+                </Link>
+              </div>
+
+              {/* Feature 3 */}
+              <div className="feature-card">
+                <div className="feature-icon-box">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="4" />
+                    <path d="M12 2v2" />
+                    <path d="M12 20v2" />
+                    <path d="m4.93 4.93 1.41 1.41" />
+                    <path d="m17.66 17.66 1.41 1.41" />
+                    <path d="M2 12h2" />
+                    <path d="M20 12h2" />
+                    <path d="m6.34 17.66-1.41 1.41" />
+                    <path d="m19.07 4.93-1.41 1.41" />
+                  </svg>
+                </div>
+                <h3>365 Daily Exegesis</h3>
+                <p>
+                  A full year of daily exegetical devotionals analyzing key verses through
+                  their original root concepts, historical settings, and practical reflections.
+                </p>
+                <Link href="/features" className="feature-tag">
+                  <span>Explore Devotionals</span>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6" /></svg>
+                </Link>
+              </div>
+
+              {/* Feature 4 */}
+              <div className="feature-card">
+                <div className="feature-icon-box">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                </div>
+                <h3>Historical Author Timelines</h3>
+                <p>
+                  Understand the human author, royal chronology, historical setting,
+                  and covenants governing each biblical testament.
+                </p>
+                <Link href="/features" className="feature-tag">
+                  <span>See Timelines</span>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6" /></svg>
+                </Link>
+              </div>
+
+              {/* Feature 5 */}
+              <div className="feature-card">
+                <div className="feature-icon-box">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                </div>
+                <h3>Sound Church Directory</h3>
+                <p>
+                  Locate verified Christ-centered, biblical church ministries with precise GPS coordinates,
+                  service times, and pastoral leadership information.
+                </p>
+                <Link href="/features" className="feature-tag">
+                  <span>View Assemblies</span>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6" /></svg>
+                </Link>
+              </div>
+
+              {/* Feature 6 */}
+              <div className="feature-card">
+                <div className="feature-icon-box">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                </div>
+                <h3>Hardware Keystore Security</h3>
+                <p>
+                  All personal reflections and reading progress are encrypted on device via
+                  AES-256 GCM. FLAG_SECURE prevents unauthorized screenshots.
+                </p>
+                <Link href="/safety" className="feature-tag">
+                  <span>Security Details</span>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6" /></svg>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 4: STEP-BY-STEP HOW IT WORKS */}
+        <section className="section" id="how-it-works">
+          <div className="wrap">
+            <div className="section-head">
+              <span className="section-kicker">Simple Onboarding</span>
+              <h2>From Installation to Original Greek in 3 Steps</h2>
+              <p>No account registration required. Zero subscriptions. Instant local offline access.</p>
+            </div>
+
+            <div className="steps-grid">
+              <div className="step-card">
+                <div className="step-num">01</div>
+                <h3>Download APK</h3>
+                <p>
+                  Get the standalone binary directly from GitHub Releases or Google Play.
+                  Lightweight, clean, and installs in seconds.
+                </p>
+              </div>
+
+              <div className="step-card">
+                <div className="step-num">02</div>
+                <h3>Select Your Canons</h3>
+                <p>
+                  Pick your default translation (KJV, ASV, Greek NT, Vulgate) and regional languages.
+                  Everything caches immediately into SQLite.
+                </p>
+              </div>
+
+              <div className="step-card">
+                <div className="step-num">03</div>
+                <h3>Tap Any Word for Root Exegesis</h3>
+                <p>
+                  Touch any word in the reader to open the Strong&apos;s lexicon card with Greek/Hebrew lemma,
+                  morphology, pronunciation, and cross-references.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 5: SAFETY & TRUST (Cool Dark Banner) */}
+        <section className="section cool" id="safety-preview">
+          <div className="wrap">
+            <div className="section-head">
+              <span className="section-kicker">Safety, Trust &amp; Zero Telemetry</span>
+              <h2>Your Spiritual Life Stays on Your Device</h2>
+              <p>
+                We believe scripture reading and prayer are sacred. We refuse to sell data,
+                inject advertising tracking, or leak your reading habits to cloud servers.
+              </p>
+            </div>
+
+            <div className="security-grid">
+              <div className="sec-card">
+                <div className="sec-icon">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                </div>
+                <h3>Hardware Keystore</h3>
+                <p>Notes and progress are secured with AES-256 GCM backed by the Android Hardware Keystore.</p>
+              </div>
+
+              <div className="sec-card">
+                <div className="sec-icon">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                    <circle cx="12" cy="12" r="3" />
+                    <line x1="2" y1="2" x2="22" y2="22" />
+                  </svg>
+                </div>
+                <h3>FLAG_SECURE</h3>
+                <p>Operating system screen protection prevents background applications from capturing screenshots.</p>
+              </div>
+
+              <div className="sec-card">
+                <div className="sec-icon">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <ellipse cx="12" cy="5" rx="9" ry="3" />
+                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                    <path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3" />
+                  </svg>
+                </div>
+                <h3>100% Offline SQLite</h3>
+                <p>All data operations execute against local embedded databases with zero external network polling.</p>
+              </div>
+
+              <div className="sec-card">
+                <div className="sec-icon">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 6h18" />
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                  </svg>
+                </div>
+                <h3>One-Tap Data Wipe</h3>
+                <p>Full nuclear wipe capability allows you to instantly purge all stored keys, bookmarks, and notes.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 6: PRICING & FREEDOM */}
+        <section className="section alt" id="pricing">
+          <div className="wrap">
+            <div className="section-head">
+              <span className="section-kicker">Christ-Centered Stewardship</span>
+              <h2>100% Free &amp; Open Source</h2>
+              <p>
+                No premium tier. No subscriptions. No paywalled chapters.
+                The word of God is not for sale.
+              </p>
+            </div>
+
+            <div className="pricing-grid">
+              {/* Standalone Community Tier */}
+              <div className="pricing-card featured">
+                <span className="pricing-badge">Free Forever · MIT License</span>
+                <div className="pricing-header">
+                  <h3>exégeomai Standalone</h3>
+                  <p>Full access for believers, pastors, and scholars worldwide.</p>
+                </div>
+                <div className="pricing-price">
+                  <span className="pricing-amount">$0</span>
+                  <span className="pricing-period">/ forever</span>
+                </div>
+                <ul className="pricing-features">
+                  <li>
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#0F172A" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                    <span>365 Daily Exegetical Devotionals</span>
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#0F172A" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                    <span>14,298 Strong&apos;s Greek &amp; Hebrew Lexicon</span>
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#0F172A" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                    <span>32 Complete Offline Bible Translations</span>
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#0F172A" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                    <span>Hardware Keystore AES-256 Encryption</span>
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#0F172A" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                    <span>Zero Ads, Zero Analytics, Zero Trackers</span>
+                  </li>
+                </ul>
+                <a href="#download" className="btn-primary" style={{ justifyContent: 'center' }}>
+                  <span>Download APK (Free)</span>
+                </a>
+              </div>
+
+              {/* Open Source Contributor */}
+              <div className="pricing-card">
+                <div className="pricing-header">
+                  <h3>Community Contributor</h3>
+                  <p>For developers, linguists, and biblical translators.</p>
+                </div>
+                <div className="pricing-price">
+                  <span className="pricing-amount">Open</span>
+                  <span className="pricing-period">/ GitHub</span>
+                </div>
+                <ul className="pricing-features">
+                  <li>
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#0F172A" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                    <span>Full Source Code on GitHub</span>
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#0F172A" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                    <span>Submit New Offline Vernacular Bibles</span>
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#0F172A" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                    <span>Verify &amp; Add Orthodox Local Assemblies</span>
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#0F172A" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                    <span>Direct Native Compilation Toolchains</span>
+                  </li>
+                </ul>
+                <a
+                  href="https://github.com/thulanesigasa/bible_fun_facts"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-outline"
+                  style={{ justifyContent: 'center', borderColor: '#CBD5E1', color: '#0F172A' }}
+                >
+                  <span>View GitHub Repository</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 7: FREQUENTLY ASKED QUESTIONS */}
+        <section className="section" id="faq">
+          <div className="wrap">
+            <div className="section-head">
+              <span className="section-kicker">Got Questions?</span>
+              <h2>Frequently Asked Questions</h2>
+              <p>Everything you need to know about the offline architecture, translations, and privacy.</p>
+            </div>
+
+            <div className="faq-wrap">
+              {FAQS.map((faq, idx) => (
+                <div
+                  key={idx}
+                  className={`faq-item ${openFaq === idx ? 'is-open' : ''}`}
+                >
+                  <button
+                    type="button"
+                    className="faq-question"
+                    onClick={() => toggleFaq(idx)}
+                    aria-expanded={openFaq === idx}
+                  >
+                    <span>{faq.q}</span>
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </button>
+                  {openFaq === idx && (
+                    <div className="faq-answer">
+                      <p>{faq.a}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 8: DOWNLOAD CALLOUT BANNER */}
+        <section className="section alt download-section" id="download">
+          <div className="wrap">
+            <div className="download-card">
+              <h2>Begin Your Exegetical Journey Today</h2>
+              <p>
+                Experience the living depth of original biblical Hebrew and Greek.
+                Install the Android APK directly, completely offline and 100% free.
+              </p>
+
+              <div className="download-actions">
+                <a
+                  href="https://github.com/thulanesigasa/bible_fun_facts/releases/latest"
+                  className="btn-primary"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M12 4v12" />
+                    <path d="m7 11 5 5 5-5" />
+                    <path d="M4 20h16" />
+                  </svg>
+                  <span>Download APK (v1.0.4)</span>
+                </a>
+                <a
+                  href="https://github.com/thulanesigasa/bible_fun_facts"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-outline"
+                >
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+                  </svg>
+                  <span>GitHub Repository</span>
+                </a>
+              </div>
+
+              <div className="download-meta">
+                <span>Android 8.0+ Compatible</span>
+                <span>•</span>
+                <span>SHA-256 Verified Binary</span>
+                <span>•</span>
+                <span>MIT License Open Source</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
       <Footer />
     </>
   );

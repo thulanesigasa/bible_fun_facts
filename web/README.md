@@ -62,14 +62,28 @@ web/
 
 ---
 
-## Pages
+## Pages & Routes
 
 | Route | Description |
 |---|---|
-| `/` | Landing page — Hero, Features, Strong's, Security, FAQ |
-| `/deletion` | GDPR account & data deletion request portal |
-| `/privacy` | Privacy Policy (GDPR Art. 17, CCPA, Google Play compliant) |
-| `/terms` | Terms of Service (MIT license, South African law) |
+| `/` | Flagship landing page — Hero with 3 mobile devices, Features, Walkthrough, Safety, Pricing, FAQ, Download |
+| `/features` | Full feature catalog (365 Devotionals, 14,298 Strong's, 32 Canons, Keystore) & comparison matrix |
+| `/how-it-works` | 6-step visual walkthrough from APK installation to Strong's root interlinear study |
+| `/pricing` | 100% Free & Open Source MIT tier (zero ads, zero subscriptions) vs Contributor tier |
+| `/safety` | Cryptographic privacy architecture (Keystore AES-256 GCM, FLAG_SECURE, zero telemetry) |
+| `/safety-and-trust` | Trust guarantees, data sovereignty, and security pillars |
+| `/about` | Theological vision of *ἐξηγέομαι* (John 1:18), historical-grammatical exegesis, open source |
+| `/support` | Central support hub linking to help guides, FAQ, contact channels, and problem reporting |
+| `/contact` | Inquiry form for general support, lexicon errata, church additions, and security disclosures |
+| `/faq` | 8-item categorized interactive accordion covering offline storage, canons, and security |
+| `/community-guidelines` | Christian fellowship standards grounded in Ephesians 4:29 and Colossians 4:6 |
+| `/report-a-problem` | Technical bug report and vulnerability disclosure form |
+| `/help` | User manual for APK sideloading, translation switching, and biometric locking |
+| `/deletion` | GDPR Article 17 and Google Play policy self-service data eradication portal |
+| `/account-deletion` | Direct alias to account & data eradication portal |
+| `/privacy` | 6-section privacy policy detailing offline SQLite and zero tracking |
+| `/terms` | 6-section terms of service covering MIT open source licensing and public domain texts |
+| `/data-safety` | Official Google Play Store Data Safety matrix confirming 0 bytes collected or shared |
 | `/api/deletion-request` | Edge API — accepts POST with email + reason |
 
 ---
