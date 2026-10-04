@@ -8,6 +8,9 @@
     "android": "expo start --android --port 8082",
     "ios": "expo start --ios --port 8082",
     "web": "expo start --web --port 8082",
+    "web:portal": "npm --prefix web run dev",
+    "web:build": "npm --prefix web run build",
+    "web:start": "npm --prefix web run start",
     "test": "jest"
   },
   "dependencies": {
