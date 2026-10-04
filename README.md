@@ -2216,6 +2216,7 @@ To ensure believers and seekers can explore authentic physical locations on the 
 
 <p align="left">
   <img src="https://img.shields.io/badge/Framework-Next.js%2015%20App%20Router-black?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js 15 App Router" />
+  <img src="https://img.shields.io/badge/HTML5-100%25%20Semantic%20%7C%20Zero%20Divs-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="100% Semantic Zero Divs" />
   <img src="https://img.shields.io/badge/Design%20System-60--30--10%20Vanilla%20CSS-0284C7?style=for-the-badge&logo=css3&logoColor=white" alt="60-30-10 Vanilla CSS" />
   <img src="https://img.shields.io/badge/Interactive-Scroll--Driven%20Focal%20Brand%20Mark-FDD223?style=for-the-badge&logo=react&logoColor=black" alt="Scroll-Driven Focal Brand Mark" />
   <img src="https://img.shields.io/badge/Content%20Pillars-6%20Scholarly%20Dimensions-10B981?style=for-the-badge&logo=book&logoColor=white" alt="6 Scholarly Dimensions" />
@@ -2225,16 +2226,26 @@ To ensure believers and seekers can explore authentic physical locations on the 
   <img src="https://img.shields.io/badge/Hero%20Design-Clean%20Pill--Free%20Typography-FDD223?style=for-the-badge&logo=shield&logoColor=white" alt="Clean Pill-Free Typography" />
 </p>
 
-The official companion web portal provides full web access to exégeomai's core offerings, redesigned with an immersive scroll-driven brand mark focal experience:
+The official companion web portal provides full web access to exégeomai's core offerings, redesigned with an immersive scroll-driven brand mark focal experience and a strict zero-div semantic HTML5 architecture:
 
-1. **Interactive Focal Brand Mark Architecture (`ScrollBrandMark.tsx`)**:
+1. **Zero-Div Semantic HTML5 Standard**:
+   - The entire web portal eliminates generic `<div>` tags across all components in favor of meaningful, accessible HTML5 elements:
+     - Root portal shell: `<main>`
+     - Reading depth tracker: `<nav aria-label="Reading depth progress">` with `<span role="progressbar">`
+     - Quick section navigation: `<nav aria-label="Section quick navigation">` with `<ol role="list">` and `<li>` items
+     - Focal brand mark: `<figure>` enclosing `<picture>`, `<figcaption>`, and decorative orbital `<span aria-hidden="true">` elements
+     - Pillar showcases: `<article>` and `<section>` with semantic `<header>`, `<blockquote>`, `<cite>`, `<aside>`, and `<ul role="list">`
+     - Action callouts: `<nav aria-label="...">` with semantic `<a>` and `<button>` triggers
+   - Delivers superior screen reader accessibility (ARIA landmark roles) and clean SEO heading and landmark hierarchy.
+
+2. **Interactive Focal Brand Mark Architecture (`ScrollBrandMark.tsx`)**:
    - Replaced generic 3D wireframe globe with the authentic high-resolution app brand mark (`logo-transparent.png`) housed in a sacred geometric enclosure with brand yellow border styling (`#FDD223`).
    - Dynamic viewport collision physics that calculate section midpoints via requestAnimationFrame and smoothly interpolate 3D transform coordinates (`translate3d(left, top, 0) scale3d(...)`) across desktop viewports.
    - Ultra-responsive mobile adaptation: scales down to an ambient backdrop (`0.12` opacity) on viewports below 900px, guaranteeing zero layout obstruction on mobile devices.
    - Auto-revealing side dot indicator navigation with pulsing active section dots and glassmorphic badge tooltips.
    - Full-width top scroll progress bar dynamically tracking viewport reading depth without layout shift.
 
-2. **6 Scholarly & Theological Content Pillars**:
+3. **6 Scholarly & Theological Content Pillars**:
    - **Pillar 1: Sacred Biblical Exegesis**: Hero presentation of Greek lemma G1834 *ἐξηγέομαι* with direct production APK download and web portal exploration CTAs.
    - **Pillar 2: Strong's Exhaustive Concordance**: Deep lexical breakdown of 14,298 biblical lemmas, transliterations, and a live interactive G1834 preview card.
    - **Pillar 3: 32 Offline Canons**: Complete African language preservation matrix (isiZulu, isiXhosa, Sesotho, Sepedi, Setswana, Xitsonga, Tshivenda, siSwati, isiNdebele, ChiShona) alongside scholarly English canons.
@@ -2242,7 +2253,7 @@ The official companion web portal provides full web access to exégeomai's core 
    - **Pillar 5: Hardware Keystore Privacy**: Hardware-backed AES-256 local encrypted storage, biometric authentication, and strict zero-telemetry architectural guarantees.
    - **Pillar 6: Kingdom Community & Branch Directory**: Pre-seeded directory of canonical ministries (God Embassy, Christ Embassy, Spirit Embassy, ECG) with 1-tap coordinate-based native GPS routing.
 
-3. **Web Portal Startup Commands**:
+4. **Web Portal Startup Commands**:
 ```bash
 # Launch Next.js web portal development server (http://localhost:3000)
 npm run web:portal

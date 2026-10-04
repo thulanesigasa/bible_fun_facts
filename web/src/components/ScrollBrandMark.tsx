@@ -41,8 +41,7 @@ const parsePercent = (str: string): number => parseFloat(str.replace('%', ''));
 
 /**
  * Interactive Focal Brand Mark (Replaces the generic wireframe globe)
- * Features exégeomai's authentic transparent brand mark enclosed in
- * precision sacred geometric rings with subtle dynamic rotation.
+ * Built with semantic HTML5 <figure>, <picture>, and <figcaption>.
  */
 function BrandMark({ activeSection }: { activeSection: number }) {
   const sectionLabels = [
@@ -55,15 +54,15 @@ function BrandMark({ activeSection }: { activeSection: number }) {
   ];
 
   return (
-    <div className="brandmark-focal-wrap">
+    <figure className="brandmark-focal-wrap" aria-label="exégeomai Interactive Brand Mark">
       {/* Outer subtle orbital ring with 12 cardinal theological ticks */}
-      <div className="brandmark-orbit-ring" />
+      <span className="brandmark-orbit-ring" aria-hidden="true" />
       
       {/* Secondary concentric aura ring */}
-      <div className="brandmark-aura-ring" />
+      <span className="brandmark-aura-ring" aria-hidden="true" />
 
       {/* Surface enclosure housing the transparent brand mark */}
-      <div className="brandmark-core-enclosure">
+      <picture className="brandmark-core-enclosure">
         <Image
           src="/assets/logo-transparent.png"
           alt="exégeomai Sacred Brand Mark"
@@ -72,14 +71,14 @@ function BrandMark({ activeSection }: { activeSection: number }) {
           priority
           className="brandmark-emblem-image"
         />
-      </div>
+      </picture>
 
       {/* Floating active theological badge */}
-      <div className="brandmark-floating-tag">
-        <span className="brandmark-tag-dot" />
+      <figcaption className="brandmark-floating-tag">
+        <span className="brandmark-tag-dot" aria-hidden="true" />
         <span className="brandmark-tag-label">{sectionLabels[activeSection] || sectionLabels[0]}</span>
-      </div>
-    </div>
+      </figcaption>
+    </figure>
   );
 }
 
@@ -92,7 +91,7 @@ export function ScrollBrandMark({
   const [scrollProgress, setScrollProgress] = useState(0);
   const [brandTransform, setBrandTransform] = useState('');
   const [brandOpacity, setBrandOpacity] = useState(0.95);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLElement>(null);
   const sectionRefs = useRef<(HTMLElement | null)[]>([]);
   const animationFrameId = useRef<number | null>(null);
 
@@ -177,37 +176,41 @@ export function ScrollBrandMark({
   }, [calculatedPositions]);
 
   return (
-    <div
+    <main
       ref={containerRef}
       className={cn('scroll-portal-root', className)}
     >
-      {/* ── Top Progress Bar ── */}
-      <div className="scroll-progress-track">
-        <div
+      {/* ── Top Progress Bar with Semantic Nav & Role ── */}
+      <nav className="scroll-progress-track" aria-label="Reading depth progress">
+        <span
+          role="progressbar"
+          aria-valuenow={Math.round(scrollProgress * 100)}
+          aria-valuemin={0}
+          aria-valuemax={100}
           className="scroll-progress-fill"
           style={{
             transform: `scaleX(${scrollProgress})`,
           }}
         />
-      </div>
+      </nav>
 
-      {/* ── Floating Side Navigation Dots with Responsive Labels ── */}
+      {/* ── Floating Side Navigation with Semantic Nav & List ── */}
       <nav className="scroll-side-nav" aria-label="Section quick navigation">
-        <div className="scroll-dots-column">
+        <ol className="scroll-dots-column" role="list">
           {sections.map((section, index) => (
-            <div key={section.id} className="scroll-dot-wrapper">
+            <li key={section.id} className="scroll-dot-wrapper">
               {/* Auto-revealing section label on active state or hover */}
-              <div
+              <span
                 className={cn(
                   'scroll-nav-label',
                   activeSection === index ? 'scroll-label-active' : 'scroll-label-hidden'
                 )}
               >
-                <span className="scroll-label-dot" />
+                <span className="scroll-label-dot" aria-hidden="true" />
                 <span className="scroll-label-text">
                   {section.badge || `Section ${index + 1}`}
                 </span>
-              </div>
+              </span>
 
               <button
                 type="button"
@@ -224,14 +227,14 @@ export function ScrollBrandMark({
                 aria-label={`Jump to ${section.badge || section.title}`}
                 title={section.badge || section.title}
               />
-            </div>
+            </li>
           ))}
-        </div>
-        <div className="scroll-nav-line" aria-hidden="true" />
+        </ol>
+        <span className="scroll-nav-line" aria-hidden="true" />
       </nav>
 
-      {/* ── Ultra-Smooth Interactive Focal Brand Mark (Replacing Globe) ── */}
-      <div
+      {/* ── Ultra-Smooth Interactive Focal Brand Mark in Semantic Aside ── */}
+      <aside
         className="scroll-focal-brandmark"
         style={{
           transform: brandTransform,
@@ -240,10 +243,10 @@ export function ScrollBrandMark({
         aria-hidden="true"
       >
         <BrandMark activeSection={activeSection} />
-      </div>
+      </aside>
 
       {/* ── Dynamic Sections with Rich Scholarly & Architectural Content ── */}
-      <div className="scroll-sections-container">
+      <article className="scroll-sections-container">
         {sections.map((section, index) => (
           <section
             key={section.id}
@@ -258,70 +261,72 @@ export function ScrollBrandMark({
               section.align !== 'center' && section.align !== 'right' && 'section-align-left'
             )}
           >
-            <div className="scroll-section-inner">
+            <article className="scroll-section-inner">
               {/* Badge */}
               {section.badge && (
-                <div className="section-badge-pill">
-                  <span className="section-badge-dot" />
+                <span className="section-badge-pill">
+                  <span className="section-badge-dot" aria-hidden="true" />
                   <span>{section.badge}</span>
-                </div>
+                </span>
               )}
 
               {/* Title & Subtitle */}
-              <h2 className="section-heading">
-                {section.subtitle ? (
-                  <span className="section-heading-split">
+              <header className="section-heading-wrap">
+                <h2 className="section-heading">
+                  {section.subtitle ? (
+                    <span className="section-heading-split">
+                      <span className="heading-main">{section.title}</span>
+                      <span className="heading-sub">{section.subtitle}</span>
+                    </span>
+                  ) : (
                     <span className="heading-main">{section.title}</span>
-                    <span className="heading-sub">{section.subtitle}</span>
-                  </span>
-                ) : (
-                  <span className="heading-main">{section.title}</span>
-                )}
-              </h2>
+                  )}
+                </h2>
+              </header>
 
               {/* Lead Description */}
               <p className="section-description">{section.description}</p>
 
               {/* Interactive Experience hints for Section 1 */}
               {index === 0 && (
-                <div className="hero-scroll-hints">
-                  <div className="scroll-hint-item">
-                    <span className="hint-pulse-dot" />
+                <aside className="hero-scroll-hints" aria-label="Exploration tips">
+                  <span className="scroll-hint-item">
+                    <span className="hint-pulse-dot" aria-hidden="true" />
                     <span>Dynamic Focal Brand Motion</span>
-                  </div>
-                  <div className="scroll-hint-item">
-                    <span className="hint-pulse-dot delay" />
+                  </span>
+                  <span className="scroll-hint-item">
+                    <span className="hint-pulse-dot delay" aria-hidden="true" />
                     <span>Scroll to Explore All 6 Pillars</span>
-                  </div>
-                </div>
+                  </span>
+                </aside>
               )}
 
-              {/* Features Grid */}
+              {/* Features List */}
               {section.features && section.features.length > 0 && (
-                <div className="section-features-grid">
+                <ul className="section-features-grid" role="list">
                   {section.features.map((feature) => (
-                    <div key={feature.title} className="feature-card">
-                      <div className="feature-card-header">
-                        <span className="feature-accent-marker" />
+                    <li key={feature.title} className="feature-card">
+                      <header className="feature-card-header">
+                        <span className="feature-accent-marker" aria-hidden="true" />
                         <h3 className="feature-title">{feature.title}</h3>
                         {feature.tag && <span className="feature-tag">{feature.tag}</span>}
-                      </div>
+                      </header>
                       <p className="feature-description">{feature.description}</p>
-                    </div>
+                    </li>
                   ))}
-                </div>
+                </ul>
               )}
 
               {/* Optional Custom Extra Node (e.g. Strong's preview card, translations pill matrix) */}
               {section.extraNode && (
-                <div className="section-extra-wrap">
+                <aside className="section-extra-wrap" aria-label={`${section.title} Details`}>
                   {section.extraNode}
-                </div>
+                </aside>
               )}
 
-              {/* Action Buttons */}
+              {/* Action Buttons Nav */}
               {section.actions && section.actions.length > 0 && (
-                <div className="section-actions-row">
+                <nav className="section-actions-row" aria-label="Section primary actions">
                   {section.actions.map((action) => (
                     action.href ? (
                       <a
@@ -349,12 +354,12 @@ export function ScrollBrandMark({
                       </button>
                     )
                   ))}
-                </div>
+                </nav>
               )}
-            </div>
+            </article>
           </section>
         ))}
-      </div>
-    </div>
+      </article>
+    </main>
   );
 }

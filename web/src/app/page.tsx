@@ -6,38 +6,38 @@ import { Footer } from '@/components/Footer';
 import { ScrollBrandMark, ScrollSection } from '@/components/ScrollBrandMark';
 
 /**
- * ── Rich Interactive Sub-Components ────────────────────────────
+ * ── Rich Interactive Sub-Components (100% Semantic HTML5, Zero Divs) ──
  */
 
 function StrongsPreviewCard() {
   return (
-    <div className="strongs-preview-box">
-      <div className="strongs-preview-header">
-        <div className="strongs-lemma-wrap">
+    <aside className="strongs-preview-box" aria-label="Strong's Concordance G1834 Preview">
+      <header className="strongs-preview-header">
+        <h3 className="strongs-lemma-wrap">
           <span className="strongs-number-pill">G1834</span>
-          <span className="strongs-lemma-greek">ἐξηγέоmai</span>
+          <span className="strongs-lemma-greek">ἐξηγέομαι</span>
           <span className="strongs-translit">exēgéomai</span>
-        </div>
+        </h3>
         <span className="strongs-speech-badge">Verb · Middle Voice</span>
-      </div>
+      </header>
 
-      <div className="strongs-pronounce-row">
+      <p className="strongs-pronounce-row">
         <span className="pronounce-label">Phonetics:</span>
         <span className="pronounce-value">ex-ay-geh&apos;-om-ahee</span>
         <span className="pronounce-root">From G1537 (ek) + G2233 (hēgeomai)</span>
-      </div>
+      </p>
 
       <p className="strongs-def-text">
         <strong>Definition:</strong> To lead out, unfold, declare, explain, and set forth with divine authority and thorough narrative clarity.
       </p>
 
-      <div className="strongs-quote-card">
+      <blockquote className="strongs-quote-card">
         <p className="strongs-verse-quote">
           &ldquo;No man hath seen God at any time; the only begotten Son, which is in the bosom of the Father, he hath <em>declared [ἐξηγήσατο]</em> him.&rdquo;
         </p>
-        <span className="strongs-verse-cite">John 1:18 · King James Version (KJV 1611)</span>
-      </div>
-    </div>
+        <cite className="strongs-verse-cite">John 1:18 · King James Version (KJV 1611)</cite>
+      </blockquote>
+    </aside>
   );
 }
 
@@ -56,108 +56,108 @@ function TranslationsMatrixCard() {
   ];
 
   return (
-    <div className="translations-matrix-box">
-      <div className="translations-matrix-heading">
+    <section className="translations-matrix-box" aria-label="Embedded Translations Matrix">
+      <header className="translations-matrix-heading">
         <span>Authentic African &amp; Global Translations (32 Embedded Offline)</span>
         <span className="offline-verified-badge">100% Offline SQLite</span>
-      </div>
-      <div className="translations-tags-grid">
+      </header>
+      <ul className="translations-tags-grid" role="list">
         {translations.map((t) => (
-          <div key={t.code} className="translation-tag-card">
+          <li key={t.code} className="translation-tag-card">
             <span className="trans-code">{t.code}</span>
-            <div className="trans-meta">
+            <span className="trans-meta">
               <span className="trans-name">{t.name}</span>
               <span className="trans-region">{t.region}</span>
-            </div>
-          </div>
+            </span>
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </section>
   );
 }
 
 function TheologyLensesCard() {
   return (
-    <div className="theology-lenses-box">
-      <div className="lens-item lens-historical">
-        <div className="lens-header">
-          <span className="lens-icon-marker" />
+    <section className="theology-lenses-box" aria-label="Three Scholarly Exegetical Lenses">
+      <article className="lens-item lens-historical">
+        <header className="lens-header">
+          <span className="lens-icon-marker" aria-hidden="true" />
           <h4>1. Historical Lens</h4>
           <span className="lens-tag">Context</span>
-        </div>
+        </header>
         <p>
           Archaeological discoveries, Second Temple Judaism, the Roman imperial hegemony, and Old Testament cultural chronology.
         </p>
-      </div>
+      </article>
 
-      <div className="lens-item lens-customs">
-        <div className="lens-header">
-          <span className="lens-icon-marker" />
+      <article className="lens-item lens-customs">
+        <header className="lens-header">
+          <span className="lens-icon-marker" aria-hidden="true" />
           <h4>2. Ancient Customs Lens</h4>
           <span className="lens-tag">Culture</span>
-        </div>
+        </header>
         <p>
           Near Eastern marriage rituals, shepherd covenant pacts, Hebrew idioms, festival shadows, and biblical hospitality.
         </p>
-      </div>
+      </article>
 
-      <div className="lens-item lens-theology">
-        <div className="lens-header">
-          <span className="lens-icon-marker" />
+      <article className="lens-item lens-theology">
+        <header className="lens-header">
+          <span className="lens-icon-marker" aria-hidden="true" />
           <h4>3. Theology Lens</h4>
           <span className="lens-tag">Christocentric</span>
-        </div>
+        </header>
         <p>
           Typological fulfillment in Christ, redemptive historical progression, apostolic doctrine, and practical personal devotion.
         </p>
-      </div>
-    </div>
+      </article>
+    </section>
   );
 }
 
 function SecurityPillarsCard() {
   return (
-    <div className="security-pillars-box">
-      <div className="sec-pillar">
-        <div className="sec-icon-circle">
+    <ul className="security-pillars-box" role="list" aria-label="Hardware Keystore Security Architecture">
+      <li className="sec-pillar">
+        <span className="sec-icon-circle" aria-hidden="true">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
           </svg>
-        </div>
-        <div className="sec-info">
+        </span>
+        <header className="sec-info">
           <h5>Hardware Keystore</h5>
           <p>Keys isolated inside Android Keystore &amp; Apple Secure Enclave.</p>
-        </div>
-      </div>
+        </header>
+      </li>
 
-      <div className="sec-pillar">
-        <div className="sec-icon-circle">
+      <li className="sec-pillar">
+        <span className="sec-icon-circle" aria-hidden="true">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
-        </div>
-        <div className="sec-info">
+        </span>
+        <header className="sec-info">
           <h5>AES-256-CBC Encryption</h5>
           <p>Every private note is ciphered client-side before touching disk.</p>
-        </div>
-      </div>
+        </header>
+      </li>
 
-      <div className="sec-pillar">
-        <div className="sec-icon-circle">
+      <li className="sec-pillar">
+        <span className="sec-icon-circle" aria-hidden="true">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
             <circle cx="9" cy="7" r="4" />
             <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
             <path d="M16 3.13a4 4 0 0 1 0 7.75" />
           </svg>
-        </div>
-        <div className="sec-info">
+        </span>
+        <header className="sec-info">
           <h5>Zero Telemetry or Ads</h5>
           <p>Zero third-party tracking SDKs, data brokers, or commercial cookies.</p>
-        </div>
-      </div>
-    </div>
+        </header>
+      </li>
+    </ul>
   );
 }
 
@@ -170,23 +170,23 @@ function ChurchDirectoryCard() {
   ];
 
   return (
-    <div className="churches-directory-box">
-      <div className="churches-header">
+    <section className="churches-directory-box" aria-label="Pre-Seeded Headquarters & Physical GPS Coordinates">
+      <header className="churches-header">
         <span>Pre-Seeded Headquarters &amp; Physical GPS Coordinates</span>
         <span className="gps-pill">Zero API Keys Required</span>
-      </div>
-      <div className="churches-grid">
+      </header>
+      <ul className="churches-grid" role="list">
         {churches.map((c) => (
-          <div key={c.name} className="church-card">
-            <div className="church-main">
+          <li key={c.name} className="church-card">
+            <header className="church-main">
               <span className="church-title">{c.name}</span>
               <span className="church-loc">{c.loc}</span>
-            </div>
+            </header>
             <span className="church-coords">{c.coords}</span>
-          </div>
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </section>
   );
 }
 
@@ -480,9 +480,7 @@ export default function Home() {
   return (
     <>
       <Header />
-      <main>
-        <ScrollBrandMark sections={sections} />
-      </main>
+      <ScrollBrandMark sections={sections} />
       <Footer />
     </>
   );
