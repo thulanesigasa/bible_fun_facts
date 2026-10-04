@@ -1352,12 +1352,18 @@ ul, ol {
   flex-direction: column;
   gap: 20px;
   position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .scroll-dot-wrapper {
   position: relative;
   display: flex;
   align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .scroll-dot-button {
@@ -1447,6 +1453,8 @@ ul, ol {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0;
+  padding: 0;
 }
 
 .brandmark-orbit-ring {
@@ -1639,7 +1647,9 @@ ul, ol {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 14px;
-  margin-bottom: 28px;
+  margin: 0 0 28px 0;
+  padding: 0;
+  list-style: none;
 }
 
 .feature-card {
@@ -1649,6 +1659,7 @@ ul, ol {
   padding: 18px 20px;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
   transition: transform 0.2s ease, border-color 0.2s ease;
+  list-style: none;
 }
 
 .feature-card:hover {
@@ -1920,6 +1931,9 @@ ul, ol {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .translation-tag-card {
@@ -1931,6 +1945,7 @@ ul, ol {
   border: 1px solid #E2E8F0;
   border-radius: 8px;
   transition: all 0.2s ease;
+  list-style: none;
 }
 
 .translation-tag-card:hover {
@@ -2021,6 +2036,9 @@ ul, ol {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 12px;
+  list-style: none;
+  margin: 24px 0 28px 0;
+  padding: 0;
 }
 
 .sec-pillar {
@@ -2032,6 +2050,7 @@ ul, ol {
   border-radius: 12px;
   padding: 16px 18px;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+  list-style: none;
 }
 
 .sec-icon-circle {
@@ -2094,6 +2113,9 @@ ul, ol {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .church-card {
@@ -2104,6 +2126,7 @@ ul, ol {
   background: #F8FAFC;
   border: 1px solid #E2E8F0;
   border-radius: 8px;
+  list-style: none;
 }
 
 .church-main {
