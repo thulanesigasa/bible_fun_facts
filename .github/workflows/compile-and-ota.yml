@@ -105,6 +105,8 @@ jobs:
       - name: Apply non-breaking npm audit fixes on hardening branch
         if: github.event_name == 'pull_request' && github.head_ref == 'production-readiness/master-prompt-1-20261012'
         run: |
+          git fetch origin "${{ github.head_ref }}"
+          git checkout "${{ github.head_ref }}"
           npm audit fix --omit=dev --package-lock-only --legacy-peer-deps || true
           if ! git diff --quiet -- package-lock.json; then
             git config user.name "github-actions[bot]"
