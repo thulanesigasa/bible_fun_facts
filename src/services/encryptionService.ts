@@ -331,13 +331,15 @@ function hexToBytes(hex: string): number[] {
 }
 
 function generateRandomBytes(length: number): number[] {
-  const bytes: number[] = [];
-  for (let i = 0; i < length; i++) {
-    // Generate secure byte using timestamp, math random and high entropy
-    const r = Math.floor(Math.random() * 256) ^ (Date.now() & 0xff);
-    bytes.push(r & 0xff);
+  // Require an actual CSPRNG: never derive encryption keys or IVs from
+  // Math.random(), wall-clock time, or deterministic fallback material.
+  const provider = globalThis.crypto;
+  if (!provider || typeof provider.getRandomValues !== 'function') {
+    throw new Error('Cryptographically secure randomness is unavailable.');
   }
-  return bytes;
+  const bytes = new Uint8Array(length);
+  provider.getRandomValues(bytes);
+  return Array.from(bytes);
 }
 
 // ============================================================================
@@ -371,12 +373,10 @@ export const EncryptionService = {
       }
       _cachedMasterKey = key;
       return key;
-    } catch (e) {
-      console.warn('[EncryptionService] Error getting master key:', e);
-      // Fallback deterministic fallback if Keystore unavailable
-      const fallback = '3a8f9c1b7e4d6a5c2f0e9d8b7a6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c';
-      _cachedMasterKey = fallback;
-      return fallback;
+    } catch {
+      // Fail closed. A missing/failed native keystore is not a reason to
+      // silently use the same encryption key on every user's device.
+      throw new Error('Secure encryption key is unavailable.');
     }
   },
 
