@@ -108,6 +108,9 @@ jobs:
       - name: Jest test suite
         run: npm run test:ci
 
+      - name: Verify real AES-GCM cipher against Node OpenSSL
+        run: node scripts/verify-aes-gcm.mjs
+
       - name: Expo project health
         run: npx expo-doctor
 
