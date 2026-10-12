@@ -129,6 +129,7 @@ interface AppContextType extends UserState {
 const UserContext = createContext<AppContextType | undefined>(undefined);
 
 const STORAGE_KEY = '@exegeomai_user_data';
+const SECURE_STUDY_KEY = (userId: string) => `@exegeomai_user_data_secure_v2:${userId}`;
 const LOCAL_OWNER_KEY = '@exegeomai_local_owner_v1';
 const PERMANENT_STREAK_KEY = '@exegeomai_permanent_streak';
 const PERMANENT_BACKUP_KEY = '@exegeomai_streak_resilient_v2';
@@ -436,10 +437,21 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             await AsyncStorage.removeItem(LOCAL_OWNER_KEY);
           }
         }
-        const storedRaw = await AsyncStorage.getItem(STORAGE_KEY);
-        const storedEnvelope = storedRaw ? JSON.parse(storedRaw) : null;
-        const saved = cachedSession?.user &&
-          storedEnvelope?._authUserId === cachedSession.user.id ? storedRaw : null;
+        // New private state must come from native encrypted, account-scoped storage.
+        // Import a legacy plaintext cache only if its immutable owner ID matches.
+        let saved: string | null = null;
+        if (cachedSession?.user) {
+          saved = await SecureStoreAdapter.getItem(SECURE_STUDY_KEY(cachedSession.user.id));
+          if (!saved) {
+            const oldRaw = await AsyncStorage.getItem(STORAGE_KEY);
+            const oldEnvelope = oldRaw ? JSON.parse(oldRaw) : null;
+            if (oldEnvelope?._authUserId === cachedSession.user.id) {
+              await SecureStoreAdapter.setItem(SECURE_STUDY_KEY(cachedSession.user.id), oldRaw!);
+              await AsyncStorage.removeItem(STORAGE_KEY);
+              saved = oldRaw;
+            }
+          }
+        }
         const permStreakRaw = await AsyncStorage.getItem(PERMANENT_STREAK_KEY);
         const backupStreakRaw = await AsyncStorage.getItem(PERMANENT_BACKUP_KEY);
         const permLastLogin = await AsyncStorage.getItem(PERMANENT_LAST_LOGIN_KEY);
@@ -720,12 +732,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user) return;
         await AsyncStorage.setItem(LOCAL_OWNER_KEY, session.user.id);
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({
+        await SecureStoreAdapter.setItem(SECURE_STUDY_KEY(session.user.id), JSON.stringify({
           ...state,
-          // Never use an editable username/email as an identity boundary.
           _authUserId: session.user.id,
           userProfile: state.userProfile ? { ...state.userProfile, email: session.user.email || '' } : null,
         }));
+        await AsyncStorage.removeItem(STORAGE_KEY);
         if (typeof state.streak === 'number' && state.streak > 0) {
           await AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(state.streak));
           await AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(state.streak));
