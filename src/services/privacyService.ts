@@ -1,3 +1,4 @@
+import { supabase } from './supabase';
 import { SecureStoreAdapter } from './secureStorage';
 
 export const PRIVATE_STUDY_KEY = '@exegeomai_private_study_mode_v1';
@@ -13,6 +14,24 @@ export interface ScholarPrivacyPreferences {
 }
 
 export const PrivacyService = {
+  /**
+   * A public privacy toggle only takes effect after the server confirms it.
+   * Offline writes are not silently represented as successful public changes.
+   */
+  updateServerPreference: async (field: 'is_discoverable' | 'show_streaks_publicly' | 'private_study_notes', enabled: boolean): Promise<boolean> => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) return false;
+      const { error } = await supabase.from('user_privacy_settings').upsert(
+        { user_id: session.user.id, [field]: enabled, updated_at: new Date().toISOString() },
+        { onConflict: 'user_id' },
+      );
+      return !error;
+    } catch {
+      return false;
+    }
+  },
+
   /**
    * Fetches all scholar privacy settings at once.
    */
@@ -60,6 +79,8 @@ export const PrivacyService = {
    */
   setDiscoverableInSearch: async (enabled: boolean): Promise<boolean> => {
     try {
+      const confirmed = await PrivacyService.updateServerPreference('is_discoverable', enabled);
+      if (!confirmed) return false;
       await SecureStoreAdapter.setItem(DISCOVERABLE_IN_SEARCH_KEY, enabled ? 'true' : 'false');
       return true;
     } catch (e) {
@@ -73,6 +94,8 @@ export const PrivacyService = {
    */
   setShowStreaksPublicly: async (enabled: boolean): Promise<boolean> => {
     try {
+      const confirmed = await PrivacyService.updateServerPreference('show_streaks_publicly', enabled);
+      if (!confirmed) return false;
       await SecureStoreAdapter.setItem(SHOW_STREAKS_PUBLICLY_KEY, enabled ? 'true' : 'false');
       return true;
     } catch (e) {
@@ -86,6 +109,8 @@ export const PrivacyService = {
    */
   setPrivateStudyNotes: async (enabled: boolean): Promise<boolean> => {
     try {
+      const confirmed = await PrivacyService.updateServerPreference('private_study_notes', enabled);
+      if (!confirmed) return false;
       await SecureStoreAdapter.setItem(PRIVATE_STUDY_NOTES_KEY, enabled ? 'true' : 'false');
       return true;
     } catch (e) {
