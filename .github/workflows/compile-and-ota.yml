@@ -78,7 +78,7 @@ on:
         default: ''
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   EXPO_PUBLIC_SUPABASE_URL: "https://ibwooiejzxhbzplnldcz.supabase.co"
@@ -98,6 +98,18 @@ jobs:
         with:
           node-version: 22
           cache: 'npm'
+
+      - name: Repair SDK-aligned lockfile on this hardening branch
+        if: github.event_name == 'pull_request' && github.head_ref == 'production-readiness/master-prompt-1-20261012'
+        run: |
+          npm install --legacy-peer-deps --package-lock-only --ignore-scripts --no-audit
+          if ! git diff --quiet -- package-lock.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add package-lock.json
+            git commit -m "chore(deps): regenerate Expo SDK 57 lockfile"
+            git push origin HEAD:${{ github.head_ref }}
+          fi
 
       - name: Install dependencies reproducibly
         run: npm ci --legacy-peer-deps --no-audit
