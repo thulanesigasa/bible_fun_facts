@@ -77,4 +77,32 @@ describe('Server-enforced privacy settings', () => {
     expect(preferences.showStreaksPublicly).toBe(false);
     expect(preferences.privateStudyNotes).toBe(true);
   });
+  it('scopes local private-study preference to the authenticated account', async () => {
+    expect(await PrivacyService.setPrivateStudyMode(true)).toBe(true);
+    expect(setSecure).toHaveBeenCalledWith(
+      '@exegeomai_private_study_mode_v2:user-alpha', 'true',
+    );
+  });
+
+  it('defaults to private before authentication and after secure-storage errors', async () => {
+    getSession.mockResolvedValue({ data: { session: null }, error: null });
+    const prefs = await PrivacyService.getPreferences();
+    expect(prefs.isPrivateStudyMode).toBe(true);
+    expect(await PrivacyService.setPrivateStudyMode(false)).toBe(false);
+    expect(setSecure).not.toHaveBeenCalled();
+  });
+
+  it('preserves a prior device-wide private setting conservatively', async () => {
+    getSecure.mockImplementation(async (key: string) =>
+      key === '@exegeomai_private_study_mode_v1' ? 'true' : null,
+    );
+    (supabase.from as jest.Mock).mockReturnValue({
+      select: () => ({ eq: () => ({ maybeSingle: async () => ({
+        data: { is_discoverable: false, show_streaks_publicly: false, private_study_notes: true },
+        error: null,
+      }) }) }),
+    });
+    const prefs = await PrivacyService.getPreferences();
+    expect(prefs.isPrivateStudyMode).toBe(true);
+  });
 });
