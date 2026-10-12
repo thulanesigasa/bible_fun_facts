@@ -11,9 +11,17 @@ REVOKE ALL ON FUNCTION public.increment_ministry_count(uuid, text)
 ALTER FUNCTION public.handle_new_user() SET search_path = '';
 ALTER FUNCTION public.set_updated_at() SET search_path = '';
 
--- Prevent direct client-side changes to calculated ministry counts while
--- retaining update rights for profile/detail fields of owned rows.
-REVOKE UPDATE (branches_count, homecells_count, created_by, is_preadded)
- ON TABLE public.ministries FROM authenticated;
-REVOKE UPDATE (created_by, is_preadded)
- ON TABLE public.branches FROM authenticated;
+-- Prevent direct client-side updates to canonical flags, ownership and
+-- server-derived counters. Column REVOKE alone cannot override a table UPDATE
+-- grant, so remove table-level UPDATE before granting only editable fields.
+REVOKE UPDATE ON public.ministries FROM authenticated;
+REVOKE UPDATE ON public.branches FROM authenticated;
+GRANT UPDATE (
+  name, founder, headquarters, headquarters_country, description, category,
+  website, contact_email, contact_phone
+) ON public.ministries TO authenticated;
+GRANT UPDATE (
+  ministry_id, ministry_name, name, type, leader_name, contact_number,
+  contact_email, town, province, country, postal_code, address,
+  meeting_times, latitude, longitude
+) ON public.branches TO authenticated;
