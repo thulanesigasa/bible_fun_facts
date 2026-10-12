@@ -1,9 +1,13 @@
 import { OfflineStudyQueue } from '../src/services/offlineStudyQueue';
 import { SecureStoreAdapter } from '../src/services/secureStorage';
 import { supabase } from '../src/services/supabase';
+import { PrivacyService } from '../src/services/privacyService';
 
 jest.mock('../src/services/secureStorage', () => ({
   SecureStoreAdapter: { getItem: jest.fn(), setItem: jest.fn(), removeItem: jest.fn() },
+}));
+jest.mock('../src/services/privacyService', () => ({
+  PrivacyService: { getPreferences: jest.fn() },
 }));
 jest.mock('../src/services/supabase', () => ({
   supabase: { auth: { getSession: jest.fn() }, from: jest.fn() },
@@ -22,6 +26,10 @@ beforeEach(() => {
   remote.clear();
   activeUser = 'account-a';
   databaseOnline = false;
+  (PrivacyService.getPreferences as jest.Mock).mockResolvedValue({
+    isPrivateStudyMode: false, privateStudyNotes: false,
+    isDiscoverableInSearch: false, showStreaksPublicly: false,
+  });
   (client.auth.getSession as jest.Mock).mockImplementation(async () => ({
     data: { session: activeUser ? { user: { id: activeUser } } : null },
     error: null,
@@ -145,5 +153,35 @@ describe('OfflineStudyQueue', () => {
       .rejects.toThrow(/Invalid earned achievement/);
     await expect(OfflineStudyQueue.enqueue('earn_achievement', 'other:scope', true))
       .rejects.toThrow(/Invalid earned achievement/);
+  });
+  it('does not replay any pending events while private study mode is enabled', async () => {
+    await OfflineStudyQueue.enqueue('favorite_fact', 'sensitive', true);
+    (PrivacyService.getPreferences as jest.Mock).mockResolvedValue({
+      isPrivateStudyMode: true, privateStudyNotes: true,
+    });
+    databaseOnline = true;
+    expect(await OfflineStudyQueue.flush()).toEqual({ synced: 0, pending: 1 });
+    expect(remote.size).toBe(0);
+  });
+
+  it('blocks even direct note enqueues when server notes are private', async () => {
+    (PrivacyService.getPreferences as jest.Mock).mockResolvedValue({
+      isPrivateStudyMode: false, privateStudyNotes: true,
+    });
+    await expect(OfflineStudyQueue.enqueueNote(
+      'e2c93866-5115-4112-8e26-c22de8ea9301', 'John 3:16', 'keep private',
+    )).rejects.toThrow(/cloud synchronization is disabled/);
+    expect(await OfflineStudyQueue.pendingCount()).toBe(0);
+  });
+
+  it('retains queued note edits if the privacy setting is switched to local-only', async () => {
+    const noteId = 'e2c93866-5115-4112-8e26-c22de8ea9301';
+    await OfflineStudyQueue.enqueueNote(noteId, 'John 3:16', 'draft');
+    (PrivacyService.getPreferences as jest.Mock).mockResolvedValue({
+      isPrivateStudyMode: false, privateStudyNotes: true,
+    });
+    databaseOnline = true;
+    expect(await OfflineStudyQueue.flush()).toEqual({ synced: 0, pending: 1 });
+    expect(remote.size).toBe(0);
   });
 });
