@@ -10,7 +10,9 @@ export type OfflineStudyAction =
   | 'favorite_scripture'
   | 'complete_wotd'
   | 'read_fact'
-  | 'highlight_verse';
+  | 'highlight_verse'
+  | 'upsert_note'
+  | 'delete_note';
 
 export interface OfflineStudyOperation {
   version: 1;
@@ -59,7 +61,7 @@ async function readQueue(userId: string): Promise<OfflineStudyOperation[]> {
   }
   return values.map((item) => {
     if (!item || item.version !== 1 || item.userId !== userId ||
-        !['favorite_fact', 'favorite_scripture', 'complete_wotd', 'read_fact', 'highlight_verse'].includes(item.action) ||
+        !['favorite_fact', 'favorite_scripture', 'complete_wotd', 'read_fact', 'highlight_verse', 'upsert_note', 'delete_note'].includes(item.action) ||
         typeof item.entityId !== 'string' || typeof item.operationId !== 'string' ||
         typeof item.desired !== 'boolean' ||
         (item.value !== undefined && typeof item.value !== 'string')) {
@@ -83,6 +85,29 @@ async function executeOperation(operation: OfflineStudyOperation): Promise<void>
   if (sessionError || !session?.user || session.user.id !== operation.userId) {
     throw new Error('Account changed before offline sync; refusing to submit operation.');
   }
+  if (operation.action === 'upsert_note') {
+    if (!operation.value) throw new Error('Missing offline note body.');
+    const note = JSON.parse(operation.value) as { reference?: unknown; text?: unknown };
+    if (typeof note.reference !== 'string' || typeof note.text !== 'string') {
+      throw new Error('Invalid offline note payload.');
+    }
+    const { error } = await supabase.from('study_notes').upsert({
+      id: operation.entityId,
+      user_id: operation.userId,
+      reference: note.reference,
+      note_text: note.text,
+      updated_at: operation.createdAt,
+    }, { onConflict: 'id' });
+    if (error) throw error;
+    return;
+  }
+  if (operation.action === 'delete_note') {
+    const { error } = await supabase.from('study_notes')
+      .delete().eq('user_id', operation.userId).eq('id', operation.entityId);
+    if (error) throw error;
+    return;
+  }
+
   const config = {
     favorite_fact: { table: 'user_favorites_facts', field: 'fact_id' },
     favorite_scripture: { table: 'user_favorites_scriptures', field: 'scripture_id' },
@@ -121,6 +146,9 @@ export const OfflineStudyQueue = {
       if (action === 'highlight_verse' && desired && (!value || value.length > 32)) {
         throw new Error('Invalid verse highlight color.');
       }
+      if (action === 'upsert_note' && (!value || value.length > 35000)) {
+        throw new Error('Invalid offline note payload.');
+      }
       const queue = await readQueue(userId);
       if (queue.length >= MAX_PENDING) throw new Error('Offline queue is full. Reconnect to sync before continuing.');
       queue.push({
@@ -137,6 +165,26 @@ export const OfflineStudyQueue = {
       // Persist before attempting network delivery. Offline actions remain durable.
       await writeQueue(userId, queue);
     });
+  },
+
+  /**
+   * Durable note save/deletion for an existing stable note UUID. UI callers
+   * must check the user's private-study and private-notes choices before using
+   * cloud sync; local-only notes must never be enqueued here.
+   */
+  enqueueNote(noteId: string, reference: string, text: string | null): Promise<void> {
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(noteId)) {
+      return Promise.reject(new Error('Offline note requires a stable UUID.'));
+    }
+    if (!reference.trim() || reference.length > 512 || (text !== null && text.length > 32000)) {
+      return Promise.reject(new Error('Invalid offline study note.'));
+    }
+    return OfflineStudyQueue.enqueue(
+      text === null ? 'delete_note' : 'upsert_note',
+      noteId,
+      text !== null,
+      text === null ? undefined : JSON.stringify({ reference, text }),
+    );
   },
 
   flush(): Promise<{ synced: number; pending: number }> {
