@@ -96,7 +96,12 @@ async function executeOperation(operation: OfflineStudyOperation): Promise<void>
     const { error } = await supabase.from(table).upsert(
       {
         user_id: operation.userId, [field]: operation.entityId,
-        ...(operation.action === 'highlight_verse' ? { color: operation.value } : {}),
+        ...(operation.action === 'highlight_verse'
+          ? { color: operation.value, updated_at: operation.createdAt } : {}),
+        ...(operation.action === 'complete_wotd'
+          ? { completed_at: operation.createdAt } : {}),
+        ...(operation.action === 'read_fact'
+          ? { read_at: operation.createdAt } : {}),
       },
       { onConflict: `user_id,${field}`, ignoreDuplicates: operation.action !== 'highlight_verse' },
     );
