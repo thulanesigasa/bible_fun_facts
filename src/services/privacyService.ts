@@ -27,16 +27,16 @@ export const PrivacyService = {
 
       return {
         isPrivateStudyMode: privateStudy === 'true',
-        isDiscoverableInSearch: discoverable === null ? true : discoverable === 'true', // default true
-        showStreaksPublicly: showStreaks === null ? true : showStreaks === 'true',     // default true
+        isDiscoverableInSearch: discoverable === 'true', // opt-in by default
+        showStreaksPublicly: showStreaks === 'true',     // opt-in by default
         privateStudyNotes: privateNotes === 'true',                                    // default false
       };
     } catch (e) {
       console.warn('[PrivacyService] getPreferences error:', e);
       return {
         isPrivateStudyMode: false,
-        isDiscoverableInSearch: true,
-        showStreaksPublicly: true,
+        isDiscoverableInSearch: false,
+        showStreaksPublicly: false,
         privateStudyNotes: false,
       };
     }
