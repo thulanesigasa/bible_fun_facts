@@ -32,7 +32,7 @@ beforeEach(() => {
   (client.from as jest.Mock).mockImplementation((table: string) => ({
     upsert: async (row: any) => {
       if (!databaseOnline) return { error: new Error('offline') };
-      remote.add(`${table}:${row.user_id}:${row.fact_id || row.scripture_id || row.wotd_id || row.verse_key || row.id}`);
+      remote.add(`${table}:${row.user_id}:${row.fact_id || row.scripture_id || row.wotd_id || row.verse_key || row.achievement_id || row.id}`);
       return { error: null };
     },
     delete: () => ({
@@ -127,5 +127,23 @@ describe('OfflineStudyQueue', () => {
     await expect(OfflineStudyQueue.enqueueNote('not-uuid', 'John 1:1', 'text')).rejects.toThrow(/stable UUID/);
     await expect(OfflineStudyQueue.enqueueNote('e2c93866-5115-4112-8e26-c22de8ea9301', 'John 1:1', 'a'.repeat(32001)))
       .rejects.toThrow(/Invalid offline study note/);
+  });
+  it('persists an earned milestone exactly once per user after reconnect', async () => {
+    await OfflineStudyQueue.enqueue('earn_achievement', 'streak_7', true);
+    expect(await OfflineStudyQueue.pendingCount()).toBe(1);
+    databaseOnline = true;
+    await expect(OfflineStudyQueue.flush()).resolves.toEqual({ synced: 1, pending: 0 });
+    expect(remote.has('user_earned_achievements:account-a:streak_7')).toBe(true);
+    activeUser = 'account-b';
+    expect(await OfflineStudyQueue.pendingCount()).toBe(0);
+    await expect(OfflineStudyQueue.flush()).resolves.toEqual({ synced: 0, pending: 0 });
+    expect(remote.has('user_earned_achievements:account-b:streak_7')).toBe(false);
+  });
+
+  it('rejects attempts to remove earned milestones or use malformed IDs', async () => {
+    await expect(OfflineStudyQueue.enqueue('earn_achievement', 'streak_7', false))
+      .rejects.toThrow(/Invalid earned achievement/);
+    await expect(OfflineStudyQueue.enqueue('earn_achievement', 'other:scope', true))
+      .rejects.toThrow(/Invalid earned achievement/);
   });
 });
