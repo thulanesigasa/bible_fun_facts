@@ -1153,6 +1153,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (prev.readFactIds.includes(id)) return prev;
       const nextIds = [...prev.readFactIds, id];
       const nextCount = nextIds.length;
+      OfflineStudyQueue.enqueue('read_fact', id, true)
+        .then(() => OfflineStudyQueue.flush())
+        .catch(() => console.warn('[OfflineStudy] Fact read could not be queued.'));
       syncUserDataToRemote({ readFactIds: nextIds, factsViewedCount: nextCount });
       return { ...prev, readFactIds: nextIds, factsViewedCount: nextCount };
     });
@@ -1209,6 +1212,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         delete updated[verseKey];
       }
+      OfflineStudyQueue.enqueue('highlight_verse', verseKey, !!color, color)
+        .then(() => OfflineStudyQueue.flush())
+        .catch(() => console.warn('[OfflineStudy] Highlight could not be queued.'));
       syncUserDataToRemote({ bibleHighlights: updated });
       return { ...prev, bibleHighlights: updated };
     });
