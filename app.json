@@ -4,7 +4,9 @@
     "slug": "exegeomai",
     "scheme": "exegeomai",
     "version": "1.0.4",
-    "runtimeVersion": "1.0.1",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -27,7 +29,9 @@
       "bundleIdentifier": "com.thulanesigasa.exegeomai",
       "buildNumber": "1",
       "infoPlist": {
-        "NSUserNotificationsUsageDescription": "exégeomai sends daily biblical insights and cultural context to deepen your walk in the Word."
+        "NSUserNotificationsUsageDescription": "exégeomai sends daily biblical insights and cultural context to deepen your walk in the Word.",
+        "NSPhotoLibraryUsageDescription": "exégeomai lets you choose a profile image from your photo library.",
+        "NSFaceIDUsageDescription": "exégeomai can use Face ID to protect access to private study data when you enable app lock."
       }
     },
     "android": {
@@ -66,6 +70,18 @@
         {
           "organization": "exegeomai",
           "project": "exegeomai-mobile"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "exégeomai lets you choose a profile image from your photo library."
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow exégeomai to use Face ID to protect your private study data."
         }
       ]
     ]
