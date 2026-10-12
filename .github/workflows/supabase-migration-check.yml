@@ -22,7 +22,7 @@ jobs:
       - name: Install Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.57.0
 
       - name: Start disposable local Supabase
         run: supabase start
