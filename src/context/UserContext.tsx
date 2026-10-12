@@ -794,29 +794,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
 
-    const fallbackEmail = rawInput.includes('@') ? rawInput : `${rawInput.toLowerCase().replace(/\s+/g, '')}@example.com`;
-    setState(prev => ({
-      ...prev,
-      userProfile: {
-        name: prev.userProfile?.name || formattedName,
-        firstName: prev.userProfile?.firstName || formattedName.split(' ')[0],
-        lastName: prev.userProfile?.lastName || formattedName.split(' ').slice(1).join(' '),
-        username: prev.userProfile?.username || rawInput.split('@')[0].toLowerCase().replace(/\s+/g, '_'),
-        avatarUrl: prev.userProfile?.avatarUrl,
-        email: prev.userProfile?.email || fallbackEmail,
-        joinedDate: prev.userProfile?.joinedDate || 'September 2026',
-        preferredTranslation: prev.userProfile?.preferredTranslation || 'ESV',
-        notificationsEnabled: prev.userProfile?.notificationsEnabled ?? true,
-        studyFocus: prev.userProfile?.studyFocus,
-        dailyGoal: prev.userProfile?.dailyGoal,
-        knowledgeLevel: prev.userProfile?.knowledgeLevel,
-        fontSize: prev.userProfile?.fontSize || 16,
-        fontType: prev.userProfile?.fontType || 'serif',
-        redLetterEnabled: prev.userProfile?.redLetterEnabled ?? true,
-        followersCount: 0,
-        followingCount: prev.followedUserIds?.length || 0,
-      },
-    }));
+    // No fabricated accounts: a first login requires a real Supabase session.
+    showAlert({
+      title: 'Sign In Unavailable',
+      message: 'Sign in with your email and password while online. Previously authenticated sessions can use downloaded content offline.',
+      icon: 'warning',
+    });
   };
 
   const uploadAvatar = async (uri: string): Promise<{ success: boolean; avatarUrl?: string; error?: string }> => {
@@ -965,7 +948,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
               icon: 'success',
             });
           }
-          setState(prev => ({
+          if (data.session) setState(prev => ({
             ...prev,
             userProfile: {
               name: fullName,
@@ -997,27 +980,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
 
-    // Offline / fallback signup
-    setState(prev => ({
-      ...prev,
-      userProfile: {
-        name: fullName,
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        username: cleanUsername,
-        email,
-        countryCode,
-        phoneNumber,
-        joinedDate: 'September 2026',
-        preferredTranslation,
-        notificationsEnabled: true,
-        redLetterEnabled: true,
-        studyFocus,
-        dailyGoal,
-        knowledgeLevel,
-      },
-    }));
-    return { success: true };
+    return { success: false, error: 'Account creation requires an online Supabase connection.' };
   };
 
   const signup = async (name: string, email: string, password?: string) => {
@@ -1026,7 +989,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       lastName: name.split(' ').slice(1).join(' ') || '',
       username: name.toLowerCase().replace(/\s+/g, '_'),
       email,
-      password: password || 'SecurePass123!',
+      password: password || '',
     });
   };
 
@@ -1544,21 +1507,22 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const deleteAccountAndPurgeData = useCallback(async (): Promise<boolean> => {
     try {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          try {
-            await supabase.from('profiles').delete().eq('id', session.user.id);
-          } catch (delErr) {
-            console.warn('Profile delete warning:', delErr);
-          }
-        }
-      } catch (err) {
-        console.warn('Remote profile cleanup exception:', err);
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session?.user) {
+        showAlert({ title: 'Deletion Failed', message: 'You must sign in online to delete your account.', icon: 'danger' });
+        return false;
+      }
+
+      // The server must delete the auth account and its owned records.
+      // Deleting only public.profiles is not account deletion.
+      const { error: deletionError } = await supabase.rpc('delete_user_account');
+      if (deletionError) {
+        showAlert({ title: 'Deletion Failed', message: 'The server could not confirm account deletion. Your data has not been cleared from this device.', icon: 'danger' });
+        return false;
       }
 
       await supabase.auth.signOut().catch(() => {});
-      await AsyncStorage.clear().catch(() => {});
+      await AsyncStorage.clear();
       await SecureStoreAdapter.removeItem('@exegeomai_biometric_lock_enabled_v1').catch(() => {});
       await cancelAllAutomatedNotifications().catch(() => {});
 
@@ -1586,7 +1550,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.warn('Purge data error:', e);
       return false;
     }
-  }, []);
+  }, [showAlert]);
 
   return (
     <UserContext.Provider value={{
