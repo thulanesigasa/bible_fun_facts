@@ -1085,6 +1085,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = async () => {
+    const previousUserId = activeAuthUserIdRef.current;
     activeAuthUserIdRef.current = null;
     if (SUPABASE_ANON_KEY) {
       try {
@@ -1095,6 +1096,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     // Never leave the next account inside the previous account's cached state.
     isLoadedFromStorage.current = false;
+    if (previousUserId) await SecureStoreAdapter.removeItem(SECURE_STUDY_KEY(previousUserId)).catch(() => {});
     await AsyncStorage.multiRemove([
       STORAGE_KEY, LOCAL_OWNER_KEY, PERMANENT_STREAK_KEY,
       PERMANENT_BACKUP_KEY, PERMANENT_LAST_LOGIN_KEY,
@@ -1598,6 +1600,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       await supabase.auth.signOut().catch(() => {});
+      await SecureStoreAdapter.removeItem(SECURE_STUDY_KEY(session.user.id));
+      await SecureStoreAdapter.removeItem(`@exegeomai_secure_user_data_v2:${session.user.id}`);
+      await SecureStoreAdapter.removeItem(`@exegeomai_offline_study_queue_v1:${session.user.id}`);
       await AsyncStorage.clear();
       await SecureStoreAdapter.removeItem('@exegeomai_biometric_lock_enabled_v1').catch(() => {});
       await cancelAllAutomatedNotifications().catch(() => {});
