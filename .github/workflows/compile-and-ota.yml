@@ -15,6 +15,22 @@ on:
       - 'package-lock.json'
       - 'jest.config.js'
       - '__tests__/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'assets/**'
+      - '.github/workflows/**'
+      - '.npmrc'
+      - 'App.tsx'
+      - 'app.json'
+      - 'eas.json'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'jest.config.js'
+      - 'tsconfig.json'
+      - '__tests__/**'
   workflow_dispatch:
     inputs:
       action:
@@ -60,15 +76,48 @@ on:
         default: ''
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   EXPO_PUBLIC_SUPABASE_URL: "https://ibwooiejzxhbzplnldcz.supabase.co"
   EXPO_PUBLIC_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlid29vaWVqenhoYnpwbG5sZGN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4ODgwNjcsImV4cCI6MjEwNTQ2NDA2N30.1RTBu4znHqhQRx5dnNAR5Oyfgfq3Kiqsp4NnS4FmPfk"
 
 jobs:
-  # Job 1: Publish Over-The-Air Updates (Both Preview & Production Channels)
+  quality_gate:
+    name: Production Quality Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies reproducibly
+        run: npm ci --legacy-peer-deps --no-audit
+
+      - name: TypeScript strict check
+        run: npm run typecheck
+
+      - name: Jest test suite
+        run: npm run test:ci
+
+      - name: Expo project health
+        run: npx expo-doctor
+
+      - name: Validate production Android bundle export
+        run: npx expo export --platform android --output-dir dist-ci
+
+      - name: Production dependency vulnerability audit
+        run: npm audit --omit=dev --audit-level=high
+
+  # Job 1: Publish Over-The-Air Updates
   publish_ota:
+    needs: quality_gate
     name: Publish Expo OTA Updates
     if: github.event_name == 'push' || inputs.action == 'publish_ota' || inputs.action == 'both'
     runs-on: ubuntu-latest
@@ -84,7 +133,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps --prefer-offline --no-audit
+        run: npm ci --legacy-peer-deps --prefer-offline --no-audit
 
       - name: Verify TypeScript & Config
         run: |
@@ -102,7 +151,7 @@ jobs:
 
       # Publish to Production Channel
       - name: Publish OTA Update to Production Channel
-        if: github.event_name == 'push' || inputs.ota_channel == 'production' || inputs.ota_channel == 'both'
+        if: github.event_name == 'workflow_dispatch' && (inputs.ota_channel == 'production' || inputs.ota_channel == 'both')
         run: |
           eas update --branch production --environment production --message "${{ github.event.head_commit.message || 'Automated OTA production update from GitHub' }}" --non-interactive
         env:
@@ -120,6 +169,9 @@ jobs:
   # Strictly gated: compiled ONLY when explicitly requested via workflow_dispatch or deliberate commit flag ([build-apk], [compile-apk], [release-apk])
   compile_native_app:
     name: Compile Native Android APK on GitHub
+    needs: quality_gate
+    permissions:
+      contents: write
     if: |
       (github.event_name == 'workflow_dispatch' && (inputs.action == 'compile_native_app' || inputs.action == 'both')) ||
       (github.event_name == 'push' && (
