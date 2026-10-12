@@ -411,9 +411,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Replay previously recorded actions when the app returns to the foreground.
   // This does not attempt to authenticate a new user while offline.
   useEffect(() => {
-    OfflineStudyQueue.flush().catch(() => {});
+    if (!isPrivateStudyModeRef.current) OfflineStudyQueue.flush().catch(() => {});
     const subscription = AppState.addEventListener('change', status => {
-      if (status === 'active') OfflineStudyQueue.flush().catch(() => {});
+      if (status === 'active' && !isPrivateStudyModeRef.current) OfflineStudyQueue.flush().catch(() => {});
     });
     return () => subscription.remove();
   }, []);
@@ -1116,7 +1116,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const nextFavorites = exists
         ? prev.favoritesFacts.filter(f => f.id !== fact.id)
         : [...prev.favoritesFacts, fact];
-      OfflineStudyQueue.enqueue('favorite_fact', fact.id, !exists)
+      !isPrivateStudyModeRef.current && OfflineStudyQueue.enqueue('favorite_fact', fact.id, !exists)
         .then(() => OfflineStudyQueue.flush())
         .catch(() => console.warn('[OfflineStudy] Fact bookmark pending sync could not be persisted.'));
       syncUserDataToRemote({ favoritesFacts: nextFavorites });
@@ -1130,7 +1130,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const nextFavorites = exists
         ? prev.favoritesScriptures.filter(s => s.id !== scripture.id)
         : [...prev.favoritesScriptures, scripture];
-      OfflineStudyQueue.enqueue('favorite_scripture', scripture.id, !exists)
+      !isPrivateStudyModeRef.current && OfflineStudyQueue.enqueue('favorite_scripture', scripture.id, !exists)
         .then(() => OfflineStudyQueue.flush())
         .catch(() => console.warn('[OfflineStudy] Scripture bookmark pending sync could not be persisted.'));
       syncUserDataToRemote({ favoritesScriptures: nextFavorites });
@@ -1142,7 +1142,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setState(prev => {
       const exists = prev.completedWOTDs.find(w => w.id === wotd.id);
       if (exists) return prev;
-      OfflineStudyQueue.enqueue('complete_wotd', wotd.id, true)
+      !isPrivateStudyModeRef.current && OfflineStudyQueue.enqueue('complete_wotd', wotd.id, true)
         .then(() => OfflineStudyQueue.flush())
         .catch(() => console.warn('[OfflineStudy] Devotional completion could not be persisted.'));
       return { ...prev, completedWOTDs: [...prev.completedWOTDs, wotd] };
@@ -1154,7 +1154,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (prev.readFactIds.includes(id)) return prev;
       const nextIds = [...prev.readFactIds, id];
       const nextCount = nextIds.length;
-      OfflineStudyQueue.enqueue('read_fact', id, true)
+      !isPrivateStudyModeRef.current && OfflineStudyQueue.enqueue('read_fact', id, true)
         .then(() => OfflineStudyQueue.flush())
         .catch(() => console.warn('[OfflineStudy] Fact read could not be queued.'));
       syncUserDataToRemote({ readFactIds: nextIds, factsViewedCount: nextCount });
@@ -1213,7 +1213,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         delete updated[verseKey];
       }
-      OfflineStudyQueue.enqueue('highlight_verse', verseKey, !!color, color)
+      !isPrivateStudyModeRef.current && OfflineStudyQueue.enqueue('highlight_verse', verseKey, !!color, color)
         .then(() => OfflineStudyQueue.flush())
         .catch(() => console.warn('[OfflineStudy] Highlight could not be queued.'));
       syncUserDataToRemote({ bibleHighlights: updated });
