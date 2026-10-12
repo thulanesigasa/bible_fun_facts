@@ -1,4 +1,16 @@
-import { PinSecurityService, sha256 } from '../src/services/pinSecurityService';
+import { PinSecurityService, sha256, PIN_HASH_KEY, PIN_SALT_KEY } from '../src/services/pinSecurityService';
+
+jest.mock('@noble/hashes/scrypt.js', () => {
+  const crypto = jest.requireActual('node:crypto') as typeof import('node:crypto');
+  return {
+    scryptAsync: async (password: string, salt: string, opts: {
+      N: number; r: number; p: number; dkLen: number; maxmem: number;
+    }) => new Uint8Array(crypto.scryptSync(
+      password, salt, opts.dkLen,
+      { N: opts.N, r: opts.r, p: opts.p, maxmem: opts.maxmem },
+    )),
+  };
+});
 
 let memoryStore: Record<string, string> = {};
 
@@ -14,7 +26,7 @@ jest.mock('../src/services/secureStorage', () => ({
   },
 }));
 
-describe('PinSecurityService - Salted SHA-256 & Rate Limiting', () => {
+describe('PinSecurityService - Memory-hard scrypt & Rate Limiting', () => {
   beforeEach(() => {
     memoryStore = {};
   });
@@ -54,6 +66,8 @@ describe('PinSecurityService - Salted SHA-256 & Rate Limiting', () => {
 
       const isSet = await PinSecurityService.isPinSet();
       expect(isSet).toBe(true);
+      expect(memoryStore[PIN_HASH_KEY]).toMatch(/^scrypt-v1\\$/);
+      expect(memoryStore[PIN_SALT_KEY]).toBeUndefined();
 
       // Verify correct PIN
       const correctVerify = await PinSecurityService.verifyPin('4821');
@@ -75,5 +89,15 @@ describe('PinSecurityService - Salted SHA-256 & Rate Limiting', () => {
       expect(removed.success).toBe(true);
       expect(await PinSecurityService.isPinSet()).toBe(false);
     });
+  });
+  it('rehashes an existing secure-store SHA256 PIN once after successful verification', async () => {
+    const salt = 'ab'.repeat(16);
+    memoryStore[PIN_SALT_KEY] = salt;
+    memoryStore[PIN_HASH_KEY] = sha256('4821' + salt);
+    expect((await PinSecurityService.verifyPin('4821')).success).toBe(true);
+    expect(memoryStore[PIN_HASH_KEY]).toMatch(/^scrypt-v1\\$/);
+    expect(memoryStore[PIN_SALT_KEY]).toBeUndefined();
+    expect((await PinSecurityService.verifyPin('4821')).success).toBe(true);
+    expect((await PinSecurityService.verifyPin('0000')).success).toBe(false);
   });
 });
