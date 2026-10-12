@@ -1453,11 +1453,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const backgroundTimestampRef = useRef<number | null>(null);
 
   // Scholar Privacy Controls (Phase 3)
-  const [isPrivateStudyMode, setIsPrivateStudyModeState] = useState<boolean>(false);
+  const [isPrivateStudyMode, setIsPrivateStudyModeState] = useState<boolean>(true);
   const [isDiscoverableInSearch, setIsDiscoverableInSearchState] = useState<boolean>(false);
   const [showStreaksPublicly, setShowStreaksPubliclyState] = useState<boolean>(false);
   const [privateStudyNotes, setPrivateStudyNotesState] = useState<boolean>(true);
-  const isPrivateStudyModeRef = useRef<boolean>(false);
+  const isPrivateStudyModeRef = useRef<boolean>(true);
 
   const refreshPinStatus = useCallback(async () => {
     const set = await PinSecurityService.isPinSet();
@@ -1489,6 +1489,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsDiscoverableInSearchState(prefs.isDiscoverableInSearch);
       setShowStreaksPubliclyState(prefs.showStreaksPublicly);
       setPrivateStudyNotesState(prefs.privateStudyNotes);
+      // Only after the owner-scoped privacy preference is loaded can pending
+      // study operations be sent. Never flush during first-frame restore.
+      if (!prefs.isPrivateStudyMode) OfflineStudyQueue.flush().catch(() => {});
     });
   }, [refreshPinStatus]);
 
@@ -1497,6 +1500,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (ok) {
       setIsPrivateStudyModeState(enabled);
       isPrivateStudyModeRef.current = enabled;
+      if (!enabled) OfflineStudyQueue.flush().catch(() => {});
     }
   }, []);
 
