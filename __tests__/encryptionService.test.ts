@@ -17,6 +17,30 @@ jest.mock('../src/services/secureStorage', () => {
   };
 });
 
+// Isolate Node/Jest from the ESM package loader; CI separately exercises
+// the real audited cipher library in Node's ESM runtime.
+jest.mock('@noble/ciphers/aes.js', () => {
+  const nodeCrypto = jest.requireActual('node:crypto') as typeof import('node:crypto');
+  return {
+    gcm: (key: Uint8Array, iv: Uint8Array) => ({
+      encrypt(data: Uint8Array) {
+        const cipher = nodeCrypto.createCipheriv('aes-256-gcm', Buffer.from(key), Buffer.from(iv));
+        return new Uint8Array(Buffer.concat([
+          cipher.update(Buffer.from(data)), cipher.final(), cipher.getAuthTag(),
+        ]));
+      },
+      decrypt(data: Uint8Array) {
+        const d = Buffer.from(data);
+        const decipher = nodeCrypto.createDecipheriv('aes-256-gcm', Buffer.from(key), Buffer.from(iv));
+        decipher.setAuthTag(d.subarray(d.length - 16));
+        return new Uint8Array(Buffer.concat([
+          decipher.update(d.subarray(0, -16)), decipher.final(),
+        ]));
+      },
+    }),
+  };
+});
+
 const originalCrypto = Object.getOwnPropertyDescriptor(globalThis, 'crypto');
 beforeAll(() => {
   Object.defineProperty(globalThis, 'crypto', {
@@ -77,10 +101,20 @@ describe('EncryptionService - Hardware-Backed AES-256 Study Journal', () => {
     await expect(EncryptionService.decryptString(JSON.stringify(payload))).rejects.toThrow();
   });
 
-  it('fails closed when platform AES-GCM is unavailable', async () => {
+  it('supports audited JavaScript AES-GCM when Hermes lacks WebCrypto.subtle', async () => {
     Object.defineProperty(globalThis, 'crypto', {
       configurable: true, value: { getRandomValues: webcrypto.getRandomValues.bind(webcrypto) },
     });
+    try {
+      const encrypted = await EncryptionService.encryptString('private message');
+      await expect(EncryptionService.decryptString(encrypted)).resolves.toBe('private message');
+    } finally {
+      Object.defineProperty(globalThis, 'crypto', { configurable: true, value: webcrypto });
+    }
+  });
+
+  it('fails closed if cryptographic randomness is completely unavailable', async () => {
+    Object.defineProperty(globalThis, 'crypto', { configurable: true, value: undefined });
     try {
       await expect(EncryptionService.encryptString('secret')).rejects.toThrow();
     } finally {
