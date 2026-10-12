@@ -12,7 +12,8 @@ export type OfflineStudyAction =
   | 'read_fact'
   | 'highlight_verse'
   | 'upsert_note'
-  | 'delete_note';
+  | 'delete_note'
+  | 'earn_achievement';
 
 export interface OfflineStudyOperation {
   version: 1;
@@ -61,7 +62,7 @@ async function readQueue(userId: string): Promise<OfflineStudyOperation[]> {
   }
   return values.map((item) => {
     if (!item || item.version !== 1 || item.userId !== userId ||
-        !['favorite_fact', 'favorite_scripture', 'complete_wotd', 'read_fact', 'highlight_verse', 'upsert_note', 'delete_note'].includes(item.action) ||
+        !['favorite_fact', 'favorite_scripture', 'complete_wotd', 'read_fact', 'highlight_verse', 'upsert_note', 'delete_note', 'earn_achievement'].includes(item.action) ||
         typeof item.entityId !== 'string' || typeof item.operationId !== 'string' ||
         typeof item.desired !== 'boolean' ||
         (item.value !== undefined && typeof item.value !== 'string')) {
@@ -114,6 +115,7 @@ async function executeOperation(operation: OfflineStudyOperation): Promise<void>
     complete_wotd: { table: 'user_study_progress', field: 'wotd_id' },
     read_fact: { table: 'user_read_facts', field: 'fact_id' },
     highlight_verse: { table: 'user_verse_highlights', field: 'verse_key' },
+    earn_achievement: { table: 'user_earned_achievements', field: 'achievement_id' },
   } as const;
   const { table, field } = config[operation.action];
 
@@ -127,6 +129,8 @@ async function executeOperation(operation: OfflineStudyOperation): Promise<void>
           ? { completed_at: operation.createdAt } : {}),
         ...(operation.action === 'read_fact'
           ? { read_at: operation.createdAt } : {}),
+        ...(operation.action === 'earn_achievement'
+          ? { earned_at: operation.createdAt } : {}),
       },
       { onConflict: `user_id,${field}`, ignoreDuplicates: operation.action !== 'highlight_verse' },
     );
@@ -145,6 +149,9 @@ export const OfflineStudyQueue = {
       if (!entityId.trim()) throw new Error('Cannot queue an empty study entity ID.');
       if (action === 'highlight_verse' && desired && (!value || value.length > 32)) {
         throw new Error('Invalid verse highlight color.');
+      }
+      if (action === 'earn_achievement' && (!desired || !/^[a-z_0-9]{1,64}$/.test(entityId))) {
+        throw new Error('Invalid earned achievement.');
       }
       if (action === 'upsert_note' && (!value || value.length > 35000)) {
         throw new Error('Invalid offline note payload.');
