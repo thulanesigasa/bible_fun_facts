@@ -1,11 +1,12 @@
 /**
  * EncryptionService - Hardware-Backed AES-256 Study Journal Encryption
  *
- * Implements FIPS 197 compliant AES-256-CBC with PKCS#7 padding and SHA-256 MAC integrity
- * verification. The 256-bit symmetric master key is stored in hardware-backed secure storage
+ * Creates version 2 archives with platform WebCrypto AES-256-GCM authenticated
+ * encryption. Reads older v1 CBC archives for migration only, never writes v1.
+ * The 256-bit symmetric master key is stored in native secure storage
  * (Android Keystore via EncryptedSharedPreferences / iOS Keychain) via SecureStoreAdapter.
  *
- * Designed in pure TypeScript for 100% cross-platform zero-native-compilation reliability.
+ * Platforms without WebCrypto AES-GCM support must fail closed for encrypted exports.
  */
 
 import { SecureStoreAdapter } from './secureStorage';
@@ -347,10 +348,10 @@ function generateRandomBytes(length: number): number[] {
 // ============================================================================
 
 export interface EncryptedPayload {
-  v: number;      // Version (1)
+  v: number;      // 1 = legacy CBC; 2 = authenticated AES-GCM
   iv: string;     // Hex IV (16 bytes = 32 chars)
   data: string;   // Hex Ciphertext
-  mac: string;    // SHA-256 MAC
+  mac?: string;   // Legacy v1 checksum only
 }
 
 let _cachedMasterKey: string | null = null;
@@ -384,52 +385,30 @@ export const EncryptionService = {
    * Encrypts plaintext string using AES-256-CBC with PKCS#7 padding.
    */
   encryptString: async (plaintext: string): Promise<string> => {
+    // No home-grown CBC/MAC for new journal files. AES-GCM from the platform
+    // WebCrypto provider supplies encryption and integrity together.
+    // If WebCrypto is unavailable, fail closed rather than using weak fallback.
     try {
+      const subtle = globalThis.crypto?.subtle;
+      if (!subtle) throw new Error('Authenticated encryption is unavailable.');
       const keyHex = await EncryptionService.getMasterKey();
-      const keyBytes = hexToBytes(keyHex);
-      const roundKeys = keyExpansion(keyBytes);
-
-      const iv = generateRandomBytes(16);
-      const plainBytes = stringToUtf8Bytes(plaintext);
-
-      // PKCS#7 padding
-      const padLen = 16 - (plainBytes.length % 16);
-      for (let i = 0; i < padLen; i++) {
-        plainBytes.push(padLen);
-      }
-
-      // CBC encryption
-      const cipherBytes: number[] = [];
-      let prevBlock = [...iv];
-
-      for (let i = 0; i < plainBytes.length; i += 16) {
-        const block = plainBytes.slice(i, i + 16);
-        for (let b = 0; b < 16; b++) {
-          block[b] ^= prevBlock[b];
-        }
-        const encrypted = cipherBlock(block, roundKeys);
-        cipherBytes.push(...encrypted);
-        prevBlock = encrypted;
-      }
-
-      const ivHex = bytesToHex(iv);
-      const dataHex = bytesToHex(cipherBytes);
-
-      // Compute MAC for cryptographic integrity
-      const macInput = `${ivHex}:${dataHex}:${keyHex}`;
-      const mac = sha256(macInput);
-
-      const payload: EncryptedPayload = {
-        v: 1,
-        iv: ivHex,
-        data: dataHex,
-        mac,
-      };
-
-      return JSON.stringify(payload);
-    } catch (err) {
-      console.error('[EncryptionService] Encryption error:', err);
-      throw new Error('Failed to encrypt study journal payload.');
+      const key = await subtle.importKey(
+        'raw', new Uint8Array(hexToBytes(keyHex)), { name: 'AES-GCM' }, false, ['encrypt']
+      );
+      const iv = new Uint8Array(generateRandomBytes(12));
+      const ciphertext = await subtle.encrypt(
+        { name: 'AES-GCM', iv, tagLength: 128 },
+        key,
+        new Uint8Array(stringToUtf8Bytes(plaintext))
+      );
+      return JSON.stringify({
+        v: 2,
+        alg: 'AES-256-GCM',
+        iv: bytesToHex(Array.from(iv)),
+        data: bytesToHex(Array.from(new Uint8Array(ciphertext))),
+      });
+    } catch {
+      throw new Error('Failed to encrypt study journal with authenticated encryption.');
     }
   },
 
@@ -439,7 +418,33 @@ export const EncryptionService = {
   decryptString: async (payloadStr: string): Promise<string> => {
     try {
       const payload: EncryptedPayload = JSON.parse(payloadStr);
-      if (!payload.iv || !payload.data || !payload.mac) {
+      if (payload.v === 2) {
+        const modern = payload as EncryptedPayload & { alg?: string };
+        if (modern.alg !== 'AES-256-GCM' ||
+            !/^[0-9a-f]{24}$/i.test(modern.iv || '') ||
+            !/^(?:[0-9a-f]{2}){16,}$/i.test(modern.data || '')) {
+          throw new Error('Invalid authenticated journal payload.');
+        }
+        const subtle = globalThis.crypto?.subtle;
+        if (!subtle) throw new Error('Authenticated decryption is unavailable.');
+        const keyHex = await EncryptionService.getMasterKey();
+        const key = await subtle.importKey(
+          'raw', new Uint8Array(hexToBytes(keyHex)), { name: 'AES-GCM' }, false, ['decrypt']
+        );
+        const result = await subtle.decrypt(
+          { name: 'AES-GCM', iv: new Uint8Array(hexToBytes(modern.iv)), tagLength: 128 },
+          key,
+          new Uint8Array(hexToBytes(modern.data))
+        );
+        return utf8BytesToString(Array.from(new Uint8Array(result)));
+      }
+      // Legacy v1 is supported ONLY for decryption of previously exported
+      // journals. Never create new unauthenticated-CBC v1 archives.
+      if (payload.v !== 1) throw new Error('Unsupported journal version.');
+      if (!payload.iv || !payload.data || !payload.mac ||
+          !/^[0-9a-f]{32}$/i.test(payload.iv) ||
+          !/^(?:[0-9a-f]{32})+$/i.test(payload.data) ||
+          !/^[0-9a-f]{64}$/i.test(payload.mac)) {
         throw new Error('Invalid encrypted payload format.');
       }
 
