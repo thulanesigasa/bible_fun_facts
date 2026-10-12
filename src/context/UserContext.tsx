@@ -570,6 +570,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const user = session.user;
           if (activeAuthUserIdRef.current !== user.id) {
             activeAuthUserIdRef.current = user.id;
+            isLoadedFromStorage.current = false;
+            hasEvaluatedStreakTodayRef.current = false;
             setState(prev => ({
               ...prev, userProfile: null,
               favoritesFacts: [], favoritesScriptures: [], completedWOTDs: [],
@@ -577,6 +579,35 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
               factsViewedCount: 0, sharesCount: 0, streak: 1,
               lastLoginDate: null,
             }));
+            // Rehydrate ONLY this authenticated account's encrypted cache.
+            // Check identity again after asynchronous disk access; rapid A/B
+            // account switches must not restore the previous owner's data.
+            void SecureStoreAdapter.getItem(SECURE_STUDY_KEY(user.id))
+              .then(raw => {
+                if (activeAuthUserIdRef.current !== user.id) return;
+                if (raw) {
+                  const restored = JSON.parse(raw) as Partial<UserState> & { _authUserId?: string };
+                  if (restored._authUserId === user.id) {
+                    setState(prev => ({
+                      ...prev,
+                      favoritesFacts: Array.isArray(restored.favoritesFacts) ? restored.favoritesFacts : [],
+                      favoritesScriptures: Array.isArray(restored.favoritesScriptures) ? restored.favoritesScriptures : [],
+                      completedWOTDs: Array.isArray(restored.completedWOTDs) ? restored.completedWOTDs : [],
+                      readFactIds: Array.isArray(restored.readFactIds) ? restored.readFactIds : [],
+                      bibleHighlights: restored.bibleHighlights && typeof restored.bibleHighlights === 'object'
+                        ? restored.bibleHighlights : {},
+                      streak: typeof restored.streak === 'number' ? restored.streak : 1,
+                      lastLoginDate: restored.lastLoginDate || null,
+                    }));
+                  }
+                }
+                isLoadedFromStorage.current = true;
+              })
+              .catch(() => {
+                // Never overwrite a previous encrypted snapshot after a
+                // secure-store read failure; future writes stay suspended.
+                console.warn('[UserContext] Unable to restore secure account cache.');
+              });
           }
           const meta = user.user_metadata as any || {};
           const metaName = meta.name || user.email?.split('@')[0] || 'Believer';
@@ -726,11 +757,17 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Save data on change - only after initial load finishes
   useEffect(() => {
-    if (!isLoadedFromStorage.current) return;
+    if (!isLoadedFromStorage.current || !state.userProfile) return;
+    const expectedUser = activeAuthUserIdRef.current;
+    if (!expectedUser) return;
     const saveData = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session?.user) return;
+        // Never persist transient logged-out data or the previous account's
+        // state under a newly authenticated account's secure-storage key.
+        if (!session?.user || session.user.id !== expectedUser ||
+            activeAuthUserIdRef.current !== expectedUser ||
+            state.userProfile?.email?.toLowerCase() !== session.user.email?.toLowerCase()) return;
         await AsyncStorage.setItem(LOCAL_OWNER_KEY, session.user.id);
         await SecureStoreAdapter.setItem(SECURE_STUDY_KEY(session.user.id), JSON.stringify({
           ...state,
