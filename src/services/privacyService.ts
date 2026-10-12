@@ -22,10 +22,10 @@ export const PrivacyService = {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) return false;
-      const { error } = await supabase.from('user_privacy_settings').upsert(
-        { user_id: session.user.id, [field]: enabled, updated_at: new Date().toISOString() },
-        { onConflict: 'user_id' },
-      );
+      const { error } = await supabase.rpc('set_my_privacy_preference', {
+        p_field: field,
+        p_enabled: enabled,
+      });
       return !error;
     } catch {
       return false;
@@ -37,18 +37,36 @@ export const PrivacyService = {
    */
   getPreferences: async (): Promise<ScholarPrivacyPreferences> => {
     try {
-      const [privateStudy, discoverable, showStreaks, privateNotes] = await Promise.all([
-        SecureStoreAdapter.getItem(PRIVATE_STUDY_KEY),
-        SecureStoreAdapter.getItem(DISCOVERABLE_IN_SEARCH_KEY),
-        SecureStoreAdapter.getItem(SHOW_STREAKS_PUBLICLY_KEY),
-        SecureStoreAdapter.getItem(PRIVATE_STUDY_NOTES_KEY),
-      ]);
-
+      const privateStudy = await SecureStoreAdapter.getItem(PRIVATE_STUDY_KEY);
+      // Server state is authoritative for any privacy setting affecting others.
+      // A missing/failed read must fail PRIVATE, not use stale local public flags.
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) {
+        return {
+          isPrivateStudyMode: privateStudy === 'true',
+          isDiscoverableInSearch: false,
+          showStreaksPublicly: false,
+          privateStudyNotes: true,
+        };
+      }
+      const { data, error } = await supabase
+        .from('user_privacy_settings')
+        .select('is_discoverable, show_streaks_publicly, private_study_notes')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+      if (error || !data) {
+        return {
+          isPrivateStudyMode: privateStudy === 'true',
+          isDiscoverableInSearch: false,
+          showStreaksPublicly: false,
+          privateStudyNotes: true,
+        };
+      }
       return {
         isPrivateStudyMode: privateStudy === 'true',
-        isDiscoverableInSearch: discoverable === 'true', // opt-in by default
-        showStreaksPublicly: showStreaks === 'true',     // opt-in by default
-        privateStudyNotes: privateNotes === null ? true : privateNotes === 'true', // default private
+        isDiscoverableInSearch: data.is_discoverable === true,
+        showStreaksPublicly: data.show_streaks_publicly === true,
+        privateStudyNotes: data.private_study_notes !== false,
       };
     } catch (e) {
       console.warn('[PrivacyService] getPreferences error:', e);
