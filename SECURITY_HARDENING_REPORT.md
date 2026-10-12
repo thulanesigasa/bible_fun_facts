@@ -74,3 +74,14 @@ Keep PR draft and DO NOT MERGE for production until all deployment-affecting beh
 6. Add live endpoint wiring and functional testing for opt-in community discovery; the SQL RPC alone does not restore every screen behavior.
 
 **Do not classify PR #922 as complete or merge until these checks are satisfied.**
+
+### 2026-10-12 end-to-end hardening follow-up
+- PIN secrets now use memory-hard scrypt N=16384, r=8, p=1 via audited @noble/hashes and one atomic encrypted salt+hash record. A successful legacy SHA256 PIN verification transparently upgrades the record; wrong PINs never upgrade it. Automated tests exercise migration and scrypt/Node OpenSSL equivalence. Physical device responsiveness and tamper/clock lockout tests remain.
+- Version 2 encrypted journal exports use AES-256-GCM and audited @noble/ciphers on JavaScript runtimes without WebCrypto.subtle. Real ESM AES-GCM interoperability vs Node OpenSSL and modified-tag rejection run in CI. CSPRNG remains mandatory. Expo runtimeVersion remains `1.0.1`.
+- Offline study events preserve source timestamps; a protected RLS table stores earned achievement IDs permanently, and the app can display badges after bookmarks/highlights are removed. New event and private-note queue operations are owner-isolated. The notes API has not yet been connected to an interactive note editor.
+- Private study mode is account scoped and fails private on startup, and UserContext does not flush offline operations until privacy settings restore.
+- Privileged database functions and editable column grants are tightened by the latest forward-only SQL migration. Disposable two-user and anonymous attack tests must remain green.
+- **IMPORTANT RELEASE GATE**: This work has NOT been deployed to the connected live exégeomai Supabase project. The currently installed production app may require public profile reads or username lookup that the privacy migrations deliberately revoke, so migration deployment must be coordinated with an app build/OTA rollout. Merge on main also triggers preview OTA publishing. No native Android/iOS security checks have run. No live production data or migrations have been changed.
+
+### Release go/no-go, updated
+The branch cannot be described as finished until both GitHub workflows are green at the SAME HEAD, compatibility tests on installed app versions are completed, a production migration rollout/rollback sequence is vetted, and account A/B test sessions verify privacy and actual deletion. Native biometric/PIN offline behavior and data restoration are not covered by the Node/Metro export CI. Keep PR draft until verified.
