@@ -55,3 +55,22 @@ Keep PR draft and DO NOT MERGE for production until all deployment-affecting beh
 - New journal exports use WebCrypto AES-256-GCM with an authenticated tag, version 2. Legacy v1 CBC archives are readable only for compatibility; new exports never emit version 1.
 - Added regression tests for interrupted secure-storage writes, legacy native chunk reads, modified ciphertext, and unavailable WebCrypto.
 - **Mobile runtime limitation:** Expo/Hermes environments must be tested for WebCrypto AES-GCM availability. Without an implementation the journal export fails closed. This is not yet proof of operational encrypted journal exports on real devices.
+
+### One-pass integration follow-up (2026-10-12)
+- Main UserContext private study cache now uses a per-account native SecureStore key; legacy plaintext import requires a matching immutable `_authUserId` and encrypted write success before removal. There is no automatic import of owner-unknown legacy plaintext data.
+- Both contexts clear private in-memory data on account transitions; async restore in the secondary context is guarded against stale concurrent login/logout events.
+- Confirmed deletion removes the main and secondary encrypted caches and durable queue for the deleting user. Local cleanup failures must still be surfaced and checked on-device.
+- Added an opt-in, allowlisted `search_public_scholars` SQL RPC. It does not return email, telephone or private streaks.
+- Extended durable offline queue for fact reads and verse highlight edits/removals, with owner-only RLS and deterministic idempotent write semantics. No cryptographic randomness is required merely to assign queue operation labels.
+- Branch count updates now have a database trigger proposed; the privileged client increment function is revoked in the security migration.
+- Added GitHub Actions workflow `.github/workflows/supabase-migration-check.yml` to start disposable Supabase and replay all migrations on a clean local database. This is **not** equivalent to staging deployment or actual multi-user adversarial testing.
+
+### Remaining external release prerequisites
+1. Validate Supabase migrations (including user deletion, storage object cleanup and all RLS denial cases) against a staging project with two real test accounts, and deploy migrations through a controlled release.
+2. Test native Android/iOS JS encryption provider availability, secure-storage migration, offline restore/queue replay and account switching using device builds.
+3. Implement and test note synchronization and server-authoritative achievements/streak conflict resolution, including offline edits and multi-device conflicts.
+4. Confirm legacy data migration and recovery behavior against a real upgraded installation; no silent discard of unowned data.
+5. Validate 4-digit PIN protection and session revocation behavior. A salted fast SHA-256 hash is not a slow password KDF.
+6. Add live endpoint wiring and functional testing for opt-in community discovery; the SQL RPC alone does not restore every screen behavior.
+
+**Do not classify PR #922 as complete or merge until these checks are satisfied.**
