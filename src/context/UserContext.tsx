@@ -129,6 +129,7 @@ interface AppContextType extends UserState {
 const UserContext = createContext<AppContextType | undefined>(undefined);
 
 const STORAGE_KEY = '@exegeomai_user_data';
+const LOCAL_OWNER_KEY = '@exegeomai_local_owner_v1';
 const PERMANENT_STREAK_KEY = '@exegeomai_permanent_streak';
 const PERMANENT_BACKUP_KEY = '@exegeomai_streak_resilient_v2';
 const PERMANENT_LAST_LOGIN_KEY = '@exegeomai_permanent_last_login';
@@ -420,6 +421,18 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // A cached profile is not authentication. Load private local data only
         // when a securely persisted Supabase session belongs to the same user.
         const { data: { session: cachedSession } } = await supabase.auth.getSession();
+        const lastOwnerId = await AsyncStorage.getItem(LOCAL_OWNER_KEY);
+        if (!cachedSession?.user || lastOwnerId !== cachedSession.user.id) {
+          await AsyncStorage.multiRemove([
+            STORAGE_KEY, PERMANENT_STREAK_KEY, PERMANENT_BACKUP_KEY,
+            PERMANENT_LAST_LOGIN_KEY,
+          ]);
+          if (cachedSession?.user) {
+            await AsyncStorage.setItem(LOCAL_OWNER_KEY, cachedSession.user.id);
+          } else {
+            await AsyncStorage.removeItem(LOCAL_OWNER_KEY);
+          }
+        }
         const storedRaw = await AsyncStorage.getItem(STORAGE_KEY);
         const storedEnvelope = storedRaw ? JSON.parse(storedRaw) : null;
         const saved = cachedSession?.user &&
@@ -686,6 +699,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user) return;
+        await AsyncStorage.setItem(LOCAL_OWNER_KEY, session.user.id);
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({
           ...state,
           // Never use an editable username/email as an identity boundary.
@@ -1048,7 +1062,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     // Never leave the next account inside the previous account's cached state.
     isLoadedFromStorage.current = false;
-    await AsyncStorage.removeItem(STORAGE_KEY).catch(() => {});
+    await AsyncStorage.multiRemove([
+      STORAGE_KEY, LOCAL_OWNER_KEY, PERMANENT_STREAK_KEY,
+      PERMANENT_BACKUP_KEY, PERMANENT_LAST_LOGIN_KEY,
+    ]).catch(() => {});
     setState(prev => ({
       ...prev, userProfile: null, favoritesFacts: [], favoritesScriptures: [],
       completedWOTDs: [], readFactIds: [], bibleHighlights: {},
