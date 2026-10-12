@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { SecureStoreAdapter } from './secureStorage';
+import { PrivacyService } from './privacyService';
 
 /**
  * Durable, per-account offline sync for idempotent study actions.
@@ -186,22 +187,37 @@ export const OfflineStudyQueue = {
     if (!reference.trim() || reference.length > 512 || (text !== null && text.length > 32000)) {
       return Promise.reject(new Error('Invalid offline study note.'));
     }
-    return OfflineStudyQueue.enqueue(
-      text === null ? 'delete_note' : 'upsert_note',
+    return PrivacyService.getPreferences().then((preferences) => {
+      if (preferences.isPrivateStudyMode || preferences.privateStudyNotes) {
+        throw new Error('Study notes are private; cloud synchronization is disabled.');
+      }
+      return OfflineStudyQueue.enqueue(
+        text === null ? 'delete_note' : 'upsert_note',
       noteId,
       text !== null,
-      text === null ? undefined : JSON.stringify({ reference, text }),
-    );
+        text === null ? undefined : JSON.stringify({ reference, text }),
+      );
+    });
   },
 
   flush(): Promise<{ synced: number; pending: number }> {
     return serialize(async () => {
       const userId = await currentUserId();
       const queue = await readQueue(userId);
+      // Defensive service boundary: never rely on a UI caller remembering
+      // to check incognito or private-notes settings before replay.
+      const privacy = await PrivacyService.getPreferences();
+      if (privacy.isPrivateStudyMode) return { synced: 0, pending: queue.length };
       let synced = 0;
       while (queue.length > 0) {
         const op = queue[0];
         try {
+          if ((op.action === 'upsert_note' || op.action === 'delete_note') &&
+              (await PrivacyService.getPreferences()).privateStudyNotes) {
+            // Leave all later operations ordered and pending while the
+            // user prefers local-only notes. Never silently discard them.
+            break;
+          }
           await executeOperation(op);
         } catch {
           op.retryCount += 1;
