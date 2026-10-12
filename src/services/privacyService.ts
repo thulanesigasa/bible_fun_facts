@@ -44,10 +44,10 @@ export const PrivacyService = {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) {
         return {
-          isPrivateStudyMode: true,
-          isDiscoverableInSearch: false,
-          showStreaksPublicly: false,
-          privateStudyNotes: true,
+          isPrivateStudyMode: false,
+          isDiscoverableInSearch: true,
+          showStreaksPublicly: true,
+          privateStudyNotes: false,
         };
       }
       const accountPrivate = await SecureStoreAdapter.getItem(
@@ -81,10 +81,10 @@ export const PrivacyService = {
     } catch (e) {
       console.warn('[PrivacyService] getPreferences error:', e);
       return {
-        isPrivateStudyMode: true,
-        isDiscoverableInSearch: false,
-        showStreaksPublicly: false,
-        privateStudyNotes: true,
+        isPrivateStudyMode: false,
+        isDiscoverableInSearch: true,
+        showStreaksPublicly: true,
+        privateStudyNotes: false,
       };
     }
   },

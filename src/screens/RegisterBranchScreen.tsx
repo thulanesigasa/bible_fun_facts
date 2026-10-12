@@ -727,34 +727,23 @@ export default function RegisterBranchScreen({
                 </View>
               </View>
 
-              {/* Street address with inline pin drop icon button */}
+              {/* Street address with Autocomplete Suggestions */}
               <View style={styles.fieldGroup}>
                 <Text style={styles.fieldLabel}>Street Address (Live Suggestions & GPS)</Text>
-                <View style={styles.addressInputRow}>
-                  <TextInput
-                    style={[styles.input, styles.addressInputFlex]}
-                    placeholder="e.g. 14 Willow Street"
-                    placeholderTextColor="#94A3B8"
-                    value={address}
-                    onChangeText={(v) => {
-                      setAddress(v);
-                      setShowAddressSuggestions(true);
-                    }}
-                    onFocus={() => {
-                      if (addressSuggestions.length > 0) setShowAddressSuggestions(true);
-                    }}
-                    returnKeyType="next"
-                  />
-                  <TouchableOpacity
-                    style={styles.inlinePinDropBtn}
-                    onPress={() => setShowPinDropModal(true)}
-                    activeOpacity={0.7}
-                    accessibilityRole="button"
-                    accessibilityLabel="Pin-drop exact location on map"
-                  >
-                    <MapPinSvg size={24} color="#0F172A" fill="#FDD223" strokeWidth={2} />
-                  </TouchableOpacity>
-                </View>
+                <TextInput
+                  style={styles.input}
+                  placeholder="e.g. 14 Willow Street"
+                  placeholderTextColor="#94A3B8"
+                  value={address}
+                  onChangeText={(v) => {
+                    setAddress(v);
+                    setShowAddressSuggestions(true);
+                  }}
+                  onFocus={() => {
+                    if (addressSuggestions.length > 0) setShowAddressSuggestions(true);
+                  }}
+                  returnKeyType="next"
+                />
                 {isSearchingAddress && (
                   <Text style={styles.searchingHint}>Searching exact address coordinates...</Text>
                 )}
@@ -786,11 +775,27 @@ export default function RegisterBranchScreen({
                   </View>
                 )}
 
-                {isCoordinatesExplicit && (
-                  <Text style={styles.coordinatesLockedHint}>
-                    GPS: {latitude.toFixed(5)}, {longitude.toFixed(5)} (Exact Street Navigation)
+                {/* Pin-Drop Location Button */}
+                <TouchableOpacity
+                  style={styles.pinDropBtn}
+                  onPress={() => setShowPinDropModal(true)}
+                  activeOpacity={0.8}
+                  accessibilityRole="button"
+                  accessibilityLabel="Pin-drop exact location on map"
+                >
+                  <MapPinSvg size={18} color="#0F172A" fill="#FDD223" strokeWidth={2} />
+                  <Text style={styles.pinDropBtnText}>Pin-Drop Location on Map</Text>
+                </TouchableOpacity>
+
+                {/* GPS Status Badge */}
+                <View style={[styles.gpsStatusRow, isCoordinatesExplicit ? styles.gpsStatusLocked : styles.gpsStatusApprox]}>
+                  <MapPinSvg size={14} color={isCoordinatesExplicit ? '#0F172A' : '#64748B'} />
+                  <Text style={styles.gpsStatusText}>
+                    {isCoordinatesExplicit
+                      ? `Locked GPS: ${latitude.toFixed(5)}, ${longitude.toFixed(5)} (Exact Street Navigation)`
+                      : `Town Centroid: ${latitude.toFixed(4)}, ${longitude.toFixed(4)} (Tap Pin-Drop to set exact location)`}
                   </Text>
-                )}
+                </View>
               </View>
 
               <View style={styles.actionRow}>
@@ -1445,26 +1450,49 @@ const styles = StyleSheet.create({
     fontFamily: Platform.select({ ios: 'Menlo', default: 'monospace' }),
     marginTop: 2,
   },
-  addressInputRow: {
+  pinDropBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-  },
-  addressInputFlex: {
-    flex: 1,
-  },
-  inlinePinDropBtn: {
-    alignItems: 'center',
     justifyContent: 'center',
-    width: 44,
-    height: 44,
+    gap: 8,
+    paddingVertical: 11,
+    paddingHorizontal: 16,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#FDD223',
+    borderRadius: radius.sm,
+    marginTop: 8,
   },
-  coordinatesLockedHint: {
-    fontSize: 11,
+  pinDropBtnText: {
+    fontSize: 13,
+    fontWeight: '700',
     color: '#0F172A',
-    fontWeight: '600',
+  },
+  gpsStatusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderRadius: radius.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     marginTop: 6,
-    fontFamily: Platform.select({ ios: 'Menlo', default: 'monospace' }),
+  },
+  gpsStatusLocked: {
+    backgroundColor: 'rgba(253, 210, 35, 0.20)',
+    borderWidth: 1,
+    borderColor: '#FDD223',
+  },
+  gpsStatusApprox: {
+    backgroundColor: '#F1F5F9',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  gpsStatusText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#0F172A',
+    flex: 1,
+    lineHeight: 15,
   },
 });
 

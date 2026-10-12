@@ -61,11 +61,11 @@
   <img src="https://img.shields.io/badge/Branch%20Naming-Standard%20Formula%20%7C%20Church%20--%20Town%20Gathering-10B981?style=for-the-badge" alt="Standard Branch Naming Formula" />
   <img src="https://img.shields.io/badge/Geocoding-Live%20OSM%20Nominatim%20%2B%20Photon%20%7C%20Country--Biased-0284C7?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="Country Biased Geocoding" />
   <img src="https://img.shields.io/badge/CARTO%20Basemaps-Watermark--Free%20Voyager%20Tiles%20%2B%20Legal%20Attribution-10B981?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="CARTO Basemaps Watermark-Free Voyager Tiles" />
-  <img src="https://img.shields.io/badge/Maps-Inline%20Pin%20Drop%20%7C%20Zero%20Border%20Radius-FDD223?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Inline Pin Drop" />
+  <img src="https://img.shields.io/badge/Maps-Standalone%20Pin%20Drop%20%7C%20GPS%20Status%20Badge-FDD223?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Standalone Pin Drop and GPS Status Badge" />
   <img src="https://img.shields.io/badge/Strongs%20Loading-Instant%200ms%20Curated%20Render%20%7C%20Infinite%20Paging-10B981?style=for-the-badge&logo=fastapi&logoColor=white" alt="Instant Strongs Loading" />
   <img src="https://img.shields.io/badge/Hermes%20Optimization-Zero--Crash%20AST%20Stack%20Protection-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Hermes Zero-Crash AST Stack Protection" />
   <img src="https://img.shields.io/badge/Cold%20Boot%20Stability-Decoupled%20Warmup%20%7C%20Zero%20OOM-FDD223?style=for-the-badge&logo=android&logoColor=white" alt="Cold Boot Stability" />
-  <img src="https://img.shields.io/badge/Tests-Jest%2084%2F84%20Passing%20(8%20Suites)-10B981?style=for-the-badge&logo=jest&logoColor=white" alt="Jest 84/84 Passing" />
+  <img src="https://img.shields.io/badge/Tests-Jest%20119%2F119%20Passing%20(11%20Suites)-10B981?style=for-the-badge&logo=jest&logoColor=white" alt="Jest 119/119 Passing" />
   <img src="https://img.shields.io/badge/Compliance-GDPR%20Purge%20RPC%20%7C%20Inexact%20Alarms-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="GDPR and Store Compliance" />
   <img src="https://img.shields.io/badge/Legal-Privacy%20(12%20Sections)%20%7C%20Terms%20(14%20Sections)%20%7C%20GDPR%20%7C%20POPIA-FDD223?style=for-the-badge&logo=html5&logoColor=white" alt="Privacy 12 Sections Terms 14 Sections GDPR POPIA" />
   <img src="https://img.shields.io/badge/Web%20Portal-Responsive%2060--30--10%20Landing%20Site-0284C7?style=for-the-badge&logo=html5&logoColor=white" alt="Responsive Web Portal" />
