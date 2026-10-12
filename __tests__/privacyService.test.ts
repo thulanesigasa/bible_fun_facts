@@ -84,10 +84,10 @@ describe('Server-enforced privacy settings', () => {
     );
   });
 
-  it('defaults to private before authentication and after secure-storage errors', async () => {
+  it('defaults to public discovery before authentication and prevents unauthenticated mutations', async () => {
     getSession.mockResolvedValue({ data: { session: null }, error: null });
     const prefs = await PrivacyService.getPreferences();
-    expect(prefs.isPrivateStudyMode).toBe(true);
+    expect(prefs.isPrivateStudyMode).toBe(false);
     expect(await PrivacyService.setPrivateStudyMode(false)).toBe(false);
     expect(setSecure).not.toHaveBeenCalled();
   });
