@@ -25,3 +25,6 @@ Each queued operation carries a CSPRNG-generated ID, schema version, auth user I
 
 ## Required test matrix
 First online login, first offline login denied, cached-session offline behavior, duplicate add/remove across retries, account switching, missing SecureStore, token expiry, process kill mid-queue write, airplane-mode reconnect, time changes, multi-device collisions, notes conflict and server-authoritative achievements. Test both Android and iOS native devices.
+
+## Secondary UserDataContext storage
+The separate UserDataContext no longer loads shared plaintext AsyncStorage keys. It stores the account-scoped study state under a secure storage key derived from the authenticated Supabase user UUID and resets state on sign-out/user switch. It does **not** automatically import the old global keys; a verified per-account migration and on-device regression testing remain required to avoid losing existing users' old-only study history.
