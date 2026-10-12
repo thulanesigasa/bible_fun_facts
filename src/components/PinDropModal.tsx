@@ -252,8 +252,12 @@ export default function PinDropModal({
                   const left = originX + dx * TILE_SIZE;
                   const top = originY + dy * TILE_SIZE;
 
-                  // High-speed CartoDB Voyager raster tiles with OpenStreetMap data
-                  const tileUrl = `https://a.basemaps.cartocdn.com/rastertiles/voyager/${zoom}/${tileX}/${tileY}.png`;
+                  // High-speed CartoDB Voyager raster tiles with registered API key (watermark-free)
+                  const cartoKey =
+                    process.env.EXPO_PUBLIC_CARTO_API_KEY ||
+                    'cb1_4i48_1_96858c75f2e3dc7fbe65fe45';
+                  const tileUrl = `https://basemaps.cartocdn.com/rastertiles/voyager/${zoom}/${tileX}/${tileY}.png?key=${cartoKey}`;
+
 
                   return (
                     <Image
@@ -334,6 +338,11 @@ export default function PinDropModal({
               >
                 <Text style={styles.nudgeText}>▼</Text>
               </TouchableOpacity>
+            </View>
+
+            {/* Legal Basemap Attribution */}
+            <View style={styles.attributionBadge} pointerEvents="none">
+              <Text style={styles.attributionText}>© CARTO · © OpenStreetMap</Text>
             </View>
           </View>
         </View>
@@ -595,5 +604,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: '#0F172A',
+  },
+  attributionBadge: {
+    position: 'absolute',
+    bottom: 6,
+    right: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.78)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    zIndex: 15,
+  },
+  attributionText: {
+    fontSize: 9,
+    fontWeight: '500',
+    color: '#64748B',
   },
 });

@@ -58,11 +58,12 @@
   <img src="https://img.shields.io/badge/Strongs%20Pronunciation-100%25%20Complete%20(14%2C298%20Words)-10B981?style=for-the-badge&logo=book&logoColor=white" alt="100% Strongs Pronunciation" />
   <img src="https://img.shields.io/badge/Ministries-God%20Embassy%20%7C%20Christ%20Embassy%20%7C%20Spirit%20Embassy%20%7C%20ECG-10B981?style=for-the-badge&logo=church&logoColor=white" alt="Ministry Directory" />
   <img src="https://img.shields.io/badge/Geocoding-Live%20OpenStreetMap%20Nominatim%20%2B%20Photon%20Hybrid-0284C7?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="Live OpenStreetMap Geocoding" />
-  <img src="https://img.shields.io/badge/Maps-Native%20Device%20Directions%20%7C%20Zero%20Tile%20Canvas-FDD223?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Native Device Directions Zero Tile Canvas" />
+  <img src="https://img.shields.io/badge/CARTO%20Basemaps-Watermark--Free%20Voyager%20Tiles%20%2B%20Legal%20Attribution-10B981?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="CARTO Basemaps Watermark-Free Voyager Tiles" />
+  <img src="https://img.shields.io/badge/Maps-Pin%20Drop%20Modal%20%7C%20Native%20Directions%20Launcher-FDD223?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Pin Drop Modal and Native Directions Launcher" />
   <img src="https://img.shields.io/badge/Strongs%20Loading-Instant%200ms%20Curated%20Render%20%7C%20Infinite%20Paging-10B981?style=for-the-badge&logo=fastapi&logoColor=white" alt="Instant Strongs Loading" />
   <img src="https://img.shields.io/badge/Hermes%20Optimization-Zero--Crash%20AST%20Stack%20Protection-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Hermes Zero-Crash AST Stack Protection" />
   <img src="https://img.shields.io/badge/Cold%20Boot%20Stability-Decoupled%20Warmup%20%7C%20Zero%20OOM-FDD223?style=for-the-badge&logo=android&logoColor=white" alt="Cold Boot Stability" />
-  <img src="https://img.shields.io/badge/Tests-Jest%2067%2F67%20Passing%20(8%20Suites)-10B981?style=for-the-badge&logo=jest&logoColor=white" alt="Jest 67/67 Passing" />
+  <img src="https://img.shields.io/badge/Tests-Jest%2084%2F84%20Passing%20(8%20Suites)-10B981?style=for-the-badge&logo=jest&logoColor=white" alt="Jest 84/84 Passing" />
   <img src="https://img.shields.io/badge/Compliance-GDPR%20Purge%20RPC%20%7C%20Inexact%20Alarms-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="GDPR and Store Compliance" />
   <img src="https://img.shields.io/badge/Legal-Privacy%20(12%20Sections)%20%7C%20Terms%20(14%20Sections)%20%7C%20GDPR%20%7C%20POPIA-FDD223?style=for-the-badge&logo=html5&logoColor=white" alt="Privacy 12 Sections Terms 14 Sections GDPR POPIA" />
   <img src="https://img.shields.io/badge/Web%20Portal-Responsive%2060--30--10%20Landing%20Site-0284C7?style=for-the-badge&logo=html5&logoColor=white" alt="Responsive Web Portal" />
