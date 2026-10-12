@@ -161,8 +161,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       if (sessionError || !session?.user) return false;
-      const { error } = await supabase.rpc('delete_user_account');
-      if (error) return false;
+      const { data: deleted, error } = await supabase.rpc('delete_user_account');
+      if (error || deleted !== true) return false;
       await supabase.auth.signOut();
       await AsyncStorage.removeItem('@user_profile_v1');
       setUserProfile(null);
