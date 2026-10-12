@@ -184,4 +184,15 @@ describe('OfflineStudyQueue', () => {
     expect(await OfflineStudyQueue.flush()).toEqual({ synced: 0, pending: 1 });
     expect(remote.size).toBe(0);
   });
+  it('keeps scripture and fact bookmarks local when the private-notes preference is enabled', async () => {
+    (PrivacyService.getPreferences as jest.Mock).mockResolvedValue({
+      isPrivateStudyMode: false, privateStudyNotes: true,
+    });
+    await expect(OfflineStudyQueue.enqueue('favorite_fact', 'f-private', true))
+      .rejects.toThrow(/remain local/);
+    await expect(OfflineStudyQueue.enqueue('favorite_scripture', 's-private', true))
+      .rejects.toThrow(/remain local/);
+    expect(await OfflineStudyQueue.pendingCount()).toBe(0);
+    expect(remote.size).toBe(0);
+  });
 });
