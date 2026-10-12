@@ -65,4 +65,33 @@ describe('SecureStoreAdapter fail-closed behavior', () => {
     native.set('auth-token_chunk_0', 'only-one');
     await expect(SecureStoreAdapter.getItem('auth-token')).rejects.toThrow(/Incomplete/);
   });
+  it('preserves the previous committed secret when replacement chunk writing fails', async () => {
+    const previous = 'A'.repeat(3900);
+    await SecureStoreAdapter.setItem('auth-token', previous);
+    const setter = secureMock.setItemAsync as jest.Mock;
+    const original = setter.getMockImplementation()!;
+    setter.mockImplementation(async (key: string, value: string) => {
+      if (key.includes('_v2_1_1')) throw new Error('interrupted encrypted write');
+      return original(key, value);
+    });
+    await expect(SecureStoreAdapter.setItem('auth-token', 'B'.repeat(3900)))
+      .rejects.toThrow('interrupted encrypted write');
+    expect(await SecureStoreAdapter.getItem('auth-token')).toBe(previous);
+    expect(plainMock.setItem).not.toHaveBeenCalled();
+  });
+
+  it('recovers an existing native SecureStore v1 chunked value', async () => {
+    native.set('old-token_chunk_count', '2');
+    native.set('old-token_chunk_0', 'old-');
+    native.set('old-token_chunk_1', 'secret');
+    await expect(SecureStoreAdapter.getItem('old-token')).resolves.toBe('old-secret');
+    await SecureStoreAdapter.setItem('old-token', 'new-secret');
+    await expect(SecureStoreAdapter.getItem('old-token')).resolves.toBe('new-secret');
+  });
+
+  it('does not expose partial data if the committed manifest points to missing chunks', async () => {
+    native.set('auth-token_manifest_v2', JSON.stringify({ version: 2, bank: 0, count: 2 }));
+    native.set('auth-token_v2_0_0', 'first');
+    await expect(SecureStoreAdapter.getItem('auth-token')).rejects.toThrow(/Incomplete/);
+  });
 });
