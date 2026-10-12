@@ -93,12 +93,21 @@ export function sha256(ascii: string): string {
  * Generates a pseudo-random hex salt string.
  */
 function generateSalt(length = 32): string {
-  const chars = '0123456789abcdef';
-  let salt = '';
-  for (let i = 0; i < length; i++) {
-    salt += chars.charAt(Math.floor(Math.random() * chars.length));
+  const cryptoProvider = globalThis.crypto;
+  if (!cryptoProvider || typeof cryptoProvider.getRandomValues !== 'function') {
+    throw new Error('Secure random generator is unavailable for PIN salt.');
   }
-  return salt;
+  const bytes = new Uint8Array(Math.ceil(length / 2));
+  cryptoProvider.getRandomValues(bytes);
+  return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('').slice(0, length);
+}
+
+/** Compares fixed-length hash hex strings without early character mismatch exit. */
+function equalHash(a: string, b: string): boolean {
+  if (a.length !== 64 || b.length !== 64) return false;
+  let mismatch = 0;
+  for (let i = 0; i < 64; i++) mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return mismatch === 0;
 }
 
 export interface PinVerifyResult {
@@ -194,8 +203,8 @@ export const PinSecurityService = {
 
       const inputHash = sha256(pin + storedSalt);
 
-      // 3. Constant-time match
-      if (inputHash === storedHash) {
+      // 3. Fixed-length comparison (not a replacement for a slow KDF).
+      if (equalHash(inputHash, storedHash)) {
         // Reset failed attempts upon success
         await SecureStoreAdapter.removeItem(PIN_FAILED_ATTEMPTS_KEY);
         await SecureStoreAdapter.removeItem(PIN_LOCKOUT_UNTIL_KEY);
