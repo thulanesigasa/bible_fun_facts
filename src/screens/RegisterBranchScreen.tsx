@@ -74,7 +74,7 @@ const BRANCH_TYPE_OPTIONS: {
   {
     type: 'cell_branch',
     label: 'Cell Branch',
-    description: 'A structured cell that operates under a main branch, with its own leader and gathering schedule.',
+    description: 'A structured cell that operates under a branch, with its own leader and gathering schedule.',
   },
   {
     type: 'cluster',

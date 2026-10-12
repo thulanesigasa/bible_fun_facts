@@ -79,7 +79,7 @@ export default function BranchMapScreen({
 
   const TYPE_FILTERS: { key: BranchType | 'all'; label: string }[] = [
     { key: 'all', label: 'All Structures' },
-    { key: 'branch', label: 'Main Branches' },
+    { key: 'branch', label: 'Branches' },
     { key: 'homecell', label: 'Homecells' },
     { key: 'cell_branch', label: 'Cell Branches' },
     { key: 'sub_cluster', label: 'Sub-Clusters' },
