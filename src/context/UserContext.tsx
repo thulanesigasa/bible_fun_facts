@@ -33,6 +33,7 @@ import { PrivacyService } from '../services/privacyService';
 import { EncryptionService } from '../services/encryptionService';
 import { SecureStoreAdapter } from '../services/secureStorage';
 import { OfflineStudyQueue } from '../services/offlineStudyQueue';
+import { ALL_ACHIEVEMENTS } from '../data/achievements';
 import { AuthProvider, UserProfile, SignUpExtendedParams } from './AuthContext';
 import { SecurityProvider } from './SecurityContext';
 import { ReaderSettingsProvider, LastReadBiblePosition } from './ReaderSettingsContext';
@@ -49,6 +50,7 @@ interface UserState {
   factsViewedCount: number;
   readFactIds: string[];
   sharesCount: number;
+  earnedAchievementIds: string[];
   lastLoginDate: string | null;
   followedUserIds: string[];
   lastReadBible: LastReadBiblePosition;
@@ -171,6 +173,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     factsViewedCount: 0,
     readFactIds: [],
     sharesCount: 0,
+    earnedAchievementIds: [],
     lastLoginDate: null,
     followedUserIds: [],
     lastReadBible: { book: 'John', chapter: 3, translation: 'web' },
@@ -408,6 +411,37 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Milestones are permanently earned once; bookmark/highlight removals
+  // must not revoke a previously unlocked badge. The local secure cache
+  // updates immediately when studying offline, while the owner-only queue
+  // submits the achievement later if private study mode is disabled.
+  useEffect(() => {
+    if (!isLoadedFromStorage.current || !activeAuthUserIdRef.current) return;
+    const stats: Record<'streak' | 'bookmark' | 'highlight' | 'share', number> = {
+      streak: state.streak,
+      bookmark: state.favoritesScriptures.length,
+      highlight: Object.keys(state.bibleHighlights).length,
+      share: state.sharesCount,
+    };
+    const newlyEarned = Object.values(ALL_ACHIEVEMENTS)
+      .flat()
+      .filter(a => stats[a.category] >= a.target && !state.earnedAchievementIds.includes(a.id))
+      .map(a => a.id);
+    if (!newlyEarned.length) return;
+    setState(prev => ({
+      ...prev,
+      earnedAchievementIds: Array.from(new Set([...prev.earnedAchievementIds, ...newlyEarned])),
+    }));
+    if (!isPrivateStudyModeRef.current) {
+      for (const id of newlyEarned) {
+        OfflineStudyQueue.enqueue('earn_achievement', id, true)
+          .then(() => OfflineStudyQueue.flush())
+          .catch(() => console.warn('[OfflineStudy] Earned achievement awaiting sync.'));
+      }
+    }
+  }, [state.streak, state.favoritesScriptures, state.bibleHighlights,
+      state.sharesCount, state.earnedAchievementIds]);
+
   // Replay previously recorded actions when the app returns to the foreground.
   // This does not attempt to authenticate a new user while offline.
   useEffect(() => {
@@ -577,6 +611,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
               favoritesFacts: [], favoritesScriptures: [], completedWOTDs: [],
               readFactIds: [], bibleHighlights: {}, followedUserIds: [],
               factsViewedCount: 0, sharesCount: 0, streak: 1,
+              earnedAchievementIds: [],
               lastLoginDate: null,
             }));
             // Rehydrate ONLY this authenticated account's encrypted cache.
@@ -594,6 +629,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
                       favoritesScriptures: Array.isArray(restored.favoritesScriptures) ? restored.favoritesScriptures : [],
                       completedWOTDs: Array.isArray(restored.completedWOTDs) ? restored.completedWOTDs : [],
                       readFactIds: Array.isArray(restored.readFactIds) ? restored.readFactIds : [],
+                      earnedAchievementIds: Array.isArray(restored.earnedAchievementIds) ? restored.earnedAchievementIds : [],
                       bibleHighlights: restored.bibleHighlights && typeof restored.bibleHighlights === 'object'
                         ? restored.bibleHighlights : {},
                       streak: typeof restored.streak === 'number' ? restored.streak : 1,
@@ -641,7 +677,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             ...prev, userProfile: null, favoritesFacts: [], favoritesScriptures: [],
             completedWOTDs: [], readFactIds: [], bibleHighlights: {},
             followedUserIds: [], factsViewedCount: 0, sharesCount: 0,
-            streak: 1, lastLoginDate: null,
+            earnedAchievementIds: [], streak: 1, lastLoginDate: null,
           }));
         }
       });
@@ -1143,6 +1179,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ...prev, userProfile: null, favoritesFacts: [], favoritesScriptures: [],
       completedWOTDs: [], readFactIds: [], bibleHighlights: {},
       followedUserIds: [], sharesCount: 0, factsViewedCount: 0,
+      earnedAchievementIds: [],
     }));
     isLoadedFromStorage.current = true;
   };
@@ -1664,6 +1701,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         factsViewedCount: 0,
         readFactIds: [],
         sharesCount: 0,
+        earnedAchievementIds: [],
         lastLoginDate: null,
         followedUserIds: [],
         lastReadBible: { book: 'John', chapter: 1, translation: 'WEB' },
