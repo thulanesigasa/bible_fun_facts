@@ -158,6 +158,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { showAlert } = useThemedAlert();
   const isLoadedFromStorage = useRef<boolean>(false);
   const hasEvaluatedStreakTodayRef = useRef<boolean>(false);
+  const activeAuthUserIdRef = useRef<string | null>(null);
   const [hideTabBar, setHideTabBar] = useState<boolean>(false);
   const [accent, setAccent] = useState<string>(colors.accent);
   const [state, setState] = useState<UserState>({
@@ -324,7 +325,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (permLastLoginRaw) localPermLastLogin = permLastLoginRaw;
       } catch {}
 
+      if (activeAuthUserIdRef.current !== userId) return;
       setState(prev => {
+        if (activeAuthUserIdRef.current !== userId) return prev;
         const todayStr = getLocalDateString();
         const localStreak = Math.max(prev.streak || 1, localPermStreak || 1);
         const localLastLogin = getLatestDateString(prev.lastLoginDate, localPermLastLogin);
@@ -522,6 +525,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session?.user) {
           const user = session.user;
+          activeAuthUserIdRef.current = user.id;
           const meta = user.user_metadata as any || {};
           const metaName = meta.name || user.email?.split('@')[0] || 'Believer';
           const metaUsername = meta.username || user.email?.split('@')[0] || 'believer';
@@ -552,6 +556,16 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
         if (session?.user) {
           const user = session.user;
+          if (activeAuthUserIdRef.current !== user.id) {
+            activeAuthUserIdRef.current = user.id;
+            setState(prev => ({
+              ...prev, userProfile: null,
+              favoritesFacts: [], favoritesScriptures: [], completedWOTDs: [],
+              readFactIds: [], bibleHighlights: {}, followedUserIds: [],
+              factsViewedCount: 0, sharesCount: 0, streak: 1,
+              lastLoginDate: null,
+            }));
+          }
           const meta = user.user_metadata as any || {};
           const metaName = meta.name || user.email?.split('@')[0] || 'Believer';
           const metaUsername = meta.username || user.email?.split('@')[0] || 'believer';
@@ -579,7 +593,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             },
           }));
         } else if (_event === 'SIGNED_OUT') {
-          setState(prev => ({ ...prev, userProfile: null }));
+          activeAuthUserIdRef.current = null;
+          setState(prev => ({
+            ...prev, userProfile: null, favoritesFacts: [], favoritesScriptures: [],
+            completedWOTDs: [], readFactIds: [], bibleHighlights: {},
+            followedUserIds: [], factsViewedCount: 0, sharesCount: 0,
+            streak: 1, lastLoginDate: null,
+          }));
         }
       });
 
@@ -1053,6 +1073,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = async () => {
+    activeAuthUserIdRef.current = null;
     if (SUPABASE_ANON_KEY) {
       try {
         await supabase.auth.signOut();
