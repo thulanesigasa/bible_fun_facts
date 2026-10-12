@@ -32,6 +32,7 @@ import { PinSecurityService } from '../services/pinSecurityService';
 import { PrivacyService } from '../services/privacyService';
 import { EncryptionService } from '../services/encryptionService';
 import { SecureStoreAdapter } from '../services/secureStorage';
+import { OfflineStudyQueue } from '../services/offlineStudyQueue';
 import { AuthProvider, UserProfile, SignUpExtendedParams } from './AuthContext';
 import { SecurityProvider } from './SecurityContext';
 import { ReaderSettingsProvider, LastReadBiblePosition } from './ReaderSettingsContext';
@@ -401,6 +402,16 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.warn('[UserContext] restoreRemoteUserData notice:', err);
     }
   };
+
+  // Replay previously recorded actions when the app returns to the foreground.
+  // This does not attempt to authenticate a new user while offline.
+  useEffect(() => {
+    OfflineStudyQueue.flush().catch(() => {});
+    const subscription = AppState.addEventListener('change', status => {
+      if (status === 'active') OfflineStudyQueue.flush().catch(() => {});
+    });
+    return () => subscription.remove();
+  }, []);
 
   // Load data on mount
   useEffect(() => {
@@ -1052,6 +1063,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const nextFavorites = exists
         ? prev.favoritesFacts.filter(f => f.id !== fact.id)
         : [...prev.favoritesFacts, fact];
+      OfflineStudyQueue.enqueue('favorite_fact', fact.id, !exists)
+        .then(() => OfflineStudyQueue.flush())
+        .catch(() => console.warn('[OfflineStudy] Fact bookmark pending sync could not be persisted.'));
       syncUserDataToRemote({ favoritesFacts: nextFavorites });
       return { ...prev, favoritesFacts: nextFavorites };
     });
@@ -1063,6 +1077,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const nextFavorites = exists
         ? prev.favoritesScriptures.filter(s => s.id !== scripture.id)
         : [...prev.favoritesScriptures, scripture];
+      OfflineStudyQueue.enqueue('favorite_scripture', scripture.id, !exists)
+        .then(() => OfflineStudyQueue.flush())
+        .catch(() => console.warn('[OfflineStudy] Scripture bookmark pending sync could not be persisted.'));
       syncUserDataToRemote({ favoritesScriptures: nextFavorites });
       return { ...prev, favoritesScriptures: nextFavorites };
     });
@@ -1072,6 +1089,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setState(prev => {
       const exists = prev.completedWOTDs.find(w => w.id === wotd.id);
       if (exists) return prev;
+      OfflineStudyQueue.enqueue('complete_wotd', wotd.id, true)
+        .then(() => OfflineStudyQueue.flush())
+        .catch(() => console.warn('[OfflineStudy] Devotional completion could not be persisted.'));
       return { ...prev, completedWOTDs: [...prev.completedWOTDs, wotd] };
     });
   };
