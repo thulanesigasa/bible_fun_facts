@@ -160,16 +160,26 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      # Publish to Production Channel
-      - name: Publish OTA Update to Production Channel
+      # Publish to Production Channel (Primary runtime 1.0.4)
+      - name: Publish OTA Update to Production Channel (runtime 1.0.4)
         if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (inputs.ota_channel == 'production' || inputs.ota_channel == 'both'))
         run: |
           eas update --branch production --environment production --message "${{ github.event.head_commit.message || 'Automated OTA production update from GitHub' }}" --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      # Publish to Preview Channel
-      - name: Publish OTA Update to Preview Channel
+      # Also publish to Production Channel for legacy 1.0.1 clients
+      - name: Publish OTA Update to Production Channel (runtime 1.0.1 legacy)
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (inputs.ota_channel == 'production' || inputs.ota_channel == 'both'))
+        run: |
+          node -e "const fs = require('fs'); const a = JSON.parse(fs.readFileSync('app.json', 'utf8')); a.expo.runtimeVersion = '1.0.1'; fs.writeFileSync('app.json', JSON.stringify(a, null, 2));"
+          eas update --branch production --environment production --message "Legacy 1.0.1 runtime: ${{ github.event.head_commit.message || 'Automated OTA update' }}" --non-interactive
+          git checkout app.json
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      # Publish to Preview Channel (Primary runtime 1.0.4)
+      - name: Publish OTA Update to Preview Channel (runtime 1.0.4)
         if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (inputs.ota_channel == 'preview' || inputs.ota_channel == 'both'))
         run: |
           eas update --branch preview --environment preview --message "${{ github.event.head_commit.message || 'Automated OTA preview update from GitHub' }}" --non-interactive
@@ -221,7 +231,7 @@ jobs:
       - name: Inject Incremental Compilation Build Version
         run: |
           BUILD_NUM="${{ inputs.compile_build_number || github.run_number }}"
-          echo "Compiling native build with dynamic build number: $BUILD_NUM (runtimeVersion remains 1.0.1)"
+          echo "Compiling native build with dynamic build number: $BUILD_NUM (runtimeVersion matches 1.0.4 per Rule 21)"
           node -e "
             const fs = require('fs');
             const app = JSON.parse(fs.readFileSync('app.json', 'utf8'));

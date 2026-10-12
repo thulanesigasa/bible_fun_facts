@@ -13,6 +13,8 @@
   <img src="https://img.shields.io/badge/CI%2FCD-Rule%2021%20Compliant-10B981?style=for-the-badge&logo=githubactions&logoColor=white" alt="Rule 21 Compliant" />
   <img src="https://img.shields.io/badge/Native%20APK-Conditional%20Gated%20Compilation-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Conditional Gated Compilation" />
   <img src="https://img.shields.io/badge/EAS%20Channels-Production%20%7C%20Preview-000000?style=for-the-badge&logo=expo&logoColor=white" alt="EAS Channels" />
+  <img src="https://img.shields.io/badge/Runtime%20Version-1.0.4%20%7C%20Rule%2021%20Locked-10B981?style=for-the-badge&logo=expo&logoColor=white" alt="Runtime Version 1.0.4 Locked" />
+  <img src="https://img.shields.io/badge/Dual--Runtime%20OTA-1.0.4%20%26%201.0.1%20Legacy-000000?style=for-the-badge&logo=githubactions&logoColor=white" alt="Dual-Runtime OTA Delivery" />
   <img src="https://img.shields.io/badge/Outer%20Release-v1.0.4-2563EB?style=for-the-badge&logo=android&logoColor=white" alt="Outer Release v1.0.4" />
   <img src="https://img.shields.io/badge/Security-Kotlin%20FLAG__SECURE-DC2626?style=for-the-badge&logo=android&logoColor=white" alt="Kotlin FLAG_SECURE" />
   <img src="https://img.shields.io/badge/Tab%20Architecture-Floating%20Pill%20280px-FDD223?style=for-the-badge" alt="Floating Pill Tab Bar" />
