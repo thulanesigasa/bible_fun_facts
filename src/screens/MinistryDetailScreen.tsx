@@ -33,6 +33,9 @@ import {
   CloseSvg,
   SearchSvg,
 } from '../components/SvgIcons';
+import { openDirections } from '../utils/directions';
+
+
 
 type StructureTab = 'all' | BranchType;
 
@@ -96,40 +99,16 @@ export default function MinistryDetailScreen({
   }, [branches, activeTab, searchQuery]);
 
   const handleOpenDirections = (b: Branch) => {
-    const hasCoords =
-      b.coordinates &&
-      typeof b.coordinates.latitude === 'number' &&
-      typeof b.coordinates.longitude === 'number' &&
-      (b.coordinates.latitude !== 0 || b.coordinates.longitude !== 0);
-
-    const lat = b.coordinates?.latitude;
-    const lng = b.coordinates?.longitude;
-    const label = encodeURIComponent(b.name);
-    const query = encodeURIComponent(`${b.name}, ${b.address}, ${b.town}, ${b.country}`);
-
-    let url: string;
-    if (hasCoords) {
-      url =
-        Platform.select({
-          ios: `maps:0,0?q=${label}&ll=${lat},${lng}`,
-          android: `geo:0,0?q=${lat},${lng}(${label})`,
-        }) || `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-    } else {
-      url =
-        Platform.select({
-          ios: `maps:0,0?q=${query}`,
-          android: `geo:0,0?q=${query}`,
-        }) || `https://www.google.com/maps/search/?api=1&query=${query}`;
-    }
-
-    const fallbackUrl = hasCoords
-      ? `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
-      : `https://www.google.com/maps/search/?api=1&query=${query}`;
-
-    Linking.openURL(url).catch(() => {
-      Linking.openURL(fallbackUrl);
+    openDirections({
+      latitude: b.coordinates?.latitude,
+      longitude: b.coordinates?.longitude,
+      name: b.name,
+      address: b.address,
+      town: b.town,
+      country: b.country,
     });
   };
+
 
   if (!ministry) {
     return (

@@ -26,15 +26,31 @@ import { colors } from '../theme/colors';
 import { spacing, radius } from '../theme';
 import { Text } from '../components/Typography';
 import { useThemedAlert } from '../context/AlertContext';
-import { searchTownsOnline, GeoLocation } from '../services/geoService';
+import {
+  searchTownsOnline,
+  searchAddressesOnline,
+  GeoLocation,
+  AddressSuggestion,
+} from '../services/geoService';
 import {
   registerBranch,
   getAllMinistries,
   Ministry,
   BranchType,
   getBranchTypeLabel,
+  formatBranchName,
 } from '../services/ministryService';
-import { CloseSvg, CheckSvg, SearchSvg } from '../components/SvgIcons';
+import {
+  CloseSvg,
+  CheckSvg,
+  SearchSvg,
+  MapPinSvg,
+  SyncSvg,
+} from '../components/SvgIcons';
+import PinDropModal from '../components/PinDropModal';
+
+export { formatBranchName };
+
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -146,15 +162,23 @@ export default function RegisterBranchScreen({
 
   // Step 3: Location
   const [branchName, setBranchName] = useState('');
-  const [townQuery, setTownQuery] = useState('Johannesburg');
-  const [province, setProvince] = useState('Gauteng');
+  const [isBranchNameCustomized, setIsBranchNameCustomized] = useState(false);
+  const [townQuery, setTownQuery] = useState('Standerton');
+  const [province, setProvince] = useState('Mpumalanga');
   const [country, setCountry] = useState('South Africa');
-  const [postalCode, setPostalCode] = useState('2000');
-  const [latitude, setLatitude] = useState(-26.2041);
-  const [longitude, setLongitude] = useState(28.0473);
+  const [postalCode, setPostalCode] = useState('2430');
+  const [latitude, setLatitude] = useState(-26.9333);
+  const [longitude, setLongitude] = useState(29.2417);
   const [address, setAddress] = useState('');
+  const [isCoordinatesExplicit, setIsCoordinatesExplicit] = useState(false);
   const [suggestions, setSuggestions] = useState<GeoLocation[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Address search suggestions & pin-drop
+  const [addressSuggestions, setAddressSuggestions] = useState<AddressSuggestion[]>([]);
+  const [showAddressSuggestions, setShowAddressSuggestions] = useState(false);
+  const [isSearchingAddress, setIsSearchingAddress] = useState(false);
+  const [showPinDropModal, setShowPinDropModal] = useState(false);
 
   // Step 4: Leadership & Contact
   const [leaderName, setLeaderName] = useState('');
@@ -186,6 +210,20 @@ export default function RegisterBranchScreen({
     });
   }, []);
 
+  const activeMinistry = ministries.find((m) => m.id === selectedMinistryId);
+
+  // Dynamic branch name formula synchronization:
+  // {Church Name} - {Town} {Branch Type Suffix}
+  useEffect(() => {
+    if (!isBranchNameCustomized) {
+      const churchName = activeMinistry?.name || initialMinistryName;
+      if (churchName) {
+        setBranchName(formatBranchName(churchName, townQuery, selectedType));
+      }
+    }
+  }, [selectedType, selectedMinistryId, ministries, townQuery, isBranchNameCustomized]);
+
+  // Town suggestions effect
   useEffect(() => {
     if (townQuery.trim().length >= 2) {
       searchTownsOnline(townQuery).then(setSuggestions);
@@ -193,6 +231,30 @@ export default function RegisterBranchScreen({
       setSuggestions([]);
     }
   }, [townQuery]);
+
+  // Street address autocomplete effect
+  useEffect(() => {
+    if (address.trim().length >= 3) {
+      const timer = setTimeout(() => {
+        setIsSearchingAddress(true);
+        searchAddressesOnline(address, townQuery, country)
+          .then((results) => {
+            setAddressSuggestions(results);
+            setShowAddressSuggestions(true);
+          })
+          .catch(() => {
+            setAddressSuggestions([]);
+          })
+          .finally(() => {
+            setIsSearchingAddress(false);
+          });
+      }, 350);
+      return () => clearTimeout(timer);
+    } else {
+      setAddressSuggestions([]);
+      setShowAddressSuggestions(false);
+    }
+  }, [address, townQuery, country]);
 
   const handleSelectTown = (item: GeoLocation) => {
     setTownQuery(item.town);
@@ -202,7 +264,72 @@ export default function RegisterBranchScreen({
     if (item.coordinates?.latitude !== undefined) setLatitude(item.coordinates.latitude);
     if (item.coordinates?.longitude !== undefined) setLongitude(item.coordinates.longitude);
     setShowSuggestions(false);
+
+    if (!isBranchNameCustomized) {
+      const churchName = activeMinistry?.name || initialMinistryName;
+      if (churchName) {
+        setBranchName(formatBranchName(churchName, item.town, selectedType));
+      }
+    }
   };
+
+  const handleSelectAddress = (item: AddressSuggestion) => {
+    setAddress(item.streetAddress || item.displayName);
+    if (item.coordinates?.latitude && item.coordinates?.longitude) {
+      setLatitude(item.coordinates.latitude);
+      setLongitude(item.coordinates.longitude);
+      setIsCoordinatesExplicit(true);
+    }
+    if (item.province) setProvince(item.province);
+    if (item.postalCode) setPostalCode(item.postalCode);
+    if (item.town && item.town.toLowerCase() !== townQuery.toLowerCase()) {
+      setTownQuery(item.town);
+      if (!isBranchNameCustomized) {
+        const churchName = activeMinistry?.name || initialMinistryName;
+        if (churchName) {
+          setBranchName(formatBranchName(churchName, item.town, selectedType));
+        }
+      }
+    }
+    setShowAddressSuggestions(false);
+  };
+
+  const handleConfirmPinDrop = (location: {
+    latitude: number;
+    longitude: number;
+    streetAddress?: string;
+    suburb?: string;
+    town?: string;
+    province?: string;
+    postalCode?: string;
+  }) => {
+    setLatitude(location.latitude);
+    setLongitude(location.longitude);
+    setIsCoordinatesExplicit(true);
+    if (location.streetAddress) {
+      setAddress(location.streetAddress);
+    }
+    if (location.town && location.town.toLowerCase() !== townQuery.toLowerCase()) {
+      setTownQuery(location.town);
+      if (!isBranchNameCustomized) {
+        const churchName = activeMinistry?.name || initialMinistryName;
+        if (churchName) {
+          setBranchName(formatBranchName(churchName, location.town, selectedType));
+        }
+      }
+    }
+    if (location.province) setProvince(location.province);
+    if (location.postalCode) setPostalCode(location.postalCode);
+  };
+
+  const handleResetBranchFormula = () => {
+    setIsBranchNameCustomized(false);
+    const churchName = activeMinistry?.name || initialMinistryName;
+    if (churchName) {
+      setBranchName(formatBranchName(churchName, townQuery, selectedType));
+    }
+  };
+
 
   const buildPhone = (): string => {
     const digits = phoneNumber.replace(/\D/g, '').replace(/^0+/, '');
@@ -212,7 +339,6 @@ export default function RegisterBranchScreen({
   const buildMeetingTimesString = (): string =>
     services.map((s) => `${s.day}s: ${s.time} — ${s.label}`).join(' | ');
 
-  const activeMinistry = ministries.find((m) => m.id === selectedMinistryId);
 
   const goToStep = (n: number) => {
     setStep(n);
@@ -508,18 +634,36 @@ export default function RegisterBranchScreen({
                 Search a town or city — province and postal code are filled automatically.
               </Text>
 
-              {/* Branch Name */}
+              {/* Branch Name with Dynamic Formula */}
               <View style={styles.fieldGroup}>
-                <Text style={styles.fieldLabel}>{getBranchTypeLabel(selectedType)} Name *</Text>
+                <View style={styles.labelRow}>
+                  <Text style={styles.fieldLabel}>{getBranchTypeLabel(selectedType)} Name *</Text>
+                  <TouchableOpacity
+                    style={styles.formulaBtn}
+                    onPress={handleResetBranchFormula}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel="Sync standard name formula"
+                  >
+                    <SyncSvg size={11} color="#64748B" />
+                    <Text style={styles.formulaBtnText}>Auto-Formula</Text>
+                  </TouchableOpacity>
+                </View>
                 <TextInput
                   style={styles.input}
-                  placeholder={`e.g. ${activeMinistry?.name || ''} Sandton Branch`}
+                  placeholder={`e.g. ${activeMinistry?.name || ''} - ${townQuery} ${getBranchTypeLabel(selectedType)}`}
                   placeholderTextColor="#94A3B8"
                   value={branchName}
-                  onChangeText={setBranchName}
+                  onChangeText={(v) => {
+                    setBranchName(v);
+                    setIsBranchNameCustomized(true);
+                  }}
                   autoCapitalize="words"
                   returnKeyType="next"
                 />
+                <Text style={styles.fieldHint}>
+                  Auto-formatted: Church Name - Town {selectedType === 'homecell' ? 'Homecell' : getBranchTypeLabel(selectedType)}
+                </Text>
               </View>
 
               {/* Town search */}
@@ -583,17 +727,75 @@ export default function RegisterBranchScreen({
                 </View>
               </View>
 
-              {/* Street address */}
+              {/* Street address with Autocomplete Suggestions */}
               <View style={styles.fieldGroup}>
-                <Text style={styles.fieldLabel}>Street Address (Optional)</Text>
+                <Text style={styles.fieldLabel}>Street Address (Live Suggestions & GPS)</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="e.g. 12 Main Street, Sandton"
+                  placeholder="e.g. 14 Willow Street, Standerton"
                   placeholderTextColor="#94A3B8"
                   value={address}
-                  onChangeText={setAddress}
+                  onChangeText={(v) => {
+                    setAddress(v);
+                    setShowAddressSuggestions(true);
+                  }}
+                  onFocus={() => {
+                    if (addressSuggestions.length > 0) setShowAddressSuggestions(true);
+                  }}
                   returnKeyType="next"
                 />
+                {isSearchingAddress && (
+                  <Text style={styles.searchingHint}>Searching exact address coordinates...</Text>
+                )}
+
+                {/* Address Autocomplete Suggestions Dropdown */}
+                {showAddressSuggestions && addressSuggestions.length > 0 && (
+                  <View style={styles.addressSuggestionList}>
+                    {addressSuggestions.slice(0, 5).map((item, idx) => (
+                      <TouchableOpacity
+                        key={`${item.streetAddress}_${idx}`}
+                        style={styles.addressSuggestionRow}
+                        onPress={() => handleSelectAddress(item)}
+                        activeOpacity={0.7}
+                      >
+                        <View style={{ flex: 1, paddingRight: 8 }}>
+                          <Text style={styles.addressSuggestionTitle} numberOfLines={1}>
+                            {item.streetAddress}
+                          </Text>
+                          <Text style={styles.addressSuggestionSubtitle} numberOfLines={1}>
+                            {item.suburb ? `${item.suburb}, ` : ''}{item.town}, {item.province}
+                          </Text>
+                          <Text style={styles.addressCoordTag}>
+                            GPS: {item.coordinates.latitude.toFixed(4)}, {item.coordinates.longitude.toFixed(4)}
+                          </Text>
+                        </View>
+                        <CheckSvg size={14} color="#0F172A" />
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+
+                {/* Pin-Drop Location Button */}
+                <TouchableOpacity
+                  style={styles.pinDropBtn}
+                  onPress={() => setShowPinDropModal(true)}
+                  activeOpacity={0.8}
+                  accessibilityRole="button"
+                  accessibilityLabel="Pin-drop exact location on map"
+                >
+                  <MapPinSvg size={18} color="#0F172A" fill="#FDD223" strokeWidth={2} />
+                  <Text style={styles.pinDropBtnText}>Pin-Drop Location on Map</Text>
+                </TouchableOpacity>
+
+                {/* GPS Status Badge */}
+                <View style={[styles.gpsStatusRow, isCoordinatesExplicit ? styles.gpsStatusLocked : styles.gpsStatusApprox]}>
+                  <MapPinSvg size={14} color={isCoordinatesExplicit ? '#0F172A' : '#64748B'} />
+                  <Text style={styles.gpsStatusText}>
+                    {isCoordinatesExplicit
+                      ? `Locked GPS: ${latitude.toFixed(5)}, ${longitude.toFixed(5)} (Exact Street Navigation)`
+                      : `Town Centroid: ${latitude.toFixed(4)}, ${longitude.toFixed(4)} (Tap Pin-Drop to set exact location)`}
+                  </Text>
+                </View>
               </View>
 
               <View style={styles.actionRow}>
@@ -925,6 +1127,16 @@ export default function RegisterBranchScreen({
 
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Interactive Map Pin-Drop Location Selector */}
+      <PinDropModal
+        visible={showPinDropModal}
+        initialLatitude={latitude}
+        initialLongitude={longitude}
+        townName={townQuery}
+        onClose={() => setShowPinDropModal(false)}
+        onConfirm={handleConfirmPinDrop}
+      />
     </SafeAreaView>
   );
 }
@@ -1168,4 +1380,119 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   secondaryBtnText: { color: '#0F172A', fontSize: 13, fontWeight: '700' },
+
+  // Dynamic naming formula & address styles
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.xs,
+  },
+  formulaBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    backgroundColor: '#F1F5F9',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  formulaBtnText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  fieldHint: {
+    fontSize: 11,
+    color: '#64748B',
+    marginTop: 4,
+    lineHeight: 16,
+  },
+  searchingHint: {
+    fontSize: 11,
+    color: '#64748B',
+    fontStyle: 'italic',
+    marginTop: 4,
+  },
+  addressSuggestionList: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(15,23,42,0.12)',
+    borderRadius: radius.sm,
+    marginTop: 4,
+    maxHeight: 220,
+    overflow: 'hidden',
+  },
+  addressSuggestionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.md,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15,23,42,0.06)',
+  },
+  addressSuggestionTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0F172A',
+    marginBottom: 1,
+  },
+  addressSuggestionSubtitle: {
+    fontSize: 11,
+    color: '#64748B',
+  },
+  addressCoordTag: {
+    fontSize: 10,
+    color: '#94A3B8',
+    fontFamily: Platform.select({ ios: 'Menlo', default: 'monospace' }),
+    marginTop: 2,
+  },
+  pinDropBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 11,
+    paddingHorizontal: 16,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#FDD223',
+    borderRadius: radius.sm,
+    marginTop: 8,
+  },
+  pinDropBtnText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  gpsStatusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderRadius: radius.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginTop: 6,
+  },
+  gpsStatusLocked: {
+    backgroundColor: 'rgba(253, 210, 35, 0.20)',
+    borderWidth: 1,
+    borderColor: '#FDD223',
+  },
+  gpsStatusApprox: {
+    backgroundColor: '#F1F5F9',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  gpsStatusText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#0F172A',
+    flex: 1,
+    lineHeight: 15,
+  },
 });
+

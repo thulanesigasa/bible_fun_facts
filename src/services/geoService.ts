@@ -25,6 +25,20 @@ export interface GeoLocation {
   };
 }
 
+export interface AddressSuggestion {
+  displayName: string;
+  streetAddress: string;
+  suburb?: string;
+  town: string;
+  province: string;
+  country: string;
+  postalCode: string;
+  coordinates: {
+    latitude: number;
+    longitude: number;
+  };
+}
+
 export const GEO_DATABASE: GeoLocation[] = [
   // ==========================================================================
   // SOUTH AFRICA — GAUTENG (Expanded Suburbs & Townships)
@@ -504,6 +518,42 @@ export const GEO_DATABASE: GeoLocation[] = [
     postalCode: '2302',
     coordinates: { latitude: -26.5503, longitude: 29.1664 },
   },
+  {
+    town: 'Standerton',
+    province: 'Mpumalanga',
+    country: 'South Africa',
+    postalCode: '2430',
+    coordinates: { latitude: -26.9333, longitude: 29.2417 },
+  },
+  {
+    town: 'Ermelo',
+    province: 'Mpumalanga',
+    country: 'South Africa',
+    postalCode: '2350',
+    coordinates: { latitude: -26.5333, longitude: 29.9833 },
+  },
+  {
+    town: 'Bethal',
+    province: 'Mpumalanga',
+    country: 'South Africa',
+    postalCode: '2310',
+    coordinates: { latitude: -26.4583, longitude: 29.4642 },
+  },
+  {
+    town: 'Piet Retief',
+    province: 'Mpumalanga',
+    country: 'South Africa',
+    postalCode: '2380',
+    coordinates: { latitude: -27.0071, longitude: 30.8130 },
+  },
+  {
+    town: 'Barberton',
+    province: 'Mpumalanga',
+    country: 'South Africa',
+    postalCode: '1300',
+    coordinates: { latitude: -25.7889, longitude: 31.0532 },
+  },
+
 
   // ==========================================================================
   // SOUTH AFRICA — LIMPOPO
@@ -1080,3 +1130,295 @@ export function getProvincesByCountry(country: string): string[] {
   ).forEach((item) => provinces.add(item.province));
   return Array.from(provinces).sort();
 }
+
+/**
+ * Live OpenStreetMap Nominatim Street Address Search
+ */
+async function queryNominatimAddress(
+  searchQuery: string,
+  townHint?: string,
+  countryHint: string = 'South Africa'
+): Promise<AddressSuggestion[]> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 4000);
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+      searchQuery
+    )}&format=json&addressdetails=1&limit=6`;
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'BibleFunFactsApp/1.0 (contact@exegeomai.app)',
+        Accept: 'application/json',
+      },
+    });
+    clearTimeout(timer);
+    if (!res.ok) return [];
+    const data = await res.json();
+    if (!Array.isArray(data)) return [];
+
+    return data
+      .map((item: any) => {
+        const addr = item.address || {};
+        const houseNumber = addr.house_number || '';
+        const road =
+          addr.road ||
+          addr.street ||
+          addr.pedestrian ||
+          addr.footway ||
+          addr.path ||
+          '';
+        const suburb = addr.suburb || addr.neighbourhood || addr.residential || '';
+        const town =
+          addr.city ||
+          addr.town ||
+          addr.village ||
+          addr.municipality ||
+          townHint ||
+          suburb ||
+          '';
+        const province = addr.state || addr.province || addr.region || '';
+        const country = addr.country || countryHint;
+        const postalCode = addr.postcode || '';
+
+        const streetAddress =
+          [houseNumber, road].filter(Boolean).join(' ') || item.name || '';
+        if (!streetAddress && !suburb && !town) return null;
+
+        const displayName =
+          item.display_name ||
+          [streetAddress, suburb, town, province].filter(Boolean).join(', ');
+
+        return {
+          displayName,
+          streetAddress: streetAddress || displayName.split(',')[0],
+          suburb,
+          town: town || suburb,
+          province,
+          country,
+          postalCode,
+          coordinates: {
+            latitude: parseFloat(item.lat),
+            longitude: parseFloat(item.lon),
+          },
+        };
+      })
+      .filter(Boolean) as AddressSuggestion[];
+  } catch {
+    clearTimeout(timer);
+    return [];
+  }
+}
+
+/**
+ * Live Photon (Komoot OSM) Street Address Search Fallback
+ */
+async function queryPhotonAddress(
+  searchQuery: string,
+  townHint?: string,
+  countryHint: string = 'South Africa'
+): Promise<AddressSuggestion[]> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 3500);
+  try {
+    const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(searchQuery)}&limit=6`;
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timer);
+    if (!res.ok) return [];
+    const data = await res.json();
+    if (!data?.features || !Array.isArray(data.features)) return [];
+
+    return data.features
+      .map((f: any) => {
+        const p = f.properties || {};
+        const houseNumber = p.housenumber || '';
+        const street = p.street || '';
+        const streetAddress =
+          [houseNumber, street].filter(Boolean).join(' ') || p.name || '';
+        const suburb = p.district || p.suburb || '';
+        const town = p.city || p.town || p.locality || townHint || suburb || '';
+        const province = p.state || '';
+        const country = p.country || countryHint;
+        const postalCode = p.postcode || '';
+
+        if (!streetAddress && !suburb && !town) return null;
+
+        const displayName =
+          [streetAddress, suburb, town, province, country].filter(Boolean).join(', ');
+
+        return {
+          displayName,
+          streetAddress: streetAddress || displayName.split(',')[0],
+          suburb,
+          town,
+          province,
+          country,
+          postalCode,
+          coordinates: {
+            latitude: f.geometry?.coordinates?.[1] || 0,
+            longitude: f.geometry?.coordinates?.[0] || 0,
+          },
+        };
+      })
+      .filter(Boolean) as AddressSuggestion[];
+  } catch {
+    clearTimeout(timer);
+    return [];
+  }
+}
+
+/**
+ * Real-Time Street Address Autocomplete with Exact GPS Coordinates.
+ * Pulls suggestions from Nominatim + Photon with AsyncStorage caching.
+ */
+export async function searchAddressesOnline(
+  query: string,
+  townHint?: string,
+  countryHint: string = 'South Africa'
+): Promise<AddressSuggestion[]> {
+  const q = query.trim();
+  if (q.length < 2) return [];
+
+  const hasTown = townHint && q.toLowerCase().includes(townHint.toLowerCase());
+  const searchQuery = hasTown
+    ? `${q}, ${countryHint}`
+    : townHint
+    ? `${q}, ${townHint}, ${countryHint}`
+    : `${q}, ${countryHint}`;
+
+  const cacheKey = `@addr_cache_v2_${searchQuery.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+  try {
+    const cached = await AsyncStorage.getItem(cacheKey);
+    if (cached) {
+      const parsed: AddressSuggestion[] = JSON.parse(cached);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch {
+    // ignore
+  }
+
+  let suggestions: AddressSuggestion[] = await queryNominatimAddress(
+    searchQuery,
+    townHint,
+    countryHint
+  );
+
+  if (suggestions.length === 0 && searchQuery !== `${q}, ${countryHint}`) {
+    suggestions = await queryNominatimAddress(`${q}, ${countryHint}`, townHint, countryHint);
+  }
+
+  if (suggestions.length === 0) {
+    suggestions = await queryPhotonAddress(searchQuery, townHint, countryHint);
+  }
+
+  // Deduplicate by displayName or coordinates
+  const seen = new Set<string>();
+  const deduplicated: AddressSuggestion[] = [];
+  for (const s of suggestions) {
+    const key = `${s.streetAddress.toLowerCase()}_${s.coordinates.latitude.toFixed(4)}_${s.coordinates.longitude.toFixed(4)}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      deduplicated.push(s);
+    }
+  }
+
+  if (deduplicated.length > 0) {
+    try {
+      await AsyncStorage.setItem(cacheKey, JSON.stringify(deduplicated.slice(0, 10)));
+    } catch {
+      // ignore
+    }
+  }
+
+  return deduplicated.slice(0, 8);
+}
+
+/**
+ * Reverse Geocodes exact GPS coordinates into a street address and town.
+ */
+export async function reverseGeocodeOnline(
+  latitude: number,
+  longitude: number
+): Promise<AddressSuggestion | null> {
+  const cacheKey = `@rev_geo_v1_${latitude.toFixed(4)}_${longitude.toFixed(4)}`;
+  try {
+    const cached = await AsyncStorage.getItem(cacheKey);
+    if (cached) {
+      const parsed: AddressSuggestion = JSON.parse(cached);
+      if (parsed?.coordinates) return parsed;
+    }
+  } catch {
+    // ignore
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 4000);
+  try {
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1`;
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'BibleFunFactsApp/1.0 (contact@exegeomai.app)',
+        Accept: 'application/json',
+      },
+    });
+    clearTimeout(timer);
+    if (!res.ok) return null;
+    const item = await res.json();
+    if (!item || !item.address) return null;
+
+    const addr = item.address;
+    const houseNumber = addr.house_number || '';
+    const road =
+      addr.road ||
+      addr.street ||
+      addr.pedestrian ||
+      addr.footway ||
+      '';
+    const suburb = addr.suburb || addr.neighbourhood || addr.residential || '';
+    const town =
+      addr.city ||
+      addr.town ||
+      addr.village ||
+      addr.municipality ||
+      suburb ||
+      '';
+    const province = addr.state || addr.province || addr.region || '';
+    const country = addr.country || 'South Africa';
+    const postalCode = addr.postcode || '';
+
+    const streetAddress =
+      [houseNumber, road].filter(Boolean).join(' ') || item.name || '';
+    const displayName =
+      item.display_name ||
+      [streetAddress, suburb, town, province].filter(Boolean).join(', ');
+
+    const result: AddressSuggestion = {
+      displayName,
+      streetAddress: streetAddress || displayName.split(',')[0],
+      suburb,
+      town: town || suburb,
+      province,
+      country,
+      postalCode,
+      coordinates: {
+        latitude,
+        longitude,
+      },
+    };
+
+    try {
+      await AsyncStorage.setItem(cacheKey, JSON.stringify(result));
+    } catch {
+      // ignore
+    }
+
+    return result;
+  } catch {
+    clearTimeout(timer);
+    return null;
+  }
+}
+
