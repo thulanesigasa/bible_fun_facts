@@ -31,13 +31,12 @@ function serialize<T>(job: () => Promise<T>): Promise<T> {
   return next;
 }
 
+let localSequence = 0;
 function newOperationId(): string {
-  if (!globalThis.crypto || typeof globalThis.crypto.getRandomValues !== 'function') {
-    throw new Error('Secure random generator is unavailable for offline operation IDs.');
-  }
-  const b = new Uint8Array(16);
-  globalThis.crypto.getRandomValues(b);
-  return Array.from(b, n => n.toString(16).padStart(2, '0')).join('');
+  // IDs only label queue entries locally; database idempotence comes from
+  // UNIQUE(user_id, entity_id) and upserts, NOT unpredictability of this ID.
+  localSequence += 1;
+  return `${Date.now().toString(36)}-${localSequence.toString(36)}`;
 }
 
 async function currentUserId(): Promise<string> {
