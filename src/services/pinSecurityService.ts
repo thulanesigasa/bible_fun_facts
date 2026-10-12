@@ -90,15 +90,37 @@ export function sha256(ascii: string): string {
 }
 
 /**
- * Generates a pseudo-random hex salt string.
+ * Generates a cryptographically secure hex salt string.
  */
 function generateSalt(length = 32): string {
-  const chars = '0123456789abcdef';
-  let salt = '';
-  for (let i = 0; i < length; i++) {
-    salt += chars.charAt(Math.floor(Math.random() * chars.length));
+  const cryptoProvider = globalThis.crypto;
+  if (!cryptoProvider || typeof cryptoProvider.getRandomValues !== 'function') {
+    throw new Error('Secure random generator is unavailable for PIN salt.');
   }
-  return salt;
+  const bytes = new Uint8Array(Math.ceil(length / 2));
+  cryptoProvider.getRandomValues(bytes);
+  return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('').slice(0, length);
+}
+
+const SCRYPT_WORK_FACTOR = 1 << 14;
+const SCRYPT_PREFIX = 'scrypt-v1';
+
+/** Scrypt is memory-hard and audited. The legacy SHA256 hash is read-only. */
+async function derivePinHash(pin: string, salt: string): Promise<string> {
+  const { scryptAsync } = await import('@noble/hashes/scrypt.js');
+  const bytes = await scryptAsync(pin, salt, {
+    N: SCRYPT_WORK_FACTOR, r: 8, p: 1, dkLen: 32,
+    asyncTick: 12, maxmem: 32 * 1024 * 1024,
+  });
+  return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+}
+
+/** Compares fixed-length hash hex strings without early character mismatch exit. */
+function equalHash(a: string, b: string): boolean {
+  if (a.length !== 64 || b.length !== 64) return false;
+  let mismatch = 0;
+  for (let i = 0; i < 64; i++) mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return mismatch === 0;
 }
 
 export interface PinVerifyResult {
@@ -131,11 +153,13 @@ export const PinSecurityService = {
         throw new Error('PIN must be exactly 4 numeric digits');
       }
       const salt = generateSalt(32);
-      const hash = sha256(pin + salt);
+      const hash = await derivePinHash(pin, salt);
 
-      await SecureStoreAdapter.setItem(PIN_SALT_KEY, salt);
-      await SecureStoreAdapter.setItem(PIN_HASH_KEY, hash);
+      // Publish salt + scrypt hash as one atomic encrypted key-store value.
+      // A crash can no longer pair an old PIN hash with a new salt.
+      await SecureStoreAdapter.setItem(PIN_HASH_KEY, SCRYPT_PREFIX + '$' + salt + '$' + hash);
       await SecureStoreAdapter.setItem(PIN_ENABLED_KEY, 'true');
+      await SecureStoreAdapter.removeItem(PIN_SALT_KEY).catch(() => {});
 
       // Clear previous lockouts
       await SecureStoreAdapter.removeItem(PIN_FAILED_ATTEMPTS_KEY);
@@ -184,19 +208,35 @@ export const PinSecurityService = {
         };
       }
 
-      // 2. Fetch Hash and Salt
+      // 2. Compare a memory-hard record or a legacy record requiring upgrade.
       const storedHash = await SecureStoreAdapter.getItem(PIN_HASH_KEY);
-      const storedSalt = await SecureStoreAdapter.getItem(PIN_SALT_KEY);
-
-      if (!storedHash || !storedSalt) {
+      if (!storedHash) {
         return { success: false, error: 'No security PIN has been set on this device' };
       }
 
-      const inputHash = sha256(pin + storedSalt);
+      let isValid = false;
+      let needsUpgrade = false;
+      if (storedHash.startsWith(SCRYPT_PREFIX + '$')) {
+        const parts = storedHash.split('$');
+        if (parts.length !== 3 || parts[0] !== SCRYPT_PREFIX ||
+            !/^[0-9a-f]{32}$/i.test(parts[1]) ||
+            !/^[0-9a-f]{64}$/i.test(parts[2])) {
+          return { success: false, error: 'Invalid secure PIN format.' };
+        }
+        isValid = equalHash(await derivePinHash(pin, parts[1]), parts[2]);
+      } else {
+        // Read old salted SHA256 data only to migrate an existing user's PIN
+        // after the correct entry has been verified.
+        const legacySalt = await SecureStoreAdapter.getItem(PIN_SALT_KEY);
+        needsUpgrade = typeof legacySalt === 'string' &&
+          /^[0-9a-f]{64}$/i.test(storedHash);
+        isValid = needsUpgrade && equalHash(sha256(pin + legacySalt!), storedHash);
+      }
 
-      // 3. Constant-time match
-      if (inputHash === storedHash) {
-        // Reset failed attempts upon success
+      if (isValid) {
+        if (needsUpgrade && !(await PinSecurityService.setPin(pin))) {
+          return { success: false, error: 'Could not upgrade legacy PIN protection.' };
+        }
         await SecureStoreAdapter.removeItem(PIN_FAILED_ATTEMPTS_KEY);
         await SecureStoreAdapter.removeItem(PIN_LOCKOUT_UNTIL_KEY);
         return { success: true };

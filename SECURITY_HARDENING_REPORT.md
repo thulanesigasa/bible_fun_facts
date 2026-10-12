@@ -1,0 +1,87 @@
+# Security Hardening Report — Master Prompt 2
+
+## Status: SECURITY NO-GO for public release
+
+This report tracks implementation on `security/master-prompt-2-rls-ownership`. A passing TypeScript/Jest/Expo CI gate does not replace database adversarial testing, mobile-device tests or a vetted cryptographic implementation.
+
+### Implemented in this branch
+- Removed fabricated/local first-time login and fake offline account signup from both authentication contexts.
+- Restored authentication identity from a securely stored Supabase session, not an arbitrary plaintext local profile.
+- Scoped local study data to immutable auth user IDs and added owner boundaries for legacy streak keys.
+- Changed secure token/secret storage to fail closed, without falling back to plaintext AsyncStorage.
+- Added a durable, per-account offline mutation queue for fact and scripture favorites and devotional completion. Retries are serialized; server writes use unique-key upserts or idempotent deletes.
+- Confirmed account deletion RPC must return `true`; a network error or `false` cannot be described as completed deletion.
+- Added forward-only owner-only RLS policies for ministry/branch modifications and private profile select.
+- Revoked public username-email resolver, closed avatar upload path ownership hole, and removed public execution of privileged ministry counter RPC.
+- Added an owner-only server privacy-settings table with private-by-default values.
+- Removed universal fallback encryption key and insecure random key/IV generation; encryption now requires CSPRNG availability.
+- Replaced PIN salt Math.random with CSPRNG and removed early-exit hash comparison.
+- Reduced Sentry identity, request and contextual payload exposure.
+- Added automated secure-storage and offline-queue tests.
+
+### Blocking work before any SECURITY GO
+1. Validate the new WebCrypto AES-256-GCM journal exports on actual Android/iOS builds and provision a vetted platform crypto provider where absent. Legacy v1 CBC is still supported for reading older exports; test and document migration without discarding user data.
+2. Strengthen low-entropy PIN verification with an appropriate slow KDF / native unlock API and verify rate limiting against app restart/clock changes.
+3. Build complete offline synchronization for personal notes, highlights, read progress, achievements and preferences; resolve conflicts, protect in-flight data, and test interruption/reconnect/expiry/reinstall.
+4. Finish proper authenticated-offline authorization state machine, including expiry/revocation policy; session presence alone is insufficient as an offline entitlement model.
+5. Verify privacy rules end to end; public people search must use a carefully allowlisted privacy-aware server endpoint (old broad `profiles` reads were intentionally disabled).
+6. Implement secure server-side username authentication if username login is to be restored; currently login requires email.
+7. Validate migrations in disposable Supabase and staging, including adversarial account A/account B and anonymous cases; do not apply untested security SQL directly to production.
+8. Audit all remaining RLS and `SECURITY DEFINER` functions, storage ownership and privacy-sensitive social functionality.
+9. Confirm account deletion server cascade through auth, storage and user-data tables with real test accounts; verify deletion errors and false returns.
+10. Real-device offline, network transition, session expiry, privacy, biometrics, exports and release smoke tests.
+
+### Verification
+- GitHub CI has run TypeScript, Jest, Expo Doctor, Android export and scoped dependency audit on branch commits.
+- SQL migration staging execution and two-account RLS attack tests: **not executed** in this environment.
+- Real-device security/offline tests: **not executed**.
+
+### Release constraint
+`app.json` Expo `runtimeVersion` must remain exactly `"1.0.1"`. This branch does not change it.
+
+### Merge policy
+Keep PR draft and DO NOT MERGE for production until all deployment-affecting behavior is tested and outstanding blockers are resolved.
+
+### Follow-up changes
+- Added atomic `set_my_privacy_preference` SECURITY INVOKER RPC so changing one server-side privacy preference cannot reset unrelated flags; privacy reads now consult the server and fail private if unavailable.
+- Changed the secondary `UserDataContext` to use a per-account secure cache rather than globally shared plaintext preference and study keys.
+- Added privacy regression tests for atomic writes, missing sessions and offline server reads.
+
+### Additional validation needed
+- Real-device data migration/recovery is essential: the new secondary secure storage intentionally does not import globally shared legacy data without verified ownership. Identify safe migration paths and regression-test upgrade from the last production build.
+
+### October 12 follow-up: atomic SecureStore and authenticated archives
+- SecureStoreAdapter now writes encrypted secrets with a two-bank versioned manifest. Interrupted writes must leave the previous committed secret readable. Existing v1 native-chunk secrets remain readable for migration; the adapter never reads from plaintext AsyncStorage.
+- New journal exports use WebCrypto AES-256-GCM with an authenticated tag, version 2. Legacy v1 CBC archives are readable only for compatibility; new exports never emit version 1.
+- Added regression tests for interrupted secure-storage writes, legacy native chunk reads, modified ciphertext, and unavailable WebCrypto.
+- **Mobile runtime limitation:** Expo/Hermes environments must be tested for WebCrypto AES-GCM availability. Without an implementation the journal export fails closed. This is not yet proof of operational encrypted journal exports on real devices.
+
+### One-pass integration follow-up (2026-10-12)
+- Main UserContext private study cache now uses a per-account native SecureStore key; legacy plaintext import requires a matching immutable `_authUserId` and encrypted write success before removal. There is no automatic import of owner-unknown legacy plaintext data.
+- Both contexts clear private in-memory data on account transitions; async restore in the secondary context is guarded against stale concurrent login/logout events.
+- Confirmed deletion removes the main and secondary encrypted caches and durable queue for the deleting user. Local cleanup failures must still be surfaced and checked on-device.
+- Added an opt-in, allowlisted `search_public_scholars` SQL RPC. It does not return email, telephone or private streaks.
+- Extended durable offline queue for fact reads and verse highlight edits/removals, with owner-only RLS and deterministic idempotent write semantics. No cryptographic randomness is required merely to assign queue operation labels.
+- Branch count updates now have a database trigger proposed; the privileged client increment function is revoked in the security migration.
+- Added GitHub Actions workflow `.github/workflows/supabase-migration-check.yml` to start disposable Supabase and replay all migrations on a clean local database. This is **not** equivalent to staging deployment or actual multi-user adversarial testing.
+
+### Remaining external release prerequisites
+1. Validate Supabase migrations (including user deletion, storage object cleanup and all RLS denial cases) against a staging project with two real test accounts, and deploy migrations through a controlled release.
+2. Test native Android/iOS JS encryption provider availability, secure-storage migration, offline restore/queue replay and account switching using device builds.
+3. Implement and test note synchronization and server-authoritative achievements/streak conflict resolution, including offline edits and multi-device conflicts.
+4. Confirm legacy data migration and recovery behavior against a real upgraded installation; no silent discard of unowned data.
+5. Validate 4-digit PIN protection and session revocation behavior. A salted fast SHA-256 hash is not a slow password KDF.
+6. Add live endpoint wiring and functional testing for opt-in community discovery; the SQL RPC alone does not restore every screen behavior.
+
+**Do not classify PR #922 as complete or merge until these checks are satisfied.**
+
+### 2026-10-12 end-to-end hardening follow-up
+- PIN secrets now use memory-hard scrypt N=16384, r=8, p=1 via audited @noble/hashes and one atomic encrypted salt+hash record. A successful legacy SHA256 PIN verification transparently upgrades the record; wrong PINs never upgrade it. Automated tests exercise migration and scrypt/Node OpenSSL equivalence. Physical device responsiveness and tamper/clock lockout tests remain.
+- Version 2 encrypted journal exports use AES-256-GCM and audited @noble/ciphers on JavaScript runtimes without WebCrypto.subtle. Real ESM AES-GCM interoperability vs Node OpenSSL and modified-tag rejection run in CI. CSPRNG remains mandatory. Expo runtimeVersion remains `1.0.1`.
+- Offline study events preserve source timestamps; a protected RLS table stores earned achievement IDs permanently, and the app can display badges after bookmarks/highlights are removed. New event and private-note queue operations are owner-isolated. The notes API has not yet been connected to an interactive note editor.
+- Private study mode is account scoped and fails private on startup, and UserContext does not flush offline operations until privacy settings restore.
+- Privileged database functions and editable column grants are tightened by the latest forward-only SQL migration. Disposable two-user and anonymous attack tests must remain green.
+- **IMPORTANT RELEASE GATE**: This work has NOT been deployed to the connected live exégeomai Supabase project. The currently installed production app may require public profile reads or username lookup that the privacy migrations deliberately revoke, so migration deployment must be coordinated with an app build/OTA rollout. Merge on main also triggers preview OTA publishing. No native Android/iOS security checks have run. No live production data or migrations have been changed.
+
+### Release go/no-go, updated
+The branch cannot be described as finished until both GitHub workflows are green at the SAME HEAD, compatibility tests on installed app versions are completed, a production migration rollout/rollback sequence is vetted, and account A/B test sessions verify privacy and actual deletion. Native biometric/PIN offline behavior and data restoration are not covered by the Node/Metro export CI. Keep PR draft until verified.

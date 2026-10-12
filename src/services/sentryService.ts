@@ -32,6 +32,7 @@ export function initSentry(): void {
     Sentry.init({
       dsn: SENTRY_DSN,
       debug: __DEV__,
+      sendDefaultPii: false,
       enableAutoSessionTracking: true,
       sessionTrackingIntervalMillis: 30000,
       tracesSampleRate: __DEV__ ? 1.0 : 0.2, // Sample 20% of transactions in production
@@ -40,9 +41,16 @@ export function initSentry(): void {
       },
       beforeSend(event) {
         // Sanitize sensitive auth headers and personal info if any
-        if (event.request?.headers) {
-          delete event.request.headers['Authorization'];
+        // Do not transmit request headers, URLs, user-entered text or identities.
+        if (event.request) {
+          delete event.request.headers;
+          delete event.request.cookies;
+          delete event.request.data;
+          delete event.request.url;
+          delete event.request.query_string;
         }
+        delete event.user;
+        delete event.extra;
         return event;
       },
     });
@@ -79,7 +87,8 @@ export function captureException(
     if (SENTRY_DSN) {
       Sentry.captureException(error, {
         tags: context?.tags,
-        extra: context?.extra,
+        // Caller-provided extras may contain study notes or contact details.
+        extra: undefined,
         level: context?.level || 'error',
       });
     }
@@ -125,7 +134,8 @@ export function addBreadcrumb(
       Sentry.addBreadcrumb({
         category,
         message,
-        data,
+        // User-controlled breadcrumb data is deliberately discarded.
+        data: undefined,
         level: 'info',
       });
     }
@@ -143,8 +153,7 @@ export function setSentryUser(user: { id: string; email?: string; username?: str
       if (user) {
         Sentry.setUser({
           id: user.id,
-          email: user.email,
-          username: user.username,
+
         });
       } else {
         Sentry.setUser(null);

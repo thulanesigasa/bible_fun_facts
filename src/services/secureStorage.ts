@@ -1,121 +1,148 @@
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const CHUNK_SIZE = 1800; // Android Keystore threshold is ~2048 bytes per entry
+const CHUNK_SIZE = 1800;
+const MAX_CHUNKS = 1024;
+type Manifest = { version: 2; bank: 0 | 1; count: number };
+const manifestKey = (key: string) => `${key}_manifest_v2`;
+const bankChunk = (key: string, bank: 0 | 1, index: number) =>
+  `${key}_v2_${bank}_${index}`;
 
-/**
- * Enterprise-grade, resilient encrypted storage adapter.
- * Uses Android Keystore (EncryptedSharedPreferences) and iOS Keychain via expo-secure-store.
- * Employs transparent chunking for payloads exceeding 1800 bytes, guaranteeing that
- * sensitive Supabase auth sessions, tokens, and encryption keys never leak into plain text.
- */
+async function requireSecureStore(): Promise<void> {
+  if (!(await SecureStore.isAvailableAsync())) {
+    throw new Error('Secure storage is unavailable on this device.');
+  }
+}
+
+function validateCount(raw: string): number {
+  const count = Number(raw);
+  if (!Number.isSafeInteger(count) || count < 1 || count > MAX_CHUNKS) {
+    throw new Error('Invalid secure storage chunk manifest.');
+  }
+  return count;
+}
+
+function parseManifest(raw: string): Manifest {
+  const value: unknown = JSON.parse(raw);
+  if (typeof value !== 'object' || !value ||
+      !('version' in value) || value.version !== 2 ||
+      !('bank' in value) || (value.bank !== 0 && value.bank !== 1) ||
+      !('count' in value) || typeof value.count !== 'number') {
+    throw new Error('Invalid secure storage manifest.');
+  }
+  return { version: 2, bank: value.bank, count: validateCount(String(value.count)) };
+}
+
+async function getManifest(key: string): Promise<Manifest | null> {
+  const raw = await SecureStore.getItemAsync(manifestKey(key));
+  return raw === null ? null : parseManifest(raw);
+}
+
+async function deleteBank(key: string, bank: 0 | 1, count: number): Promise<void> {
+  for (let i = 0; i < count; i++) {
+    await SecureStore.deleteItemAsync(bankChunk(key, bank, i));
+  }
+}
+
+// Serializes changes to each key within the process. The active bank remains
+// intact until the replacement bank is fully written and committed.
+const pending = new Map<string, Promise<unknown>>();
+function locked<T>(key: string, fn: () => Promise<T>): Promise<T> {
+  const prev = pending.get(key) || Promise.resolve();
+  const next = prev.catch(() => {}).then(fn);
+  const settle = next.catch(() => {});
+  pending.set(key, settle);
+  void settle.then(() => { if (pending.get(key) === settle) pending.delete(key); });
+  return next;
+}
+
+/** Native encrypted storage only; never use AsyncStorage for secret retrieval. */
 export const SecureStoreAdapter = {
   getItem: async (key: string): Promise<string | null> => {
-    try {
-      const isAvailable = await SecureStore.isAvailableAsync();
-      if (isAvailable) {
-        // Check if item is stored across multi-entry chunks
-        const chunkCountStr = await SecureStore.getItemAsync(`${key}_chunk_count`);
-        if (chunkCountStr !== null) {
-          const chunkCount = parseInt(chunkCountStr, 10);
-          if (!isNaN(chunkCount) && chunkCount > 0) {
-            const chunks: string[] = [];
-            for (let i = 0; i < chunkCount; i++) {
-              const chunk = await SecureStore.getItemAsync(`${key}_chunk_${i}`);
-              if (chunk !== null) {
-                chunks.push(chunk);
-              }
-            }
-            if (chunks.length === chunkCount) {
-              return chunks.join('');
-            }
-          }
+    await requireSecureStore();
+    return locked(key, async () => {
+      const active = await getManifest(key);
+      if (active) {
+        const parts: string[] = [];
+        for (let i = 0; i < active.count; i++) {
+          const part = await SecureStore.getItemAsync(bankChunk(key, active.bank, i));
+          if (part === null) throw new Error('Incomplete secure storage payload.');
+          parts.push(part);
         }
-
-        // Direct single-value lookup
-        const secureValue = await SecureStore.getItemAsync(key);
-        if (secureValue !== null) {
-          return secureValue;
-        }
+        return parts.join('');
       }
-    } catch (e) {
-      console.warn('[SecureStorage] Secure retrieval notice:', e);
-    }
 
-    // Graceful fallback to legacy AsyncStorage if migrated from earlier builds
-    try {
-      return await AsyncStorage.getItem(key);
-    } catch {
-      return null;
-    }
+      // Read existing native SecureStore v1 installations for forward compatibility.
+      const countRaw = await SecureStore.getItemAsync(`${key}_chunk_count`);
+      if (countRaw !== null) {
+        const count = validateCount(countRaw);
+        const parts: string[] = [];
+        for (let i = 0; i < count; i++) {
+          const part = await SecureStore.getItemAsync(`${key}_chunk_${i}`);
+          if (part === null) throw new Error('Incomplete secure storage payload.');
+          parts.push(part);
+        }
+        return parts.join('');
+      }
+      return SecureStore.getItemAsync(key);
+    });
   },
 
   setItem: async (key: string, value: string): Promise<void> => {
-    try {
-      const isAvailable = await SecureStore.isAvailableAsync();
-      if (isAvailable) {
-        if (value.length <= CHUNK_SIZE) {
-          // Direct single-value write
-          await SecureStore.setItemAsync(key, value);
-          // Clean any previous chunk manifests
-          await SecureStore.deleteItemAsync(`${key}_chunk_count`).catch(() => {});
-        } else {
-          // Multi-chunk write for large payloads (e.g. expanded Supabase auth metadata)
-          const chunks: string[] = [];
-          for (let i = 0; i < value.length; i += CHUNK_SIZE) {
-            chunks.push(value.slice(i, i + CHUNK_SIZE));
-          }
+    await requireSecureStore();
+    return locked(key, async () => {
+      const old = await getManifest(key);
+      const bank: 0 | 1 = old?.bank === 0 ? 1 : 0;
+      const count = Math.max(1, Math.ceil(value.length / CHUNK_SIZE));
+      if (count > MAX_CHUNKS) throw new Error('Secure storage payload is too large.');
 
-          // Write each chunk
-          for (let i = 0; i < chunks.length; i++) {
-            await SecureStore.setItemAsync(`${key}_chunk_${i}`, chunks[i]);
-          }
-          await SecureStore.setItemAsync(`${key}_chunk_count`, String(chunks.length));
-          await SecureStore.deleteItemAsync(key).catch(() => {});
-        }
-
-        // Purge legacy plain text from AsyncStorage
-        await AsyncStorage.removeItem(key).catch(() => {});
-        return;
+      // Never mutate the active bank before the new manifest is committed.
+      for (let i = 0; i < count; i++) {
+        await SecureStore.setItemAsync(
+          bankChunk(key, bank, i),
+          value.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE)
+        );
       }
-    } catch (e) {
-      console.warn('[SecureStorage] SecureStore write error, falling back to AsyncStorage:', e);
-    }
+      await SecureStore.setItemAsync(manifestKey(key), JSON.stringify({
+        version: 2, bank, count,
+      } satisfies Manifest));
 
-    // Fallback if hardware keystore is unavailable
-    try {
-      await AsyncStorage.setItem(key, value);
-    } catch (e) {
-      console.warn('[SecureStorage] Fallback setItem error:', e);
-    }
+      // Cleanup is best-effort AFTER commit. A cleanup failure must not undo
+      // a successfully published secure value or cause plaintext fallback.
+      if (old) await deleteBank(key, old.bank, old.count).catch(() => {});
+      const legacy = await SecureStore.getItemAsync(`${key}_chunk_count`).catch(() => null);
+      if (legacy !== null) {
+        const legacyCount = validateCount(legacy);
+        for (let i = 0; i < legacyCount; i++) {
+          await SecureStore.deleteItemAsync(`${key}_chunk_${i}`).catch(() => {});
+        }
+        await SecureStore.deleteItemAsync(`${key}_chunk_count`).catch(() => {});
+      }
+      await SecureStore.deleteItemAsync(key).catch(() => {});
+      await AsyncStorage.removeItem(key);
+    });
   },
 
   removeItem: async (key: string): Promise<void> => {
-    try {
-      const isAvailable = await SecureStore.isAvailableAsync();
-      if (isAvailable) {
-        // Remove single entry
-        await SecureStore.deleteItemAsync(key).catch(() => {});
-
-        // Remove any chunks if present
-        const chunkCountStr = await SecureStore.getItemAsync(`${key}_chunk_count`).catch(() => null);
-        if (chunkCountStr) {
-          const chunkCount = parseInt(chunkCountStr, 10);
-          for (let i = 0; i < chunkCount; i++) {
-            await SecureStore.deleteItemAsync(`${key}_chunk_${i}`).catch(() => {});
-          }
-          await SecureStore.deleteItemAsync(`${key}_chunk_count`).catch(() => {});
-        }
+    await requireSecureStore();
+    return locked(key, async () => {
+      const old = await getManifest(key);
+      // Hide the previous encrypted value first, then erase both banks.
+      await SecureStore.deleteItemAsync(manifestKey(key));
+      if (old) {
+        await deleteBank(key, old.bank, old.count);
       }
-    } catch {
-      // Non-blocking
-    }
-
-    try {
-      await AsyncStorage.removeItem(key).catch(() => {});
-    } catch {
-      // Ignore
-    }
+      const legacy = await SecureStore.getItemAsync(`${key}_chunk_count`);
+      if (legacy !== null) {
+        const count = validateCount(legacy);
+        for (let i = 0; i < count; i++) {
+          await SecureStore.deleteItemAsync(`${key}_chunk_${i}`);
+        }
+        await SecureStore.deleteItemAsync(`${key}_chunk_count`);
+      }
+      await SecureStore.deleteItemAsync(key);
+      await AsyncStorage.removeItem(key);
+    });
   },
 };
 

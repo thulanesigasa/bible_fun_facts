@@ -32,6 +32,8 @@ import { PinSecurityService } from '../services/pinSecurityService';
 import { PrivacyService } from '../services/privacyService';
 import { EncryptionService } from '../services/encryptionService';
 import { SecureStoreAdapter } from '../services/secureStorage';
+import { OfflineStudyQueue } from '../services/offlineStudyQueue';
+import { ALL_ACHIEVEMENTS } from '../data/achievements';
 import { AuthProvider, UserProfile, SignUpExtendedParams } from './AuthContext';
 import { SecurityProvider } from './SecurityContext';
 import { ReaderSettingsProvider, LastReadBiblePosition } from './ReaderSettingsContext';
@@ -48,6 +50,7 @@ interface UserState {
   factsViewedCount: number;
   readFactIds: string[];
   sharesCount: number;
+  earnedAchievementIds: string[];
   lastLoginDate: string | null;
   followedUserIds: string[];
   lastReadBible: LastReadBiblePosition;
@@ -128,6 +131,8 @@ interface AppContextType extends UserState {
 const UserContext = createContext<AppContextType | undefined>(undefined);
 
 const STORAGE_KEY = '@exegeomai_user_data';
+const SECURE_STUDY_KEY = (userId: string) => `@exegeomai_user_data_secure_v2:${userId}`;
+const LOCAL_OWNER_KEY = '@exegeomai_local_owner_v1';
 const PERMANENT_STREAK_KEY = '@exegeomai_permanent_streak';
 const PERMANENT_BACKUP_KEY = '@exegeomai_streak_resilient_v2';
 const PERMANENT_LAST_LOGIN_KEY = '@exegeomai_permanent_last_login';
@@ -156,6 +161,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { showAlert } = useThemedAlert();
   const isLoadedFromStorage = useRef<boolean>(false);
   const hasEvaluatedStreakTodayRef = useRef<boolean>(false);
+  const activeAuthUserIdRef = useRef<string | null>(null);
   const [hideTabBar, setHideTabBar] = useState<boolean>(false);
   const [accent, setAccent] = useState<string>(colors.accent);
   const [state, setState] = useState<UserState>({
@@ -167,6 +173,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     factsViewedCount: 0,
     readFactIds: [],
     sharesCount: 0,
+    earnedAchievementIds: [],
     lastLoginDate: null,
     followedUserIds: [],
     lastReadBible: { book: 'John', chapter: 3, translation: 'web' },
@@ -322,7 +329,23 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (permLastLoginRaw) localPermLastLogin = permLastLoginRaw;
       } catch {}
 
+      // Restore immutable historical unlocks from the owner's protected
+      // server table. Missing migration/offline errors leave local badges intact.
+      let remoteAchievementIds: string[] = [];
+      try {
+        const { data: achievements, error } = await supabase
+          .from('user_earned_achievements')
+          .select('achievement_id').eq('user_id', userId);
+        if (!error && Array.isArray(achievements)) {
+          remoteAchievementIds = achievements
+            .map(row => row.achievement_id)
+            .filter((id): id is string => typeof id === 'string');
+        }
+      } catch {}
+
+      if (activeAuthUserIdRef.current !== userId) return;
       setState(prev => {
+        if (activeAuthUserIdRef.current !== userId) return prev;
         const todayStr = getLocalDateString();
         const localStreak = Math.max(prev.streak || 1, localPermStreak || 1);
         const localLastLogin = getLatestDateString(prev.lastLoginDate, localPermLastLogin);
@@ -394,6 +417,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           favoritesScriptures: mergedFavScriptures,
           readFactIds: mergedReadFactIds,
           bibleHighlights: mergedHighlights,
+          earnedAchievementIds: Array.from(new Set([
+            ...prev.earnedAchievementIds, ...remoteAchievementIds,
+          ])),
           lastReadBible: meta?.lastReadBible || prev.lastReadBible,
         };
       });
@@ -402,11 +428,81 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Milestones are permanently earned once; bookmark/highlight removals
+  // must not revoke a previously unlocked badge. The local secure cache
+  // updates immediately when studying offline, while the owner-only queue
+  // submits the achievement later if private study mode is disabled.
+  useEffect(() => {
+    if (!isLoadedFromStorage.current || !activeAuthUserIdRef.current) return;
+    const stats: Record<'streak' | 'bookmark' | 'highlight' | 'share', number> = {
+      streak: state.streak,
+      bookmark: state.favoritesScriptures.length,
+      highlight: Object.keys(state.bibleHighlights).length,
+      share: state.sharesCount,
+    };
+    const newlyEarned = Object.values(ALL_ACHIEVEMENTS)
+      .flat()
+      .filter(a => stats[a.category] >= a.target && !state.earnedAchievementIds.includes(a.id))
+      .map(a => a.id);
+    if (!newlyEarned.length) return;
+    setState(prev => ({
+      ...prev,
+      earnedAchievementIds: Array.from(new Set([...prev.earnedAchievementIds, ...newlyEarned])),
+    }));
+    if (!isPrivateStudyModeRef.current) {
+      for (const id of newlyEarned) {
+        OfflineStudyQueue.enqueue('earn_achievement', id, true)
+          .then(() => OfflineStudyQueue.flush())
+          .catch(() => console.warn('[OfflineStudy] Earned achievement awaiting sync.'));
+      }
+    }
+  }, [state.streak, state.favoritesScriptures, state.bibleHighlights,
+      state.sharesCount, state.earnedAchievementIds]);
+
+  // Replay previously recorded actions when the app returns to the foreground.
+  // This does not attempt to authenticate a new user while offline.
+  useEffect(() => {
+    if (!isPrivateStudyModeRef.current) OfflineStudyQueue.flush().catch(() => {});
+    const subscription = AppState.addEventListener('change', status => {
+      if (status === 'active' && !isPrivateStudyModeRef.current) OfflineStudyQueue.flush().catch(() => {});
+    });
+    return () => subscription.remove();
+  }, []);
+
   // Load data on mount
   useEffect(() => {
     const loadData = async () => {
       try {
-        const saved = await AsyncStorage.getItem(STORAGE_KEY);
+        // A cached profile is not authentication. Load private local data only
+        // when a securely persisted Supabase session belongs to the same user.
+        const { data: { session: cachedSession } } = await supabase.auth.getSession();
+        const lastOwnerId = await AsyncStorage.getItem(LOCAL_OWNER_KEY);
+        if (!cachedSession?.user || lastOwnerId !== cachedSession.user.id) {
+          await AsyncStorage.multiRemove([
+            STORAGE_KEY, PERMANENT_STREAK_KEY, PERMANENT_BACKUP_KEY,
+            PERMANENT_LAST_LOGIN_KEY,
+          ]);
+          if (cachedSession?.user) {
+            await AsyncStorage.setItem(LOCAL_OWNER_KEY, cachedSession.user.id);
+          } else {
+            await AsyncStorage.removeItem(LOCAL_OWNER_KEY);
+          }
+        }
+        // New private state must come from native encrypted, account-scoped storage.
+        // Import a legacy plaintext cache only if its immutable owner ID matches.
+        let saved: string | null = null;
+        if (cachedSession?.user) {
+          saved = await SecureStoreAdapter.getItem(SECURE_STUDY_KEY(cachedSession.user.id));
+          if (!saved) {
+            const oldRaw = await AsyncStorage.getItem(STORAGE_KEY);
+            const oldEnvelope = oldRaw ? JSON.parse(oldRaw) : null;
+            if (oldEnvelope?._authUserId === cachedSession.user.id) {
+              await SecureStoreAdapter.setItem(SECURE_STUDY_KEY(cachedSession.user.id), oldRaw!);
+              await AsyncStorage.removeItem(STORAGE_KEY);
+              saved = oldRaw;
+            }
+          }
+        }
         const permStreakRaw = await AsyncStorage.getItem(PERMANENT_STREAK_KEY);
         const backupStreakRaw = await AsyncStorage.getItem(PERMANENT_BACKUP_KEY);
         const permLastLogin = await AsyncStorage.getItem(PERMANENT_LAST_LOGIN_KEY);
@@ -421,6 +517,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (saved) {
           parsedData = JSON.parse(saved);
+          delete parsedData._authUserId;
           cleanFollowed = (parsedData.followedUserIds || []).filter(
             (id: string) => !id.startsWith('user_')
           );
@@ -491,6 +588,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session?.user) {
           const user = session.user;
+          activeAuthUserIdRef.current = user.id;
           const meta = user.user_metadata as any || {};
           const metaName = meta.name || user.email?.split('@')[0] || 'Believer';
           const metaUsername = meta.username || user.email?.split('@')[0] || 'believer';
@@ -521,6 +619,49 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
         if (session?.user) {
           const user = session.user;
+          if (activeAuthUserIdRef.current !== user.id) {
+            activeAuthUserIdRef.current = user.id;
+            isLoadedFromStorage.current = false;
+            hasEvaluatedStreakTodayRef.current = false;
+            setState(prev => ({
+              ...prev, userProfile: null,
+              favoritesFacts: [], favoritesScriptures: [], completedWOTDs: [],
+              readFactIds: [], bibleHighlights: {}, followedUserIds: [],
+              factsViewedCount: 0, sharesCount: 0, streak: 1,
+              earnedAchievementIds: [],
+              lastLoginDate: null,
+            }));
+            // Rehydrate ONLY this authenticated account's encrypted cache.
+            // Check identity again after asynchronous disk access; rapid A/B
+            // account switches must not restore the previous owner's data.
+            void SecureStoreAdapter.getItem(SECURE_STUDY_KEY(user.id))
+              .then(raw => {
+                if (activeAuthUserIdRef.current !== user.id) return;
+                if (raw) {
+                  const restored = JSON.parse(raw) as Partial<UserState> & { _authUserId?: string };
+                  if (restored._authUserId === user.id) {
+                    setState(prev => ({
+                      ...prev,
+                      favoritesFacts: Array.isArray(restored.favoritesFacts) ? restored.favoritesFacts : [],
+                      favoritesScriptures: Array.isArray(restored.favoritesScriptures) ? restored.favoritesScriptures : [],
+                      completedWOTDs: Array.isArray(restored.completedWOTDs) ? restored.completedWOTDs : [],
+                      readFactIds: Array.isArray(restored.readFactIds) ? restored.readFactIds : [],
+                      earnedAchievementIds: Array.isArray(restored.earnedAchievementIds) ? restored.earnedAchievementIds : [],
+                      bibleHighlights: restored.bibleHighlights && typeof restored.bibleHighlights === 'object'
+                        ? restored.bibleHighlights : {},
+                      streak: typeof restored.streak === 'number' ? restored.streak : 1,
+                      lastLoginDate: restored.lastLoginDate || null,
+                    }));
+                  }
+                }
+                isLoadedFromStorage.current = true;
+              })
+              .catch(() => {
+                // Never overwrite a previous encrypted snapshot after a
+                // secure-store read failure; future writes stay suspended.
+                console.warn('[UserContext] Unable to restore secure account cache.');
+              });
+          }
           const meta = user.user_metadata as any || {};
           const metaName = meta.name || user.email?.split('@')[0] || 'Believer';
           const metaUsername = meta.username || user.email?.split('@')[0] || 'believer';
@@ -548,7 +689,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             },
           }));
         } else if (_event === 'SIGNED_OUT') {
-          setState(prev => ({ ...prev, userProfile: null }));
+          activeAuthUserIdRef.current = null;
+          setState(prev => ({
+            ...prev, userProfile: null, favoritesFacts: [], favoritesScriptures: [],
+            completedWOTDs: [], readFactIds: [], bibleHighlights: {},
+            followedUserIds: [], factsViewedCount: 0, sharesCount: 0,
+            earnedAchievementIds: [], streak: 1, lastLoginDate: null,
+          }));
         }
       });
 
@@ -663,10 +810,24 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Save data on change - only after initial load finishes
   useEffect(() => {
-    if (!isLoadedFromStorage.current) return;
+    if (!isLoadedFromStorage.current || !state.userProfile) return;
+    const expectedUser = activeAuthUserIdRef.current;
+    if (!expectedUser) return;
     const saveData = async () => {
       try {
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        const { data: { session } } = await supabase.auth.getSession();
+        // Never persist transient logged-out data or the previous account's
+        // state under a newly authenticated account's secure-storage key.
+        if (!session?.user || session.user.id !== expectedUser ||
+            activeAuthUserIdRef.current !== expectedUser ||
+            state.userProfile?.email?.toLowerCase() !== session.user.email?.toLowerCase()) return;
+        await AsyncStorage.setItem(LOCAL_OWNER_KEY, session.user.id);
+        await SecureStoreAdapter.setItem(SECURE_STUDY_KEY(session.user.id), JSON.stringify({
+          ...state,
+          _authUserId: session.user.id,
+          userProfile: state.userProfile ? { ...state.userProfile, email: session.user.email || '' } : null,
+        }));
+        await AsyncStorage.removeItem(STORAGE_KEY);
         if (typeof state.streak === 'number' && state.streak > 0) {
           await AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(state.streak));
           await AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(state.streak));
@@ -707,33 +868,16 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         let targetEmail = rawInput.toLowerCase();
 
-        // If the user typed their username instead of email, resolve their email from Supabase
+        // Public username-to-email resolution is disabled to prevent email
+        // enumeration. A secure server-side username/password endpoint can
+        // restore username sign-in in a separate, audited migration.
         if (!targetEmail.includes('@')) {
-          const { data: resolvedEmail } = await supabase.rpc('resolve_email_by_username', {
-            lookup_username: targetEmail,
+          showAlert({
+            title: 'Email Required',
+            message: 'For your account security, sign in using your email address.',
+            icon: 'warning',
           });
-
-          if (resolvedEmail) {
-            targetEmail = String(resolvedEmail).toLowerCase();
-          } else {
-            // Also attempt direct query on profiles
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('email')
-              .eq('username', targetEmail)
-              .maybeSingle();
-
-            if (profile?.email) {
-              targetEmail = profile.email.toLowerCase();
-            } else {
-              showAlert({
-                title: 'Account Not Found',
-                message: `No account was found with the username "@${rawInput}". Please check the spelling or enter your email address.`,
-                icon: 'warning',
-              });
-              return;
-            }
-          }
+          return;
         }
 
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -794,29 +938,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
 
-    const fallbackEmail = rawInput.includes('@') ? rawInput : `${rawInput.toLowerCase().replace(/\s+/g, '')}@example.com`;
-    setState(prev => ({
-      ...prev,
-      userProfile: {
-        name: prev.userProfile?.name || formattedName,
-        firstName: prev.userProfile?.firstName || formattedName.split(' ')[0],
-        lastName: prev.userProfile?.lastName || formattedName.split(' ').slice(1).join(' '),
-        username: prev.userProfile?.username || rawInput.split('@')[0].toLowerCase().replace(/\s+/g, '_'),
-        avatarUrl: prev.userProfile?.avatarUrl,
-        email: prev.userProfile?.email || fallbackEmail,
-        joinedDate: prev.userProfile?.joinedDate || 'September 2026',
-        preferredTranslation: prev.userProfile?.preferredTranslation || 'ESV',
-        notificationsEnabled: prev.userProfile?.notificationsEnabled ?? true,
-        studyFocus: prev.userProfile?.studyFocus,
-        dailyGoal: prev.userProfile?.dailyGoal,
-        knowledgeLevel: prev.userProfile?.knowledgeLevel,
-        fontSize: prev.userProfile?.fontSize || 16,
-        fontType: prev.userProfile?.fontType || 'serif',
-        redLetterEnabled: prev.userProfile?.redLetterEnabled ?? true,
-        followersCount: 0,
-        followingCount: prev.followedUserIds?.length || 0,
-      },
-    }));
+    // No fabricated accounts: a first login requires a real Supabase session.
+    showAlert({
+      title: 'Sign In Unavailable',
+      message: 'Sign in with your email and password while online. Previously authenticated sessions can use downloaded content offline.',
+      icon: 'warning',
+    });
   };
 
   const uploadAvatar = async (uri: string): Promise<{ success: boolean; avatarUrl?: string; error?: string }> => {
@@ -824,7 +951,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (SUPABASE_ANON_KEY) {
         try {
           const userSession = (await supabase.auth.getSession()).data.session?.user;
-          const userId = userSession?.id || state.userProfile?.username || 'user';
+          if (!userSession?.id) return { success: false, error: 'Sign in before uploading a profile image.' };
+          const userId = userSession.id;
           const fileName = `${userId}/avatar_${Date.now()}.avif`;
 
           const response = await fetch(uri);
@@ -965,7 +1093,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
               icon: 'success',
             });
           }
-          setState(prev => ({
+          if (data.session) setState(prev => ({
             ...prev,
             userProfile: {
               name: fullName,
@@ -997,27 +1125,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
 
-    // Offline / fallback signup
-    setState(prev => ({
-      ...prev,
-      userProfile: {
-        name: fullName,
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        username: cleanUsername,
-        email,
-        countryCode,
-        phoneNumber,
-        joinedDate: 'September 2026',
-        preferredTranslation,
-        notificationsEnabled: true,
-        redLetterEnabled: true,
-        studyFocus,
-        dailyGoal,
-        knowledgeLevel,
-      },
-    }));
-    return { success: true };
+    return { success: false, error: 'Account creation requires an online Supabase connection.' };
   };
 
   const signup = async (name: string, email: string, password?: string) => {
@@ -1026,7 +1134,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       lastName: name.split(' ').slice(1).join(' ') || '',
       username: name.toLowerCase().replace(/\s+/g, '_'),
       email,
-      password: password || 'SecurePass123!',
+      password: password || '',
     });
   };
 
@@ -1067,6 +1175,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = async () => {
+    activeAuthUserIdRef.current = null;
     if (SUPABASE_ANON_KEY) {
       try {
         await supabase.auth.signOut();
@@ -1074,7 +1183,22 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.warn('Supabase sign out notice:', err);
       }
     }
-    setState(prev => ({ ...prev, userProfile: null }));
+    // Never leave the next account inside the previous account's cached state.
+    isLoadedFromStorage.current = false;
+    // Keep the encrypted owner-scoped cache (and pending offline queue) for
+    // restoration when this same authenticated account signs in again.
+    // Never delete unsynced user study history merely because of sign-out.
+    await AsyncStorage.multiRemove([
+      STORAGE_KEY, LOCAL_OWNER_KEY, PERMANENT_STREAK_KEY,
+      PERMANENT_BACKUP_KEY, PERMANENT_LAST_LOGIN_KEY,
+    ]).catch(() => {});
+    setState(prev => ({
+      ...prev, userProfile: null, favoritesFacts: [], favoritesScriptures: [],
+      completedWOTDs: [], readFactIds: [], bibleHighlights: {},
+      followedUserIds: [], sharesCount: 0, factsViewedCount: 0,
+      earnedAchievementIds: [],
+    }));
+    isLoadedFromStorage.current = true;
   };
 
   const toggleFavoriteFact = (fact: Fact) => {
@@ -1083,6 +1207,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const nextFavorites = exists
         ? prev.favoritesFacts.filter(f => f.id !== fact.id)
         : [...prev.favoritesFacts, fact];
+      !isPrivateStudyModeRef.current && OfflineStudyQueue.enqueue('favorite_fact', fact.id, !exists)
+        .then(() => OfflineStudyQueue.flush())
+        .catch(() => console.warn('[OfflineStudy] Fact bookmark pending sync could not be persisted.'));
       syncUserDataToRemote({ favoritesFacts: nextFavorites });
       return { ...prev, favoritesFacts: nextFavorites };
     });
@@ -1094,6 +1221,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const nextFavorites = exists
         ? prev.favoritesScriptures.filter(s => s.id !== scripture.id)
         : [...prev.favoritesScriptures, scripture];
+      !isPrivateStudyModeRef.current && OfflineStudyQueue.enqueue('favorite_scripture', scripture.id, !exists)
+        .then(() => OfflineStudyQueue.flush())
+        .catch(() => console.warn('[OfflineStudy] Scripture bookmark pending sync could not be persisted.'));
       syncUserDataToRemote({ favoritesScriptures: nextFavorites });
       return { ...prev, favoritesScriptures: nextFavorites };
     });
@@ -1103,6 +1233,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setState(prev => {
       const exists = prev.completedWOTDs.find(w => w.id === wotd.id);
       if (exists) return prev;
+      !isPrivateStudyModeRef.current && OfflineStudyQueue.enqueue('complete_wotd', wotd.id, true)
+        .then(() => OfflineStudyQueue.flush())
+        .catch(() => console.warn('[OfflineStudy] Devotional completion could not be persisted.'));
       return { ...prev, completedWOTDs: [...prev.completedWOTDs, wotd] };
     });
   };
@@ -1112,6 +1245,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (prev.readFactIds.includes(id)) return prev;
       const nextIds = [...prev.readFactIds, id];
       const nextCount = nextIds.length;
+      !isPrivateStudyModeRef.current && OfflineStudyQueue.enqueue('read_fact', id, true)
+        .then(() => OfflineStudyQueue.flush())
+        .catch(() => console.warn('[OfflineStudy] Fact read could not be queued.'));
       syncUserDataToRemote({ readFactIds: nextIds, factsViewedCount: nextCount });
       return { ...prev, readFactIds: nextIds, factsViewedCount: nextCount };
     });
@@ -1168,6 +1304,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         delete updated[verseKey];
       }
+      !isPrivateStudyModeRef.current && OfflineStudyQueue.enqueue('highlight_verse', verseKey, !!color, color)
+        .then(() => OfflineStudyQueue.flush())
+        .catch(() => console.warn('[OfflineStudy] Highlight could not be queued.'));
       syncUserDataToRemote({ bibleHighlights: updated });
       return { ...prev, bibleHighlights: updated };
     });
@@ -1368,11 +1507,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const backgroundTimestampRef = useRef<number | null>(null);
 
   // Scholar Privacy Controls (Phase 3)
-  const [isPrivateStudyMode, setIsPrivateStudyModeState] = useState<boolean>(false);
-  const [isDiscoverableInSearch, setIsDiscoverableInSearchState] = useState<boolean>(true);
-  const [showStreaksPublicly, setShowStreaksPubliclyState] = useState<boolean>(true);
-  const [privateStudyNotes, setPrivateStudyNotesState] = useState<boolean>(false);
-  const isPrivateStudyModeRef = useRef<boolean>(false);
+  const [isPrivateStudyMode, setIsPrivateStudyModeState] = useState<boolean>(true);
+  const [isDiscoverableInSearch, setIsDiscoverableInSearchState] = useState<boolean>(false);
+  const [showStreaksPublicly, setShowStreaksPubliclyState] = useState<boolean>(false);
+  const [privateStudyNotes, setPrivateStudyNotesState] = useState<boolean>(true);
+  const isPrivateStudyModeRef = useRef<boolean>(true);
 
   const refreshPinStatus = useCallback(async () => {
     const set = await PinSecurityService.isPinSet();
@@ -1404,6 +1543,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsDiscoverableInSearchState(prefs.isDiscoverableInSearch);
       setShowStreaksPubliclyState(prefs.showStreaksPublicly);
       setPrivateStudyNotesState(prefs.privateStudyNotes);
+      // Only after the owner-scoped privacy preference is loaded can pending
+      // study operations be sent. Never flush during first-frame restore.
+      if (!prefs.isPrivateStudyMode) OfflineStudyQueue.flush().catch(() => {});
     });
   }, [refreshPinStatus]);
 
@@ -1412,6 +1554,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (ok) {
       setIsPrivateStudyModeState(enabled);
       isPrivateStudyModeRef.current = enabled;
+      if (!enabled) OfflineStudyQueue.flush().catch(() => {});
     }
   }, []);
 
@@ -1544,21 +1687,25 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const deleteAccountAndPurgeData = useCallback(async (): Promise<boolean> => {
     try {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          try {
-            await supabase.from('profiles').delete().eq('id', session.user.id);
-          } catch (delErr) {
-            console.warn('Profile delete warning:', delErr);
-          }
-        }
-      } catch (err) {
-        console.warn('Remote profile cleanup exception:', err);
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session?.user) {
+        showAlert({ title: 'Deletion Failed', message: 'You must sign in online to delete your account.', icon: 'danger' });
+        return false;
+      }
+
+      // The server must delete the auth account and its owned records.
+      // Deleting only public.profiles is not account deletion.
+      const { data: deletionConfirmed, error: deletionError } = await supabase.rpc('delete_user_account');
+      if (deletionError || deletionConfirmed !== true) {
+        showAlert({ title: 'Deletion Failed', message: 'The server could not confirm account deletion. Your data has not been cleared from this device.', icon: 'danger' });
+        return false;
       }
 
       await supabase.auth.signOut().catch(() => {});
-      await AsyncStorage.clear().catch(() => {});
+      await SecureStoreAdapter.removeItem(SECURE_STUDY_KEY(session.user.id));
+      await SecureStoreAdapter.removeItem(`@exegeomai_secure_user_data_v2:${session.user.id}`);
+      await SecureStoreAdapter.removeItem(`@exegeomai_offline_study_queue_v1:${session.user.id}`);
+      await AsyncStorage.clear();
       await SecureStoreAdapter.removeItem('@exegeomai_biometric_lock_enabled_v1').catch(() => {});
       await cancelAllAutomatedNotifications().catch(() => {});
 
@@ -1571,6 +1718,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         factsViewedCount: 0,
         readFactIds: [],
         sharesCount: 0,
+        earnedAchievementIds: [],
         lastLoginDate: null,
         followedUserIds: [],
         lastReadBible: { book: 'John', chapter: 1, translation: 'WEB' },
@@ -1586,7 +1734,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.warn('Purge data error:', e);
       return false;
     }
-  }, []);
+  }, [showAlert]);
 
   return (
     <UserContext.Provider value={{
