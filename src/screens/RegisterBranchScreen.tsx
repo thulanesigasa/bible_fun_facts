@@ -63,7 +63,7 @@ const BRANCH_TYPE_OPTIONS: {
 }[] = [
   {
     type: 'branch',
-    label: 'Main Branch',
+    label: 'Branch',
     description: 'A full-service church building or assembly with regular Sunday and midweek services.',
   },
   {
@@ -163,12 +163,12 @@ export default function RegisterBranchScreen({
   // Step 3: Location
   const [branchName, setBranchName] = useState('');
   const [isBranchNameCustomized, setIsBranchNameCustomized] = useState(false);
-  const [townQuery, setTownQuery] = useState('Standerton');
-  const [province, setProvince] = useState('Mpumalanga');
+  const [townQuery, setTownQuery] = useState('');
+  const [province, setProvince] = useState('');
   const [country, setCountry] = useState('South Africa');
-  const [postalCode, setPostalCode] = useState('2430');
-  const [latitude, setLatitude] = useState(-26.9333);
-  const [longitude, setLongitude] = useState(29.2417);
+  const [postalCode, setPostalCode] = useState('');
+  const [latitude, setLatitude] = useState(0);
+  const [longitude, setLongitude] = useState(0);
   const [address, setAddress] = useState('');
   const [isCoordinatesExplicit, setIsCoordinatesExplicit] = useState(false);
   const [suggestions, setSuggestions] = useState<GeoLocation[]>([]);
@@ -651,7 +651,7 @@ export default function RegisterBranchScreen({
                 </View>
                 <TextInput
                   style={styles.input}
-                  placeholder={`e.g. ${activeMinistry?.name || ''} - ${townQuery} ${getBranchTypeLabel(selectedType)}`}
+                  placeholder={`e.g. ${activeMinistry?.name || 'ECG The Jesus Nation Church'} - ${townQuery || 'Kempton Park'} ${getBranchTypeLabel(selectedType)}`}
                   placeholderTextColor="#94A3B8"
                   value={branchName}
                   onChangeText={(v) => {
@@ -662,7 +662,7 @@ export default function RegisterBranchScreen({
                   returnKeyType="next"
                 />
                 <Text style={styles.fieldHint}>
-                  Auto-formatted: Church Name - Town {selectedType === 'homecell' ? 'Homecell' : getBranchTypeLabel(selectedType)}
+                  Auto-formatted: Church Name - Town {getBranchTypeLabel(selectedType)}
                 </Text>
               </View>
 
@@ -727,23 +727,34 @@ export default function RegisterBranchScreen({
                 </View>
               </View>
 
-              {/* Street address with Autocomplete Suggestions */}
+              {/* Street address with inline pin drop icon button */}
               <View style={styles.fieldGroup}>
                 <Text style={styles.fieldLabel}>Street Address (Live Suggestions & GPS)</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="e.g. 14 Willow Street, Standerton"
-                  placeholderTextColor="#94A3B8"
-                  value={address}
-                  onChangeText={(v) => {
-                    setAddress(v);
-                    setShowAddressSuggestions(true);
-                  }}
-                  onFocus={() => {
-                    if (addressSuggestions.length > 0) setShowAddressSuggestions(true);
-                  }}
-                  returnKeyType="next"
-                />
+                <View style={styles.addressInputRow}>
+                  <TextInput
+                    style={[styles.input, styles.addressInputFlex]}
+                    placeholder="e.g. 14 Willow Street"
+                    placeholderTextColor="#94A3B8"
+                    value={address}
+                    onChangeText={(v) => {
+                      setAddress(v);
+                      setShowAddressSuggestions(true);
+                    }}
+                    onFocus={() => {
+                      if (addressSuggestions.length > 0) setShowAddressSuggestions(true);
+                    }}
+                    returnKeyType="next"
+                  />
+                  <TouchableOpacity
+                    style={styles.inlinePinDropBtn}
+                    onPress={() => setShowPinDropModal(true)}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel="Pin-drop exact location on map"
+                  >
+                    <MapPinSvg size={24} color="#0F172A" fill="#FDD223" strokeWidth={2} />
+                  </TouchableOpacity>
+                </View>
                 {isSearchingAddress && (
                   <Text style={styles.searchingHint}>Searching exact address coordinates...</Text>
                 )}
@@ -775,27 +786,11 @@ export default function RegisterBranchScreen({
                   </View>
                 )}
 
-                {/* Pin-Drop Location Button */}
-                <TouchableOpacity
-                  style={styles.pinDropBtn}
-                  onPress={() => setShowPinDropModal(true)}
-                  activeOpacity={0.8}
-                  accessibilityRole="button"
-                  accessibilityLabel="Pin-drop exact location on map"
-                >
-                  <MapPinSvg size={18} color="#0F172A" fill="#FDD223" strokeWidth={2} />
-                  <Text style={styles.pinDropBtnText}>Pin-Drop Location on Map</Text>
-                </TouchableOpacity>
-
-                {/* GPS Status Badge */}
-                <View style={[styles.gpsStatusRow, isCoordinatesExplicit ? styles.gpsStatusLocked : styles.gpsStatusApprox]}>
-                  <MapPinSvg size={14} color={isCoordinatesExplicit ? '#0F172A' : '#64748B'} />
-                  <Text style={styles.gpsStatusText}>
-                    {isCoordinatesExplicit
-                      ? `Locked GPS: ${latitude.toFixed(5)}, ${longitude.toFixed(5)} (Exact Street Navigation)`
-                      : `Town Centroid: ${latitude.toFixed(4)}, ${longitude.toFixed(4)} (Tap Pin-Drop to set exact location)`}
+                {isCoordinatesExplicit && (
+                  <Text style={styles.coordinatesLockedHint}>
+                    GPS: {latitude.toFixed(5)}, {longitude.toFixed(5)} (Exact Street Navigation)
                   </Text>
-                </View>
+                )}
               </View>
 
               <View style={styles.actionRow}>
@@ -1450,49 +1445,26 @@ const styles = StyleSheet.create({
     fontFamily: Platform.select({ ios: 'Menlo', default: 'monospace' }),
     marginTop: 2,
   },
-  pinDropBtn: {
+  addressInputRow: {
     flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  addressInputFlex: {
+    flex: 1,
+  },
+  inlinePinDropBtn: {
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 11,
-    paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1.5,
-    borderColor: '#FDD223',
-    borderRadius: radius.sm,
-    marginTop: 8,
+    width: 44,
+    height: 44,
   },
-  pinDropBtnText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#0F172A',
-  },
-  gpsStatusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    borderRadius: radius.sm,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginTop: 6,
-  },
-  gpsStatusLocked: {
-    backgroundColor: 'rgba(253, 210, 35, 0.20)',
-    borderWidth: 1,
-    borderColor: '#FDD223',
-  },
-  gpsStatusApprox: {
-    backgroundColor: '#F1F5F9',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-  },
-  gpsStatusText: {
+  coordinatesLockedHint: {
     fontSize: 11,
-    fontWeight: '600',
     color: '#0F172A',
-    flex: 1,
-    lineHeight: 15,
+    fontWeight: '600',
+    marginTop: 6,
+    fontFamily: Platform.select({ ios: 'Menlo', default: 'monospace' }),
   },
 });
 

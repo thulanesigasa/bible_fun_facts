@@ -1134,6 +1134,23 @@ export function getProvincesByCountry(country: string): string[] {
 /**
  * Live OpenStreetMap Nominatim Street Address Search
  */
+const COUNTRY_CODE_MAP: Record<string, string> = {
+  'south africa': 'za',
+  'zimbabwe': 'zw',
+  'nigeria': 'ng',
+  'ghana': 'gh',
+  'kenya': 'ke',
+  'tanzania': 'tz',
+  'uganda': 'ug',
+  'zambia': 'zm',
+  'malawi': 'mw',
+  'botswana': 'bw',
+  'namibia': 'na',
+  'united states': 'us',
+  'united kingdom': 'gb',
+  'australia': 'au',
+};
+
 async function queryNominatimAddress(
   searchQuery: string,
   townHint?: string,
@@ -1142,9 +1159,11 @@ async function queryNominatimAddress(
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 4000);
   try {
+    const countryCode = COUNTRY_CODE_MAP[countryHint.toLowerCase()] || '';
+    const countryParam = countryCode ? `&countrycodes=${countryCode}` : '';
     const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
       searchQuery
-    )}&format=json&addressdetails=1&limit=6`;
+    )}&format=json&addressdetails=1&limit=6${countryParam}`;
     const res = await fetch(url, {
       signal: controller.signal,
       headers: {
@@ -1168,7 +1187,8 @@ async function queryNominatimAddress(
           addr.footway ||
           addr.path ||
           '';
-        const suburb = addr.suburb || addr.neighbourhood || addr.residential || '';
+        const rawSuburb = addr.suburb || addr.neighbourhood || addr.residential || '';
+        const suburb = /^.*ward\s*\d+/i.test(rawSuburb) ? '' : rawSuburb;
         const town =
           addr.city ||
           addr.town ||
@@ -1311,6 +1331,9 @@ export async function searchAddressesOnline(
 
   if (suggestions.length === 0) {
     suggestions = await queryPhotonAddress(searchQuery, townHint, countryHint);
+    if (suggestions.length === 0 && townHint && !hasTown) {
+      suggestions = await queryPhotonAddress(`${q}, ${countryHint}`, townHint, countryHint);
+    }
   }
 
   // Deduplicate by displayName or coordinates

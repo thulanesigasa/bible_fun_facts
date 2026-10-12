@@ -57,9 +57,10 @@
   <img src="https://img.shields.io/badge/Lexicon%20Performance-Sub--15ms%20Isolated%20Pipelines%20%7C%20Pre--Warming-10B981?style=for-the-badge&logo=fastapi&logoColor=white" alt="Lexicon Performance Sub-15ms" />
   <img src="https://img.shields.io/badge/Strongs%20Pronunciation-100%25%20Complete%20(14%2C298%20Words)-10B981?style=for-the-badge&logo=book&logoColor=white" alt="100% Strongs Pronunciation" />
   <img src="https://img.shields.io/badge/Ministries-God%20Embassy%20%7C%20Christ%20Embassy%20%7C%20Spirit%20Embassy%20%7C%20ECG-10B981?style=for-the-badge&logo=church&logoColor=white" alt="Ministry Directory" />
-  <img src="https://img.shields.io/badge/Geocoding-Live%20OpenStreetMap%20Nominatim%20%2B%20Photon%20Hybrid-0284C7?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="Live OpenStreetMap Geocoding" />
+  <img src="https://img.shields.io/badge/Branch%20Naming-Standard%20Formula%20%7C%20Church%20--%20Town%20Gathering-10B981?style=for-the-badge" alt="Standard Branch Naming Formula" />
+  <img src="https://img.shields.io/badge/Geocoding-Live%20OSM%20Nominatim%20%2B%20Photon%20%7C%20Country--Biased-0284C7?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="Country Biased Geocoding" />
   <img src="https://img.shields.io/badge/CARTO%20Basemaps-Watermark--Free%20Voyager%20Tiles%20%2B%20Legal%20Attribution-10B981?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="CARTO Basemaps Watermark-Free Voyager Tiles" />
-  <img src="https://img.shields.io/badge/Maps-Pin%20Drop%20Modal%20%7C%20Native%20Directions%20Launcher-FDD223?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Pin Drop Modal and Native Directions Launcher" />
+  <img src="https://img.shields.io/badge/Maps-Inline%20Pin%20Drop%20%7C%20Zero%20Border%20Radius-FDD223?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Inline Pin Drop" />
   <img src="https://img.shields.io/badge/Strongs%20Loading-Instant%200ms%20Curated%20Render%20%7C%20Infinite%20Paging-10B981?style=for-the-badge&logo=fastapi&logoColor=white" alt="Instant Strongs Loading" />
   <img src="https://img.shields.io/badge/Hermes%20Optimization-Zero--Crash%20AST%20Stack%20Protection-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Hermes Zero-Crash AST Stack Protection" />
   <img src="https://img.shields.io/badge/Cold%20Boot%20Stability-Decoupled%20Warmup%20%7C%20Zero%20OOM-FDD223?style=for-the-badge&logo=android&logoColor=white" alt="Cold Boot Stability" />
