@@ -721,33 +721,16 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         let targetEmail = rawInput.toLowerCase();
 
-        // If the user typed their username instead of email, resolve their email from Supabase
+        // Public username-to-email resolution is disabled to prevent email
+        // enumeration. A secure server-side username/password endpoint can
+        // restore username sign-in in a separate, audited migration.
         if (!targetEmail.includes('@')) {
-          const { data: resolvedEmail } = await supabase.rpc('resolve_email_by_username', {
-            lookup_username: targetEmail,
+          showAlert({
+            title: 'Email Required',
+            message: 'For your account security, sign in using your email address.',
+            icon: 'warning',
           });
-
-          if (resolvedEmail) {
-            targetEmail = String(resolvedEmail).toLowerCase();
-          } else {
-            // Also attempt direct query on profiles
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('email')
-              .eq('username', targetEmail)
-              .maybeSingle();
-
-            if (profile?.email) {
-              targetEmail = profile.email.toLowerCase();
-            } else {
-              showAlert({
-                title: 'Account Not Found',
-                message: `No account was found with the username "@${rawInput}". Please check the spelling or enter your email address.`,
-                icon: 'warning',
-              });
-              return;
-            }
-          }
+          return;
         }
 
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -821,7 +804,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (SUPABASE_ANON_KEY) {
         try {
           const userSession = (await supabase.auth.getSession()).data.session?.user;
-          const userId = userSession?.id || state.userProfile?.username || 'user';
+          if (!userSession?.id) return { success: false, error: 'Sign in before uploading a profile image.' };
+          const userId = userSession.id;
           const fileName = `${userId}/avatar_${Date.now()}.avif`;
 
           const response = await fetch(uri);
@@ -1537,8 +1521,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // The server must delete the auth account and its owned records.
       // Deleting only public.profiles is not account deletion.
-      const { error: deletionError } = await supabase.rpc('delete_user_account');
-      if (deletionError) {
+      const { data: deletionConfirmed, error: deletionError } = await supabase.rpc('delete_user_account');
+      if (deletionError || deletionConfirmed !== true) {
         showAlert({ title: 'Deletion Failed', message: 'The server could not confirm account deletion. Your data has not been cleared from this device.', icon: 'danger' });
         return false;
       }
