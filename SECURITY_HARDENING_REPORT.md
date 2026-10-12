@@ -41,3 +41,11 @@ This report tracks implementation on `security/master-prompt-2-rls-ownership`. A
 
 ### Merge policy
 Keep PR draft and DO NOT MERGE for production until all deployment-affecting behavior is tested and outstanding blockers are resolved.
+
+### Follow-up changes
+- Added atomic `set_my_privacy_preference` SECURITY INVOKER RPC so changing one server-side privacy preference cannot reset unrelated flags; privacy reads now consult the server and fail private if unavailable.
+- Changed the secondary `UserDataContext` to use a per-account secure cache rather than globally shared plaintext preference and study keys.
+- Added privacy regression tests for atomic writes, missing sessions and offline server reads.
+
+### Additional validation needed
+- Real-device data migration/recovery is essential: the new secondary secure storage intentionally does not import globally shared legacy data without verified ownership. Identify safe migration paths and regression-test upgrade from the last production build.
