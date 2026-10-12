@@ -1375,9 +1375,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Scholar Privacy Controls (Phase 3)
   const [isPrivateStudyMode, setIsPrivateStudyModeState] = useState<boolean>(false);
-  const [isDiscoverableInSearch, setIsDiscoverableInSearchState] = useState<boolean>(true);
-  const [showStreaksPublicly, setShowStreaksPubliclyState] = useState<boolean>(true);
-  const [privateStudyNotes, setPrivateStudyNotesState] = useState<boolean>(false);
+  const [isDiscoverableInSearch, setIsDiscoverableInSearchState] = useState<boolean>(false);
+  const [showStreaksPublicly, setShowStreaksPubliclyState] = useState<boolean>(false);
+  const [privateStudyNotes, setPrivateStudyNotesState] = useState<boolean>(true);
   const isPrivateStudyModeRef = useRef<boolean>(false);
 
   const refreshPinStatus = useCallback(async () => {
