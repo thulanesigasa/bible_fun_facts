@@ -84,6 +84,9 @@ END $$;
 INSERT INTO public.user_verse_highlights (user_id, verse_key, color)
 VALUES (auth.uid(), 'JHN.3.16', '#FF0000');
 
+INSERT INTO public.user_earned_achievements (user_id, achievement_id)
+VALUES (auth.uid(), 'streak_7');
+
 RESET ROLE;
 SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claim.sub', '22222222-2222-4222-8222-222222222222', true);
@@ -118,6 +121,13 @@ BEGIN
    WHERE user_id = '11111111-1111-4111-8111-111111111111'
  ) THEN
    RAISE EXCEPTION 'Cross-account private highlight read succeeded';
+ END IF;
+
+ IF EXISTS (
+   SELECT 1 FROM public.user_earned_achievements
+   WHERE user_id = '11111111-1111-4111-8111-111111111111'
+ ) THEN
+   RAISE EXCEPTION 'Cross-account earned milestone leaked';
  END IF;
 
  IF EXISTS (
