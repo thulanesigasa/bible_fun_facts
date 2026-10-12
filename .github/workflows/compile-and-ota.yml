@@ -11,6 +11,8 @@ on:
       - '.npmrc'
       - 'App.tsx'
       - 'app.json'
+      - 'eas.json'
+      - 'tsconfig.json'
       - 'package.json'
       - 'package-lock.json'
       - 'jest.config.js'
@@ -205,7 +207,7 @@ jobs:
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses >/dev/null 2>&1 || true
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps --prefer-offline --no-audit
+        run: npm ci --legacy-peer-deps --prefer-offline --no-audit
 
       - name: Inject Incremental Compilation Build Version
         run: |
@@ -243,10 +245,10 @@ jobs:
           cd android
           chmod +x gradlew
           # Execute Gradle build with retry logic if network blip occurs during wrapper bootstrap
-          ./gradlew assembleRelease -Pexpo.inlineModules.watchedDirectories="[]" -Psentry.uploadSources=false -Psentry.autoUpload=false -x lint -x test --no-daemon --stacktrace || {
+          ./gradlew assembleRelease -Pexpo.inlineModules.watchedDirectories="[]" -Psentry.uploadSources=false -Psentry.autoUpload=false --no-daemon --stacktrace || {
             echo "First attempt encountered an issue. Retrying assembleRelease..."
             sleep 5
-            ./gradlew assembleRelease -Pexpo.inlineModules.watchedDirectories="[]" -Psentry.uploadSources=false -Psentry.autoUpload=false -x lint -x test --no-daemon --stacktrace
+            ./gradlew assembleRelease -Pexpo.inlineModules.watchedDirectories="[]" -Psentry.uploadSources=false -Psentry.autoUpload=false --no-daemon --stacktrace
           }
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
