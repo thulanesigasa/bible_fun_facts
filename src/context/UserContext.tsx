@@ -406,7 +406,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const loadData = async () => {
       try {
-        const saved = await AsyncStorage.getItem(STORAGE_KEY);
+        // A cached profile is not authentication. Load private local data only
+        // when a securely persisted Supabase session belongs to the same user.
+        const { data: { session: cachedSession } } = await supabase.auth.getSession();
+        const storedRaw = await AsyncStorage.getItem(STORAGE_KEY);
+        const storedEnvelope = storedRaw ? JSON.parse(storedRaw) : null;
+        const saved = cachedSession?.user &&
+          storedEnvelope?._authUserId === cachedSession.user.id ? storedRaw : null;
         const permStreakRaw = await AsyncStorage.getItem(PERMANENT_STREAK_KEY);
         const backupStreakRaw = await AsyncStorage.getItem(PERMANENT_BACKUP_KEY);
         const permLastLogin = await AsyncStorage.getItem(PERMANENT_LAST_LOGIN_KEY);
@@ -421,6 +427,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (saved) {
           parsedData = JSON.parse(saved);
+          delete parsedData._authUserId;
           cleanFollowed = (parsedData.followedUserIds || []).filter(
             (id: string) => !id.startsWith('user_')
           );
@@ -666,7 +673,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!isLoadedFromStorage.current) return;
     const saveData = async () => {
       try {
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) return;
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({
+          ...state,
+          // Never use an editable username/email as an identity boundary.
+          _authUserId: session.user.id,
+          userProfile: state.userProfile ? { ...state.userProfile, email: session.user.email || '' } : null,
+        }));
         if (typeof state.streak === 'number' && state.streak > 0) {
           await AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(state.streak));
           await AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(state.streak));
@@ -1037,7 +1051,15 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.warn('Supabase sign out notice:', err);
       }
     }
-    setState(prev => ({ ...prev, userProfile: null }));
+    // Never leave the next account inside the previous account's cached state.
+    isLoadedFromStorage.current = false;
+    await AsyncStorage.removeItem(STORAGE_KEY).catch(() => {});
+    setState(prev => ({
+      ...prev, userProfile: null, favoritesFacts: [], favoritesScriptures: [],
+      completedWOTDs: [], readFactIds: [], bibleHighlights: {},
+      followedUserIds: [], sharesCount: 0, factsViewedCount: 0,
+    }));
+    isLoadedFromStorage.current = true;
   };
 
   const toggleFavoriteFact = (fact: Fact) => {
