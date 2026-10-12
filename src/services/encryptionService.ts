@@ -6,7 +6,7 @@
  * The 256-bit symmetric master key is stored in native secure storage
  * (Android Keystore via EncryptedSharedPreferences / iOS Keychain) via SecureStoreAdapter.
  *
- * Platforms without WebCrypto AES-GCM support must fail closed for encrypted exports.
+ * Uses WebCrypto when present and audited @noble/ciphers AES-GCM otherwise;\n * never creates legacy CBC archives or plaintext encryption fallbacks.
  */
 
 import { SecureStoreAdapter } from './secureStorage';
@@ -385,29 +385,35 @@ export const EncryptionService = {
    * Encrypts plaintext string using AES-256-CBC with PKCS#7 padding.
    */
   encryptString: async (plaintext: string): Promise<string> => {
-    // No home-grown CBC/MAC for new journal files. AES-GCM from the platform
-    // WebCrypto provider supplies encryption and integrity together.
-    // If WebCrypto is unavailable, fail closed rather than using weak fallback.
     try {
-      const subtle = globalThis.crypto?.subtle;
-      if (!subtle) throw new Error('Authenticated encryption is unavailable.');
       const keyHex = await EncryptionService.getMasterKey();
-      const key = await subtle.importKey(
-        'raw', new Uint8Array(hexToBytes(keyHex)), { name: 'AES-GCM' }, false, ['encrypt']
-      );
-      const iv = new Uint8Array(generateRandomBytes(12));
-      const ciphertext = await subtle.encrypt(
-        { name: 'AES-GCM', iv, tagLength: 128 },
-        key,
-        new Uint8Array(stringToUtf8Bytes(plaintext))
-      );
+      const iv = Uint8Array.from(generateRandomBytes(12));
+      const keyBytes = Uint8Array.from(hexToBytes(keyHex));
+      const plainBytes = Uint8Array.from(stringToUtf8Bytes(plaintext));
+      const subtle = globalThis.crypto?.subtle;
+      let ciphertext: Uint8Array;
+
+      if (subtle) {
+        const key = await subtle.importKey(
+          'raw', keyBytes, { name: 'AES-GCM' }, false, ['encrypt']
+        );
+        ciphertext = new Uint8Array(await subtle.encrypt(
+          { name: 'AES-GCM', iv, tagLength: 128 }, key, plainBytes
+        ));
+      } else {
+        // Audited, zero-native dependency: compatible with existing Expo
+        // binaries which do not expose WebCrypto.subtle on Hermes.
+        const { gcm } = await import('@noble/ciphers/aes.js');
+        ciphertext = gcm(keyBytes, iv).encrypt(plainBytes);
+      }
       return JSON.stringify({
         v: 2,
         alg: 'AES-256-GCM',
         iv: bytesToHex(Array.from(iv)),
-        data: bytesToHex(Array.from(new Uint8Array(ciphertext))),
+        data: bytesToHex(Array.from(ciphertext)),
       });
     } catch {
+      // No downgrade to custom CBC or unencrypted exports on failure.
       throw new Error('Failed to encrypt study journal with authenticated encryption.');
     }
   },
@@ -426,17 +432,23 @@ export const EncryptionService = {
           throw new Error('Invalid authenticated journal payload.');
         }
         const subtle = globalThis.crypto?.subtle;
-        if (!subtle) throw new Error('Authenticated decryption is unavailable.');
         const keyHex = await EncryptionService.getMasterKey();
-        const key = await subtle.importKey(
-          'raw', new Uint8Array(hexToBytes(keyHex)), { name: 'AES-GCM' }, false, ['decrypt']
-        );
-        const result = await subtle.decrypt(
-          { name: 'AES-GCM', iv: new Uint8Array(hexToBytes(modern.iv)), tagLength: 128 },
-          key,
-          new Uint8Array(hexToBytes(modern.data))
-        );
-        return utf8BytesToString(Array.from(new Uint8Array(result)));
+        const rawKey = Uint8Array.from(hexToBytes(keyHex));
+        const iv = Uint8Array.from(hexToBytes(modern.iv));
+        const data = Uint8Array.from(hexToBytes(modern.data));
+        let plaintext: Uint8Array;
+        if (subtle) {
+          const key = await subtle.importKey(
+            'raw', rawKey, { name: 'AES-GCM' }, false, ['decrypt']
+          );
+          plaintext = new Uint8Array(await subtle.decrypt(
+            { name: 'AES-GCM', iv, tagLength: 128 }, key, data
+          ));
+        } else {
+          const { gcm } = await import('@noble/ciphers/aes.js');
+          plaintext = gcm(rawKey, iv).decrypt(data);
+        }
+        return utf8BytesToString(Array.from(plaintext));
       }
       // Legacy v1 is supported ONLY for decryption of previously exported
       // journals. Never create new unauthenticated-CBC v1 archives.
