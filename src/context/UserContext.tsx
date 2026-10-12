@@ -329,6 +329,20 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (permLastLoginRaw) localPermLastLogin = permLastLoginRaw;
       } catch {}
 
+      // Restore immutable historical unlocks from the owner's protected
+      // server table. Missing migration/offline errors leave local badges intact.
+      let remoteAchievementIds: string[] = [];
+      try {
+        const { data: achievements, error } = await supabase
+          .from('user_earned_achievements')
+          .select('achievement_id').eq('user_id', userId);
+        if (!error && Array.isArray(achievements)) {
+          remoteAchievementIds = achievements
+            .map(row => row.achievement_id)
+            .filter((id): id is string => typeof id === 'string');
+        }
+      } catch {}
+
       if (activeAuthUserIdRef.current !== userId) return;
       setState(prev => {
         if (activeAuthUserIdRef.current !== userId) return prev;
@@ -403,6 +417,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           favoritesScriptures: mergedFavScriptures,
           readFactIds: mergedReadFactIds,
           bibleHighlights: mergedHighlights,
+          earnedAchievementIds: Array.from(new Set([
+            ...prev.earnedAchievementIds, ...remoteAchievementIds,
+          ])),
           lastReadBible: meta?.lastReadBible || prev.lastReadBible,
         };
       });
