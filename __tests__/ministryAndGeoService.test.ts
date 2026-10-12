@@ -30,8 +30,38 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
 }));
 
 // ---------------------------------------------------------------------------
-// Mock Supabase client
+// Mock React Native (required in ts-jest Node CommonJS mode)
 // ---------------------------------------------------------------------------
+jest.mock('react-native', () => ({
+  Platform: {
+    OS: 'android',
+    select: jest.fn((obj: any) => obj.android ?? obj.default),
+  },
+  Linking: {
+    openURL: jest.fn(async () => true),
+  },
+  StyleSheet: {
+    create: jest.fn((styles: any) => styles),
+  },
+  Dimensions: {
+    get: jest.fn(() => ({ width: 375, height: 812 })),
+  },
+  View: 'View',
+  Text: 'Text',
+  TouchableOpacity: 'TouchableOpacity',
+  TextInput: 'TextInput',
+  ScrollView: 'ScrollView',
+  KeyboardAvoidingView: 'KeyboardAvoidingView',
+  Modal: 'Modal',
+  Image: 'Image',
+  ActivityIndicator: 'ActivityIndicator',
+}));
+
+jest.mock('react-native-safe-area-context', () => ({
+  SafeAreaView: 'SafeAreaView',
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}));
+
 const mockMinistries = [
 
   {
@@ -267,17 +297,24 @@ import {
   getBranchesByMinistry,
   registerBranch,
   getBranchTypeLabel,
+  formatBranchName,
 } from '../src/services/ministryService';
 
 import {
   searchTowns,
   searchTownsOnline,
+  searchAddressesOnline,
+  reverseGeocodeOnline,
   resolveTownDetails,
   resolveTownDetailsAsync,
   getAllCountries,
   getProvincesByCountry,
   GEO_DATABASE,
 } from '../src/services/geoService';
+import { openDirections, buildDirectionUrls } from '../src/utils/directions';
+import { Linking, Platform } from 'react-native';
+
+
 
 // ---------------------------------------------------------------------------
 // GEO SERVICE TESTS (unchanged — all offline, no supabase dependency)
@@ -458,4 +495,163 @@ describe('Ministry & Church Directory Service (ministryService)', () => {
     expect(getBranchTypeLabel('sub_cluster')).toBe('Sub-Cluster');
     expect(getBranchTypeLabel('cluster')).toBe('Cluster Center');
   });
+
+  // ---------------------------------------------------------------------------
+  // AUTOMATED PRE-FILLED NAMING FORMULA & GEO ACCURACY TESTS
+  // ---------------------------------------------------------------------------
+  it('includes Standerton in Mpumalanga in GEO_DATABASE with accurate GPS coordinates', () => {
+    const standerton = GEO_DATABASE.find((g) => g.town.toLowerCase() === 'standerton');
+    expect(standerton).toBeDefined();
+    expect(standerton?.province).toBe('Mpumalanga');
+    expect(standerton?.country).toBe('South Africa');
+    expect(standerton?.postalCode).toBe('2430');
+    expect(standerton?.coordinates.latitude).toBeCloseTo(-26.9333, 2);
+    expect(standerton?.coordinates.longitude).toBeCloseTo(29.2417, 2);
+  });
+
+  it('formats branch and fellowship names with standard formula: {Church Name} - {Town} {Branch Type Suffix}', () => {
+    // Exact user requirement example: ECG The Jesus Nation Church - Standerton Homecell
+    const ecgHomecell = formatBranchName(
+      'ECG The Jesus Nation Church',
+      'Standerton',
+      'homecell'
+    );
+    expect(ecgHomecell).toBe('ECG The Jesus Nation Church - Standerton Homecell');
+
+    // Main Branch formula
+    const ecgMainBranch = formatBranchName(
+      'ECG The Jesus Nation Church',
+      'Sandton',
+      'branch'
+    );
+    expect(ecgMainBranch).toBe('ECG The Jesus Nation Church - Sandton Main Branch');
+
+    // Cell Branch formula
+    const ceCell = formatBranchName(
+      'Christ Embassy',
+      'Johannesburg',
+      'cell_branch'
+    );
+    expect(ceCell).toBe('Christ Embassy - Johannesburg Cell Branch');
+
+    // Cluster formula
+    const seCluster = formatBranchName(
+      'Spirit Embassy',
+      'Harare',
+      'cluster'
+    );
+    expect(seCluster).toBe('Spirit Embassy - Harare Cluster');
+
+    // Sub-Cluster formula
+    const geSubCluster = formatBranchName(
+      'God Embassy',
+      'Kyiv',
+      'sub_cluster'
+    );
+    expect(geSubCluster).toBe('God Embassy - Kyiv Sub-Cluster');
+
+    // Handles empty town gracefully
+    const noTown = formatBranchName('ECG The Jesus Nation Church', '', 'homecell');
+    expect(noTown).toBe('ECG The Jesus Nation Church - Homecell');
+  });
+
+  it('searchAddressesOnline returns address suggestions with coordinates', async () => {
+    const originalFetch = global.fetch;
+    const mockNominatimAddressResponse = [
+      {
+        display_name: '14 Willow Street, Standerton, Lekwa, Mpumalanga, 2430, South Africa',
+        lat: '-26.93821',
+        lon: '29.24312',
+        address: {
+          house_number: '14',
+          road: 'Willow Street',
+          town: 'Standerton',
+          state: 'Mpumalanga',
+          country: 'South Africa',
+          postcode: '2430',
+        },
+      },
+    ];
+
+    global.fetch = jest.fn().mockImplementation((url: string) => {
+      if (url.includes('nominatim.openstreetmap.org/search')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => mockNominatimAddressResponse,
+        });
+      }
+      return Promise.resolve({ ok: false, json: async () => [] });
+    }) as any;
+
+    try {
+      const results = await searchAddressesOnline('14 Willow St', 'Standerton', 'South Africa');
+      expect(results.length).toBeGreaterThan(0);
+      expect(results[0].streetAddress).toContain('14 Willow Street');
+      expect(results[0].town).toBe('Standerton');
+      expect(results[0].province).toBe('Mpumalanga');
+      expect(results[0].coordinates.latitude).toBeCloseTo(-26.93821, 3);
+      expect(results[0].coordinates.longitude).toBeCloseTo(29.24312, 3);
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
+  it('reverseGeocodeOnline resolves GPS coordinates to exact street address and town', async () => {
+    const originalFetch = global.fetch;
+    const mockReverseResponse = {
+      display_name: '25 Vry Street, Standerton, Lekwa, Mpumalanga, 2430, South Africa',
+      address: {
+        house_number: '25',
+        road: 'Vry Street',
+        town: 'Standerton',
+        state: 'Mpumalanga',
+        country: 'South Africa',
+        postcode: '2430',
+      },
+    };
+
+    global.fetch = jest.fn().mockImplementation((url: string) => {
+      if (url.includes('nominatim.openstreetmap.org/reverse')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => mockReverseResponse,
+        });
+      }
+      return Promise.resolve({ ok: false, json: async () => ({}) });
+    }) as any;
+
+    try {
+      const resolved = await reverseGeocodeOnline(-26.935, 29.245);
+      expect(resolved).toBeDefined();
+      expect(resolved?.streetAddress).toContain('25 Vry Street');
+      expect(resolved?.town).toBe('Standerton');
+      expect(resolved?.province).toBe('Mpumalanga');
+      expect(resolved?.coordinates.latitude).toBe(-26.935);
+      expect(resolved?.coordinates.longitude).toBe(29.245);
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
+  it('openDirections targets exact GPS coordinates to prevent fuzzy destination drift', () => {
+    const openURLSpy = jest.spyOn(Linking, 'openURL').mockResolvedValue(true as any);
+
+    // Coordinate target
+    openDirections({
+      latitude: -26.9333,
+      longitude: 29.2417,
+      name: 'ECG Standerton Homecell',
+      address: '14 Willow St',
+      town: 'Standerton',
+      country: 'South Africa',
+    });
+
+    expect(openURLSpy).toHaveBeenCalled();
+    const calledUrl = openURLSpy.mock.calls[0][0];
+    expect(calledUrl).toContain('-26.9333');
+    expect(calledUrl).toContain('29.2417');
+
+    openURLSpy.mockRestore();
+  });
 });
+

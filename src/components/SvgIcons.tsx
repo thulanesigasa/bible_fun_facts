@@ -991,10 +991,10 @@ export const ChurchSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B'
   </Svg>
 );
 
-export const MapPinSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', strokeWidth = 2, style }) => (
-  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
-    <Path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
-    <Circle cx="12" cy="10" r="3" stroke={color} strokeWidth={strokeWidth} />
+export const MapPinSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#F59E0B', fill = 'none', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={fill} style={style}>
+    <Path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" fill={fill !== 'none' ? fill : 'none'} />
+    <Circle cx="12" cy="10" r="3" stroke={color} strokeWidth={strokeWidth} fill={fill !== 'none' ? fill : 'none'} />
   </Svg>
 );
 
@@ -1011,6 +1011,42 @@ export const SlidersSvg: React.FC<SvgIconProps> = ({ size = 20, color = '#0F172A
     <Path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
   </Svg>
 );
+
+
+export const NavigationSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#FDD223', fill = 'none', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Polygon points="3 11 22 2 13 21 11 13 3 11" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" fill={fill !== 'none' ? fill : 'none'} />
+  </Svg>
+);
+
+export const CrosshairSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#0F172A', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Circle cx="12" cy="12" r="10" stroke={color} strokeWidth={strokeWidth} />
+    <Path d="M22 12H18M6 12H2M12 6V2M12 22V18" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+  </Svg>
+);
+
+export const ZoomInSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#0F172A', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Circle cx="11" cy="11" r="8" stroke={color} strokeWidth={strokeWidth} />
+    <Path d="M21 21L16.65 16.65M11 8V14M8 11H14" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+  </Svg>
+);
+
+export const ZoomOutSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#0F172A', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Circle cx="11" cy="11" r="8" stroke={color} strokeWidth={strokeWidth} />
+    <Path d="M21 21L16.65 16.65M8 11H14" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+  </Svg>
+);
+
+export const SyncSvg: React.FC<SvgIconProps> = ({ size = 24, color = '#0F172A', strokeWidth = 2, style }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+    <Path d="M21.5 2V6H17.5M2.5 22V18H6.5" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M19.07 10.93A8 8 0 0 0 5.67 6.33L2.5 9.5M21.5 14.5L18.33 17.67A8 8 0 0 1 4.93 13.07" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
 
 
 

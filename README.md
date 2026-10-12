@@ -2001,33 +2001,71 @@ When a believer taps on any church or ministry:
 - **"Register Branch / Cell" Floating Action**: If a believer's local assembly is not yet listed, a prominent CTA opens the branch registration workflow with the parent ministry pre-selected.
 
 ### 3. Live OpenStreetMap & Photon Hybrid Geocoding Engine (`src/services/geoService.ts`)
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Geocoding-Multi--Tier%20Hybrid%20OSM%20%2B%20Photon-10B981?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="Multi-Tier Geocoding" />
+  <img src="https://img.shields.io/badge/Address%20Search-Real--Time%20Street%20Autocomplete-0284C7?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Address Autocomplete" />
+  <img src="https://img.shields.io/badge/Reverse%20Geocode-Live%20GPS%20to%20Street%20Address-FDD223?style=for-the-badge" alt="Reverse Geocode" />
+  <img src="https://img.shields.io/badge/Offline%20Cache-AsyncStorage%200ms%20Latency-10B981?style=for-the-badge&logo=redis&logoColor=white" alt="Offline Cache" />
+</p>
+
 To deliver maximum reliability, zero manual data entry errors, and complete global coverage:
-- **Tier 1 (Instant In-Memory Cache)**: Pre-compiled database with 200+ canonical municipalities, townships, and suburbs across South Africa (all 9 provinces: Gauteng, Western Cape, KwaZulu-Natal, Eastern Cape, Free State, Mpumalanga, Limpopo, North West, Northern Cape with authentic SAPO postal codes), Zimbabwe, Malawi, Nigeria, Kenya, Ghana, Zambia, Botswana, the UK, the USA, and Ukraine.
-- **Tier 2 (Live OpenStreetMap Nominatim Engine)**: When typing any suburb, township, or district anywhere on Earth (e.g. *Diepsloot, Khayelitsha, Umlazi, Hatfield, Chitungwiza, Brooklyn, Westminster*), the app dynamically queries OpenStreetMap Nominatim with address-level details to automatically resolve and auto-populate:
+- **Tier 1 (Instant In-Memory Cache)**: Pre-compiled database with 200+ canonical municipalities, townships, and suburbs across South Africa (all 9 provinces: Gauteng, Western Cape, KwaZulu-Natal, Eastern Cape, Free State, Mpumalanga including Standerton, Ermelo, Bethal, Limpopo, North West, Northern Cape with authentic SAPO postal codes), Zimbabwe, Malawi, Nigeria, Kenya, Ghana, Zambia, Botswana, the UK, the USA, and Ukraine.
+- **Tier 2 (Live OpenStreetMap Nominatim Engine)**: When typing any suburb, township, or district anywhere on Earth (e.g. *Standerton, Diepsloot, Khayelitsha, Umlazi, Hatfield, Chitungwiza, Brooklyn, Westminster*), the app dynamically queries OpenStreetMap Nominatim with address-level details to automatically resolve and auto-populate:
   1. **Town / Suburb Name**
-  2. **Province / State / Region** (e.g., Selecting `Khayelitsha` -> `Western Cape`)
+  2. **Province / State / Region** (e.g., Selecting `Standerton` -> `Mpumalanga`)
   3. **Country** (e.g., `South Africa`)
-  4. **Postal Code** (e.g., `7783`)
+  4. **Postal Code** (e.g., `2430`)
   5. **Exact GPS Coordinates** (Latitude and Longitude for map pin positioning)
 - **Tier 3 (Photon by Komoot Secondary Fallback)**: High-speed OpenStreetMap search mirror providing instant secondary geocoding fallback if primary network thresholds are reached.
 - **Tier 4 (AsyncStorage Zero-Bandwidth Cache)**: Every resolved online address is permanently cached locally so repeated lookups require zero bandwidth and operate in 0ms offline.
+- **Real-Time Street Address Autocomplete (`searchAddressesOnline`)**:
+  - Dynamically searches full street addresses, road intersections, and house numbers within the selected town context.
+  - Pulls exact street names, postal codes, and precise GPS coordinates directly into the registration form.
+- **Live Reverse Geocoding (`reverseGeocodeOnline`)**:
+  - Automatically translates touched or pin-dropped GPS coordinates back into clean, human-readable street names and municipal districts.
 
-### 4. Clean Global Branch Directory & 1-Tap Native GPS Directions (`src/screens/BranchMapScreen.tsx`)
+### 4. Interactive Map Pin-Drop & 1-Tap Coordinate Navigation (`src/components/PinDropModal.tsx` & `src/utils/directions.ts`)
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Pin--Drop-Zero--SDK%20Carto%20%2F%20OSM%20Slippy%20Tiles-10B981?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="Pin-Drop Slippy Tiles" />
+  <img src="https://img.shields.io/badge/Projection-Spherical%20Mercator%20Math-0284C7?style=for-the-badge" alt="Mercator Math" />
+  <img src="https://img.shields.io/badge/Navigation-Exact%20Destination%20GPS%20Routing-FDD223?style=for-the-badge&logo=apple&logoColor=white" alt="Exact GPS Navigation" />
+  <img src="https://img.shields.io/badge/Design%20Rule-60--30--10%20Zero%20Emojis-0F172A?style=for-the-badge" alt="60-30-10 Design" />
+</p>
+
 - **Zero Heavy Native SDK / External Tile Canvas Dependency**: Bypasses heavy native Google Maps binaries (`react-native-maps`) and fragile web tile canvases that disrupt Expo EAS and GitHub Actions native compilations, consume mobile data, or demand costly billing keys.
-- **Editorial Global Branch Directory**:
-  - Filterable by ministry tab (All Churches, God Embassy, Christ Embassy, Spirit Embassy, ECG, plus user-registered ministries) and structure type (Main Branches, Homecells, Cell Branches, Sub-Clusters, Clusters).
-  - Displays church type, assembly name, town, province, country, pastoral leader, direct contact phone, meeting times, and exact physical address.
-- **1-Tap Coordinate-First Native GPS Navigation**:
-  - Prioritizes exact latitude and longitude coordinates for pinpoint accuracy.
-  - Seamlessly launches the user's preferred native navigation app via `Linking.openURL`:
-    - **Android**: `geo:0,0?q=lat,lng(label)` or coordinate intent.
-    - **iOS**: `maps:0,0?q=label&ll=lat,lng` launching Apple Maps directly onto the coordinates.
-    - **Web / Fallback**: Direct Google Maps URL (`https://www.google.com/maps/search/?api=1&query=lat,lng`).
-  - Supports Google Plus Code resolution (e.g. Pretoria God Embassy `6X4R+2Q`), ensuring reliable routing worldwide without ambiguous query results.
+- **Interactive Pin-Drop Map Modal (`PinDropModal.tsx`)**:
+  - Renders a lightweight 3x3 slippy tile matrix centered directly on the branch GPS coordinates using high-speed CartoDB Voyager / OpenStreetMap raster tiles.
+  - **Touch Pin Placement**: Converts user touch $(x, y)$ coordinates to exact Mercator latitude and longitude deltas, positioning the golden `#FDD223` pin precisely.
+  - **Directional Precision Pan & Zoom**: Dedicated directional pad (▲, ◀, ▶, ▼) and zoom controls ($+$ / $-$) for millimeter-level gate or entryway alignment.
+  - **Real-Time Reverse Geocoding Feedback**: Instant live lookup displaying the resolved street address and GPS coordinates as the user moves the pin.
+- **1-Tap Exact GPS Directions Routing (`src/utils/directions.ts`)**:
+  - Prioritizes exact latitude and longitude coordinates for pinpoint accuracy, preventing fuzzy town-center search misdirection.
+  - Launches native mapping clients directly to the exact destination coordinates:
+    - **iOS Apple Maps**: `http://maps.apple.com/?daddr={lat},{lng}&q={label}` initiating route calculation to the exact GPS target rather than an unregistered text name.
+    - **Android Google Maps**: `geo:{lat},{lng}?q={lat},{lng}({label})` turn-by-turn navigation.
+    - **Web / Fallback**: `https://www.google.com/maps/dir/?api=1&destination={lat},{lng}` direct navigation route.
 
-### 5. Multi-Step Registration Workflows
-- **`RegisterMinistryScreen.tsx`**: For leaders registering an entirely new church organization. Captures Organization Name, Vision Statement, Founder/Presiding Pastor, and Global Headquarters. Upon saving, automatically persists to AsyncStorage and seamlessly navigates the user directly to `RegisterBranchScreen` with the new ministry pre-selected.
-- **`RegisterBranchScreen.tsx`**: For registering local assemblies under any ministry. Allows selecting the structure type (`Branch`, `Homecell`, `Cell Branch`, `Sub-Cluster`, `Cluster`), typing an area/town to trigger instant auto-cascade geocoding, reviewing real-time radar map preview of the selected location, and specifying physical meeting days and contact details.
+### 5. Automated Pre-Filled Naming & Branch Registration Workflow (`RegisterBranchScreen.tsx`)
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Auto--Formula-%7BChurch%7D%20--%20%7BTown%7D%20%7BType%7D-10B981?style=for-the-badge" alt="Naming Formula" />
+  <img src="https://img.shields.io/badge/Reactive%20Sync-Automatic%20Town%20%26%20Type%20Binding-0284C7?style=for-the-badge&logo=react&logoColor=white" alt="Reactive Sync" />
+  <img src="https://img.shields.io/badge/GPS%20Lock-Pinpoint%20Registered%20Coordinates-FDD223?style=for-the-badge" alt="GPS Lock" />
+</p>
+
+- **Automated Church & Town Pre-Filled Naming Formula (`formatBranchName`)**:
+  - Dynamically synthesizes the assembly name following the formula:
+    `{Church Name} - {Town} {Branch Type Suffix}`
+    (e.g., `ECG The Jesus Nation Church - Standerton Homecell` or `ECG The Jesus Nation Church - Sandton Main Branch`).
+  - Automatically reacts to branch type selection from Step 1, parent ministry from Step 2, and town input from Step 3.
+  - Provides a dedicated "Auto-Formula" sync button to re-apply the formula instantly while permitting custom naming when required.
+- **Street Address Autocomplete & Pin-Drop Pairing**:
+  - Users typing street addresses receive live autocompleted suggestions with locked GPS coordinates.
+  - If street autocomplete is not found, a 1-tap "Pin-Drop Location on Map" button allows dropping an interactive pin directly onto the assembly's physical location.
+  - Registered branches and homecells store verified GPS coordinates permanently in Supabase, guaranteeing that believers tapping "Directions" always reach the exact church building, home, or hall.
+
 
 ---
 

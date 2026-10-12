@@ -539,3 +539,36 @@ export function getBranchTypeLabel(type: BranchType): string {
   }
 }
 
+/**
+ * Standard Branch / Fellowship naming formula:
+ * {Church Name} - {Town} {Branch Type Suffix}
+ * e.g. "ECG The Jesus Nation Church - Standerton Homecell"
+ */
+export function formatBranchName(
+  churchName: string,
+  town: string,
+  type: BranchType
+): string {
+  const cleanChurch = (churchName || '').trim();
+  const cleanTown = (town || '').trim();
+  const typeSuffix =
+    type === 'homecell'
+      ? 'Homecell'
+      : type === 'branch'
+      ? 'Main Branch'
+      : type === 'cell_branch'
+      ? 'Cell Branch'
+      : type === 'cluster'
+      ? 'Cluster'
+      : 'Sub-Cluster';
+
+  if (!cleanChurch) {
+    return cleanTown ? `${cleanTown} ${typeSuffix}` : typeSuffix;
+  }
+  if (!cleanTown) {
+    return `${cleanChurch} - ${typeSuffix}`;
+  }
+  return `${cleanChurch} - ${cleanTown} ${typeSuffix}`;
+}
+
+
