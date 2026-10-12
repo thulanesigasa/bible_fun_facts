@@ -47,6 +47,7 @@ export default function AchievementsScreen({ route }: AchievementsScreenProps) {
     favoritesScriptures,
     bibleHighlights,
     sharesCount,
+    earnedAchievementIds,
   } = useUser();
 
   const initialCategory: AchievementCategory = route?.params?.category || 'streak';
@@ -76,23 +77,30 @@ export default function AchievementsScreen({ route }: AchievementsScreenProps) {
   const currentSharesCount = sharesCount || 0;
   const currentStreak = streak || 1;
 
+  // A badge is permanently earned. Present the highest milestone already
+  // unlocked even if a bookmark/highlight was subsequently removed.
+  const highWater = (category: AchievementCategory, current: number) =>
+    Math.max(current, 0, ...ALL_ACHIEVEMENTS[category]
+      .filter(m => earnedAchievementIds.includes(m.id))
+      .map(m => m.target));
+
   const userStats = useMemo(() => ({
-    streak: currentStreak,
-    bookmarksCount,
-    highlightsCount,
-    sharesCount: currentSharesCount,
-  }), [currentStreak, bookmarksCount, highlightsCount, currentSharesCount]);
+    streak: highWater('streak', currentStreak),
+    bookmarksCount: highWater('bookmark', bookmarksCount),
+    highlightsCount: highWater('highlight', highlightsCount),
+    sharesCount: highWater('share', currentSharesCount),
+  }), [currentStreak, bookmarksCount, highlightsCount, currentSharesCount, earnedAchievementIds]);
 
   const totalProgress = useMemo(() => getTotalAchievementsProgress(userStats), [userStats]);
 
   const currentCategoryCount = useMemo(() => {
     switch (activeCategory) {
-      case 'streak': return currentStreak;
-      case 'bookmark': return bookmarksCount;
-      case 'highlight': return highlightsCount;
-      case 'share': return currentSharesCount;
+      case 'streak': return userStats.streak;
+      case 'bookmark': return userStats.bookmarksCount;
+      case 'highlight': return userStats.highlightsCount;
+      case 'share': return userStats.sharesCount;
     }
-  }, [activeCategory, currentStreak, bookmarksCount, highlightsCount, currentSharesCount]);
+  }, [activeCategory, userStats]);
 
   const categoryProgress = useMemo(
     () => getCategoryProgress(activeCategory, currentCategoryCount),
@@ -156,10 +164,10 @@ export default function AchievementsScreen({ route }: AchievementsScreenProps) {
               const isSelected = activeCategory === cat.key;
               const count = (() => {
                 switch (cat.key) {
-                  case 'streak': return currentStreak;
-                  case 'bookmark': return bookmarksCount;
-                  case 'highlight': return highlightsCount;
-                  case 'share': return currentSharesCount;
+                  case 'streak': return userStats.streak;
+                  case 'bookmark': return userStats.bookmarksCount;
+                  case 'highlight': return userStats.highlightsCount;
+                  case 'share': return userStats.sharesCount;
                 }
               })();
               const prog = getCategoryProgress(cat.key, count);
