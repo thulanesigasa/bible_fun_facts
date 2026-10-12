@@ -111,6 +111,9 @@ jobs:
       - name: Verify real AES-GCM cipher against Node OpenSSL
         run: node scripts/verify-aes-gcm.mjs
 
+      - name: Verify real memory-hard PIN scrypt against Node OpenSSL
+        run: node scripts/verify-pin-scrypt.mjs
+
       - name: Expo project health
         run: npx expo-doctor
 
