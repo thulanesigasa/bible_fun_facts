@@ -130,7 +130,7 @@ jobs:
     # Security releases must be deliberately deployed after the linked Supabase
     # migrations and existing-installation compatibility checks. A main merge
     # must never silently publish a database-incompatible preview OTA.
-    if: (github.event_name == 'push' && vars.ENABLE_AUTOMATED_PREVIEW_OTA == 'true') || (github.event_name == 'workflow_dispatch' && (inputs.action == 'publish_ota' || inputs.action == 'both'))
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (inputs.action == 'publish_ota' || inputs.action == 'both'))
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -162,7 +162,7 @@ jobs:
 
       # Publish to Production Channel
       - name: Publish OTA Update to Production Channel
-        if: github.event_name == 'workflow_dispatch' && (inputs.ota_channel == 'production' || inputs.ota_channel == 'both')
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (inputs.ota_channel == 'production' || inputs.ota_channel == 'both'))
         run: |
           eas update --branch production --environment production --message "${{ github.event.head_commit.message || 'Automated OTA production update from GitHub' }}" --non-interactive
         env:
@@ -170,7 +170,7 @@ jobs:
 
       # Publish to Preview Channel
       - name: Publish OTA Update to Preview Channel
-        if: (github.event_name == 'push' && vars.ENABLE_AUTOMATED_PREVIEW_OTA == 'true') || (github.event_name == 'workflow_dispatch' && (inputs.ota_channel == 'preview' || inputs.ota_channel == 'both'))
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (inputs.ota_channel == 'preview' || inputs.ota_channel == 'both'))
         run: |
           eas update --branch preview --environment preview --message "${{ github.event.head_commit.message || 'Automated OTA preview update from GitHub' }}" --non-interactive
         env:
