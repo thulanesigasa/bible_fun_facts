@@ -1,3 +1,4 @@
+import { webcrypto } from 'node:crypto';
 import { EncryptionService } from '../src/services/encryptionService';
 
 // Mock SecureStoreAdapter so tests run in pure Node environment without native bridge
@@ -16,6 +17,17 @@ jest.mock('../src/services/secureStorage', () => {
   };
 });
 
+const originalCrypto = Object.getOwnPropertyDescriptor(globalThis, 'crypto');
+beforeAll(() => {
+  Object.defineProperty(globalThis, 'crypto', {
+    configurable: true, value: webcrypto,
+  });
+});
+afterAll(() => {
+  if (originalCrypto) Object.defineProperty(globalThis, 'crypto', originalCrypto);
+  else Reflect.deleteProperty(globalThis, 'crypto');
+});
+
 describe('EncryptionService - Hardware-Backed AES-256 Study Journal', () => {
   it('encrypts and decrypts a simple plaintext message correctly', async () => {
     const originalText = 'In the beginning was the Word, and the Word was with God.';
@@ -24,6 +36,7 @@ describe('EncryptionService - Hardware-Backed AES-256 Study Journal', () => {
     expect(typeof encrypted).toBe('string');
     expect(encrypted.length).toBeGreaterThan(originalText.length);
     expect(encrypted).not.toEqual(originalText);
+    expect(JSON.parse(encrypted)).toMatchObject({ v: 2, alg: 'AES-256-GCM' });
 
     const decrypted = await EncryptionService.decryptString(encrypted);
     expect(decrypted).toEqual(originalText);
@@ -57,5 +70,21 @@ describe('EncryptionService - Hardware-Backed AES-256 Study Journal', () => {
     const tampered = validEncrypted.slice(0, -6) + 'XXXXXX';
 
     await expect(EncryptionService.decryptString(tampered)).rejects.toThrow();
+  });
+  it('rejects an authenticated ciphertext modified without changing its JSON format', async () => {
+    const payload = JSON.parse(await EncryptionService.encryptString('private message'));
+    payload.data = (payload.data.slice(0, 2) === '00' ? '01' : '00') + payload.data.slice(2);
+    await expect(EncryptionService.decryptString(JSON.stringify(payload))).rejects.toThrow();
+  });
+
+  it('fails closed when platform AES-GCM is unavailable', async () => {
+    Object.defineProperty(globalThis, 'crypto', {
+      configurable: true, value: { getRandomValues: webcrypto.getRandomValues.bind(webcrypto) },
+    });
+    try {
+      await expect(EncryptionService.encryptString('secret')).rejects.toThrow();
+    } finally {
+      Object.defineProperty(globalThis, 'crypto', { configurable: true, value: webcrypto });
+    }
   });
 });
