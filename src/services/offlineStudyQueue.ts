@@ -148,6 +148,12 @@ export const OfflineStudyQueue = {
     return serialize(async () => {
       const userId = await currentUserId();
       if (!entityId.trim()) throw new Error('Cannot queue an empty study entity ID.');
+      if (action === 'favorite_fact' || action === 'favorite_scripture') {
+        const privacy = await PrivacyService.getPreferences();
+        if (privacy.isPrivateStudyMode || privacy.privateStudyNotes) {
+          throw new Error('Private bookmarks must remain local to this device.');
+        }
+      }
       if (action === 'highlight_verse' && desired && (!value || value.length > 32)) {
         throw new Error('Invalid verse highlight color.');
       }
@@ -212,7 +218,7 @@ export const OfflineStudyQueue = {
       while (queue.length > 0) {
         const op = queue[0];
         try {
-          if ((op.action === 'upsert_note' || op.action === 'delete_note') &&
+          if (['upsert_note', 'delete_note', 'favorite_fact', 'favorite_scripture'].includes(op.action) &&
               (await PrivacyService.getPreferences()).privateStudyNotes) {
             // Leave all later operations ordered and pending while the
             // user prefers local-only notes. Never silently discard them.
