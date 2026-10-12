@@ -2,7 +2,7 @@
  * User-owned study data stored under the immutable Supabase account ID.
  * Never restore a globally shared plaintext user profile after sign-out.
  */
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 import { Fact, Scripture, WOTDEntry } from '../data/mockDatabase';
 import { supabase } from '../services/supabase';
 import { SecureStoreAdapter } from '../services/secureStorage';
@@ -54,6 +54,8 @@ export const UserDataProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [state, setState] = useState<StudyState>(emptyState);
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
   const [readyUserId, setReadyUserId] = useState<string | null>(null);
+  const activeUserRef = useRef<string | null>(null);
+  const restoreEpochRef = useRef(0);
 
   // When a session changes, reset sensitive data before loading another user's
   // encrypted cache. A restored session is not equivalent to fake offline login.
@@ -61,13 +63,15 @@ export const UserDataProvider: React.FC<{ children: ReactNode }> = ({ children }
     let active = true;
     const restore = async (id: string | null) => {
       if (!active) return;
+      const epoch = ++restoreEpochRef.current;
+      activeUserRef.current = id;
       setReadyUserId(null);
       setActiveUserId(id);
       setState(emptyState());
       if (!id) return;
       try {
         const raw = await SecureStoreAdapter.getItem(localKey(id));
-        if (!active) return;
+        if (!active || restoreEpochRef.current !== epoch || activeUserRef.current !== id) return;
         if (raw) {
           const parsed = JSON.parse(raw) as Partial<StudyState>;
           setState({
@@ -80,10 +84,10 @@ export const UserDataProvider: React.FC<{ children: ReactNode }> = ({ children }
             followedUserIds: Array.isArray(parsed.followedUserIds) ? parsed.followedUserIds : [],
           });
         }
-        setReadyUserId(id);
+        if (active && restoreEpochRef.current === epoch) setReadyUserId(id);
       } catch {
         // Secure storage unavailable: fail closed, never reuse plaintext data.
-        if (active) setReadyUserId(null);
+        if (active && restoreEpochRef.current === epoch) setReadyUserId(null);
       }
     };
 
@@ -93,15 +97,16 @@ export const UserDataProvider: React.FC<{ children: ReactNode }> = ({ children }
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       // Do not reset study data on token refresh for the same account.
-      if (session?.user?.id !== activeUserId) {
+      if ((session?.user?.id || null) !== activeUserRef.current) {
         void restore(session?.user?.id || null);
       }
     });
     return () => {
       active = false;
+      ++restoreEpochRef.current;
       listener.subscription.unsubscribe();
     };
-  }, [activeUserId]);
+  }, []);
 
   useEffect(() => {
     if (!activeUserId || readyUserId !== activeUserId) return;
