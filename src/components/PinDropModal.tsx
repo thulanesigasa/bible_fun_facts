@@ -256,7 +256,7 @@ export default function PinDropModal({
                   const cartoKey =
                     process.env.EXPO_PUBLIC_CARTO_API_KEY ||
                     'cb1_4i48_1_96858c75f2e3dc7fbe65fe45';
-                  const tileUrl = `https://basemaps.cartocdn.com/rastertiles/voyager/${zoom}/${tileX}/${tileY}.png?key=${cartoKey}`;
+                  const tileUrl = `https://basemaps.cartocdn.com/rastertiles/voyager/${zoom}/${tileX}/${tileY}.png?key=${cartoKey}&v=2`;
 
 
                   return (

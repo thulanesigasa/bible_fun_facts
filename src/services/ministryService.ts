@@ -525,7 +525,7 @@ export async function registerBranch(input: {
 export function getBranchTypeLabel(type: BranchType): string {
   switch (type) {
     case 'branch':
-      return 'Main Branch / Campus';
+      return 'Branch';
     case 'homecell':
       return 'Homecell Fellowship';
     case 'cell_branch':
@@ -542,7 +542,8 @@ export function getBranchTypeLabel(type: BranchType): string {
 /**
  * Standard Branch / Fellowship naming formula:
  * {Church Name} - {Town} {Branch Type Suffix}
- * e.g. "ECG The Jesus Nation Church - Standerton Homecell"
+ * e.g. "ECG The Jesus Nation Church - Kempton Park Branch"
+ *      "ECG The Jesus Nation Church - Standerton Homecell"
  */
 export function formatBranchName(
   churchName: string,
@@ -555,7 +556,7 @@ export function formatBranchName(
     type === 'homecell'
       ? 'Homecell'
       : type === 'branch'
-      ? 'Main Branch'
+      ? 'Branch'
       : type === 'cell_branch'
       ? 'Cell Branch'
       : type === 'cluster'

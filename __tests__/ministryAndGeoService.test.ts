@@ -489,7 +489,7 @@ describe('Ministry & Church Directory Service (ministryService)', () => {
   });
 
   it('generates accurate human-readable labels for branch types', () => {
-    expect(getBranchTypeLabel('branch')).toBe('Main Branch / Campus');
+    expect(getBranchTypeLabel('branch')).toBe('Branch');
     expect(getBranchTypeLabel('homecell')).toBe('Homecell Fellowship');
     expect(getBranchTypeLabel('cell_branch')).toBe('Cell Branch');
     expect(getBranchTypeLabel('sub_cluster')).toBe('Sub-Cluster');
@@ -518,13 +518,13 @@ describe('Ministry & Church Directory Service (ministryService)', () => {
     );
     expect(ecgHomecell).toBe('ECG The Jesus Nation Church - Standerton Homecell');
 
-    // Main Branch formula
-    const ecgMainBranch = formatBranchName(
+    // Branch formula (user requirement: ECG The Jesus Nation Church - Kempton Park Branch)
+    const ecgBranch = formatBranchName(
       'ECG The Jesus Nation Church',
-      'Sandton',
+      'Kempton Park',
       'branch'
     );
-    expect(ecgMainBranch).toBe('ECG The Jesus Nation Church - Sandton Main Branch');
+    expect(ecgBranch).toBe('ECG The Jesus Nation Church - Kempton Park Branch');
 
     // Cell Branch formula
     const ceCell = formatBranchName(
@@ -550,9 +550,12 @@ describe('Ministry & Church Directory Service (ministryService)', () => {
     );
     expect(geSubCluster).toBe('God Embassy - Kyiv Sub-Cluster');
 
-    // Handles empty town gracefully
+    // Handles empty town gracefully: church name + gathering prefilled
     const noTown = formatBranchName('ECG The Jesus Nation Church', '', 'homecell');
     expect(noTown).toBe('ECG The Jesus Nation Church - Homecell');
+
+    const noTownBranch = formatBranchName('ECG The Jesus Nation Church', '', 'branch');
+    expect(noTownBranch).toBe('ECG The Jesus Nation Church - Branch');
   });
 
   it('searchAddressesOnline returns address suggestions with coordinates', async () => {
