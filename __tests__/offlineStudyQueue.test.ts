@@ -32,7 +32,7 @@ beforeEach(() => {
   (client.from as jest.Mock).mockImplementation((table: string) => ({
     upsert: async (row: any) => {
       if (!databaseOnline) return { error: new Error('offline') };
-      remote.add(`${table}:${row.user_id}:${row.fact_id || row.scripture_id || row.wotd_id}`);
+      remote.add(`${table}:${row.user_id}:${row.fact_id || row.scripture_id || row.wotd_id || row.verse_key || row.id}`);
       return { error: null };
     },
     delete: () => ({
@@ -103,5 +103,29 @@ describe('OfflineStudyQueue', () => {
       .rejects.toThrow(/Invalid verse highlight/);
     await expect(OfflineStudyQueue.enqueue('highlight_verse', 'JHN.3.16', true, 'X'.repeat(90)))
       .rejects.toThrow(/Invalid verse highlight/);
+  });
+  it('durably saves and deletes note mutations under the same account', async () => {
+    const noteId = 'e2c93866-5115-4112-8e26-c22de8ea9301';
+    await OfflineStudyQueue.enqueueNote(noteId, 'John 3:16', 'A private reflection');
+    expect(await OfflineStudyQueue.pendingCount()).toBe(1);
+    databaseOnline = true;
+    expect(await OfflineStudyQueue.flush()).toEqual({ synced: 1, pending: 0 });
+    expect(remote.has(`study_notes:account-a:${noteId}`)).toBe(true);
+
+    // Offline deletion is replayed only for the original owner.
+    databaseOnline = false;
+    await OfflineStudyQueue.enqueueNote(noteId, 'John 3:16', null);
+    activeUser = 'account-b';
+    expect(await OfflineStudyQueue.pendingCount()).toBe(0);
+    activeUser = 'account-a';
+    databaseOnline = true;
+    expect(await OfflineStudyQueue.flush()).toEqual({ synced: 1, pending: 0 });
+    expect(remote.has(`study_notes:account-a:${noteId}`)).toBe(false);
+  });
+
+  it('refuses invalid note identifiers or oversized local-only text', async () => {
+    await expect(OfflineStudyQueue.enqueueNote('not-uuid', 'John 1:1', 'text')).rejects.toThrow(/stable UUID/);
+    await expect(OfflineStudyQueue.enqueueNote('e2c93866-5115-4112-8e26-c22de8ea9301', 'John 1:1', 'a'.repeat(32001)))
+      .rejects.toThrow(/Invalid offline study note/);
   });
 });
