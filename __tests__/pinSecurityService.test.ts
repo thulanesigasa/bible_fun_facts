@@ -66,7 +66,7 @@ describe('PinSecurityService - Memory-hard scrypt & Rate Limiting', () => {
 
       const isSet = await PinSecurityService.isPinSet();
       expect(isSet).toBe(true);
-      expect(memoryStore[PIN_HASH_KEY]).toEqual(expect.stringContaining('scrypt-v1));
+    expect(memoryStore[PIN_HASH_KEY].startsWith('scrypt-v1' + '$')).toBe(true);
       expect(memoryStore[PIN_SALT_KEY]).toBeUndefined();
 
       // Verify correct PIN
@@ -95,7 +95,7 @@ describe('PinSecurityService - Memory-hard scrypt & Rate Limiting', () => {
     memoryStore[PIN_SALT_KEY] = salt;
     memoryStore[PIN_HASH_KEY] = sha256('4821' + salt);
     expect((await PinSecurityService.verifyPin('4821')).success).toBe(true);
-    expect(memoryStore[PIN_HASH_KEY]).toEqual(expect.stringContaining('scrypt-v1));
+    expect(memoryStore[PIN_HASH_KEY].startsWith('scrypt-v1' + '$')).toBe(true);
     expect(memoryStore[PIN_SALT_KEY]).toBeUndefined();
     expect((await PinSecurityService.verifyPin('4821')).success).toBe(true);
     expect((await PinSecurityService.verifyPin('0000')).success).toBe(false);
