@@ -86,4 +86,22 @@ describe('OfflineStudyQueue', () => {
     expect(result).toEqual({ synced: 2, pending: 0 });
     expect(remote.size).toBe(0);
   });
+  it('queues completed reads, highlights, edits and removals in replay order', async () => {
+    await OfflineStudyQueue.enqueue('read_fact', 'fact-10', true);
+    await OfflineStudyQueue.enqueue('highlight_verse', 'GEN.1.1', true, '#FF0000');
+    await OfflineStudyQueue.enqueue('highlight_verse', 'GEN.1.1', true, '#00FF00');
+    await OfflineStudyQueue.enqueue('highlight_verse', 'GEN.1.1', false);
+    expect(await OfflineStudyQueue.pendingCount()).toBe(4);
+    databaseOnline = true;
+    await expect(OfflineStudyQueue.flush()).resolves.toEqual({ synced: 4, pending: 0 });
+    expect(remote.has('user_read_facts:account-a:fact-10')).toBe(true);
+    expect(remote.has('user_verse_highlights:account-a:GEN.1.1')).toBe(false);
+  });
+
+  it('rejects empty or excessively large highlight payloads', async () => {
+    await expect(OfflineStudyQueue.enqueue('highlight_verse', 'JHN.3.16', true, ''))
+      .rejects.toThrow(/Invalid verse highlight/);
+    await expect(OfflineStudyQueue.enqueue('highlight_verse', 'JHN.3.16', true, 'X'.repeat(90)))
+      .rejects.toThrow(/Invalid verse highlight/);
+  });
 });
