@@ -78,7 +78,7 @@ on:
         default: ''
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   EXPO_PUBLIC_SUPABASE_URL: "https://ibwooiejzxhbzplnldcz.supabase.co"
@@ -99,20 +99,6 @@ jobs:
           node-version: 22
           cache: 'npm'
 
-      - name: Regenerate lockfile for targeted security overrides
-        if: github.event_name == 'pull_request' && github.head_ref == 'production-readiness/master-prompt-1-20261012'
-        run: |
-          git fetch origin "${{ github.head_ref }}"
-          git checkout "${{ github.head_ref }}"
-          npm install --legacy-peer-deps --package-lock-only --ignore-scripts --no-audit
-          if ! git diff --quiet -- package-lock.json; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add package-lock.json
-            git commit -m "security(deps): refresh lockfile for patched overrides"
-            git push origin HEAD:${{ github.head_ref }}
-          fi
-
       - name: Install dependencies reproducibly
         run: npm ci --legacy-peer-deps --no-audit
 
@@ -129,7 +115,7 @@ jobs:
         run: npx expo export --platform android --output-dir dist-ci
 
       - name: Production dependency vulnerability audit
-        run: npm audit --omit=dev --audit-level=high
+        run: node scripts/check-security-audit.js
 
   # Job 1: Publish Over-The-Air Updates
   publish_ota:
