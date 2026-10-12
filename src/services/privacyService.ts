@@ -2,6 +2,8 @@ import { supabase } from './supabase';
 import { SecureStoreAdapter } from './secureStorage';
 
 export const PRIVATE_STUDY_KEY = '@exegeomai_private_study_mode_v1';
+const PRIVATE_STUDY_ACCOUNT_KEY = (userId: string) =>
+  `@exegeomai_private_study_mode_v2:${userId}`;
 export const DISCOVERABLE_IN_SEARCH_KEY = '@exegeomai_discoverable_in_search_v1';
 export const SHOW_STREAKS_PUBLICLY_KEY = '@exegeomai_show_streaks_publicly_v1';
 export const PRIVATE_STUDY_NOTES_KEY = '@exegeomai_private_study_notes_v1';
@@ -37,18 +39,26 @@ export const PrivacyService = {
    */
   getPreferences: async (): Promise<ScholarPrivacyPreferences> => {
     try {
-      const privateStudy = await SecureStoreAdapter.getItem(PRIVATE_STUDY_KEY);
-      // Server state is authoritative for any privacy setting affecting others.
-      // A missing/failed read must fail PRIVATE, not use stale local public flags.
+      // Server state is authoritative for public visibility; private-study
+      // mode is local but scoped to the immutable authenticated account ID.
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) {
         return {
-          isPrivateStudyMode: privateStudy === 'true',
+          isPrivateStudyMode: true,
           isDiscoverableInSearch: false,
           showStreaksPublicly: false,
           privateStudyNotes: true,
         };
       }
+      const accountPrivate = await SecureStoreAdapter.getItem(
+        PRIVATE_STUDY_ACCOUNT_KEY(session.user.id)
+      );
+      // A prior device-wide TRUE must be retained conservatively until the
+      // account explicitly toggles. Never migrate a device-wide FALSE.
+      const legacyPrivate = accountPrivate === null
+        ? await SecureStoreAdapter.getItem(PRIVATE_STUDY_KEY)
+        : null;
+      const privateStudy = accountPrivate ?? (legacyPrivate === 'true' ? 'true' : 'false');
       const { data, error } = await supabase
         .from('user_privacy_settings')
         .select('is_discoverable, show_streaks_publicly, private_study_notes')
@@ -71,7 +81,7 @@ export const PrivacyService = {
     } catch (e) {
       console.warn('[PrivacyService] getPreferences error:', e);
       return {
-        isPrivateStudyMode: false,
+        isPrivateStudyMode: true,
         isDiscoverableInSearch: false,
         showStreaksPublicly: false,
         privateStudyNotes: true,
@@ -84,7 +94,11 @@ export const PrivacyService = {
    */
   setPrivateStudyMode: async (enabled: boolean): Promise<boolean> => {
     try {
-      await SecureStoreAdapter.setItem(PRIVATE_STUDY_KEY, enabled ? 'true' : 'false');
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error || !session?.user?.id) return false;
+      await SecureStoreAdapter.setItem(
+        PRIVATE_STUDY_ACCOUNT_KEY(session.user.id), enabled ? 'true' : 'false'
+      );
       return true;
     } catch (e) {
       console.warn('[PrivacyService] setPrivateStudyMode error:', e);
