@@ -22,6 +22,18 @@ BEGIN
  END IF;
 END $$;
 
+-- Privileged functions must not be executable as anonymous HTTP RPCs.
+DO $$
+BEGIN
+ IF has_function_privilege('anon', 'public.delete_user_account()', 'EXECUTE')
+ OR has_function_privilege('anon', 'public.handle_new_user()', 'EXECUTE')
+ OR has_function_privilege('anon', 'public.increment_ministry_count(uuid,text)', 'EXECUTE')
+ OR has_function_privilege('anon', 'public.search_public_scholars(text,integer)', 'EXECUTE')
+ THEN
+   RAISE EXCEPTION 'Anonymous privileged RPC remains executable';
+ END IF;
+END $$;
+
 RESET ROLE;
 SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claim.sub', '11111111-1111-4111-8111-111111111111', true);
@@ -37,6 +49,18 @@ BEGIN
      AND created_by = auth.uid()
  ) THEN
    RAISE EXCEPTION 'Authenticated ministry insert did not bind owner';
+ END IF;
+END $$;
+
+-- Editable attributes are permitted; owner flags and aggregate counters
+-- must never be directly writable from the authenticated API role.
+DO $$
+BEGIN
+ IF has_column_privilege('authenticated','public.ministries','branches_count','UPDATE')
+ OR has_column_privilege('authenticated','public.ministries','created_by','UPDATE')
+ OR has_column_privilege('authenticated','public.branches','created_by','UPDATE')
+ THEN
+   RAISE EXCEPTION 'Protected directory columns are client writable';
  END IF;
 END $$;
 
