@@ -8,7 +8,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../services/supabase';
-import { SecureStoreAdapter } from '../services/secureStorage';
 import { setSentryUser } from '../services/sentryService';
 
 export interface UserProfile {
@@ -60,86 +59,88 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const USER_PROFILE_KEY = '@user_profile_v1';
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
-  // Initialize and restore saved user session
+  // Only restore a profile from a securely persisted Supabase session.
   useEffect(() => {
-    async function restoreSession() {
-      try {
-        const stored = await AsyncStorage.getItem(USER_PROFILE_KEY);
-        if (stored) {
-          const profile = JSON.parse(stored) as UserProfile;
-          setUserProfile(profile);
-          setSentryUser({ id: profile.email, email: profile.email, username: profile.username });
-        }
-      } catch (err) {
-        console.warn('[AuthContext] Session restore error:', err);
-      } finally {
-        setIsLoadingAuth(false);
-      }
-    }
-    restoreSession();
-  }, []);
-
-  const login = useCallback(async (emailOrName: string, password?: string, name?: string): Promise<boolean> => {
-    try {
-      const email = emailOrName.includes('@') ? emailOrName.trim().toLowerCase() : `${emailOrName.trim().toLowerCase()}@exegeomai.local`;
-      const username = emailOrName.includes('@') ? emailOrName.split('@')[0] : emailOrName.trim();
+    let active = true;
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (!active || error || !session?.user) return;
+      const user = session.user;
+      const meta = user.user_metadata || {};
+      const username = typeof meta.username === 'string' ? meta.username : (user.email?.split('@')[0] || '');
       const profile: UserProfile = {
-        name: name || username,
+        name: typeof meta.name === 'string' ? meta.name : username,
         username,
-        email,
-        joinedDate: new Date().toISOString(),
+        email: user.email || '',
+        joinedDate: user.created_at,
         notificationsEnabled: true,
       };
-
-      await AsyncStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
       setUserProfile(profile);
-      setSentryUser({ id: profile.email, email: profile.email, username: profile.username });
+      setSentryUser({ id: user.id });
+    }).catch(() => {
+      // Offline first launch without a verified cached session stays signed out.
+    }).finally(() => {
+      if (active) setIsLoadingAuth(false);
+    });
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' || !session?.user) {
+        if (active) { setUserProfile(null); setSentryUser(null); }
+      }
+    });
+    return () => { active = false; listener.subscription.unsubscribe(); };
+  }, []);
+
+  const login = useCallback(async (emailOrName: string, password?: string): Promise<boolean> => {
+    if (!password || !emailOrName.includes('@')) return false;
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: emailOrName.trim().toLowerCase(), password,
+      });
+      if (error || !data.user || !data.session) return false;
+      const meta = data.user.user_metadata || {};
+      const username = typeof meta.username === 'string' ? meta.username : (data.user.email?.split('@')[0] || '');
+      setUserProfile({
+        name: typeof meta.name === 'string' ? meta.name : username,
+        username,
+        email: data.user.email || '',
+        joinedDate: data.user.created_at,
+        notificationsEnabled: true,
+      });
+      setSentryUser({ id: data.user.id });
       return true;
-    } catch {
-      return false;
-    }
+    } catch { return false; }
   }, []);
 
   const signup = useCallback(async (name: string, email: string, password?: string): Promise<boolean> => {
-    return login(email, password, name);
-  }, [login]);
+    if (!password) return false;
+    try {
+      const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { name } } });
+      return !error && !!data.user;
+    } catch { return false; }
+  }, []);
 
   const signupExtended = useCallback(async (params: SignUpExtendedParams): Promise<boolean> => {
+    if (!params.password) return false;
     try {
-      const profile: UserProfile = {
-        name: `${params.firstName} ${params.lastName}`.trim(),
-        firstName: params.firstName,
-        lastName: params.lastName,
-        username: params.username.trim(),
-        email: params.email.trim().toLowerCase(),
-        phoneNumber: params.phoneNumber,
-        countryCode: params.countryCode,
-        preferredTranslation: params.preferredTranslation,
-        studyFocus: params.studyFocus,
-        dailyGoal: params.dailyGoal,
-        knowledgeLevel: params.knowledgeLevel,
-        joinedDate: new Date().toISOString(),
-        notificationsEnabled: true,
-      };
-
-      await AsyncStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
-      setUserProfile(profile);
-      setSentryUser({ id: profile.email, email: profile.email, username: profile.username });
-      return true;
-    } catch {
-      return false;
-    }
+      const { data, error } = await supabase.auth.signUp({
+        email: params.email, password: params.password,
+        options: { data: {
+          name: `${params.firstName} ${params.lastName}`.trim(),
+          firstName: params.firstName, lastName: params.lastName,
+          username: params.username,
+        } },
+      });
+      return !error && !!data.user;
+    } catch { return false; }
   }, []);
 
   const logout = useCallback(async (): Promise<void> => {
     try {
-      await AsyncStorage.removeItem(USER_PROFILE_KEY);
+      await AsyncStorage.removeItem('@user_profile_v1');
       await supabase.auth.signOut().catch(() => {});
       setUserProfile(null);
       setSentryUser(null);
@@ -149,32 +150,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const updateProfile = useCallback(async (updates: Partial<UserProfile>): Promise<void> => {
-    setUserProfile((prev) => {
-      if (!prev) return null;
-      const updated = { ...prev, ...updates };
-      AsyncStorage.setItem(USER_PROFILE_KEY, JSON.stringify(updated)).catch(() => {});
-      return updated;
-    });
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) throw new Error('Authentication required');
+    const { error } = await supabase.auth.updateUser({ data: updates });
+    if (error) throw error;
+    setUserProfile(prev => prev ? { ...prev, ...updates } : prev);
   }, []);
 
   const deleteAccountAndPurgeData = useCallback(async (): Promise<boolean> => {
     try {
-      // 1. Invoke Supabase RPC if session exists
-      try {
-        await (supabase.rpc('delete_user_account') as PromiseLike<any>);
-      } catch {
-        // Fall through
-      }
-
-      // 2. Clear local auth and profile
-      await AsyncStorage.removeItem(USER_PROFILE_KEY);
-      await supabase.auth.signOut().catch(() => {});
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session?.user) return false;
+      const { error } = await supabase.rpc('delete_user_account');
+      if (error) return false;
+      await supabase.auth.signOut();
+      await AsyncStorage.removeItem('@user_profile_v1');
       setUserProfile(null);
       setSentryUser(null);
       return true;
-    } catch {
-      return false;
-    }
+    } catch { return false; }
   }, []);
 
   return (
