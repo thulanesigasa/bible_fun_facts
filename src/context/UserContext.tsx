@@ -1085,7 +1085,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = async () => {
-    const previousUserId = activeAuthUserIdRef.current;
     activeAuthUserIdRef.current = null;
     if (SUPABASE_ANON_KEY) {
       try {
@@ -1096,7 +1095,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     // Never leave the next account inside the previous account's cached state.
     isLoadedFromStorage.current = false;
-    if (previousUserId) await SecureStoreAdapter.removeItem(SECURE_STUDY_KEY(previousUserId)).catch(() => {});
+    // Keep the encrypted owner-scoped cache (and pending offline queue) for
+    // restoration when this same authenticated account signs in again.
+    // Never delete unsynced user study history merely because of sign-out.
     await AsyncStorage.multiRemove([
       STORAGE_KEY, LOCAL_OWNER_KEY, PERMANENT_STREAK_KEY,
       PERMANENT_BACKUP_KEY, PERMANENT_LAST_LOGIN_KEY,
