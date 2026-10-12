@@ -1,8 +1,8 @@
 const { spawnSync } = require('node:child_process');
 
 const ALLOWED_HIGH_ADVISORIES = new Set([
-  'GHSA-vfj7-8cjw-p6xm', // braces via Metro/Expo tooling; no compatible patched resolution currently available
-  'GHSA-86w9-cpqp-85rv', // node-forge via Expo code-signing/update tooling; no compatible patched resolution currently available
+  'GHSA-VFJ7-8CJW-P6XM', // braces via Metro/Expo tooling; no compatible patched resolution currently available
+  'GHSA-86W9-CPQP-85RV', // node-forge via Expo code-signing/update tooling; no compatible patched resolution currently available
 ]);
 
 const result = spawnSync('npm', ['audit', '--omit=dev', '--json'], {
