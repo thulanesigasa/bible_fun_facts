@@ -2353,7 +2353,8 @@ npm run web:start
 ### Interactive Map Gesture Navigation & Study Streak Engine
 
 #### 1. Zero-SDK Gesture Map Navigation (`PinDropModal.tsx`)
-- **Pinch-to-Zoom**: Fluid two-finger pinch gesture dynamically scales Esri World Imagery (Satellite) and World Street Map tile layers between zoom levels 10 and 19 without cluttering on-screen buttons.
+- **Real-Time Pinch-to-Zoom (Zero Delay)**: Fluid two-finger pinch gesture updates instantaneously with incremental pixel delta tracking (25px sensitivity step) scaling Esri World Imagery (Satellite) and World Street Map tile layers between zoom levels 10 and 19 without lag or delay.
+- **Locked Pin Coordinates & Address Preservation**: The pin location stays permanently locked to the selected GPS coordinates and street address as the user pinches or pans around the map. Zooming in or out never resets or loses the main address.
 - **Natural Directional Panning**: Single-finger drag pan gesture smoothly translates the map view in all four directions (left, right, up, down) using standard React Native `PanResponder` and spherical Mercator projection math.
 - **Precise Pin Placement**: Single tap drops or repositions the pin anywhere on the viewport, automatically initiating background reverse-geocoding via high-accuracy open geocoding providers.
 - **Clean Interface**: Removed legacy on-screen `+` / `-` buttons and arrow pads for a modern, full-canvas interactive experience.
