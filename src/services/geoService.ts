@@ -1210,8 +1210,93 @@ async function queryNominatimAddress(
         if (!streetAddress && !suburb && !town) return null;
 
         const displayName =
-          item.display_name ||
-          [streetAddress, suburb, town, province].filter(Boolean).join(', ');
+          queryHouseNumber && item.display_name && !item.display_name.startsWith(queryHouseNumber)
+            ? `${queryHouseNumber} ${item.display_name}`
+            : item.display_name ||
+              [streetAddress, suburb, town, province].filter(Boolean).join(', ');
+
+        return {
+          displayName,
+          streetAddress: streetAddress || displayName.split(',')[0],
+          suburb,
+          town: town || suburb,
+          province,
+          country,
+          postalCode,
+          coordinates: {
+            latitude: parseFloat(item.lat),
+            longitude: parseFloat(item.lon),
+          },
+        };
+      })
+      .filter(Boolean) as AddressSuggestion[];
+  } catch {
+    clearTimeout(timer);
+    return [];
+  }
+}
+
+/**
+ * Free LocationIQ Address Search (5,000 free requests/day, no credit card required)
+ */
+async function queryLocationIQAddress(
+  searchQuery: string,
+  countryHint: string = 'South Africa',
+  rawUserQuery?: string
+): Promise<AddressSuggestion[]> {
+  const apiKey = process.env.EXPO_PUBLIC_LOCATIONIQ_API_KEY;
+  if (!apiKey) return [];
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 4000);
+  try {
+    const rawNumberMatch = (rawUserQuery || searchQuery).trim().match(/^(\d+[A-Za-z]?|\d+[-\/]\d+)\s+/i);
+    const queryHouseNumber = rawNumberMatch ? rawNumberMatch[1] : '';
+
+    const countryCode = COUNTRY_CODE_MAP[countryHint.toLowerCase()] || '';
+    const countryParam = countryCode ? `&countrycodes=${countryCode}` : '';
+    const url = `https://us1.locationiq.com/v1/search?key=${apiKey}&q=${encodeURIComponent(
+      searchQuery
+    )}&format=json&addressdetails=1&limit=6${countryParam}`;
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timer);
+    if (!res.ok) return [];
+    const data = await res.json();
+    if (!Array.isArray(data)) return [];
+
+    return data
+      .map((item: any) => {
+        const addr = item.address || {};
+        const houseNumber = addr.house_number || queryHouseNumber || '';
+        const road =
+          addr.road ||
+          addr.street ||
+          addr.pedestrian ||
+          addr.footway ||
+          addr.path ||
+          '';
+        const rawSuburb = addr.suburb || addr.neighbourhood || addr.residential || '';
+        const suburb = /^.*ward\s*\d+/i.test(rawSuburb) ? '' : rawSuburb;
+        const town =
+          addr.city ||
+          addr.town ||
+          addr.village ||
+          addr.municipality ||
+          suburb ||
+          '';
+        const province = addr.state || addr.province || addr.region || '';
+        const country = addr.country || countryHint;
+        const postalCode = addr.postcode || '';
+
+        const streetAddress =
+          [houseNumber, road].filter(Boolean).join(' ') || item.name || '';
+        if (!streetAddress && !suburb && !town) return null;
+
+        const displayName =
+          queryHouseNumber && item.display_name && !item.display_name.startsWith(queryHouseNumber)
+            ? `${queryHouseNumber} ${item.display_name}`
+            : item.display_name ||
+              [streetAddress, suburb, town, province].filter(Boolean).join(', ');
 
         return {
           displayName,
@@ -1296,7 +1381,7 @@ async function queryPhotonAddress(
 
 /**
  * Real-Time Street Address Autocomplete with Exact GPS Coordinates.
- * Pulls suggestions from Nominatim + Photon with AsyncStorage caching.
+ * Multi-tier engine: LocationIQ (free tier) -> Nominatim -> Photon with AsyncStorage caching.
  */
 export async function searchAddressesOnline(
   query: string,
@@ -1326,17 +1411,28 @@ export async function searchAddressesOnline(
     // ignore
   }
 
-  let suggestions: AddressSuggestion[] = await queryNominatimAddress(
+  // 1. Try LocationIQ if free API key is configured
+  let suggestions: AddressSuggestion[] = await queryLocationIQAddress(
     searchQuery,
-    townHint,
     countryHint,
     q
   );
+
+  // 2. Query Nominatim OSM
+  if (suggestions.length === 0) {
+    suggestions = await queryNominatimAddress(
+      searchQuery,
+      townHint,
+      countryHint,
+      q
+    );
+  }
 
   if (suggestions.length === 0 && searchQuery !== `${q}, ${countryHint}`) {
     suggestions = await queryNominatimAddress(`${q}, ${countryHint}`, townHint, countryHint, q);
   }
 
+  // 3. Fallback to Photon
   if (suggestions.length === 0) {
     suggestions = await queryPhotonAddress(searchQuery, townHint, countryHint, q);
     if (suggestions.length === 0 && townHint && !hasTown) {

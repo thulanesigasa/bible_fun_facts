@@ -698,5 +698,49 @@ describe('Ministry & Church Directory Service (ministryService)', () => {
 
     openURLSpy.mockRestore();
   });
+
+  it('searchAddressesOnline queries LocationIQ when API key is provided and prefixes house number in displayName', async () => {
+    const originalFetch = global.fetch;
+    const originalApiKey = process.env.EXPO_PUBLIC_LOCATIONIQ_API_KEY;
+    process.env.EXPO_PUBLIC_LOCATIONIQ_API_KEY = 'test_locationiq_free_key';
+
+    const mockLocationIQResponse = [
+      {
+        place_id: 998877,
+        lat: '-26.1095',
+        lon: '28.2317',
+        display_name: 'Jubilee Street, Rhodesfield, Kempton Park, Gauteng, South Africa',
+        address: {
+          road: 'Jubilee Street',
+          suburb: 'Rhodesfield',
+          city: 'Kempton Park',
+          state: 'Gauteng',
+          country: 'South Africa',
+          postcode: '1627',
+        },
+      },
+    ];
+
+    global.fetch = jest.fn().mockImplementation((url: string) => {
+      if (url.includes('locationiq.com')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => mockLocationIQResponse,
+        });
+      }
+      return Promise.resolve({ ok: false, json: async () => ({}) });
+    }) as any;
+
+    try {
+      const results = await searchAddressesOnline('6 jubilee street', 'Kempton Park');
+      expect(results.length).toBeGreaterThan(0);
+      expect(results[0].streetAddress).toBe('6 Jubilee Street');
+      expect(results[0].displayName).toContain('6 Jubilee Street');
+      expect(results[0].town).toBe('Kempton Park');
+    } finally {
+      process.env.EXPO_PUBLIC_LOCATIONIQ_API_KEY = originalApiKey;
+      global.fetch = originalFetch;
+    }
+  });
 });
 
