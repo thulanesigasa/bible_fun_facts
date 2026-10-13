@@ -1768,6 +1768,151 @@ button {
   min-height: 120px;
 }
 
+/* ==========================================================================
+   Cookie Consent Banner (.cookie-banner)
+   ========================================================================== */
+.cookie-banner {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  right: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+  z-index: 999;
+  background: #FFFFFF;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.12);
+  padding: 20px 24px;
+  animation: cookieFadeIn 0.3s ease-out;
+}
+
+@keyframes cookieFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cookie-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .cookie-wrap {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.cookie-content {
+  flex: 1;
+}
+
+.cookie-title {
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 14px;
+  color: #0F172A;
+  margin-bottom: 4px;
+}
+
+.cookie-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #475569;
+}
+
+.cookie-link {
+  color: #0F172A;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cookie-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.cookie-btn {
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 9px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.cookie-btn-essential {
+  background: #F1F5F9;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  color: #334155;
+}
+
+.cookie-btn-essential:hover {
+  background: #E2E8F0;
+}
+
+.cookie-btn-accept {
+  background: var(--accent);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: #0F172A;
+}
+
+.cookie-btn-accept:hover {
+  background: var(--accent-hover);
+}
+
+/* ==========================================================================
+   Skeleton Loading Utilities (.skeleton)
+   ========================================================================== */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #F1F5F9 25%,
+    #E2E8F0 50%,
+    #F1F5F9 75%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite ease-in-out;
+  border-radius: 6px;
+}
+
+@keyframes skeletonShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-text {
+  height: 14px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.skeleton-text.short {
+  width: 60%;
+}
+
+.skeleton-card {
+  height: 240px;
+  border-radius: 16px;
+}
+
 .launch-skip{position:fixed;top:-80px;left:20px;z-index:999;background:#FDD223;color:#0B1120;padding:12px 20px;border-radius:8px}.launch-skip:focus{top:12px}
 .nav :focus-visible,.site-footer :focus-visible{outline:3px solid #b58c00;outline-offset:5px}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation:none!important;transition:none!important}}

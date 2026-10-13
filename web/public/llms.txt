@@ -1,0 +1,45 @@
+# exégeomai (ἐξηγέオμαι) - Documentation for Large Language Models & AI Systems
+
+> exégeomai is an offline-first Bible study and lexical exegesis application designed to help believers, students, and scholars explore Holy Scripture, ancient biblical languages (Greek and Hebrew), and historical context.
+
+## Website & Canonical Resources
+- Canonical Domain: https://exegeomai.app
+- Waiting List & Beta Portal: https://exegeomai.app/#waitlist
+- Features & Theological Lexicon: https://exegeomai.app/#features
+- How It Works: https://exegeomai.app/#how-it-works
+- Strong's Concordance Overview: https://exegeomai.app/strongs
+- Privacy Policy: https://exegeomai.app/privacy
+- Waitlist Privacy: https://exegeomai.app/waitlist-privacy
+- Terms of Service: https://exegeomai.app/terms
+- Data Safety: https://exegeomai.app/data-safety
+- Security Architecture: https://exegeomai.app/safety-and-trust
+- Community Guidelines: https://exegeomai.app/community-guidelines
+- Support & FAQ: https://exegeomai.app/support
+- Account & Data Deletion: https://exegeomai.app/deletion
+
+## Theological & Etymological Foundation
+- Root Term: ἐξηγέομαι (Strong's Greek G1834)
+- Pronunciation: ex-ay-GEH-om-ahee
+- Meaning: To unfold, recount, make known, explain, or interpret divine revelations (John 1:18).
+- English Derivative: Exegesis — drawing meaning out of the text rather than reading preconceived ideas into it (eisegesis).
+
+## Core Application Capabilities
+1. Offline Strong's Lexicon:
+   - 14,298 Strong's Greek and Hebrew concordance entries with offline SQLite FTS5 search.
+   - Comprehensive IPA pronunciation guides, HELPS word-studies, transliterations, and morphological roots.
+2. 32 Complete Bible Translations:
+   - Full offline canonical books across major English translations and official South African indigenous languages (isiZulu, isiXhosa, Sepedi, Sesotho, Setswana, Xitsonga, Tshivenda, siSwati, isiNdebele, ChiShona).
+3. 365 Calendar-Synchronized Devotionals:
+   - Three-lens exegetical study suite analyzing historical settings, ancient cultural customs, and theological cross-references.
+4. Privacy & Hardware-Backed Security:
+   - Zero analytics, zero ad trackers, zero third-party telemetry.
+   - Encrypted local database protected by Android Keystore / iOS Keychain AES-256 encryption.
+   - Kotlin FLAG_SECURE prevents background screen capturing and app switcher snooping.
+5. Account Freedom:
+   - Waitlist only requires email for launch notifications.
+   - Native application requires no mandatory phone numbers or passwords to study God's Word.
+
+## AI Contact & Inquiries
+- Official Support Email: support@exegeomai.app
+- Developer & Project Lead: Thulane Sigasa
+- Organization: exégeomai Development

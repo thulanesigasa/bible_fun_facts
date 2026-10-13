@@ -2319,7 +2319,23 @@ The official companion web portal (`web/`) provides full web access to exégeoma
    - Integrated form and panel surfaces (`WaitlistForm`, `privacy-panel`, `word-study`, `prose-card`) seamlessly into the page body.
    - Removed external GitHub project sections and links across footer and pages.
 
-5. **Web Portal Commands**:
+5. **SEO, Performance & Core Web Vitals Optimization**:
+   - **Dynamic Sitemap (`sitemap.ts`)**: Automatic XML sitemap generation covering all routes, priorities, and change frequencies at `/sitemap.xml`.
+   - **Dynamic Robots (`robots.ts`)**: Crawling directives, canonical host declaration, and sitemap pointer at `/robots.txt`.
+   - **AI/LLM Crawling Standards (`llms.txt`)**: Curated machine-readable overview of exégeomai lexical features, translations, and security at `/llms.txt`.
+   - **OpenGraph & Dynamic Social Sharing**: Pre-rendered `/opengraph-image` with branded typography and metadata cards.
+   - **Schema Markup**: Comprehensive JSON-LD `@graph` defining `WebSite`, `Organization`, and `SoftwareApplication` entities.
+   - **Search Console Verification**: Verified search console metadata token and canonical tags (`rel="canonical"`).
+   - **Indexation**: Removed all restrictive `noindex` and `nofollow` tags to ensure full public search discoverability.
+   - **Cookie Consent (`CookieConsent.tsx`)**: GDPR/POPIA compliant non-tracking privacy preferences banner with granular choices.
+   - **Core Web Vitals & Loading Performance**:
+     - Image lazy loading with explicit width/height dimensions to eliminate layout shifts (CLS).
+     - Next.js image optimization supporting AVIF/WebP next-gen compression.
+     - Skeleton loading utilities (`.skeleton`) for non-blocking UI rendering.
+     - Minified JS and CSS with Gzip/Brotli compression and HSTS HTTPS enforcement headers.
+     - Responsive mobile viewport scaling and overflow suppression on phone previews.
+
+6. **Web Portal Commands**:
 ```bash
 # Launch Next.js web portal development server (http://localhost:3000)
 npm run web:portal

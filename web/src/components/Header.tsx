@@ -46,7 +46,7 @@ export function Header() {
             <span className="brand-mark" aria-hidden="true">
               <Image
                 src="/logo-transparent.png"
-                alt=""
+                alt="exégeomai Holy Bible logo mark"
                 width={30}
                 height={30}
                 priority

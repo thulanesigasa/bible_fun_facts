@@ -32,7 +32,13 @@ export function PreviewPhone({ screen = 0 }: { screen?: number }) {
           <span>▰</span>
         </div>
         <div className="phone-brand">
-          <Image src="/logo-transparent.png" alt="" width={25} height={25} />
+          <Image
+            src="/logo-transparent.png"
+            alt="exégeomai Holy Bible app logo"
+            width={25}
+            height={25}
+            loading="lazy"
+          />
           <b>exégeomai</b>
           <span>☰</span>
         </div>

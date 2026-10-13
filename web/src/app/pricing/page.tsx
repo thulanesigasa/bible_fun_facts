@@ -103,15 +103,13 @@ export default function PricingPage() {
                     <span>Peer-Reviewed Lexical Corrections</span>
                   </li>
                 </ul>
-                <a
-                  href="https://github.com/thulanesigasa/bible_fun_facts"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href="/contact"
                   className="btn-outline"
                   style={{ justifyContent: 'center', borderColor: 'var(--border-strong)', color: 'var(--ink)' }}
                 >
-                  <span>Contribute on GitHub</span>
-                </a>
+                  <span>Connect With Our Team</span>
+                </Link>
               </div>
             </div>
 

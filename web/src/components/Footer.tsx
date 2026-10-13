@@ -11,10 +11,11 @@ export function Footer() {
             <Link href="/" className="brand" aria-label="exégeomai home">
               <span className="brand-mark" aria-hidden="true">
                 <Image
-                  src="/assets/logo-transparent.png"
-                  alt="exégeomai Logo"
+                  src="/logo-transparent.png"
+                  alt="exégeomai Holy Scripture and Exegesis logo"
                   width={28}
                   height={28}
+                  loading="lazy"
                 />
               </span>
               <span>exégeomai</span>

@@ -42,11 +42,11 @@ export default function SupportPage() {
       cta: 'Data Deletion Portal',
     },
     {
-      title: 'GitHub Issue Tracker',
-      desc: 'Developer and community issues, feature requests, and pull request tracking on our public repository.',
-      link: 'https://github.com/thulanesigasa/bible_fun_facts/issues',
-      cta: 'Open GitHub Issues',
-      external: true,
+      title: 'Report a Problem',
+      desc: 'Submit feedback, unexpected app behaviors, typographical errata, or feature requests directly to our team.',
+      link: '/report-a-problem',
+      cta: 'Submit Problem Report',
+      external: false,
     },
   ];
 

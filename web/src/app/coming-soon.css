@@ -1028,24 +1028,25 @@
     font-size: 11px;
   }
   .phone-trio {
-    width: 520px;
-    left: 50%;
-    margin-left: -260px;
-    margin-top: 38px;
-    height: 390px;
+    width: 100%;
+    max-width: 480px;
+    left: auto;
+    margin: 38px auto 0;
+    height: 380px;
+    overflow: hidden;
   }
   .trio-centre {
-    left: 115px;
-    transform: translateY(77px) scale(0.72);
+    left: 50%;
+    transform: translateX(-50%) translateY(70px) scale(0.72);
     transform-origin: bottom center;
   }
   .trio-left {
-    left: -28px;
-    transform: rotate(-10deg) translateY(105px) scale(0.6);
+    left: 0;
+    transform: rotate(-10deg) translateY(105px) scale(0.58);
   }
   .trio-right {
-    right: -28px;
-    transform: rotate(10deg) translateY(105px) scale(0.6);
+    right: 0;
+    transform: rotate(10deg) translateY(105px) scale(0.58);
   }
   .hero-caption {
     gap: 22px;
