@@ -2303,16 +2303,23 @@ The official companion web portal (`web/`) provides full web access to exégeoma
    - `/terms`: 6-section terms of service covering MIT open source licensing, public domain texts, and acceptable use.
    - `/data-safety`: Official Google Play Store Data Safety declaration matrix confirming 0 bytes of collected or shared personal data.
 
-3. **Plugu-Style Multi-Column Footer (`Footer.tsx`)**:
-   - Structured 5-column navigation grid:
-     - **Brand Column**: Logo, theological vision, and MIT open-source license badge.
-     - **Product Column**: Features, How It Works, Pricing (Free), Download App, FAQ.
-     - **Company Column**: About exégeomai, Contact, Support & FAQ, GitHub Project.
+3. **Multi-Column Footer (`Footer.tsx`)**:
+   - Structured navigation grid:
+     - **Brand Column**: Logo, theological vision, and coming-soon status notice.
+     - **Product Column**: Features, How It Works, Waitlist Privacy, Join Waiting List, FAQ.
+     - **Company Column**: About exégeomai, Contact, Support & FAQ.
      - **Safety Column**: Safety & Trust, Security Architecture, Community Guidelines, Report a Problem.
-     - **Support Column**: Help Centre, Contact Support, Account Deletion, Issue Tracker.
-     - **Legal Column**: Privacy Policy, Terms of Service, Data Safety, MIT License.
+     - **Support Column**: Help Centre, Contact Support, Account Deletion.
+     - **Legal Column**: Privacy Policy, Terms of Service, Data Safety.
 
-4. **Web Portal Commands**:
+4. **Web Portal Design Standards & Redesign**:
+   - Clean white background body architecture matching editorial layouts (`#FFFFFF` base).
+   - Removed pill badges and capsules across the portal in favor of clean, simple Poppins font typography (`--font-poppins`).
+   - Clean white navigation bar with borderless transparent logo mark (no white container border-radius or background box).
+   - Integrated form and panel surfaces (`WaitlistForm`, `privacy-panel`, `word-study`, `prose-card`) seamlessly into the page body.
+   - Removed external GitHub project sections and links across footer and pages.
+
+5. **Web Portal Commands**:
 ```bash
 # Launch Next.js web portal development server (http://localhost:3000)
 npm run web:portal

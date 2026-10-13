@@ -19,20 +19,11 @@ export function HeroSection() {
 
         <nav className="hero-actions" aria-label="Action links">
           <a
-            href="https://github.com/thulanesigasa/bible_fun_facts/releases/latest"
+            href="/#waitlist"
             className="btn btn-accent"
             id="heroDownloadBtn"
           >
-            Download APK — v1.0.4
-          </a>
-          <a
-            href="https://github.com/thulanesigasa/bible_fun_facts"
-            className="btn btn-ghost"
-            target="_blank"
-            rel="noopener noreferrer"
-            id="heroGithubBtn"
-          >
-            View on GitHub
+            Join Waiting List
           </a>
         </nav>
 
