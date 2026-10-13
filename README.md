@@ -2350,6 +2350,21 @@ npm run web:start
 
 ---
 
+### Interactive Map Gesture Navigation & Study Streak Engine
+
+#### 1. Zero-SDK Gesture Map Navigation (`PinDropModal.tsx`)
+- **Pinch-to-Zoom**: Fluid two-finger pinch gesture dynamically scales Esri World Imagery (Satellite) and World Street Map tile layers between zoom levels 10 and 19 without cluttering on-screen buttons.
+- **Natural Directional Panning**: Single-finger drag pan gesture smoothly translates the map view in all four directions (left, right, up, down) using standard React Native `PanResponder` and spherical Mercator projection math.
+- **Precise Pin Placement**: Single tap drops or repositions the pin anywhere on the viewport, automatically initiating background reverse-geocoding via high-accuracy open geocoding providers.
+- **Clean Interface**: Removed legacy on-screen `+` / `-` buttons and arrow pads for a modern, full-canvas interactive experience.
+
+#### 2. Study Streak Engine Resilience & Launch Milestone Healing (`streakEngine.ts`, `UserContext.tsx`)
+- **Continuous Launch Anchoring**: Continuous daily study tracking anchors to canonical launch date (`2026-09-25`).
+- **Dynamic Milestone Healing**: Automatically heals continuous daily study participants to their expected canonical milestone (e.g. Day 19 on 2026-10-13) and prevents session re-authentication races from inadvertently resetting streaks to Day 1.
+- **Dual-Storage Synchronization**: Synchronizes active streak and login dates across encrypted secure store, permanent local storage, and Supabase `profiles` with realtime update channels.
+
+---
+
 ### Verification Commands
 ```bash
 # Run unit test suite

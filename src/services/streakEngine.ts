@@ -195,12 +195,12 @@ export function healHistoricalDay7Clamp(
   const expectedStreak = getExpectedCanonicalStreak(todayStr);
 
   // Check if user is a continuous daily study participant (streak >= 4)
-  // lagging behind expectedStreak due to the historical clamp or Day 10 date-stamp stall:
+  // lagging behind expectedStreak due to the historical clamp, same-day date-stamp stall,
+  // or clamp drift:
   if (
     todayStr >= '2026-10-02' &&
     safeCandidate >= 4 &&
-    safeCandidate < expectedStreak &&
-    expectedStreak - safeCandidate <= 4
+    safeCandidate < expectedStreak
   ) {
     return { healedStreak: expectedStreak, wasHealed: true };
   }

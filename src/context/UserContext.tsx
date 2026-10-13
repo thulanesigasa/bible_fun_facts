@@ -627,9 +627,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
               ...prev, userProfile: null,
               favoritesFacts: [], favoritesScriptures: [], completedWOTDs: [],
               readFactIds: [], bibleHighlights: {}, followedUserIds: [],
-              factsViewedCount: 0, sharesCount: 0, streak: 1,
+              factsViewedCount: 0, sharesCount: 0,
+              streak: Math.max(prev.streak || 1, 1),
               earnedAchievementIds: [],
-              lastLoginDate: null,
+              lastLoginDate: prev.lastLoginDate || null,
             }));
             // Rehydrate ONLY this authenticated account's encrypted cache.
             // Check identity again after asynchronous disk access; rapid A/B
