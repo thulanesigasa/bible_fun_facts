@@ -69,7 +69,20 @@ export default function HomePage() {
       <Header />
       <main id="main" className="launch-page">
         <section className="launch-hero" id="home" aria-labelledby="hero-title">
+          {/* Decorative architectural background lines & geometric floating rings */}
+          <div className="hero-grid-lines" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
           <div className="launch-orbit" aria-hidden="true" />
+          <div className="hero-deco-ring hero-deco-ring-1" aria-hidden="true" />
+          <div className="hero-deco-ring hero-deco-ring-2" aria-hidden="true" />
+          <div className="hero-deco-circle hero-deco-circle-1" aria-hidden="true" />
+          <div className="hero-deco-circle hero-deco-circle-2" aria-hidden="true" />
+          <div className="hero-deco-square" aria-hidden="true" />
           <div className="launch-wrap hero-copy">
             <p className="launch-eyebrow">
               <span className="status-dot" /> COMING SOON

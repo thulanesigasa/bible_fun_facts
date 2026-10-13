@@ -2317,6 +2317,7 @@ The official companion web portal (`web/`) provides full web access to exégeoma
    - Removed pill badges and capsules across the portal in favor of clean, simple Poppins font typography (`--font-poppins`).
    - Clean white navigation bar with borderless transparent logo mark (no white container border-radius or background box).
    - All boxed div cards, panels, feature columns, and forms (`WaitlistForm`, `DeletionForm`, `prose-card`, `feature-card`, `step-card`, `sec-card`, `pricing-card`, `faq-item`) are seamlessly integrated into the page body matching the editorial "How it works" column style with hairline dividers, eliminating floating card containers and shadow islands.
+   - Decorative architectural elements: Background vertical grid guide lines, concentric planetary orbits (`.launch-orbit`), floating geometric rings (`.hero-deco-ring`), accent circles (`.hero-deco-circle`), and rotated geometric squares (`.hero-deco-square`).
    - Removed external GitHub project sections and links across footer and pages.
 
 5. **SEO, Performance & Core Web Vitals Optimization**:
