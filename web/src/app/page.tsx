@@ -6,9 +6,9 @@ import { WaitlistForm } from "@/components/WaitlistForm";
 import "./coming-soon.css";
 
 export const metadata: Metadata = {
-  title: { absolute: "Coming Soon — Scripture has depths. | exégeomai" },
+  title: { absolute: "exégeomai | Scripture has depths." },
   description:
-    "Meet exégeomai, the upcoming Bible study app. Explore Scripture, biblical languages and fascinating biblical facts. Join the waiting list for launch news.",
+    "Meet exégeomai, the Bible study experience. Explore Scripture, biblical languages and fascinating biblical facts. Join the waiting list for launch news.",
   alternates: { canonical: "https://exegeomai.app" },
 };
 const features = [

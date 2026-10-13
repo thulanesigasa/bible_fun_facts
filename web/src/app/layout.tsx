@@ -33,16 +33,16 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
-  title: { default: "exégeomai — Coming Soon", template: "%s | exégeomai" },
+  title: { default: "exégeomai", template: "%s | exégeomai" },
   description:
-    "Scripture has depths. Discover the upcoming exégeomai Bible study app and join the waiting list for launch notifications.",
+    "Scripture has depths. Discover the exégeomai Bible study experience and join the waiting list for launch notifications.",
   applicationName: "exégeomai",
   robots: { index: true, follow: true },
   openGraph: {
     type: "website",
     locale: "en_US",
     siteName: "exégeomai",
-    title: "exégeomai — Coming Soon",
+    title: "exégeomai",
     description:
       "Scripture has depths. Get ready to discover them. Join the waiting list.",
     images: [
@@ -50,13 +50,13 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "exégeomai — Scripture has depths. Coming soon.",
+        alt: "exégeomai — Scripture has depths.",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "exégeomai — Coming Soon",
+    title: "exégeomai",
     description: "Scripture has depths. Get ready to discover them.",
     images: ["/opengraph-image"],
   },
