@@ -59,13 +59,13 @@
   <img src="https://img.shields.io/badge/Strongs%20Pronunciation-100%25%20Complete%20(14%2C298%20Words)-10B981?style=for-the-badge&logo=book&logoColor=white" alt="100% Strongs Pronunciation" />
   <img src="https://img.shields.io/badge/Ministries-God%20Embassy%20%7C%20Christ%20Embassy%20%7C%20Spirit%20Embassy%20%7C%20ECG-10B981?style=for-the-badge&logo=church&logoColor=white" alt="Ministry Directory" />
   <img src="https://img.shields.io/badge/Branch%20Naming-Standard%20Formula%20%7C%20Church%20--%20Town%20Gathering-10B981?style=for-the-badge" alt="Standard Branch Naming Formula" />
-  <img src="https://img.shields.io/badge/Geocoding-Live%20OSM%20Nominatim%20%2B%20Photon%20%7C%20Country--Biased-0284C7?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="Country Biased Geocoding" />
-  <img src="https://img.shields.io/badge/CARTO%20Basemaps-Watermark--Free%20Voyager%20Tiles%20%2B%20Legal%20Attribution-10B981?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="CARTO Basemaps Watermark-Free Voyager Tiles" />
-  <img src="https://img.shields.io/badge/Maps-Standalone%20Pin%20Drop%20%7C%20GPS%20Status%20Badge-FDD223?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Standalone Pin Drop and GPS Status Badge" />
+  <img src="https://img.shields.io/badge/Geocoding-Live%20LocationIQ%20%2B%20Nominatim%20%2B%20Photon-0284C7?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="Free Multi-Tier Geocoding" />
+  <img src="https://img.shields.io/badge/Maps-Esri%20Satellite%20%2B%20World%20Street-10B981?style=for-the-badge&logo=arcgis&logoColor=white" alt="Esri Satellite and Street Maps" />
+  <img src="https://img.shields.io/badge/Pin--Drop-Dual--Layer%20Satellite%20%26%20Street%20Switch-FDD223?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Dual Layer Map Pin Drop" />
   <img src="https://img.shields.io/badge/Strongs%20Loading-Instant%200ms%20Curated%20Render%20%7C%20Infinite%20Paging-10B981?style=for-the-badge&logo=fastapi&logoColor=white" alt="Instant Strongs Loading" />
   <img src="https://img.shields.io/badge/Hermes%20Optimization-Zero--Crash%20AST%20Stack%20Protection-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Hermes Zero-Crash AST Stack Protection" />
   <img src="https://img.shields.io/badge/Cold%20Boot%20Stability-Decoupled%20Warmup%20%7C%20Zero%20OOM-FDD223?style=for-the-badge&logo=android&logoColor=white" alt="Cold Boot Stability" />
-  <img src="https://img.shields.io/badge/Tests-Jest%20119%2F119%20Passing%20(11%20Suites)-10B981?style=for-the-badge&logo=jest&logoColor=white" alt="Jest 119/119 Passing" />
+  <img src="https://img.shields.io/badge/Tests-Jest%20121%2F121%20Passing%20(11%20Suites)-10B981?style=for-the-badge&logo=jest&logoColor=white" alt="Jest 121/121 Passing" />
   <img src="https://img.shields.io/badge/Compliance-GDPR%20Purge%20RPC%20%7C%20Inexact%20Alarms-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="GDPR and Store Compliance" />
   <img src="https://img.shields.io/badge/Legal-Privacy%20(12%20Sections)%20%7C%20Terms%20(14%20Sections)%20%7C%20GDPR%20%7C%20POPIA-FDD223?style=for-the-badge&logo=html5&logoColor=white" alt="Privacy 12 Sections Terms 14 Sections GDPR POPIA" />
   <img src="https://img.shields.io/badge/Web%20Portal-Responsive%2060--30--10%20Landing%20Site-0284C7?style=for-the-badge&logo=html5&logoColor=white" alt="Responsive Web Portal" />
@@ -2048,24 +2048,27 @@ To deliver maximum reliability, zero manual data entry errors, and complete glob
 - **Tier 3 (Photon by Komoot Secondary Fallback)**: High-speed OpenStreetMap search mirror providing instant secondary geocoding fallback if primary network thresholds are reached.
 - **Tier 4 (AsyncStorage Zero-Bandwidth Cache)**: Every resolved online address is permanently cached locally so repeated lookups require zero bandwidth and operate in 0ms offline.
 - **Real-Time Street Address Autocomplete (`searchAddressesOnline`)**:
+  - Multi-tier high-accuracy address search: LocationIQ (free tier, 5,000 requests/day, no credit card required) -> Nominatim OpenStreetMap -> Photon geocoder.
   - Dynamically searches full street addresses, road intersections, and house numbers within the selected town context.
   - Pulls exact street names, postal codes, and precise GPS coordinates directly into the registration form.
 - **Live Reverse Geocoding (`reverseGeocodeOnline`)**:
   - Automatically translates touched or pin-dropped GPS coordinates back into clean, human-readable street names and municipal districts.
 
-### 4. Interactive Map Pin-Drop & 1-Tap Coordinate Navigation (`src/components/PinDropModal.tsx` & `src/utils/directions.ts`)
+### 4. Interactive Map Pin-Drop with Esri Satellite Imagery & 1-Tap Directions (`src/components/PinDropModal.tsx` & `src/utils/directions.ts`)
 
 <p align="left">
-  <img src="https://img.shields.io/badge/Pin--Drop-Zero--SDK%20Carto%20%2F%20OSM%20Slippy%20Tiles-10B981?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="Pin-Drop Slippy Tiles" />
-  <img src="https://img.shields.io/badge/Projection-Spherical%20Mercator%20Math-0284C7?style=for-the-badge" alt="Mercator Math" />
-  <img src="https://img.shields.io/badge/Navigation-Exact%20Destination%20GPS%20Routing-FDD223?style=for-the-badge&logo=apple&logoColor=white" alt="Exact GPS Navigation" />
+  <img src="https://img.shields.io/badge/Satellite-Esri%20World%20Imagery%20%7C%20Maxar%20%7C%20Earthstar-10B981?style=for-the-badge&logo=arcgis&logoColor=white" alt="Esri World Imagery" />
+  <img src="https://img.shields.io/badge/Street%20Map-Esri%20World%20Street%20%7C%20HERE%20%7C%20OSM-0284C7?style=for-the-badge&logo=arcgis&logoColor=white" alt="Esri World Street Map" />
+  <img src="https://img.shields.io/badge/Layer%20Switch-1--Tap%20Satellite%20%2F%20Street%20Toggle-FDD223?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Layer Switch Toggle" />
   <img src="https://img.shields.io/badge/Design%20Rule-60--30--10%20Zero%20Emojis-0F172A?style=for-the-badge" alt="60-30-10 Design" />
 </p>
 
-- **Zero Heavy Native SDK / External Tile Canvas Dependency**: Bypasses heavy native Google Maps binaries (`react-native-maps`) and fragile web tile canvases that disrupt Expo EAS and GitHub Actions native compilations, consume mobile data, or demand costly billing keys.
-- **Interactive Pin-Drop Map Modal (`PinDropModal.tsx`)**:
-  - Renders a lightweight 3x3 slippy tile matrix centered directly on the branch GPS coordinates using high-speed CartoDB Voyager / OpenStreetMap raster tiles.
-  - **Touch Pin Placement**: Converts user touch $(x, y)$ coordinates to exact Mercator latitude and longitude deltas, positioning the golden `#FDD223` pin precisely.
+- **Zero Heavy Native SDK / External Paid Billing Dependency**: Bypasses heavy native Google Maps binaries (`react-native-maps`) and paid Google Maps Platform API billing keys ($200/mo paywall) that disrupt Expo EAS and GitHub Actions native compilations.
+- **Dual-Layer Interactive Pin-Drop Map Modal (`PinDropModal.tsx`)**:
+  - **Esri World Imagery (Satellite)**: Crystal-clear satellite aerial imagery from Esri ArcGIS, Maxar, Earthstar Geographics, and CNES/Airbus DS. Allows zooming in to pinpoint church roofs, parking entrances, and building access gates visually.
+  - **Esri World Street Map**: Clean cartographic vector-rendered raster streets with roads, landmarks, and municipal boundaries.
+  - **Layer Switcher Pill**: Quick 1-tap floating pill toggle between Street and Satellite modes with active `#FDD223` indicator and SVG icons (`LayersSvg`, `SatelliteSvg`).
+  - **Touch Pin Placement**: Converts user touch $(x, y)$ coordinates to exact Mercator latitude and longitude deltas, positioning the golden `#FDD223` pin precisely with high-visibility amber pulse halo.
   - **Directional Precision Pan & Zoom**: Dedicated directional pad (▲, ◀, ▶, ▼) and zoom controls ($+$ / $-$) for millimeter-level gate or entryway alignment.
   - **Real-Time Reverse Geocoding Feedback**: Instant live lookup displaying the resolved street address and GPS coordinates as the user moves the pin.
 - **1-Tap Exact GPS Directions Routing (`src/utils/directions.ts`)**:

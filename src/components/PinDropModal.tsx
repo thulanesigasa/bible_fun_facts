@@ -34,6 +34,8 @@ import {
   CrosshairSvg,
   ZoomInSvg,
   ZoomOutSvg,
+  LayersSvg,
+  SatelliteSvg,
 } from './SvgIcons';
 import { reverseGeocodeOnline, AddressSuggestion } from '../services/geoService';
 
@@ -97,7 +99,8 @@ export default function PinDropModal({
 }: PinDropModalProps) {
   const [lat, setLat] = useState<number>(initialLatitude || -26.2041);
   const [lng, setLng] = useState<number>(initialLongitude || 28.0473);
-  const [zoom, setZoom] = useState<number>(15);
+  const [zoom, setZoom] = useState<number>(16);
+  const [mapLayer, setMapLayer] = useState<'satellite' | 'streets'>('satellite');
   const [resolvedAddress, setResolvedAddress] = useState<AddressSuggestion | null>(null);
   const [isResolving, setIsResolving] = useState<boolean>(false);
 
@@ -191,17 +194,17 @@ export default function PinDropModal({
   };
 
   const handleZoomIn = () => {
-    if (zoom < 18) setZoom((z) => z + 1);
+    if (zoom < 19) setZoom((z) => z + 1);
   };
 
   const handleZoomOut = () => {
-    if (zoom > 11) setZoom((z) => z - 1);
+    if (zoom > 10) setZoom((z) => z - 1);
   };
 
   const handleResetToInitial = () => {
     setLat(initialLatitude || -26.2041);
     setLng(initialLongitude || 28.0473);
-    setZoom(15);
+    setZoom(16);
     triggerReverseGeocode(initialLatitude || -26.2041, initialLongitude || 28.0473);
   };
 
@@ -267,16 +270,15 @@ export default function PinDropModal({
                   const left = originX + dx * TILE_SIZE;
                   const top = originY + dy * TILE_SIZE;
 
-                  // High-speed CartoDB Voyager raster tiles with registered API key (watermark-free)
-                  const cartoKey =
-                    process.env.EXPO_PUBLIC_CARTO_API_KEY ||
-                    'cb1_4i48_1_96858c75f2e3dc7fbe65fe45';
-                  const tileUrl = `https://basemaps.cartocdn.com/rastertiles/voyager/${zoom}/${tileX}/${tileY}.png?key=${cartoKey}&v=2`;
-
+                  // High-resolution Esri World Imagery (Satellite aerial photos) or Esri World Street Map (100% free, keyless)
+                  const tileUrl =
+                    mapLayer === 'satellite'
+                      ? `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${zoom}/${tileY}/${tileX}`
+                      : `https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/${zoom}/${tileY}/${tileX}`;
 
                   return (
                     <Image
-                      key={`${zoom}_${tileX}_${tileY}`}
+                      key={`${mapLayer}_${zoom}_${tileX}_${tileY}`}
                       source={{ uri: tileUrl }}
                       style={[
                         styles.mapTile,
@@ -285,6 +287,7 @@ export default function PinDropModal({
                           top,
                           width: TILE_SIZE,
                           height: TILE_SIZE,
+                          backgroundColor: mapLayer === 'satellite' ? '#1E293B' : '#F1F5F9',
                         },
                       ]}
                       resizeMode="cover"
@@ -295,10 +298,54 @@ export default function PinDropModal({
 
               {/* Grid Crosshair & Target Overlay */}
               <View style={[styles.centerCrosshair, { left: HALF_MAP - 1, top: HALF_MAP - 18 }]}>
-                <View style={styles.pulseRing} />
+                <View style={[styles.pulseRing, mapLayer === 'satellite' && styles.pulseRingSatellite]} />
                 <MapPinSvg size={36} color="#FDD223" fill="#FDD223" strokeWidth={2.5} />
               </View>
             </TouchableOpacity>
+
+            {/* Map Layer Switcher Floating Pill (Satellite vs Streets) */}
+            <View style={styles.layerSwitcherWrapper}>
+              <TouchableOpacity
+                style={[
+                  styles.layerPillBtn,
+                  mapLayer === 'satellite' && styles.layerPillBtnActive,
+                ]}
+                onPress={() => setMapLayer('satellite')}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="Switch to Satellite aerial view"
+              >
+                <SatelliteSvg size={13} color={mapLayer === 'satellite' ? '#0F172A' : '#64748B'} />
+                <Text
+                  style={[
+                    styles.layerPillText,
+                    mapLayer === 'satellite' && styles.layerPillTextActive,
+                  ]}
+                >
+                  Satellite
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.layerPillBtn,
+                  mapLayer === 'streets' && styles.layerPillBtnActive,
+                ]}
+                onPress={() => setMapLayer('streets')}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="Switch to Street map view"
+              >
+                <LayersSvg size={13} color={mapLayer === 'streets' ? '#0F172A' : '#64748B'} />
+                <Text
+                  style={[
+                    styles.layerPillText,
+                    mapLayer === 'streets' && styles.layerPillTextActive,
+                  ]}
+                >
+                  Streets
+                </Text>
+              </TouchableOpacity>
+            </View>
 
             {/* Map Floating Controls */}
             <View style={styles.floatingControls}>
@@ -357,7 +404,9 @@ export default function PinDropModal({
 
             {/* Legal Basemap Attribution */}
             <View style={styles.attributionBadge} pointerEvents="none">
-              <Text style={styles.attributionText}>© CARTO · © OpenStreetMap</Text>
+              <Text style={styles.attributionText}>
+                {mapLayer === 'satellite' ? '© Esri · Maxar · Earthstar' : '© Esri · HERE · OpenStreetMap'}
+              </Text>
             </View>
           </View>
         </View>
@@ -634,5 +683,47 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: '500',
     color: '#64748B',
+  },
+  layerSwitcherWrapper: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    zIndex: 25,
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 8,
+    padding: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.1)',
+    elevation: 4,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    gap: 3,
+  },
+  layerPillBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 6,
+  },
+  layerPillBtnActive: {
+    backgroundColor: '#FDD223', // 10% accent
+  },
+  layerPillText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#64748B',
+  },
+  layerPillTextActive: {
+    color: '#0F172A',
+    fontWeight: '700',
+  },
+  pulseRingSatellite: {
+    borderColor: '#FDD223',
+    backgroundColor: 'rgba(253, 210, 35, 0.25)',
   },
 });
