@@ -40,9 +40,9 @@
   --muted-accent: #94A3B8;
 
   /* Typography */
-  --font-heading: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-body: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: 'Space Mono', monospace;
+  --font-heading: var(--font-outfit), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: var(--font-outfit), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-space-mono), monospace;
 
   /* Layout Rhythm */
   --wrap: 1280px;
@@ -1757,3 +1757,7 @@ button {
   resize: vertical;
   min-height: 120px;
 }
+
+.launch-skip{position:fixed;top:-80px;left:20px;z-index:999;background:#FDD223;color:#0B1120;padding:12px 20px;border-radius:8px}.launch-skip:focus{top:12px}
+.nav :focus-visible,.site-footer :focus-visible{outline:3px solid #b58c00;outline-offset:5px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation:none!important;transition:none!important}}
