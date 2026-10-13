@@ -42,10 +42,10 @@ export default function SupportPage() {
       cta: 'Data Deletion Portal',
     },
     {
-      title: 'Report a Problem',
-      desc: 'Submit feedback, unexpected app behaviors, typographical errata, or feature requests directly to our team.',
-      link: '/report-a-problem',
-      cta: 'Submit Problem Report',
+      title: 'Security & Trust Architecture',
+      desc: 'Understand our zero-cloud telemetry, hardware AES-256 encryption, and local SQLite data isolation.',
+      link: '/safety-and-trust',
+      cta: 'Explore Security Specs',
       external: false,
     },
   ];
