@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit, Space_Mono, Poppins } from "next/font/google";
 import "./globals.css";
+import { CookieConsent } from "@/components/CookieConsent";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -65,13 +66,51 @@ export const metadata: Metadata = {
     apple: [{ url: "/icon.png" }],
   },
 };
+
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: "exégeomai",
-  url: BASE_URL,
-  description:
-    "The upcoming exégeomai Bible study app. Join the waiting list for launch news.",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${BASE_URL}/#website`,
+      url: BASE_URL,
+      name: "exégeomai",
+      description:
+        "The upcoming exégeomai Bible study app. Unfold Holy Scripture, Strong's Greek & Hebrew concordance, and ancient biblical context.",
+      publisher: {
+        "@id": `${BASE_URL}/#organization`,
+      },
+      inLanguage: "en-US",
+    },
+    {
+      "@type": "Organization",
+      "@id": `${BASE_URL}/#organization`,
+      name: "exégeomai",
+      url: BASE_URL,
+      logo: {
+        "@type": "ImageObject",
+        url: `${BASE_URL}/logo-transparent.png`,
+        width: 512,
+        height: 512,
+      },
+      sameAs: [
+        "https://exegeomai.app",
+      ],
+    },
+    {
+      "@type": "SoftwareApplication",
+      name: "exégeomai",
+      applicationCategory: "EducationalApplication",
+      operatingSystem: "Android, iOS",
+      description:
+        "365 calendar-synchronized exegetical devotionals, 14,298 Strong's concordance definitions, and 32 offline Bible translations.",
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -85,12 +124,17 @@ export default function RootLayout({
       className={`${outfit.variable} ${spaceMono.variable} ${poppins.variable}`}
     >
       <head>
+        <meta name="google-site-verification" content="exegeomai-gsc-verification-token" />
+        <link rel="canonical" href={BASE_URL} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <CookieConsent />
+      </body>
     </html>
   );
 }

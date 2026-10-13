@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: 'Account & Data Deletion Request',
   description:
     'Request permanent deletion of your exégeomai account and all associated data. GDPR Article 17 and Google Play policy compliant.',
-  robots: { index: true, follow: false },
+  robots: { index: true, follow: true },
 };
 
 const deletedItems = [
