@@ -1596,7 +1596,9 @@ Version 1.0.5 compiles and delivers the definitive embedded native Android APK w
 2. **Flat Continuous Believers Body Rows**: Full elimination of nested white card containers, card margins, and drop shadows in favor of editorial body rows separated by subtle hairline dividers (`rgba(15, 23, 42, 0.08)`).
 3. **Flat Inline Filter Row**: Direct plain-text category filter (`All • Scholars • Pastors • Exegesis • Linguistics`) replacing rounded pill capsules.
 4. **Zero-Icon Direct Canvas Empty States**: Direct typography empty states on the surface canvas without enclosing circle borders or shadow wrappers.
-5. **Runtime Compatibility Guarantee**: Native bundle permanently maintains `runtimeVersion: 1.0.1` compatibility ensuring existing installed devices seamlessly receive Over-The-Air updates without native runtime mismatch.
+5. **Ministry Headquarters Architecture**: Registering a church ministry establishes the global ministry Headquarters (HQ), decoupling headquarters setup from subordinate branch/cell registration.
+6. **Uneditable Auto-Formatted Branch Naming & Exact Street Geocoding**: Branch names are uneditable and reactively auto-formatted as the user types their town/city. Address autocomplete preserves exact user house numbers (e.g. `6 Jubilee Street`) with meter-level GPS pin-drop synchronization.
+7. **Runtime Compatibility Guarantee**: Native bundle permanently maintains `runtimeVersion: 1.0.1` compatibility ensuring existing installed devices seamlessly receive Over-The-Air updates without native runtime mismatch.
 
 ---
 

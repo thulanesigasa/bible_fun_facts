@@ -540,7 +540,7 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
             accessibilityLabel="Register Your Ministry"
           >
             <Text style={styles.actionPlusGlyph}>+</Text>
-            <Text style={styles.actionLinkText}>Register Ministry</Text>
+            <Text style={styles.actionLinkText}>Register Ministry (HQ)</Text>
           </TouchableOpacity>
 
           <View style={styles.actionDividerDot} />

@@ -162,7 +162,6 @@ export default function RegisterBranchScreen({
 
   // Step 3: Location
   const [branchName, setBranchName] = useState('');
-  const [isBranchNameCustomized, setIsBranchNameCustomized] = useState(false);
   const [townQuery, setTownQuery] = useState('');
   const [province, setProvince] = useState('');
   const [country, setCountry] = useState('South Africa');
@@ -215,13 +214,11 @@ export default function RegisterBranchScreen({
   // Dynamic branch name formula synchronization:
   // {Church Name} - {Town} {Branch Type Suffix}
   useEffect(() => {
-    if (!isBranchNameCustomized) {
-      const churchName = activeMinistry?.name || initialMinistryName;
-      if (churchName) {
-        setBranchName(formatBranchName(churchName, townQuery, selectedType));
-      }
+    const churchName = activeMinistry?.name || initialMinistryName;
+    if (churchName) {
+      setBranchName(formatBranchName(churchName, townQuery, selectedType));
     }
-  }, [selectedType, selectedMinistryId, ministries, townQuery, isBranchNameCustomized]);
+  }, [selectedType, selectedMinistryId, ministries, townQuery]);
 
   // Town suggestions effect
   useEffect(() => {
@@ -265,16 +262,19 @@ export default function RegisterBranchScreen({
     if (item.coordinates?.longitude !== undefined) setLongitude(item.coordinates.longitude);
     setShowSuggestions(false);
 
-    if (!isBranchNameCustomized) {
-      const churchName = activeMinistry?.name || initialMinistryName;
-      if (churchName) {
-        setBranchName(formatBranchName(churchName, item.town, selectedType));
-      }
+    const churchName = activeMinistry?.name || initialMinistryName;
+    if (churchName) {
+      setBranchName(formatBranchName(churchName, item.town, selectedType));
     }
   };
 
   const handleSelectAddress = (item: AddressSuggestion) => {
-    setAddress(item.streetAddress || item.displayName);
+    let finalAddress = item.streetAddress || item.displayName;
+    const match = address.trim().match(/^(\d+[A-Za-z]?|\d+[-\/]\d+)\s+/i);
+    if (match && !finalAddress.match(/^\d+/)) {
+      finalAddress = `${match[1]} ${finalAddress}`;
+    }
+    setAddress(finalAddress);
     if (item.coordinates?.latitude && item.coordinates?.longitude) {
       setLatitude(item.coordinates.latitude);
       setLongitude(item.coordinates.longitude);
@@ -284,11 +284,9 @@ export default function RegisterBranchScreen({
     if (item.postalCode) setPostalCode(item.postalCode);
     if (item.town && item.town.toLowerCase() !== townQuery.toLowerCase()) {
       setTownQuery(item.town);
-      if (!isBranchNameCustomized) {
-        const churchName = activeMinistry?.name || initialMinistryName;
-        if (churchName) {
-          setBranchName(formatBranchName(churchName, item.town, selectedType));
-        }
+      const churchName = activeMinistry?.name || initialMinistryName;
+      if (churchName) {
+        setBranchName(formatBranchName(churchName, item.town, selectedType));
       }
     }
     setShowAddressSuggestions(false);
@@ -307,27 +305,22 @@ export default function RegisterBranchScreen({
     setLongitude(location.longitude);
     setIsCoordinatesExplicit(true);
     if (location.streetAddress) {
-      setAddress(location.streetAddress);
+      const prevNumberMatch = address.trim().match(/^(\d+[A-Za-z]?|\d+[-\/]\d+)\s+/i);
+      let newAddress = location.streetAddress;
+      if (prevNumberMatch && !newAddress.match(/^\d+/)) {
+        newAddress = `${prevNumberMatch[1]} ${newAddress}`;
+      }
+      setAddress(newAddress);
     }
     if (location.town && location.town.toLowerCase() !== townQuery.toLowerCase()) {
       setTownQuery(location.town);
-      if (!isBranchNameCustomized) {
-        const churchName = activeMinistry?.name || initialMinistryName;
-        if (churchName) {
-          setBranchName(formatBranchName(churchName, location.town, selectedType));
-        }
+      const churchName = activeMinistry?.name || initialMinistryName;
+      if (churchName) {
+        setBranchName(formatBranchName(churchName, location.town, selectedType));
       }
     }
     if (location.province) setProvince(location.province);
     if (location.postalCode) setPostalCode(location.postalCode);
-  };
-
-  const handleResetBranchFormula = () => {
-    setIsBranchNameCustomized(false);
-    const churchName = activeMinistry?.name || initialMinistryName;
-    if (churchName) {
-      setBranchName(formatBranchName(churchName, townQuery, selectedType));
-    }
   };
 
 
@@ -634,36 +627,15 @@ export default function RegisterBranchScreen({
                 Search a town or city — province and postal code are filled automatically.
               </Text>
 
-              {/* Branch Name with Dynamic Formula */}
+              {/* Branch Name (Uneditable & Auto-Formatted) */}
               <View style={styles.fieldGroup}>
-                <View style={styles.labelRow}>
-                  <Text style={styles.fieldLabel}>{getBranchTypeLabel(selectedType)} Name *</Text>
-                  <TouchableOpacity
-                    style={styles.formulaBtn}
-                    onPress={handleResetBranchFormula}
-                    activeOpacity={0.7}
-                    accessibilityRole="button"
-                    accessibilityLabel="Sync standard name formula"
-                  >
-                    <SyncSvg size={11} color="#64748B" />
-                    <Text style={styles.formulaBtnText}>Auto-Formula</Text>
-                  </TouchableOpacity>
+                <Text style={styles.fieldLabel}>{getBranchTypeLabel(selectedType)} Name *</Text>
+                <View style={[styles.input, styles.readonlyInput]}>
+                  <Text style={styles.readonlyText} numberOfLines={1}>
+                    {branchName || 'Auto-formatted based on Ministry & Town'}
+                  </Text>
                 </View>
-                <TextInput
-                  style={styles.input}
-                  placeholder={`e.g. ${activeMinistry?.name || 'ECG The Jesus Nation Church'} - ${townQuery || 'Kempton Park'} ${getBranchTypeLabel(selectedType)}`}
-                  placeholderTextColor="#94A3B8"
-                  value={branchName}
-                  onChangeText={(v) => {
-                    setBranchName(v);
-                    setIsBranchNameCustomized(true);
-                  }}
-                  autoCapitalize="words"
-                  returnKeyType="next"
-                />
-                <Text style={styles.fieldHint}>
-                  Auto-formatted: Church Name - Town {getBranchTypeLabel(selectedType)}
-                </Text>
+                <Text style={styles.fieldHint}>Auto-formatted</Text>
               </View>
 
               {/* Town search */}
@@ -769,7 +741,11 @@ export default function RegisterBranchScreen({
                             GPS: {item.coordinates.latitude.toFixed(4)}, {item.coordinates.longitude.toFixed(4)}
                           </Text>
                         </View>
-                        <CheckSvg size={14} color="#0F172A" />
+                        {address.trim().toLowerCase() === item.streetAddress.toLowerCase() ? (
+                          <CheckSvg size={14} color="#0F172A" />
+                        ) : (
+                          <MapPinSvg size={14} color="#94A3B8" />
+                        )}
                       </TouchableOpacity>
                     ))}
                   </View>
@@ -1134,6 +1110,7 @@ export default function RegisterBranchScreen({
         initialLatitude={latitude}
         initialLongitude={longitude}
         townName={townQuery}
+        initialStreetAddress={address}
         onClose={() => setShowPinDropModal(false)}
         onConfirm={handleConfirmPinDrop}
       />
