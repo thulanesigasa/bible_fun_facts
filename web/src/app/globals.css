@@ -1717,6 +1717,28 @@ button {
   z-index: 0;
 }
 
+/* Watermark cross and logo motifs on subpage headers */
+.subpage-hero-watermark {
+  position: absolute;
+  top: 15px;
+  right: 8%;
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 0;
+  user-select: none;
+}
+
+.subpage-hero-cross {
+  position: absolute;
+  bottom: 25px;
+  right: 22%;
+  color: #0F172A;
+  opacity: 0.14;
+  pointer-events: none;
+  z-index: 0;
+  transform: rotate(8deg);
+}
+
 .subpage-hero .wrap {
   position: relative;
   z-index: 1;

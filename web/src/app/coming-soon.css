@@ -189,6 +189,118 @@
   z-index: 1;
 }
 
+/* Sacred Cross Decorative Elements */
+.deco-cross {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  color: #0F172A;
+  opacity: 0.18;
+}
+
+.deco-cross.hero-cross-left {
+  top: 180px;
+  left: 14%;
+  transform: rotate(-8deg);
+}
+
+.deco-cross.hero-cross-right {
+  top: 120px;
+  right: 16%;
+  transform: rotate(12deg);
+  opacity: 0.22;
+}
+
+.deco-cross.section-cross-accent {
+  bottom: 40px;
+  right: 6%;
+  opacity: 0.15;
+}
+
+/* Watermark Brand Logo Elements */
+.deco-logo-watermark {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.045;
+  user-select: none;
+}
+
+.hero-logo-watermark {
+  top: 70px;
+  right: 4%;
+  width: 260px;
+  height: 260px;
+  transform: rotate(12deg);
+}
+
+.why-logo-watermark {
+  bottom: -20px;
+  left: 3%;
+  width: 280px;
+  height: 280px;
+  transform: rotate(-15deg);
+}
+
+.waitlist-logo-watermark {
+  top: 40px;
+  right: 2%;
+  width: 320px;
+  height: 320px;
+  transform: rotate(8deg);
+}
+
+/* Sacred Geometric Chi-Rho / Star / Diamond Motifs */
+.deco-diamond {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid rgba(253, 210, 35, 0.5);
+  transform: rotate(45deg);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-diamond-1 {
+  top: 210px;
+  right: 24%;
+}
+
+.hero-diamond-2 {
+  top: 340px;
+  left: 18%;
+}
+
+/* Section Guide Lines */
+.section-guide-lines {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: space-around;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+}
+
+.section-guide-lines span {
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.01) 0%,
+    rgba(15, 23, 42, 0.05) 50%,
+    rgba(15, 23, 42, 0.01) 100%
+  );
+}
+
+.section-deco-ring {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
 .launch-orbit {
   position: absolute;
   z-index: 0;
@@ -556,6 +668,9 @@
   color: #0f172a;
 }
 .why-section {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   background: #FFFFFF;
   padding: 90px 0;
   border-top: 1px solid rgba(15, 23, 42, 0.08);
@@ -838,6 +953,8 @@
   padding: 95px 0 110px;
   color: #0F172A;
   position: relative;
+  isolation: isolate;
+  overflow: hidden;
   border-top: 1px solid rgba(15, 23, 42, 0.08);
 }
 .waitlist-grid {

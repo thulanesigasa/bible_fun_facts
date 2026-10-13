@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AppPreview, PhoneTrio } from "@/components/AppPreview";
@@ -83,6 +84,34 @@ export default function HomePage() {
           <div className="hero-deco-circle hero-deco-circle-1" aria-hidden="true" />
           <div className="hero-deco-circle hero-deco-circle-2" aria-hidden="true" />
           <div className="hero-deco-square" aria-hidden="true" />
+          
+          {/* Sacred Cross decorative elements */}
+          <div className="deco-cross hero-cross-left" aria-hidden="true">
+            <svg width="42" height="56" viewBox="0 0 24 32" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2v28M5 10h14" />
+            </svg>
+          </div>
+          <div className="deco-cross hero-cross-right" aria-hidden="true">
+            <svg width="36" height="48" viewBox="0 0 24 32" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2v28M5 10h14" />
+            </svg>
+          </div>
+
+          {/* Sacred geometric diamond accents */}
+          <div className="deco-diamond hero-diamond-1" aria-hidden="true" />
+          <div className="deco-diamond hero-diamond-2" aria-hidden="true" />
+
+          {/* Watermark brand logo motif in hero */}
+          <div className="deco-logo-watermark hero-logo-watermark" aria-hidden="true">
+            <Image
+              src="/logo-transparent.png"
+              alt=""
+              width={260}
+              height={260}
+              loading="lazy"
+            />
+          </div>
+
           <div className="launch-wrap hero-copy">
             <p className="launch-eyebrow">
               <span className="status-dot" /> COMING SOON
@@ -142,6 +171,27 @@ export default function HomePage() {
           </div>
         </section>
         <section className="why-section" aria-labelledby="why-title">
+          {/* Decorative architectural guidelines & logo watermark */}
+          <div className="section-guide-lines" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
+          <div className="deco-logo-watermark why-logo-watermark" aria-hidden="true">
+            <Image
+              src="/logo-transparent.png"
+              alt=""
+              width={280}
+              height={280}
+              loading="lazy"
+            />
+          </div>
+          <div className="deco-cross section-cross-accent" aria-hidden="true">
+            <svg width="32" height="42" viewBox="0 0 24 32" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2v28M5 10h14" />
+            </svg>
+          </div>
           <div className="launch-wrap why-grid">
             <div>
               <p className="launch-kicker">WHY EXÉGEOMAI?</p>
@@ -300,6 +350,27 @@ export default function HomePage() {
         </section>
         <span id="download" aria-hidden="true" />
         <section className="waitlist-section" id="waitlist">
+          {/* Decorative architectural guidelines & logo watermark */}
+          <div className="section-guide-lines" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
+          <div className="deco-logo-watermark waitlist-logo-watermark" aria-hidden="true">
+            <Image
+              src="/logo-transparent.png"
+              alt=""
+              width={320}
+              height={320}
+              loading="lazy"
+            />
+          </div>
+          <div className="deco-cross section-cross-accent" style={{ top: '30px', right: '10%' }} aria-hidden="true">
+            <svg width="34" height="46" viewBox="0 0 24 32" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2v28M5 10h14" />
+            </svg>
+          </div>
           <div className="launch-wrap waitlist-grid">
             <div>
               <p className="launch-eyebrow">
