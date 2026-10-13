@@ -1400,3 +1400,21 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Ensure navigation bar, hamburger button, and mobile dropdown stay above all hero layers */
+.nav {
+  z-index: 9999 !important;
+  position: fixed !important;
+}
+
+.hamburger {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 10001 !important;
+}
+
+.mobile-menu {
+  z-index: 10000 !important;
+  pointer-events: auto !important;
+}
