@@ -1,189 +1,111 @@
-'use client';
-
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-
+"use client";
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+const links = [
+  ["Home", "/"],
+  ["Features", "/#features"],
+  ["How It Works", "/#how-it-works"],
+  ["About", "/#about"],
+  ["FAQ", "/#faq"],
+];
 export function Header() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+  const button = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
-  const isHomePage = pathname === '/';
-
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 24) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
+    const scroll = () => setScrolled(window.scrollY > 24);
+    scroll();
+    window.addEventListener("scroll", scroll, { passive: true });
+    return () => window.removeEventListener("scroll", scroll);
+  }, []);
+  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => {
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && open) {
+        setOpen(false);
+        button.current?.focus();
       }
     };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Close mobile menu on route change
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [pathname]);
-
-  const navClasses = [
-    'nav',
-    isScrolled ? 'is-scrolled' : '',
-    !isHomePage ? 'is-solid' : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
-
+    document.addEventListener("keydown", escape);
+    return () => document.removeEventListener("keydown", escape);
+  }, [open]);
   return (
-    <nav className={navClasses} aria-label="Main Navigation">
-      <div className="nav-row">
-        <Link href="/" className="brand" aria-label="exégeomai home">
-          <span className="brand-mark" aria-hidden="true">
-            <Image
-              src="/assets/logo-transparent.png"
-              alt="exégeomai Logo"
-              width={28}
-              height={28}
-              priority
-            />
-          </span>
-          <span>exégeomai</span>
-        </Link>
-
-        <div className="desktop-nav">
-          <Link
-            href="/"
-            className="nav-link"
-            aria-current={pathname === '/' ? 'page' : undefined}
-          >
-            Home
-          </Link>
-          <Link
-            href="/features"
-            className="nav-link"
-            aria-current={pathname === '/features' ? 'page' : undefined}
-          >
-            Features
-          </Link>
-          <Link
-            href="/how-it-works"
-            className="nav-link"
-            aria-current={pathname === '/how-it-works' ? 'page' : undefined}
-          >
-            How It Works
-          </Link>
-          <Link
-            href="/pricing"
-            className="nav-link"
-            aria-current={pathname === '/pricing' ? 'page' : undefined}
-          >
-            Pricing
-          </Link>
-          <Link
-            href="/safety"
-            className="nav-link"
-            aria-current={pathname === '/safety' || pathname === '/safety-and-trust' ? 'page' : undefined}
-          >
-            Safety
-          </Link>
-          <Link
-            href="/about"
-            className="nav-link"
-            aria-current={pathname === '/about' ? 'page' : undefined}
-          >
-            About
-          </Link>
-          <Link
-            href="/support"
-            className="nav-link"
-            aria-current={pathname === '/support' ? 'page' : undefined}
-          >
-            Support
-          </Link>
-          <Link
-            href="/faq"
-            className="nav-link"
-            aria-current={pathname === '/faq' ? 'page' : undefined}
-          >
-            FAQ
-          </Link>
-        </div>
-
-        <div className="nav-right">
-          <a href="/#download" className="cta-btn">
-            <span>Download App</span>
-            <svg
-              viewBox="0 0 24 24"
-              width="15"
-              height="15"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M12 4v12" />
-              <path d="m7 11 5 5 5-5" />
-              <path d="M4 20h16" />
-            </svg>
-          </a>
-        </div>
-
-        <button
-          type="button"
-          className={`burger ${mobileMenuOpen ? 'is-open' : ''}`}
-          aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-          aria-expanded={mobileMenuOpen}
-          aria-controls="mobile-menu"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          <span className="burger-bar"></span>
-          <span className="burger-bar"></span>
-          <span className="burger-bar"></span>
-        </button>
-      </div>
-
-      <div
-        className={`mobile-menu ${mobileMenuOpen ? 'is-open' : ''}`}
-        id="mobile-menu"
+    <>
+      <a href="#main" className="launch-skip">
+        Skip to content
+      </a>
+      <nav
+        className={`nav ${scrolled ? "is-scrolled" : ""} ${pathname !== "/" ? "is-solid" : ""}`}
+        aria-label="Main navigation"
       >
-        <div className="mobile-menu-links">
-          <Link href="/" aria-current={pathname === '/' ? 'page' : undefined}>
-            Home
+        <div className="nav-row">
+          <Link href="/" className="brand" aria-label="exégeomai home">
+            <span className="brand-mark" aria-hidden="true">
+              <Image
+                src="/logo-transparent.png"
+                alt=""
+                width={30}
+                height={30}
+                priority
+              />
+            </span>
+            <span>exégeomai</span>
           </Link>
-          <Link href="/features" aria-current={pathname === '/features' ? 'page' : undefined}>
-            Features
-          </Link>
-          <Link href="/how-it-works" aria-current={pathname === '/how-it-works' ? 'page' : undefined}>
-            How It Works
-          </Link>
-          <Link href="/pricing" aria-current={pathname === '/pricing' ? 'page' : undefined}>
-            Pricing (100% Free)
-          </Link>
-          <Link href="/safety" aria-current={pathname === '/safety' ? 'page' : undefined}>
-            Safety &amp; Trust
-          </Link>
-          <Link href="/about" aria-current={pathname === '/about' ? 'page' : undefined}>
-            About Exégeomai
-          </Link>
-          <Link href="/support" aria-current={pathname === '/support' ? 'page' : undefined}>
-            Support &amp; FAQ
-          </Link>
-          <Link href="/contact" aria-current={pathname === '/contact' ? 'page' : undefined}>
-            Contact Us
-          </Link>
-          <div className="mobile-menu-actions">
-            <a href="/#download" className="cta-btn">
-              Download App (APK)
+          <div className="desktop-nav">
+            {links.map(([label, href]) => (
+              <Link
+                key={label}
+                className="nav-link"
+                href={href}
+                aria-current={
+                  href === "/" && pathname === "/" ? "page" : undefined
+                }
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
+          <div className="nav-right">
+            <a href="/#waitlist" className="cta-btn">
+              Join Waiting List <span aria-hidden="true">↗</span>
             </a>
           </div>
+          <button
+            ref={button}
+            type="button"
+            className={`burger ${open ? "is-open" : ""}`}
+            aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            onClick={() => setOpen(!open)}
+          >
+            <span className="burger-bar" />
+            <span className="burger-bar" />
+            <span className="burger-bar" />
+          </button>
         </div>
-      </div>
-    </nav>
+        {open && (
+          <div className="mobile-menu is-open" id="mobile-menu">
+            <div className="mobile-menu-links">
+              {links.map(([label, href]) => (
+                <Link key={label} href={href} onClick={() => setOpen(false)}>
+                  {label}
+                </Link>
+              ))}
+              <a
+                href="/#waitlist"
+                className="cta-btn"
+                onClick={() => setOpen(false)}
+              >
+                Join Waiting List ↗
+              </a>
+            </div>
+          </div>
+        )}
+      </nav>
+    </>
   );
 }
