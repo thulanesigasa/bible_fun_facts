@@ -2349,7 +2349,11 @@ The official companion web portal (`web/`) provides full web access to exégeoma
    - **Concentric Celestial Orbits & Diamonds**: Golden accent orbital curves (`.launch-orbit`), floating geometric rings, and 45-degree diamond markers providing structural depth without UI clutter.
    - **Subpage Header Motifs**: Consistent vertical grid guidelines, watermark logos, and cross accents applied to all subpages.
 
-8. **Web Portal Commands**:
+8. **Mobile Navigation & Animated Uiverse Hamburger Menu**:
+   - **Uiverse SVG Morphing Animation**: Smooth SVG stroke transition (`stroke-dasharray` and `stroke-dashoffset` 600ms cubic-bezier) transforming three lines into an 'X' close icon on check.
+   - **Fixed High-Z-Index Dropdown**: Mobile drawer dropdown positioned with `z-index: 1000`, full viewport bounds, tap-to-close handlers, and clear navigation links.
+
+9. **Web Portal Commands**:
 ```bash
 # Launch Next.js web portal development server (http://localhost:3000)
 npm run web:portal
