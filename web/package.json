@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test:waitlist": "node --import tsx --test tests/waitlist.test.ts",
+    "test:waitlist": "node --import tsx --test tests/waitlist.check.ts",
     "check:links": "node scripts/check-links.mjs"
   },
   "dependencies": {

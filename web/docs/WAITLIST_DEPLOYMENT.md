@@ -31,8 +31,8 @@ No production credentials were read or copied into this checkout. No mail provid
 
 ## Approval and production smoke test
 
-1. Finish desktop/mobile visual review and screenshots, then obtain design/merge/publish approval.
-2. Obtain explicit approval to apply **this migration** to **ibwooiejzxhbzplnldcz**. Applying is a separate gate from PR creation. Use the project's normal reviewed migration workflow; do not blindly push unrelated migrations.
+1. Finish desktop/mobile visual review and screenshots, then obtain design approval. Do not merge yet.
+2. Obtain explicit approval to apply **this migration** to **ibwooiejzxhbzplnldcz** **before merging**. The repository has a Supabase GitHub integration, which can apply migrations on merge; verify its current production settings. Applying is a separate gate from PR creation. Use the project's normal reviewed migration workflow; do not blindly push unrelated migrations.
 3. Apply the approved migration, inspect grants/RLS/function EXECUTE permissions, and run Supabase security advisors. Confirm no anon/authenticated access to either table or RPC. Do not expose a public SELECT policy to make signup work.
 4. Configure server secrets and verify the trusted ingress header. Smoke-test one owner-controlled address, confirm one row in the private table, repeat with mixed case/whitespace and confirm the same row and unchanged consent timestamp. Confirm malformed email, absent consent, cross-origin requests and repeated attempts are rejected. Verify an upstream failure is shown as an error, not success.
 5. Obtain approval before removing any production smoke-test record unless it was explicitly designated disposable. Verify unsubscribe handling with the monitored support mailbox before opening the list publicly.
