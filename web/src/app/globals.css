@@ -1669,11 +1669,52 @@ button {
    Dedicated Subpage Standard Layout (.subpage-hero, .subpage-content)
    ========================================================================== */
 .subpage-hero {
-  padding: 130px 0 40px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 130px 0 44px;
   background: #FFFFFF;
   color: #0F172A;
   text-align: left;
   border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  background-image: linear-gradient(
+    90deg,
+    transparent calc(100% - 1px),
+    rgba(15, 23, 42, 0.03) 1px
+  );
+  background-size: 16.666% 100%;
+}
+
+.subpage-hero::before {
+  content: "";
+  position: absolute;
+  top: -40px;
+  right: 5%;
+  width: 220px;
+  height: 220px;
+  border: 1.5px solid rgba(15, 23, 42, 0.08);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.subpage-hero::after {
+  content: "";
+  position: absolute;
+  top: 30px;
+  right: 15%;
+  width: 12px;
+  height: 12px;
+  background: var(--accent);
+  opacity: 0.6;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.subpage-hero .wrap {
+  position: relative;
+  z-index: 1;
 }
 
 .subpage-hero h1 {
