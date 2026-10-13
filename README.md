@@ -2312,11 +2312,11 @@ The official companion web portal (`web/`) provides full web access to exégeoma
      - **Support Column**: Help Centre, Contact Support, Account Deletion.
      - **Legal Column**: Privacy Policy, Terms of Service, Data Safety.
 
-4. **Web Portal Design Standards & Redesign**:
-   - Clean white background body architecture matching editorial layouts (`#FFFFFF` base).
+4. **Web Portal Design Standards & Continuous Body Architecture**:
+   - Clean white background body architecture matching editorial layouts (`#FFFFFF` base) across all pages and subpages.
    - Removed pill badges and capsules across the portal in favor of clean, simple Poppins font typography (`--font-poppins`).
    - Clean white navigation bar with borderless transparent logo mark (no white container border-radius or background box).
-   - Integrated form and panel surfaces (`WaitlistForm`, `privacy-panel`, `word-study`, `prose-card`) seamlessly into the page body.
+   - All boxed div cards, panels, feature columns, and forms (`WaitlistForm`, `DeletionForm`, `prose-card`, `feature-card`, `step-card`, `sec-card`, `pricing-card`, `faq-item`) are seamlessly integrated into the page body matching the editorial "How it works" column style with hairline dividers, eliminating floating card containers and shadow islands.
    - Removed external GitHub project sections and links across footer and pages.
 
 5. **SEO, Performance & Core Web Vitals Optimization**:
