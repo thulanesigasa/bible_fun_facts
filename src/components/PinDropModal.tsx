@@ -96,6 +96,11 @@ export default function PinDropModal({
   onClose,
   onConfirm,
 }: PinDropModalProps) {
+  // Target GPS coordinates (the locked pin location)
+  const [pinLat, setPinLat] = useState<number>(initialLatitude || -26.2041);
+  const [pinLng, setPinLng] = useState<number>(initialLongitude || 28.0473);
+
+  // Map viewport center (can be panned without moving the pin)
   const [lat, setLat] = useState<number>(initialLatitude || -26.2041);
   const [lng, setLng] = useState<number>(initialLongitude || 28.0473);
   const [zoom, setZoom] = useState<number>(16);
@@ -109,9 +114,11 @@ export default function PinDropModal({
     if (visible) {
       const validLat = typeof initialLatitude === 'number' && !isNaN(initialLatitude) && initialLatitude !== 0 ? initialLatitude : -26.2041;
       const validLng = typeof initialLongitude === 'number' && !isNaN(initialLongitude) && initialLongitude !== 0 ? initialLongitude : 28.0473;
+      setPinLat(validLat);
+      setPinLng(validLng);
       setLat(validLat);
       setLng(validLng);
-      setZoom(15);
+      setZoom(16);
       triggerReverseGeocode(validLat, validLng);
     }
   }, [visible, initialLatitude, initialLongitude]);
@@ -140,7 +147,7 @@ export default function PinDropModal({
     }, 400);
   };
 
-  // Convert current lat, lng into tile coordinates
+  // Convert map center into tile coordinates
   const centerExactTileX = lon2tile(lng, zoom);
   const centerExactTileY = lat2tile(lat, zoom);
 
@@ -152,23 +159,29 @@ export default function PinDropModal({
   const fracOffsetY = (centerExactTileY - baseTileY) * TILE_SIZE;
 
   // Grid coordinates relative to map center
-  // Base tile top-left in container is HALF_MAP - fracOffsetX, HALF_MAP - fracOffsetY
   const originX = HALF_MAP - fracOffsetX;
   const originY = HALF_MAP - fracOffsetY;
+
+  // Compute exact pixel position of the locked pin on the map viewport
+  const pinExactTileX = lon2tile(pinLng, zoom);
+  const pinExactTileY = lat2tile(pinLat, zoom);
+  const pinPixelX = HALF_MAP + (pinExactTileX - centerExactTileX) * TILE_SIZE;
+  const pinPixelY = HALF_MAP + (pinExactTileY - centerExactTileY) * TILE_SIZE;
 
   // Generate 3x3 surrounding tiles: -1, 0, 1
   const tileIndices = [-1, 0, 1];
   const maxTile = Math.pow(2, zoom);
 
-  // Refs for tracking active gestures
+  // Refs for tracking active gestures without React state lag
   const panStartCoordsRef = useRef<{ lat: number; lng: number }>({ lat, lng });
   const initialPinchDistRef = useRef<number | null>(null);
   const pinchStartZoomRef = useRef<number>(zoom);
+  const lastZoomUpdateDistRef = useRef<number>(0);
   const isDraggingRef = useRef<boolean>(false);
   const currentZoomRef = useRef<number>(zoom);
   currentZoomRef.current = zoom;
-  const currentCoordsRef = useRef<{ lat: number; lng: number }>({ lat, lng });
-  currentCoordsRef.current = { lat, lng };
+  const currentCenterCoordsRef = useRef<{ lat: number; lng: number }>({ lat, lng });
+  currentCenterCoordsRef.current = { lat, lng };
 
   // Calculate Euclidean distance between two touches
   const getPinchDistance = (touch0: any, touch1: any): number => {
@@ -184,11 +197,13 @@ export default function PinDropModal({
         return Math.abs(gestureState.dx) > 2 || Math.abs(gestureState.dy) > 2;
       },
       onPanResponderGrant: (evt) => {
-        panStartCoordsRef.current = { ...currentCoordsRef.current };
+        panStartCoordsRef.current = { ...currentCenterCoordsRef.current };
         isDraggingRef.current = false;
         const touches = evt.nativeEvent.touches;
         if (touches && touches.length === 2) {
-          initialPinchDistRef.current = getPinchDistance(touches[0], touches[1]);
+          const dist = getPinchDistance(touches[0], touches[1]);
+          initialPinchDistRef.current = dist;
+          lastZoomUpdateDistRef.current = dist;
           pinchStartZoomRef.current = currentZoomRef.current;
         } else {
           initialPinchDistRef.current = null;
@@ -197,29 +212,32 @@ export default function PinDropModal({
       onPanResponderMove: (evt, gestureState) => {
         const touches = evt.nativeEvent.touches;
 
-        // Two-finger pinch to zoom in / out
+        // Two-finger pinch to zoom in / out with real-time responsiveness
         if (touches && touches.length === 2) {
           isDraggingRef.current = true;
           const currentDist = getPinchDistance(touches[0], touches[1]);
           if (initialPinchDistRef.current && initialPinchDistRef.current > 0) {
-            const scaleRatio = currentDist / initialPinchDistRef.current;
-            // Log2 scale to calculate zoom levels delta
-            const deltaZoom = Math.round(Math.log2(scaleRatio));
-            const newZoom = Math.min(19, Math.max(10, pinchStartZoomRef.current + deltaZoom));
-            if (newZoom !== currentZoomRef.current) {
-              setZoom(newZoom);
+            // Instant sensitivity: dynamically adjust zoom when pinch distance delta changes by 25px
+            const distDelta = currentDist - lastZoomUpdateDistRef.current;
+            if (Math.abs(distDelta) > 25) {
+              const zoomStep = distDelta > 0 ? 1 : -1;
+              const targetZoom = Math.min(19, Math.max(10, currentZoomRef.current + zoomStep));
+              if (targetZoom !== currentZoomRef.current) {
+                currentZoomRef.current = targetZoom;
+                setZoom(targetZoom);
+                lastZoomUpdateDistRef.current = currentDist;
+              }
             }
           }
           return;
         }
 
-        // One-finger pan (left, right, up, down)
-        if (Math.abs(gestureState.dx) > 3 || Math.abs(gestureState.dy) > 3) {
+        // One-finger pan (left, right, up, down) smoothly across viewport
+        if (Math.abs(gestureState.dx) > 2 || Math.abs(gestureState.dy) > 2) {
           isDraggingRef.current = true;
           const startExactTileX = lon2tile(panStartCoordsRef.current.lng, currentZoomRef.current);
           const startExactTileY = lat2tile(panStartCoordsRef.current.lat, currentZoomRef.current);
 
-          // Inverting gesture deltas: dragging left (dx < 0) moves map view right
           const deltaTileX = -gestureState.dx / TILE_SIZE;
           const deltaTileY = -gestureState.dy / TILE_SIZE;
 
@@ -231,14 +249,14 @@ export default function PinDropModal({
         }
       },
       onPanResponderRelease: (evt, gestureState) => {
-        // If not dragged or pinched, treat as tap to drop/reposition pin
+        // If it was a quick tap (not drag or pinch), reposition pin to tapped point
         if (!isDraggingRef.current && Math.abs(gestureState.dx) < 5 && Math.abs(gestureState.dy) < 5) {
           const { locationX, locationY } = evt.nativeEvent;
           const deltaPixelX = locationX - HALF_MAP;
           const deltaPixelY = locationY - HALF_MAP;
 
-          const exactTileX = lon2tile(currentCoordsRef.current.lng, currentZoomRef.current);
-          const exactTileY = lat2tile(currentCoordsRef.current.lat, currentZoomRef.current);
+          const exactTileX = lon2tile(currentCenterCoordsRef.current.lng, currentZoomRef.current);
+          const exactTileY = lat2tile(currentCenterCoordsRef.current.lat, currentZoomRef.current);
 
           const newExactTileX = exactTileX + deltaPixelX / TILE_SIZE;
           const newExactTileY = exactTileY + deltaPixelY / TILE_SIZE;
@@ -246,12 +264,12 @@ export default function PinDropModal({
           const newLng = tile2lon(newExactTileX, currentZoomRef.current);
           const newLat = tile2lat(newExactTileY, currentZoomRef.current);
 
+          // Update locked pin position and center viewport
+          setPinLat(newLat);
+          setPinLng(newLng);
           setLat(newLat);
           setLng(newLng);
           triggerReverseGeocode(newLat, newLng);
-        } else {
-          // Finished drag or pinch: trigger reverse geocode for current position
-          triggerReverseGeocode(currentCoordsRef.current.lat, currentCoordsRef.current.lng);
         }
         initialPinchDistRef.current = null;
         isDraggingRef.current = false;
@@ -260,10 +278,14 @@ export default function PinDropModal({
   ).current;
 
   const handleResetToInitial = () => {
-    setLat(initialLatitude || -26.2041);
-    setLng(initialLongitude || 28.0473);
+    const validLat = initialLatitude || -26.2041;
+    const validLng = initialLongitude || 28.0473;
+    setPinLat(validLat);
+    setPinLng(validLng);
+    setLat(validLat);
+    setLng(validLng);
     setZoom(16);
-    triggerReverseGeocode(initialLatitude || -26.2041, initialLongitude || 28.0473);
+    triggerReverseGeocode(validLat, validLng);
   };
 
   const handleConfirm = () => {
@@ -274,8 +296,8 @@ export default function PinDropModal({
     }
 
     onConfirm({
-      latitude: lat,
-      longitude: lng,
+      latitude: pinLat,
+      longitude: pinLng,
       streetAddress: finalStreet,
       suburb: resolvedAddress?.suburb,
       town: resolvedAddress?.town || townName,
@@ -353,8 +375,8 @@ export default function PinDropModal({
                 })
               )}
 
-              {/* Grid Crosshair & Target Overlay */}
-              <View style={[styles.centerCrosshair, { left: HALF_MAP - 1, top: HALF_MAP - 18 }]}>
+              {/* Locked GPS Pin & Pulse Overlay */}
+              <View style={[styles.centerCrosshair, { left: pinPixelX - 1, top: pinPixelY - 18 }]}>
                 <View style={[styles.pulseRing, mapLayer === 'satellite' && styles.pulseRingSatellite]} />
                 <MapPinSvg size={36} color="#FDD223" fill="#FDD223" strokeWidth={2.5} />
               </View>
@@ -419,7 +441,7 @@ export default function PinDropModal({
             <View style={styles.coordBadge}>
               <Text style={styles.coordLabel}>GPS Coordinates</Text>
               <Text style={styles.coordValue}>
-                {lat.toFixed(5)}, {lng.toFixed(5)}
+                {pinLat.toFixed(5)}, {pinLng.toFixed(5)}
               </Text>
             </View>
             {isResolving && (
