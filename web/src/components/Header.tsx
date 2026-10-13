@@ -116,18 +116,14 @@ export function Header() {
             </a>
           </div>
 
-          <label
-            className="hamburger"
+          <button
+            type="button"
+            className={`hamburger ${open ? "is-active" : ""}`}
+            onClick={() => setOpen((prev) => !prev)}
             aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
           >
-            <input
-              ref={button}
-              type="checkbox"
-              checked={open}
-              onChange={(e) => setOpen(e.target.checked)}
-              aria-expanded={open}
-              aria-controls="mobile-menu"
-            />
             <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
               <path
                 className="line line-top-bottom"
@@ -135,33 +131,35 @@ export function Header() {
               />
               <path className="line" d="M7 16 27 16" />
             </svg>
-          </label>
+          </button>
         </div>
 
-        <div
-          className={`mobile-menu ${open ? "is-open" : ""}`}
-          id="mobile-menu"
-          aria-hidden={!open}
-        >
-          <div className="mobile-menu-links">
-            {links.map(({ label, href }) => (
+        {open && (
+          <div
+            className="mobile-menu is-open"
+            id="mobile-menu"
+            aria-hidden={false}
+          >
+            <div className="mobile-menu-links">
+              {links.map(({ label, href }) => (
+                <a
+                  key={label}
+                  href={href}
+                  onClick={(e) => handleNavClick(e, href)}
+                >
+                  {label}
+                </a>
+              ))}
               <a
-                key={label}
-                href={href}
-                onClick={(e) => handleNavClick(e, href)}
+                href="/#waitlist"
+                className="cta-btn"
+                onClick={(e) => handleNavClick(e, "/#waitlist")}
               >
-                {label}
+                Join Waiting List ↗
               </a>
-            ))}
-            <a
-              href="/#waitlist"
-              className="cta-btn"
-              onClick={(e) => handleNavClick(e, "/#waitlist")}
-            >
-              Join Waiting List ↗
-            </a>
+            </div>
           </div>
-        </div>
+        )}
       </nav>
     </>
   );
