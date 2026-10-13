@@ -138,22 +138,23 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 12.5px;
-  font-weight: 700;
-  letter-spacing: .08em;
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--ink);
-  background: var(--accent-subtle);
-  border: 1px solid var(--accent-border);
-  padding: 6px 14px;
-  border-radius: var(--r-pill);
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  padding: 0;
+  border-radius: 0;
   margin-bottom: 16px;
 }
 
 .section.cool .section-kicker {
   color: var(--accent);
-  background: rgba(253, 210, 35, 0.12);
-  border-color: rgba(253, 210, 35, 0.3);
+  background: transparent;
+  border: none;
 }
 
 .section-head h2 {
@@ -189,17 +190,18 @@ button {
   right: 0;
   z-index: 120;
   transition: background .35s ease, box-shadow .35s ease, backdrop-filter .35s ease, border-color .35s ease;
-  background: transparent;
-  border-bottom: 1px solid transparent;
+  background: #FFFFFF;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 }
 
 .nav.is-scrolled,
 .nav.is-solid {
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   box-shadow: var(--shadow-nav);
-  border-bottom-color: var(--border);
+  border-bottom-color: rgba(15, 23, 42, 0.08);
 }
 
 .nav-row {
@@ -220,26 +222,26 @@ button {
   font-size: 21px;
   font-weight: 700;
   letter-spacing: -.02em;
-  color: #FFFFFF;
+  color: #0F172A;
   transition: color .3s ease;
 }
 
 .nav.is-scrolled .brand,
 .nav.is-solid .brand {
-  color: var(--ink);
+  color: #0F172A;
 }
 
 .brand-mark {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  background: #FFFFFF;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  padding: 4px;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
 }
 
 .brand-mark img {
@@ -256,16 +258,17 @@ button {
 
 .nav-link {
   position: relative;
+  font-family: var(--font-poppins), sans-serif;
   font-size: 14.5px;
   font-weight: 500;
-  color: #FFFFFF;
+  color: #0F172A;
   white-space: nowrap;
   transition: opacity .2s ease, color .2s ease;
 }
 
 .nav.is-scrolled .nav-link,
 .nav.is-solid .nav-link {
-  color: var(--ink-secondary);
+  color: #0F172A;
 }
 
 .nav-link:hover {
@@ -274,12 +277,12 @@ button {
 
 .nav-link[aria-current="page"] {
   font-weight: 700;
-  color: var(--accent);
+  color: #0F172A;
 }
 
 .nav.is-scrolled .nav-link[aria-current="page"],
 .nav.is-solid .nav-link[aria-current="page"] {
-  color: var(--ink);
+  color: #0F172A;
 }
 
 .nav-link[aria-current="page"]::after {
@@ -295,7 +298,7 @@ button {
 
 .nav.is-scrolled .nav-link[aria-current="page"]::after,
 .nav.is-solid .nav-link[aria-current="page"]::after {
-  background: var(--ink);
+  background: var(--accent);
 }
 
 .nav-right {
@@ -309,13 +312,14 @@ button {
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  border-radius: var(--r-pill);
-  font-size: 14px;
-  font-weight: 700;
+  border-radius: 8px;
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
   white-space: nowrap;
   background: var(--accent);
   color: #0F172A;
-  box-shadow: var(--shadow-btn);
+  box-shadow: none;
   transition: transform .18s ease, background .2s ease;
   border: none;
 }
@@ -342,13 +346,13 @@ button {
   width: 22px;
   height: 2px;
   border-radius: 2px;
-  background: #FFFFFF;
+  background: #0F172A;
   transition: transform .3s ease, background .3s ease, opacity .2s ease;
 }
 
 .nav.is-scrolled .burger-bar,
 .nav.is-solid .burger-bar {
-  background: var(--ink);
+  background: #0F172A;
 }
 
 .burger.is-open .burger-bar:nth-child(1) {
@@ -512,15 +516,16 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: .08em;
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--accent);
-  background: rgba(253, 210, 35, 0.12);
-  border: 1px solid rgba(253, 210, 35, 0.32);
-  padding: 6px 16px;
-  border-radius: var(--r-pill);
+  background: transparent;
+  border: none;
+  padding: 0;
+  border-radius: 0;
   margin-bottom: 20px;
 }
 
@@ -1596,13 +1601,15 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 12px;
-  border-radius: var(--r-pill);
-  background: rgba(253, 210, 35, 0.1);
-  border: 1px solid rgba(253, 210, 35, 0.25);
-  font-size: 12px;
-  font-weight: 700;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
   color: var(--accent);
+  letter-spacing: 0.5px;
 }
 
 .footer-col-title {
@@ -1646,37 +1653,40 @@ button {
    Dedicated Subpage Standard Layout (.subpage-hero, .subpage-content)
    ========================================================================== */
 .subpage-hero {
-  padding: 130px 0 60px;
-  background: linear-gradient(145deg, #0B1120 0%, #0F172A 50%, #1E293B 100%);
-  color: #FFFFFF;
-  text-align: center;
+  padding: 130px 0 40px;
+  background: #FFFFFF;
+  color: #0F172A;
+  text-align: left;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .subpage-hero h1 {
-  font-size: clamp(32px, 4.5vw, 50px);
-  font-weight: 800;
+  font-family: var(--font-poppins), var(--font-outfit), sans-serif;
+  font-size: clamp(32px, 4.5vw, 48px);
+  font-weight: 700;
   letter-spacing: -.025em;
+  color: #0F172A;
   margin-bottom: 16px;
 }
 
 .subpage-hero p {
   font-size: 17px;
-  color: #CBD5E1;
-  max-width: 660px;
-  margin: 0 auto;
+  color: #475569;
+  max-width: 720px;
   line-height: 1.6;
 }
 
 .subpage-content {
-  padding: 60px 0 100px;
+  padding: 50px 0 90px;
+  background: #FFFFFF;
 }
 
 .prose-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-xl);
-  padding: 48px 40px;
-  box-shadow: var(--shadow-card);
+  background: #FFFFFF;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  padding: 40px 36px;
+  box-shadow: none;
   max-width: 920px;
   margin: 0 auto;
 }

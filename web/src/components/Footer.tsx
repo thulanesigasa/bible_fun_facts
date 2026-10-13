@@ -58,13 +58,6 @@ export function Footer() {
               <Link href="/#about">About exégeomai</Link>
               <Link href="/contact">Contact</Link>
               <Link href="/support">Support &amp; FAQ</Link>
-              <a
-                href="https://github.com/thulanesigasa/bible_fun_facts"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                GitHub Project
-              </a>
             </div>
           </div>
 
@@ -84,13 +77,6 @@ export function Footer() {
               <Link href="/help">Help Centre</Link>
               <Link href="/contact">Contact Support</Link>
               <Link href="/deletion">Account Deletion</Link>
-              <a
-                href="https://github.com/thulanesigasa/bible_fun_facts/issues"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Issue Tracker
-              </a>
             </div>
           </div>
 
@@ -100,13 +86,6 @@ export function Footer() {
               <Link href="/privacy">Privacy Policy</Link>
               <Link href="/terms">Terms of Service</Link>
               <Link href="/data-safety">Data Safety</Link>
-              <a
-                href="https://github.com/thulanesigasa/bible_fun_facts/blob/main/LICENSE"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                MIT License
-              </a>
             </div>
           </div>
         </div>
