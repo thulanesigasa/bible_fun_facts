@@ -60,7 +60,7 @@ const faqs = [
   ],
   [
     "How do I leave the waiting list?",
-    "Email support@exegeomai.app from the address you registered, with “Unsubscribe from waitlist” as the subject. The team will remove your waitlist record. Joining does not subscribe you to other marketing.",
+    "Email joinus@exegeomai.co.za from the address you registered, with “Unsubscribe from waitlist” as the subject. The team will remove your waitlist record. Joining does not subscribe you to other marketing.",
   ],
 ];
 export default function HomePage() {

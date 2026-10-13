@@ -101,8 +101,8 @@ export function WaitlistForm() {
       <p className="waitlist-fineprint">
         Your email stays private. Read our{" "}
         <a href="/waitlist-privacy">waitlist privacy notice</a>. To leave,{" "}
-        <a href="mailto:support@exegeomai.app?subject=Unsubscribe%20from%20waitlist">
-          email support
+        <a href="mailto:joinus@exegeomai.co.za?subject=Unsubscribe%20from%20waitlist">
+          email us
         </a>{" "}
         from your registered address.
       </p>

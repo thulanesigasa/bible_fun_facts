@@ -104,8 +104,8 @@ export default function SupportPage() {
               <h2>Direct Email Support</h2>
               <p>
                 Need personal assistance? Email our core open source maintainers directly at{' '}
-                <a href="mailto:support@exegeomai.app" style={{ color: 'var(--ink)', fontWeight: 700, textDecoration: 'underline' }}>
-                  support@exegeomai.app
+                <a href="mailto:support@exegeomai.co.za" style={{ color: 'var(--ink)', fontWeight: 700, textDecoration: 'underline' }}>
+                  support@exegeomai.co.za
                 </a>
               </p>
               <p style={{ fontSize: 13, color: 'var(--muted)', margin: 0 }}>

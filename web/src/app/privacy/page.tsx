@@ -71,8 +71,8 @@ export default function PrivacyPage() {
               <h2>6. Contact Us</h2>
               <p>
                 If you have questions about our privacy practices, please contact us at{' '}
-                <a href="mailto:privacy@exegeomai.app" style={{ color: 'var(--ink)', fontWeight: 700 }}>
-                  privacy@exegeomai.app
+                <a href="mailto:privacy@exegeomai.co.za" style={{ color: 'var(--ink)', fontWeight: 700 }}>
+                  privacy@exegeomai.co.za
                 </a>.
               </p>
             </div>

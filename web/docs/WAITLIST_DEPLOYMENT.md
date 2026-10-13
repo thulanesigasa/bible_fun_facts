@@ -25,19 +25,19 @@ Configure **server-only** environment variables in the host's secret manager (ne
 | WAITLIST_RATE_LIMIT_SALT | Cryptographically random secret, at least 32 characters; stable across instances |
 | WAITLIST_TRUSTED_IP_HEADER | A single-IP header that the hosting ingress **overwrites** and cannot be supplied/spoofed by clients |
 | RESEND_API_KEY | API key generated from Resend account dashboard (free tier 3,000 emails/month) |
-| RESEND_FROM_EMAIL | `exégeomai <noreply@xn--exgeomai-c1a.co.za>` or configured domain in Resend |
-| RESEND_ADMIN_EMAIL | `joinus@xn--exgeomai-c1a.co.za` (receives team notifications upon each sign-up) |
+| RESEND_FROM_EMAIL | `exégeomai <noreply@exegeomai.co.za>` |
+| RESEND_ADMIN_EMAIL | `joinus@exegeomai.co.za` (receives team notifications upon each sign-up) |
 
 Do not guess the IP header. Confirm your hosting provider's ingress contract and verify an incoming spoofed header is overwritten before enabling the form. A raw client-supplied `x-forwarded-for` is unsuitable. Missing/multi-valued/invalid IP headers fail closed with 503. A matching Origin is required. The handler is locked to the requested Supabase project. Missing settings or missing migration also fail closed: it never falls back to an in-memory list or fake success.
 
 ### Resend Email Integration Setup
 1. Create a free account at [Resend](https://resend.com) (free tier allows 3,000 emails/month, 100 emails/day, zero cost).
-2. In the Resend Dashboard under **Domains**, add `xn--exgeomai-c1a.co.za` (the DNS Punycode equivalent of `exégeomai.co.za`).
+2. In the Resend Dashboard under **Domains**, add `exegeomai.co.za`.
 3. Add the DNS records provided by Resend (DKIM, SPF, MX) to your DNS host (Cloudflare, registrar, or hosting DNS).
 4. Generate an API Key under **API Keys** and add it to hosting environment variables as `RESEND_API_KEY`.
 5. Upon user submission on the waitlist:
-   - A branded welcome & confirmation email is immediately dispatched to the user from `noreply@exégeomai.co.za` (`noreply@xn--exgeomai-c1a.co.za`).
-   - A sign-up notification is sent to the team at `joinus@exégeomai.co.za` (`joinus@xn--exgeomai-c1a.co.za`).
+   - A branded welcome & confirmation email is immediately dispatched to the user from `noreply@exegeomai.co.za`.
+   - A sign-up notification is sent to the team at `joinus@exegeomai.co.za`.
 
 No production credentials were read or copied into this checkout. No mail provider, CAPTCHA service or paid resource is provisioned. Preview signup testing should use a disposable/local database transport; do not silently point previews at production for tests.
 
@@ -52,7 +52,7 @@ No production credentials were read or copied into this checkout. No mail provid
 
 ## Unsubscribe and retention operations
 
-The page and notice explain the manual unsubscribe channel: `support@exegeomai.app`, subject “Unsubscribe from waitlist”, sent from the subscribed address. The owner must monitor this inbox and process removals before sending any notifications. Use a parameterised administrator operation:
+The page and notice explain the manual unsubscribe channel: `joinus@exegeomai.co.za`, subject “Unsubscribe from waitlist”, sent from the subscribed address. The owner must monitor this inbox and process removals before sending any notifications. Use a parameterised administrator operation:
 
 ```sql
 -- $1 is the verified requesting email, passed as a bound parameter.
