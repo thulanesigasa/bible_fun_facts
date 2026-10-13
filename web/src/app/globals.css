@@ -331,91 +331,112 @@ button {
   background: var(--accent-hover);
 }
 
-.burger {
+/* From Uiverse.io by JulanDeAlb - Animated SVG Hamburger */
+.hamburger {
+  cursor: pointer;
   display: flex;
-  flex-direction: column;
-  gap: 5px;
-  width: 44px;
-  height: 44px;
   align-items: center;
   justify-content: center;
-  background: none;
-  border: 0;
-  padding: 0;
+  width: 44px;
+  height: 44px;
+  user-select: none;
 }
 
-.burger-bar {
-  width: 22px;
-  height: 2px;
-  border-radius: 2px;
-  background: #0F172A;
-  transition: transform .3s ease, background .3s ease, opacity .2s ease;
+.hamburger input {
+  display: none;
 }
 
-.nav.is-scrolled .burger-bar,
-.nav.is-solid .burger-bar {
-  background: #0F172A;
+.hamburger svg {
+  height: 2.3em;
+  width: 2.3em;
+  transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.burger.is-open .burger-bar:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
+.line {
+  fill: none;
+  stroke: #0F172A;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+  transition: stroke-dasharray 600ms cubic-bezier(0.4, 0, 0.2, 1),
+              stroke-dashoffset 600ms cubic-bezier(0.4, 0, 0.2, 1),
+              stroke 0.2s ease;
 }
 
-.burger.is-open .burger-bar:nth-child(2) {
-  opacity: 0;
+.line-top-bottom {
+  stroke-dasharray: 12 63;
 }
 
-.burger.is-open .burger-bar:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
+.hamburger input:checked + svg {
+  transform: rotate(-45deg);
+}
+
+.hamburger input:checked + svg .line-top-bottom {
+  stroke-dasharray: 20 300;
+  stroke-dashoffset: -32.42;
 }
 
 .mobile-menu {
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--border);
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #FFFFFF;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.1);
   max-height: 0;
-  transition: max-height .4s var(--ease-panel);
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  z-index: 1000;
 }
 
 .mobile-menu.is-open {
-  max-height: min(760px, calc(100vh - 76px));
+  max-height: calc(100vh - 76px);
+  opacity: 1;
+  pointer-events: auto;
   overflow-y: auto;
 }
 
 .mobile-menu-links {
   display: flex;
   flex-direction: column;
-  padding: 20px var(--gutter) 24px;
-  gap: 4px;
+  padding: 24px 28px 32px;
+  gap: 8px;
+  background: #FFFFFF;
 }
 
 .mobile-menu-links a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px;
-  font-size: 15px;
+  padding: 14px 18px;
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 16px;
   font-weight: 600;
-  color: var(--ink);
-  border-radius: var(--r-sm);
-  transition: background .15s ease;
+  color: #0F172A;
+  border-radius: 10px;
+  background: #F8FAFC;
+  transition: background .15s ease, color .15s ease;
 }
 
-.mobile-menu-links a:hover {
-  background: var(--surface-alt);
+.mobile-menu-links a:hover,
+.mobile-menu-links a:active {
+  background: #F1F5F9;
+  color: #7A620B;
 }
 
-.mobile-menu-actions {
-  padding: 12px 14px 4px;
-}
-
-.mobile-menu-actions .cta-btn {
+.mobile-menu-links .cta-btn {
   display: flex;
-  width: 100%;
   justify-content: center;
-  padding: 12px 20px;
+  background: var(--gold, #FDD223);
+  color: #0F172A !important;
+  font-weight: 700;
+  padding: 15px 20px;
+  border-radius: 10px;
+  margin-top: 10px;
+  box-shadow: none;
 }
 
 @media (min-width: 1024px) {
@@ -423,7 +444,7 @@ button {
   .nav-right {
     display: flex;
   }
-  .burger {
+  .hamburger {
     display: none;
   }
 }

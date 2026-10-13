@@ -13,7 +13,7 @@ const links = [
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const button = useRef<HTMLButtonElement>(null);
+  const button = useRef<HTMLInputElement>(null);
   const pathname = usePathname();
   useEffect(() => {
     const scroll = () => setScrolled(window.scrollY > 24);
@@ -73,19 +73,23 @@ export function Header() {
               Join Waiting List <span aria-hidden="true">↗</span>
             </a>
           </div>
-          <button
-            ref={button}
-            type="button"
-            className={`burger ${open ? "is-open" : ""}`}
-            aria-label={open ? "Close navigation menu" : "Open navigation menu"}
-            aria-expanded={open}
-            aria-controls="mobile-menu"
-            onClick={() => setOpen(!open)}
-          >
-            <span className="burger-bar" />
-            <span className="burger-bar" />
-            <span className="burger-bar" />
-          </button>
+          <label className="hamburger" aria-label={open ? "Close navigation menu" : "Open navigation menu"}>
+            <input
+              ref={button}
+              type="checkbox"
+              checked={open}
+              onChange={(e) => setOpen(e.target.checked)}
+              aria-expanded={open}
+              aria-controls="mobile-menu"
+            />
+            <svg viewBox="0 0 32 32" aria-hidden="true">
+              <path
+                className="line line-top-bottom"
+                d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"
+              />
+              <path className="line" d="M7 16 27 16" />
+            </svg>
+          </label>
         </div>
         {open && (
           <div className="mobile-menu is-open" id="mobile-menu">
