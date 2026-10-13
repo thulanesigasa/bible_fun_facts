@@ -22,6 +22,7 @@ import {
   GestureResponderEvent,
   ActivityIndicator,
   Platform,
+  PanResponder,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
@@ -32,8 +33,6 @@ import {
   CheckSvg,
   MapPinSvg,
   CrosshairSvg,
-  ZoomInSvg,
-  ZoomOutSvg,
   LayersSvg,
   SatelliteSvg,
 } from './SvgIcons';
@@ -161,45 +160,104 @@ export default function PinDropModal({
   const tileIndices = [-1, 0, 1];
   const maxTile = Math.pow(2, zoom);
 
-  const handleMapPress = (e: GestureResponderEvent) => {
-    const { locationX, locationY } = e.nativeEvent;
-    // Difference from container center (HALF_MAP, HALF_MAP)
-    const deltaPixelX = locationX - HALF_MAP;
-    const deltaPixelY = locationY - HALF_MAP;
+  // Refs for tracking active gestures
+  const panStartCoordsRef = useRef<{ lat: number; lng: number }>({ lat, lng });
+  const initialPinchDistRef = useRef<number | null>(null);
+  const pinchStartZoomRef = useRef<number>(zoom);
+  const isDraggingRef = useRef<boolean>(false);
+  const currentZoomRef = useRef<number>(zoom);
+  currentZoomRef.current = zoom;
+  const currentCoordsRef = useRef<{ lat: number; lng: number }>({ lat, lng });
+  currentCoordsRef.current = { lat, lng };
 
-    const deltaTileX = deltaPixelX / TILE_SIZE;
-    const deltaTileY = deltaPixelY / TILE_SIZE;
-
-    const newExactTileX = centerExactTileX + deltaTileX;
-    const newExactTileY = centerExactTileY + deltaTileY;
-
-    const newLng = tile2lon(newExactTileX, zoom);
-    const newLat = tile2lat(newExactTileY, zoom);
-
-    setLat(newLat);
-    setLng(newLng);
-    triggerReverseGeocode(newLat, newLng);
+  // Calculate Euclidean distance between two touches
+  const getPinchDistance = (touch0: any, touch1: any): number => {
+    const dx = touch0.pageX - touch1.pageX;
+    const dy = touch0.pageY - touch1.pageY;
+    return Math.sqrt(dx * dx + dy * dy);
   };
 
-  const handleNudge = (dxTile: number, dyTile: number) => {
-    const newExactTileX = centerExactTileX + dxTile;
-    const newExactTileY = centerExactTileY + dyTile;
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_evt, gestureState) => {
+        return Math.abs(gestureState.dx) > 2 || Math.abs(gestureState.dy) > 2;
+      },
+      onPanResponderGrant: (evt) => {
+        panStartCoordsRef.current = { ...currentCoordsRef.current };
+        isDraggingRef.current = false;
+        const touches = evt.nativeEvent.touches;
+        if (touches && touches.length === 2) {
+          initialPinchDistRef.current = getPinchDistance(touches[0], touches[1]);
+          pinchStartZoomRef.current = currentZoomRef.current;
+        } else {
+          initialPinchDistRef.current = null;
+        }
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        const touches = evt.nativeEvent.touches;
 
-    const newLng = tile2lon(newExactTileX, zoom);
-    const newLat = tile2lat(newExactTileY, zoom);
+        // Two-finger pinch to zoom in / out
+        if (touches && touches.length === 2) {
+          isDraggingRef.current = true;
+          const currentDist = getPinchDistance(touches[0], touches[1]);
+          if (initialPinchDistRef.current && initialPinchDistRef.current > 0) {
+            const scaleRatio = currentDist / initialPinchDistRef.current;
+            // Log2 scale to calculate zoom levels delta
+            const deltaZoom = Math.round(Math.log2(scaleRatio));
+            const newZoom = Math.min(19, Math.max(10, pinchStartZoomRef.current + deltaZoom));
+            if (newZoom !== currentZoomRef.current) {
+              setZoom(newZoom);
+            }
+          }
+          return;
+        }
 
-    setLat(newLat);
-    setLng(newLng);
-    triggerReverseGeocode(newLat, newLng);
-  };
+        // One-finger pan (left, right, up, down)
+        if (Math.abs(gestureState.dx) > 3 || Math.abs(gestureState.dy) > 3) {
+          isDraggingRef.current = true;
+          const startExactTileX = lon2tile(panStartCoordsRef.current.lng, currentZoomRef.current);
+          const startExactTileY = lat2tile(panStartCoordsRef.current.lat, currentZoomRef.current);
 
-  const handleZoomIn = () => {
-    if (zoom < 19) setZoom((z) => z + 1);
-  };
+          // Inverting gesture deltas: dragging left (dx < 0) moves map view right
+          const deltaTileX = -gestureState.dx / TILE_SIZE;
+          const deltaTileY = -gestureState.dy / TILE_SIZE;
 
-  const handleZoomOut = () => {
-    if (zoom > 10) setZoom((z) => z - 1);
-  };
+          const newLng = tile2lon(startExactTileX + deltaTileX, currentZoomRef.current);
+          const newLat = tile2lat(startExactTileY + deltaTileY, currentZoomRef.current);
+
+          setLat(newLat);
+          setLng(newLng);
+        }
+      },
+      onPanResponderRelease: (evt, gestureState) => {
+        // If not dragged or pinched, treat as tap to drop/reposition pin
+        if (!isDraggingRef.current && Math.abs(gestureState.dx) < 5 && Math.abs(gestureState.dy) < 5) {
+          const { locationX, locationY } = evt.nativeEvent;
+          const deltaPixelX = locationX - HALF_MAP;
+          const deltaPixelY = locationY - HALF_MAP;
+
+          const exactTileX = lon2tile(currentCoordsRef.current.lng, currentZoomRef.current);
+          const exactTileY = lat2tile(currentCoordsRef.current.lat, currentZoomRef.current);
+
+          const newExactTileX = exactTileX + deltaPixelX / TILE_SIZE;
+          const newExactTileY = exactTileY + deltaPixelY / TILE_SIZE;
+
+          const newLng = tile2lon(newExactTileX, currentZoomRef.current);
+          const newLat = tile2lat(newExactTileY, currentZoomRef.current);
+
+          setLat(newLat);
+          setLng(newLng);
+          triggerReverseGeocode(newLat, newLng);
+        } else {
+          // Finished drag or pinch: trigger reverse geocode for current position
+          triggerReverseGeocode(currentCoordsRef.current.lat, currentCoordsRef.current.lng);
+        }
+        initialPinchDistRef.current = null;
+        isDraggingRef.current = false;
+      },
+    })
+  ).current;
 
   const handleResetToInitial = () => {
     setLat(initialLatitude || -26.2041);
@@ -242,7 +300,7 @@ export default function PinDropModal({
           </TouchableOpacity>
           <View style={{ flex: 1, alignItems: 'center' }}>
             <Text style={styles.headerTitle}>Pin-Drop Location</Text>
-            <Text style={styles.headerSubtitle}>Tap on the map to place exact GPS pin</Text>
+            <Text style={styles.headerSubtitle}>Drag or pinch to navigate · Tap to place pin</Text>
           </View>
           <TouchableOpacity
             onPress={handleResetToInitial}
@@ -257,9 +315,8 @@ export default function PinDropModal({
         {/* Map Canvas Container */}
         <View style={styles.mapOuterWrapper}>
           <View style={styles.mapContainer}>
-            <TouchableOpacity
-              activeOpacity={1}
-              onPress={handleMapPress}
+            <View
+              {...panResponder.panHandlers}
               style={[styles.mapCanvas, { width: MAP_SIZE, height: MAP_SIZE }]}
             >
               {/* Tile Grid */}
@@ -301,7 +358,7 @@ export default function PinDropModal({
                 <View style={[styles.pulseRing, mapLayer === 'satellite' && styles.pulseRingSatellite]} />
                 <MapPinSvg size={36} color="#FDD223" fill="#FDD223" strokeWidth={2.5} />
               </View>
-            </TouchableOpacity>
+            </View>
 
             {/* Map Layer Switcher Floating Pill (Satellite vs Streets) */}
             <View style={styles.layerSwitcherWrapper}>
@@ -344,61 +401,6 @@ export default function PinDropModal({
                 >
                   Streets
                 </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Map Floating Controls */}
-            <View style={styles.floatingControls}>
-              <TouchableOpacity
-                style={styles.ctrlBtn}
-                onPress={handleZoomIn}
-                activeOpacity={0.8}
-                accessibilityLabel="Zoom in"
-              >
-                <ZoomInSvg size={18} color="#0F172A" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.ctrlBtn}
-                onPress={handleZoomOut}
-                activeOpacity={0.8}
-                accessibilityLabel="Zoom out"
-              >
-                <ZoomOutSvg size={18} color="#0F172A" />
-              </TouchableOpacity>
-            </View>
-
-            {/* Directional Precision Nudge Buttons */}
-            <View style={styles.nudgeContainer}>
-              <TouchableOpacity
-                style={[styles.nudgeBtn, styles.nudgeNorth]}
-                onPress={() => handleNudge(0, -0.35)}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.nudgeText}>▲</Text>
-              </TouchableOpacity>
-              <View style={styles.nudgeRow}>
-                <TouchableOpacity
-                  style={[styles.nudgeBtn, styles.nudgeSide]}
-                  onPress={() => handleNudge(-0.35, 0)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.nudgeText}>◀</Text>
-                </TouchableOpacity>
-                <View style={styles.nudgeCenterDot} />
-                <TouchableOpacity
-                  style={[styles.nudgeBtn, styles.nudgeSide]}
-                  onPress={() => handleNudge(0.35, 0)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.nudgeText}>▶</Text>
-                </TouchableOpacity>
-              </View>
-              <TouchableOpacity
-                style={[styles.nudgeBtn, styles.nudgeSouth]}
-                onPress={() => handleNudge(0, 0.35)}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.nudgeText}>▼</Text>
               </TouchableOpacity>
             </View>
 
@@ -532,65 +534,6 @@ const styles = StyleSheet.create({
     borderColor: '#FDD223',
     backgroundColor: 'rgba(253, 210, 35, 0.25)',
     top: 26,
-  },
-  floatingControls: {
-    position: 'absolute',
-    right: 12,
-    top: 12,
-    zIndex: 20,
-    gap: 8,
-  },
-  ctrlBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 3,
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  nudgeContainer: {
-    position: 'absolute',
-    left: 12,
-    bottom: 12,
-    zIndex: 20,
-    alignItems: 'center',
-  },
-  nudgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginVertical: 2,
-  },
-  nudgeBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.92)',
-    borderWidth: 1,
-    borderColor: '#CBD5E1',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  nudgeNorth: {},
-  nudgeSouth: {},
-  nudgeSide: {},
-  nudgeCenterDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#94A3B8',
-  },
-  nudgeText: {
-    fontSize: 9,
-    color: '#0F172A',
-    fontWeight: '700',
   },
   bottomCard: {
     backgroundColor: '#FFFFFF', // 30% surface
