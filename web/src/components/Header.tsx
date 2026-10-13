@@ -4,24 +4,28 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 const links = [
-  ["Home", "/"],
-  ["About", "/#about"],
-  ["Features", "/#features"],
-  ["How It Works", "/#how-it-works"],
-  ["FAQ", "/#faq"],
+  { label: "Home", href: "/#home" },
+  { label: "About", href: "/#about" },
+  { label: "Features", href: "/#features" },
+  { label: "How It Works", href: "/#how-it-works" },
+  { label: "FAQ", href: "/#faq" },
 ];
+
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const button = useRef<HTMLInputElement>(null);
   const pathname = usePathname();
+
   useEffect(() => {
     const scroll = () => setScrolled(window.scrollY > 24);
     scroll();
     window.addEventListener("scroll", scroll, { passive: true });
     return () => window.removeEventListener("scroll", scroll);
   }, []);
+
   useEffect(() => setOpen(false), [pathname]);
+
   useEffect(() => {
     const escape = (event: KeyboardEvent) => {
       if (event.key === "Escape" && open) {
@@ -32,6 +36,29 @@ export function Header() {
     document.addEventListener("keydown", escape);
     return () => document.removeEventListener("keydown", escape);
   }, [open]);
+
+  // Handle in-page smooth scrolling including Home
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    if (pathname === "/" && href.startsWith("/#")) {
+      e.preventDefault();
+      const targetId = href.replace("/#", "");
+      if (targetId === "home") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        window.history.pushState(null, "", "/");
+      } else {
+        const el = document.getElementById(targetId);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
+          window.history.pushState(null, "", href.replace("/", ""));
+        }
+      }
+      setOpen(false);
+    }
+  };
+
   return (
     <>
       <a href="#main" className="launch-skip">
@@ -42,7 +69,18 @@ export function Header() {
         aria-label="Main navigation"
       >
         <div className="nav-row">
-          <Link href="/" className="brand" aria-label="exégeomai home">
+          <Link
+            href="/"
+            className="brand"
+            aria-label="exégeomai home"
+            onClick={(e) => {
+              if (pathname === "/") {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+                setOpen(false);
+              }
+            }}
+          >
             <span className="brand-mark" aria-hidden="true">
               <Image
                 src="/logo-transparent.png"
@@ -54,26 +92,34 @@ export function Header() {
             </span>
             <span>exégeomai</span>
           </Link>
+
           <div className="desktop-nav">
-            {links.map(([label, href]) => (
-              <Link
+            {links.map(({ label, href }) => (
+              <a
                 key={label}
                 className="nav-link"
                 href={href}
-                aria-current={
-                  href === "/" && pathname === "/" ? "page" : undefined
-                }
+                onClick={(e) => handleNavClick(e, href)}
               >
                 {label}
-              </Link>
+              </a>
             ))}
           </div>
+
           <div className="nav-right">
-            <a href="/#waitlist" className="cta-btn">
+            <a
+              href="/#waitlist"
+              className="cta-btn"
+              onClick={(e) => handleNavClick(e, "/#waitlist")}
+            >
               Join Waiting List <span aria-hidden="true">↗</span>
             </a>
           </div>
-          <label className="hamburger" aria-label={open ? "Close navigation menu" : "Open navigation menu"}>
+
+          <label
+            className="hamburger"
+            aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+          >
             <input
               ref={button}
               type="checkbox"
@@ -91,24 +137,31 @@ export function Header() {
             </svg>
           </label>
         </div>
-        {open && (
-          <div className="mobile-menu is-open" id="mobile-menu">
-            <div className="mobile-menu-links">
-              {links.map(([label, href]) => (
-                <Link key={label} href={href} onClick={() => setOpen(false)}>
-                  {label}
-                </Link>
-              ))}
+
+        <div
+          className={`mobile-menu ${open ? "is-open" : ""}`}
+          id="mobile-menu"
+          aria-hidden={!open}
+        >
+          <div className="mobile-menu-links">
+            {links.map(({ label, href }) => (
               <a
-                href="/#waitlist"
-                className="cta-btn"
-                onClick={() => setOpen(false)}
+                key={label}
+                href={href}
+                onClick={(e) => handleNavClick(e, href)}
               >
-                Join Waiting List ↗
+                {label}
               </a>
-            </div>
+            ))}
+            <a
+              href="/#waitlist"
+              className="cta-btn"
+              onClick={(e) => handleNavClick(e, "/#waitlist")}
+            >
+              Join Waiting List ↗
+            </a>
           </div>
-        )}
+        </div>
       </nav>
     </>
   );
