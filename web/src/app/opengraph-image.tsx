@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-export const alt = "exégeomai — Scripture has depths. Coming soon.";
+export const alt = "exégeomai — Scripture has depths.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export default function Image() {
@@ -19,7 +19,7 @@ export default function Image() {
         }}
       >
         <div style={{ fontSize: 25, color: "#FDD223", marginBottom: 65 }}>
-          exégeomai · COMING SOON
+          exégeomai
         </div>
         <div style={{ fontSize: 68, letterSpacing: -3 }}>
           Scripture has depths.
