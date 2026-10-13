@@ -73,6 +73,7 @@ interface PinDropModalProps {
   initialLatitude: number;
   initialLongitude: number;
   townName?: string;
+  initialStreetAddress?: string;
   onClose: () => void;
   onConfirm: (location: {
     latitude: number;
@@ -90,6 +91,7 @@ export default function PinDropModal({
   initialLatitude,
   initialLongitude,
   townName,
+  initialStreetAddress,
   onClose,
   onConfirm,
 }: PinDropModalProps) {
@@ -120,6 +122,13 @@ export default function PinDropModal({
     debounceTimerRef.current = setTimeout(async () => {
       try {
         const res = await reverseGeocodeOnline(targetLat, targetLng);
+        if (res && initialStreetAddress) {
+          const numberMatch = initialStreetAddress.trim().match(/^(\d+[A-Za-z]?|\d+[-\/]\d+)\s+/i);
+          if (numberMatch && !res.streetAddress.match(/^\d+/)) {
+            res.streetAddress = `${numberMatch[1]} ${res.streetAddress}`;
+            res.displayName = `${numberMatch[1]} ${res.displayName}`;
+          }
+        }
         setResolvedAddress(res);
       } catch {
         setResolvedAddress(null);
@@ -197,12 +206,18 @@ export default function PinDropModal({
   };
 
   const handleConfirm = () => {
+    const numberMatch = initialStreetAddress?.trim().match(/^(\d+[A-Za-z]?|\d+[-\/]\d+)\s+/i);
+    let finalStreet = resolvedAddress?.streetAddress || initialStreetAddress;
+    if (numberMatch && finalStreet && !finalStreet.match(/^\d+/)) {
+      finalStreet = `${numberMatch[1]} ${finalStreet}`;
+    }
+
     onConfirm({
       latitude: lat,
       longitude: lng,
-      streetAddress: resolvedAddress?.streetAddress,
+      streetAddress: finalStreet,
       suburb: resolvedAddress?.suburb,
-      town: resolvedAddress?.town,
+      town: resolvedAddress?.town || townName,
       province: resolvedAddress?.province,
       postalCode: resolvedAddress?.postalCode,
     });

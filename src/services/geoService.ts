@@ -1154,11 +1154,15 @@ const COUNTRY_CODE_MAP: Record<string, string> = {
 async function queryNominatimAddress(
   searchQuery: string,
   townHint?: string,
-  countryHint: string = 'South Africa'
+  countryHint: string = 'South Africa',
+  rawUserQuery?: string
 ): Promise<AddressSuggestion[]> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 4000);
   try {
+    const rawNumberMatch = (rawUserQuery || searchQuery).trim().match(/^(\d+[A-Za-z]?|\d+[-\/]\d+)\s+/i);
+    const queryHouseNumber = rawNumberMatch ? rawNumberMatch[1] : '';
+
     const countryCode = COUNTRY_CODE_MAP[countryHint.toLowerCase()] || '';
     const countryParam = countryCode ? `&countrycodes=${countryCode}` : '';
     const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
@@ -1179,7 +1183,7 @@ async function queryNominatimAddress(
     return data
       .map((item: any) => {
         const addr = item.address || {};
-        const houseNumber = addr.house_number || '';
+        const houseNumber = addr.house_number || queryHouseNumber || '';
         const road =
           addr.road ||
           addr.street ||
@@ -1236,11 +1240,14 @@ async function queryNominatimAddress(
 async function queryPhotonAddress(
   searchQuery: string,
   townHint?: string,
-  countryHint: string = 'South Africa'
+  countryHint: string = 'South Africa',
+  rawUserQuery?: string
 ): Promise<AddressSuggestion[]> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 3500);
   try {
+    const rawNumberMatch = (rawUserQuery || searchQuery).trim().match(/^(\d+[A-Za-z]?|\d+[-\/]\d+)\s+/i);
+    const queryHouseNumber = rawNumberMatch ? rawNumberMatch[1] : '';
     const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(searchQuery)}&limit=6`;
     const res = await fetch(url, { signal: controller.signal });
     clearTimeout(timer);
@@ -1251,7 +1258,7 @@ async function queryPhotonAddress(
     return data.features
       .map((f: any) => {
         const p = f.properties || {};
-        const houseNumber = p.housenumber || '';
+        const houseNumber = p.housenumber || queryHouseNumber || '';
         const street = p.street || '';
         const streetAddress =
           [houseNumber, street].filter(Boolean).join(' ') || p.name || '';
@@ -1322,17 +1329,18 @@ export async function searchAddressesOnline(
   let suggestions: AddressSuggestion[] = await queryNominatimAddress(
     searchQuery,
     townHint,
-    countryHint
+    countryHint,
+    q
   );
 
   if (suggestions.length === 0 && searchQuery !== `${q}, ${countryHint}`) {
-    suggestions = await queryNominatimAddress(`${q}, ${countryHint}`, townHint, countryHint);
+    suggestions = await queryNominatimAddress(`${q}, ${countryHint}`, townHint, countryHint, q);
   }
 
   if (suggestions.length === 0) {
-    suggestions = await queryPhotonAddress(searchQuery, townHint, countryHint);
+    suggestions = await queryPhotonAddress(searchQuery, townHint, countryHint, q);
     if (suggestions.length === 0 && townHint && !hasTown) {
-      suggestions = await queryPhotonAddress(`${q}, ${countryHint}`, townHint, countryHint);
+      suggestions = await queryPhotonAddress(`${q}, ${countryHint}`, townHint, countryHint, q);
     }
   }
 

@@ -163,11 +163,19 @@ export default function RegisterMinistryScreen({ navigation }: { navigation: any
       setIsSubmitting(false);
 
       showAlert({
-        title: 'Ministry Registered',
-        message: `${created.name} is now registered in the global directory. Let's add your first branch or homecell.`,
+        title: 'Ministry Headquarters Registered',
+        message: `${created.name} Headquarters (${townQuery.trim()}, ${headquartersCountry.trim()}) is now officially established in the global directory.`,
         buttons: [
           {
-            text: 'Add Branch or Cell',
+            text: 'View Ministry',
+            onPress: () => {
+              navigation.replace('MinistryDetail', {
+                ministryId: created.id,
+              });
+            },
+          },
+          {
+            text: '+ Add Branch or Cell',
             onPress: () => {
               navigation.replace('RegisterBranch', {
                 ministryId: created.id,
