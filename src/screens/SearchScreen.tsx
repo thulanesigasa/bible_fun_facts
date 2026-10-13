@@ -257,9 +257,7 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
       >
         {/* Header */}
         <View style={styles.headerRow}>
-          <View style={styles.searchIconCircle}>
-            <UsersSvg size={22} color={colors.accent} />
-          </View>
+          <UsersSvg size={24} color={colors.accent} />
           <View style={styles.headerTextWrap}>
             <Text variant="h2" style={styles.title}>
               {searchScope === 'believers' ? 'Believers & Scholars' : 'Ministries & Churches'}
@@ -333,7 +331,7 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
         )}
 
         {/* Search Input Box */}
-        <View style={[styles.searchContainer, shadow.sm]}>
+        <View style={styles.searchContainer}>
           <SearchSvg size={18} color={colors.accent} />
           <TextInput
             style={styles.searchInput}
@@ -390,154 +388,145 @@ export default function SearchScreen({ navigation }: { navigation?: any }) {
         {/* Scope Branch: Believers vs Ministries */}
         {searchScope === 'believers' ? (
           <>
-            {/* Filter Categories */}
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.filterTabsScroll}
-              style={styles.filterRow}
-            >
-          {FILTER_CATEGORIES.map((cat) => {
-            const isActive = activeCategory === cat;
-            return (
-              <TouchableOpacity
-                key={cat}
-                style={[styles.filterTab, isActive && styles.filterTabActive]}
-                onPress={() => setActiveCategory(cat)}
-                activeOpacity={0.8}
-              >
-                <Text
-                  variant="caption"
-                  weight={isActive ? '700' : '500'}
-                  style={[styles.filterTabText, isActive && styles.filterTabTextActive]}
-                >
-                  {cat}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-
-        {/* Results Counter */}
-        {!loading && filteredUsers.length > 0 && (
-          <View style={styles.resultsMetaRow}>
-            <Text variant="caption" color={colors.textSecondary}>
-              {filteredUsers.length} community believer{filteredUsers.length !== 1 ? 's' : ''} found
-            </Text>
-          </View>
-        )}
-
-        {loading ? (
-          <View style={styles.loaderContainer}>
-            <ActivityIndicator size="small" color={colors.accent} />
-            <Text variant="caption" color={colors.textSecondary} style={{ marginTop: spacing.sm }}>
-              Connecting to live believer network...
-            </Text>
-          </View>
-        ) : filteredUsers.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <View style={styles.emptyCircle}>
-              <UsersSvg size={36} color={colors.accent} />
-            </View>
-            <Text variant="h2" style={styles.emptyTitle}>
-              {searchText ? 'No Matching Believers' : "No Other Believers Yet"}
-            </Text>
-            <Text variant="body" color={colors.textSecondary} align="center" style={styles.emptySub}>
-              {searchText
-                ? 'Try searching with a different name, @handle, or study topic.'
-                : 'You are currently the only believer registered in the live database. When new disciples sign up, they will automatically appear here in real time.'}
-            </Text>
-          </View>
-        ) : (
-          /* Users List */
-          <View style={styles.usersList}>
-            {filteredUsers.map((user) => {
-              const isFollowed = isUserFollowed(user.id);
-              const totalFollowers = user.followersCount + (isFollowed ? 1 : 0);
-
-              return (
-                <TouchableOpacity
-                  key={user.id}
-                  activeOpacity={0.9}
-                  style={[styles.userCard, shadow.sm]}
-                  onPress={() => setSelectedUser(user)}
-                >
-                  <View style={styles.userCardTop}>
-                    {/* Avatar Initials */}
-                    <View style={styles.avatarCircle}>
-                      <Text variant="body" weight="700" color={colors.accent}>
-                        {getInitials(user.name)}
+            {/* Filter Categories: Pure Text Row (Zero Pills, Zero Divs) */}
+            <View style={styles.filterTextRow}>
+              {FILTER_CATEGORIES.map((cat, idx) => {
+                const isActive = activeCategory === cat;
+                return (
+                  <React.Fragment key={cat}>
+                    {idx > 0 && (
+                      <Text variant="caption" color={colors.textTertiary} style={styles.filterDividerDot}>
+                        •
                       </Text>
-                    </View>
-
-                    {/* User Info */}
-                    <View style={styles.userInfoWrap}>
-                      <View style={styles.userNameRow}>
-                        <Text variant="h3" style={styles.userName} numberOfLines={1}>
-                          {user.name}
-                        </Text>
-                        {user.isVerified && (
-                          <View style={styles.verifiedDot}>
-                            <CheckSvg size={10} color="#FFFFFF" strokeWidth={3} />
-                          </View>
-                        )}
-                      </View>
-                      <Text variant="caption" color={colors.textTertiary}>
-                        @{user.username} • {user.role}
-                      </Text>
-                    </View>
-
-                    {/* Follow Button */}
+                    )}
                     <TouchableOpacity
-                      style={[
-                        styles.followBtn,
-                        isFollowed ? styles.followingBtn : styles.unfollowedBtn,
-                      ]}
-                      onPress={() => toggleFollowUser(user.id)}
-                      activeOpacity={0.8}
+                      onPress={() => setActiveCategory(cat)}
+                      activeOpacity={0.7}
+                      hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Filter by ${cat}`}
                     >
-                      {isFollowed ? (
-                        <View style={styles.followingBtnContent}>
-                          <CheckSvg size={12} color={colors.textSecondary} strokeWidth={2.5} />
-                          <Text variant="caption" weight="600" color={colors.textSecondary}>
-                            Following
+                      <Text
+                        variant="caption"
+                        style={[
+                          styles.filterText,
+                          isActive ? styles.filterTextActive : styles.filterTextInactive,
+                        ]}
+                      >
+                        {cat}
+                      </Text>
+                    </TouchableOpacity>
+                  </React.Fragment>
+                );
+              })}
+            </View>
+
+            {/* Results Counter */}
+            {!loading && filteredUsers.length > 0 && (
+              <View style={styles.resultsMetaRow}>
+                <Text variant="caption" color={colors.textSecondary}>
+                  {filteredUsers.length} community believer{filteredUsers.length !== 1 ? 's' : ''} found
+                </Text>
+              </View>
+            )}
+
+            {loading ? (
+              <View style={styles.loaderContainer}>
+                <ActivityIndicator size="small" color={colors.accent} />
+                <Text variant="caption" color={colors.textSecondary} style={{ marginTop: spacing.sm }}>
+                  Connecting to live believer network...
+                </Text>
+              </View>
+            ) : filteredUsers.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <UsersSvg size={36} color={colors.accent} />
+                <Text variant="h2" style={[styles.emptyTitle, { marginTop: 12 }]}>
+                  {searchText ? 'No Matching Believers' : 'No Other Believers Yet'}
+                </Text>
+                <Text variant="body" color={colors.textSecondary} align="center" style={styles.emptySub}>
+                  {searchText
+                    ? 'Try searching with a different name, @handle, or study topic.'
+                    : 'You are currently the only believer registered in the live database. When new disciples sign up, they will automatically appear here in real time.'}
+                </Text>
+              </View>
+            ) : (
+              /* Believers List on Screen Body Canvas (Zero Card Divs, Zero Pills) */
+              <View style={styles.believerBodyList}>
+                {filteredUsers.map((user) => {
+                  const isFollowed = isUserFollowed(user.id);
+                  const totalFollowers = user.followersCount + (isFollowed ? 1 : 0);
+
+                  return (
+                    <TouchableOpacity
+                      key={user.id}
+                      style={styles.believerBodyRow}
+                      onPress={() => setSelectedUser(user)}
+                      activeOpacity={0.7}
+                      accessibilityRole="button"
+                      accessibilityLabel={`View profile for ${user.name}`}
+                    >
+                      <View style={styles.believerRowMain}>
+                        <View style={styles.believerHeaderRow}>
+                          <Text variant="h3" color={colors.textPrimary} style={styles.believerRowName}>
+                            {user.name}
+                          </Text>
+                          {user.isVerified && (
+                            <View style={styles.verifiedDot}>
+                              <CheckSvg size={10} color="#FFFFFF" strokeWidth={3} />
+                            </View>
+                          )}
+                          <Text variant="caption" color={colors.textTertiary} style={styles.believerHandle}>
+                            @{user.username}
                           </Text>
                         </View>
-                      ) : (
-                        <Text variant="caption" weight="700" color="#0F172A">
-                          + Follow
+
+                        <Text variant="caption" color={colors.textSecondary} style={styles.believerRoleMeta}>
+                          {user.role} • {user.theologicalFocus}
                         </Text>
-                      )}
+
+                        <Text
+                          variant="caption"
+                          color={colors.textSecondary}
+                          numberOfLines={2}
+                          style={styles.believerRowDesc}
+                        >
+                          {user.bio}
+                        </Text>
+
+                        <View style={styles.believerFooterRow}>
+                          <Text variant="caption" color={colors.accent} weight="700">
+                            {user.tags.slice(0, 3).map((t) => `#${t}`).join('  ')}
+                          </Text>
+                          <Text variant="caption" color={colors.textTertiary}>
+                            {totalFollowers.toLocaleString()} followers • {showStreaksPublicly ? `${user.streak}d streak` : 'Streak hidden'}
+                          </Text>
+                        </View>
+                      </View>
+
+                      <View style={styles.believerRowRight}>
+                        <TouchableOpacity
+                          style={styles.textFollowBtn}
+                          onPress={() => toggleFollowUser(user.id)}
+                          activeOpacity={0.65}
+                          accessibilityRole="button"
+                          accessibilityLabel={isFollowed ? `Unfollow ${user.name}` : `Follow ${user.name}`}
+                        >
+                          <Text
+                            variant="caption"
+                            weight="700"
+                            color={isFollowed ? colors.textSecondary : '#0F172A'}
+                          >
+                            {isFollowed ? 'Following' : '+ Follow'}
+                          </Text>
+                        </TouchableOpacity>
+                        <ChevronRightSvg size={16} color={colors.textSecondary} style={{ marginTop: 12 }} />
+                      </View>
                     </TouchableOpacity>
-                  </View>
-
-                  {/* Bio snippet */}
-                  <Text
-                    variant="body"
-                    color={colors.textPrimary}
-                    numberOfLines={2}
-                    style={styles.bioSnippet}
-                  >
-                    {user.bio}
-                  </Text>
-
-                  {/* Tags row */}
-                  <View style={styles.tagsRow}>
-                    <Text variant="caption" color={colors.accent} style={styles.tagText}>
-                      {user.tags.slice(0, 3).map((t) => `#${t}`).join('  ')}
-                    </Text>
-                    <View style={styles.statsSummary}>
-                      <Text variant="caption" color={colors.textTertiary}>
-                        {totalFollowers.toLocaleString()} followers • {showStreaksPublicly ? `${user.streak}d streak` : 'Streak hidden'}
-                      </Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        )}
-      </>
+                  );
+                })}
+              </View>
+            )}
+          </>
     ) : (
       /* Scope 2: Ministries & Churches Directory (Continuous Screen Body) */
       <View style={styles.ministriesScopeContainer}>
@@ -931,14 +920,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     gap: 12,
   },
-  searchIconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.md,
-    backgroundColor: colors.accentSoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   headerTextWrap: {
     flex: 1,
   },
@@ -967,30 +948,29 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     padding: 0,
   },
-  filterRow: {
-    marginBottom: spacing.md,
-  },
-  filterTabsScroll: {
+  // Filter Categories: Pure Text Row (Zero Pills, Zero Divs)
+  filterTextRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
     gap: 8,
+    marginBottom: spacing.md,
+    paddingHorizontal: 2,
   },
-  filterTab: {
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderRadius: radius.full,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
+  filterText: {
+    fontSize: 13,
   },
-  filterTabActive: {
-    backgroundColor: colors.accent,
-    borderColor: colors.accent,
-  },
-  filterTabText: {
-    color: colors.textSecondary,
-    fontSize: 12,
-  },
-  filterTabTextActive: {
+  filterTextActive: {
     color: '#0F172A',
+    fontWeight: '800',
+  },
+  filterTextInactive: {
+    color: colors.textSecondary,
+    fontWeight: '500',
+  },
+  filterDividerDot: {
+    fontSize: 12,
+    opacity: 0.35,
   },
   resultsMetaRow: {
     marginBottom: spacing.sm,
@@ -1006,17 +986,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xxl,
     paddingHorizontal: spacing.lg,
   },
-  emptyCircle: {
-    width: 68,
-    height: 68,
-    borderRadius: 34,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
-  },
   emptyTitle: {
     color: colors.textPrimary,
     marginBottom: spacing.sm,
@@ -1027,90 +996,71 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontSize: 13,
   },
-  usersList: {
-    gap: 12,
+
+  // Believers Continuous Body Canvas (Zero Card Divs)
+  believerBodyList: {
+    paddingTop: 4,
   },
-  userCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
-  },
-  userCardTop: {
+  believerBodyRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(15, 23, 42, 0.08)',
   },
-  avatarCircle: {
-    width: 46,
-    height: 46,
-    borderRadius: radius.full,
-    backgroundColor: colors.accentSoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(253, 210, 35, 0.2)',
-  },
-  userInfoWrap: {
+  believerRowMain: {
     flex: 1,
+    paddingRight: 12,
   },
-  userNameRow: {
+  believerHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    marginBottom: 2,
   },
-  userName: {
-    color: colors.textPrimary,
-    fontSize: 15,
+  believerRowName: {
+    fontSize: 16,
   },
   verifiedDot: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
     backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  followBtn: {
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderRadius: radius.full,
+  believerHandle: {
+    fontSize: 12,
   },
-  unfollowedBtn: {
-    backgroundColor: colors.accent,
+  believerRoleMeta: {
+    fontSize: 12,
+    marginBottom: 4,
   },
-  followingBtn: {
-    backgroundColor: 'rgba(15, 23, 42, 0.06)',
-    borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.1)',
+  believerRowDesc: {
+    fontSize: 12,
+    lineHeight: 17,
+    marginBottom: 6,
+  },
+  believerFooterRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 2,
+  },
+  believerRowRight: {
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    paddingLeft: 4,
+  },
+  textFollowBtn: {
+    paddingVertical: 4,
+    paddingHorizontal: 6,
   },
   followingBtnContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-  },
-  bioSnippet: {
-    fontSize: 13,
-    lineHeight: 18,
-    marginTop: spacing.sm,
-  },
-  tagsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: spacing.sm,
-    paddingTop: 4,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(15, 23, 42, 0.04)',
-  },
-  tagText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  statsSummary: {
-    flex: 1,
-    alignItems: 'flex-end',
+    gap: 6,
   },
 
   // Modal Profile Styles

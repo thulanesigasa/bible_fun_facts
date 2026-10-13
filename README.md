@@ -1977,11 +1977,16 @@ To achieve exhaustive 100% pronunciation coverage without manual guesswork or re
 </p>
 
 ### 1. Dual Search Hub: Believers & Ministries (`src/screens/SearchScreen.tsx`)
-The Search experience features a segmented tab switcher:
-- **Believers & Scholars Tab**: Explores community profiles, theological scholars, mutual connections, follow/unfollow states, and crisis pastoral support.
-- **Ministries & Churches Tab**:
-  - **"Register Your Ministry" Hero Card**: Direct CTA with 60-30-10 styling guiding pastors and church administrators to register their church organization.
-  - **"Interactive Radar Map" Action Card**: Directly opens the global map view to locate nearest branches and homecells.
+The Search experience features a clean text switcher between Believers and Churches, rendered on a flat, continuous screen body canvas with zero card container divs, zero box shadows, and zero pill buttons:
+- **Believers & Scholars Scope (Continuous Canvas)**:
+  - **Inline Typography Category Switcher**: Clean inline text navigation (`All • Scholars • Pastors • Exegesis • Linguistics`) without pill wrapper divs.
+  - **Flat Continuous Body Rows (`believerBodyRow`)**: Every believer row sits flush on the 60% canvas with subtle hairline dividers (`borderBottomColor: 'rgba(15, 23, 42, 0.08)'`), avatar, name, handle, role, bio snippet, and tags.
+  - **Flat Typography Action**: Text-based `+ Follow` / `Following` link without pill button wrappers.
+  - **Clean Header & Empty States**: Search icon and empty states sit directly on the background canvas without circle wrapper divs or heavy card containers.
+- **Ministries & Churches Scope (Continuous Canvas)**:
+  - **Flat Body Rows (`ministryBodyRow`)**: Displays name, location, and branch counts with clean chevron indicators.
+  - **"Register Your Ministry" Action**: Direct text button guiding church administrators.
+  - **"Interactive Radar Map" Action**: Directly opens the global map view to locate nearest branches and homecells.
   - **Live Fuzzy Search**: Filters ministries instantly across names, vision statements, founders, and categories.
   - **Pre-Added Canonical Ministries**:
     - **God Embassy**: Apostolic ministry founded by Pastor Sunday Adelaja, emphasizing kingdom transformation, community leadership, and civic impact.
