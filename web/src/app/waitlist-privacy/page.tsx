@@ -52,10 +52,10 @@ export default function WaitlistPrivacy() {
           <p>
             Email{" "}
             <a
-              href="mailto:support@exegeomai.app?subject=Unsubscribe%20from%20waitlist"
+              href="mailto:joinus@exegeomai.co.za?subject=Unsubscribe%20from%20waitlist"
               style={{ textDecoration: "underline" }}
             >
-              support@exegeomai.app
+              joinus@exegeomai.co.za
             </a>{" "}
             from the address you registered, with the subject “Unsubscribe from
             waitlist”. The team will remove your waiting-list record. You can

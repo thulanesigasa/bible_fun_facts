@@ -63,8 +63,8 @@ export default function ContactPage() {
                   <h2>Send Us a Message</h2>
                   <p style={{ marginBottom: 28 }}>
                     Fill out the form below or email us directly at{' '}
-                    <a href="mailto:support@exegeomai.app" style={{ color: 'var(--ink)', fontWeight: 700 }}>
-                      support@exegeomai.app
+                    <a href="mailto:support@exegeomai.co.za" style={{ color: 'var(--ink)', fontWeight: 700 }}>
+                      support@exegeomai.co.za
                     </a>.
                   </p>
 

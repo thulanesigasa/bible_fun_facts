@@ -62,7 +62,7 @@ export default function CommunityGuidelinesPage() {
               <p>
                 If you encounter behavior or listings that violate these standards, please alert our moderation team
                 via our <Link href="/report-a-problem" style={{ color: 'var(--ink)', fontWeight: 700, textDecoration: 'underline' }}>Report a Problem</Link> portal
-                or email <a href="mailto:support@exegeomai.app" style={{ color: 'var(--ink)', fontWeight: 700 }}>support@exegeomai.app</a>.
+                or email <a href="mailto:support@exegeomai.co.za" style={{ color: 'var(--ink)', fontWeight: 700 }}>support@exegeomai.co.za</a>.
               </p>
             </div>
           </div>

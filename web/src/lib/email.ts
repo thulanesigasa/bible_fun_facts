@@ -26,8 +26,8 @@ export async function sendWaitlistEmails(
   const {
     subscriberEmail,
     resendApiKey = process.env.RESEND_API_KEY,
-    fromEmail = process.env.RESEND_FROM_EMAIL || "exégeomai <noreply@xn--exgeomai-c1a.co.za>",
-    adminNotifyEmail = process.env.RESEND_ADMIN_EMAIL || "joinus@xn--exgeomai-c1a.co.za",
+    fromEmail = process.env.RESEND_FROM_EMAIL || "exégeomai <noreply@exegeomai.co.za>",
+    adminNotifyEmail = process.env.RESEND_ADMIN_EMAIL || "joinus@exegeomai.co.za",
     appName = "exégeomai",
   } = options;
 
@@ -81,8 +81,8 @@ export async function sendWaitlistEmails(
     <p>Warm regards,<br><strong>The ${appName} Team</strong></p>
 
     <div class="footer">
-      <p>You received this email because you signed up for early access at exégeomai.co.za.</p>
-      <p>To unsubscribe or remove your email, reply to this email or contact support@exégeomai.co.za with subject "Unsubscribe".</p>
+      <p>You received this email because you signed up for early access at exegeomai.co.za.</p>
+      <p>To unsubscribe or remove your email, reply to this email or contact joinus@exegeomai.co.za with subject "Unsubscribe from waitlist".</p>
     </div>
   </div>
 </body>

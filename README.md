@@ -2338,10 +2338,10 @@ The official companion web portal (`web/`) provides full web access to exégeoma
      - Responsive mobile viewport scaling and overflow suppression on phone previews.
 
 6. **Resend Email Integration (Free Tier)**:
-   - **Subscriber Confirmation Email**: When visitors join the waitlist, a confirmation email is dispatched from `noreply@exégeomai.co.za` (`noreply@xn--exgeomai-c1a.co.za`) confirming receipt and welcoming them to the family.
-   - **Internal Team Notification**: An administrative notification is sent to `joinus@exégeomai.co.za` (`joinus@xn--exgeomai-c1a.co.za`) with subscriber details.
+   - **Subscriber Confirmation Email**: When visitors join the waitlist, a confirmation email is dispatched from `noreply@exegeomai.co.za` confirming receipt and welcoming them to the family.
+   - **Internal Team Notification**: An administrative notification is sent to `joinus@exegeomai.co.za` with subscriber details.
    - **Free Tier Economics**: Powered by Resend (free tier includes 3,000 emails/month, 100 emails/day), providing an enterprise-grade zero-cost alternative to dedicated email hosting.
-   - **IDN & Punycode Architecture**: Built-in support for Internationalized Domain Names (IDN) via Punycode conversion (`xn--exgeomai-c1a.co.za`) for RFC-compliant mail exchange and DNS deliverability.
+   - **Domain Architecture**: Configured on official `exegeomai.co.za` domain with DKIM/SPF verification for reliable inbox deliverability.
 
 7. **Web Portal Commands**:
 ```bash
