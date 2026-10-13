@@ -1604,13 +1604,18 @@ button {
 
 .footer-brand .brand {
   margin-bottom: 16px;
+  color: #FFFFFF;
+}
+
+.footer-brand .brand-mark img {
+  filter: brightness(0) invert(1);
 }
 
 .footer-brand p {
   font-size: 14px;
   color: #94A3B8;
   line-height: 1.6;
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 .footer-badge {
