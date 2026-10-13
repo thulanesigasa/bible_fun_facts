@@ -5,9 +5,9 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 const links = [
   ["Home", "/"],
+  ["About", "/#about"],
   ["Features", "/#features"],
   ["How It Works", "/#how-it-works"],
-  ["About", "/#about"],
   ["FAQ", "/#faq"],
 ];
 export function Header() {
