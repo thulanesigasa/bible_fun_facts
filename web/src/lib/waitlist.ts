@@ -8,6 +8,7 @@ const ACCEPTED =
 type Dependencies = {
   env?: Record<string, string | undefined>;
   fetch?: typeof fetch;
+  sendEmail?: (email: string) => void | Promise<void>;
 };
 function reply(status: number, body: Record<string, unknown>) {
   return Response.json(body, {
@@ -178,6 +179,26 @@ export async function handleWaitlist(
         error: "We could not confirm your request. Please try again later.",
       });
     // Only a committed database result reaches this branch; duplicates return the same response.
+    // Send confirmation email to subscriber and notification to joinus@exégeomai.co.za via Resend
+    if (dependencies.sendEmail) {
+      dependencies.sendEmail(email);
+    } else if (env.RESEND_API_KEY) {
+      import("./email")
+        .then(({ sendWaitlistEmails }) => {
+          sendWaitlistEmails({
+            subscriberEmail: email,
+            resendApiKey: env.RESEND_API_KEY,
+            fromEmail: env.RESEND_FROM_EMAIL,
+            adminNotifyEmail: env.RESEND_ADMIN_EMAIL,
+          }).catch((err) => {
+            console.error("Failed to send waitlist confirmation emails:", err);
+          });
+        })
+        .catch((err) => {
+          console.error("Failed to load email helper:", err);
+        });
+    }
+
     return reply(200, { success: true, message: ACCEPTED });
   } catch {
     return reply(503, {

@@ -71,6 +71,7 @@
   <img src="https://img.shields.io/badge/Web%20Portal-Responsive%2060--30--10%20Landing%20Site-0284C7?style=for-the-badge&logo=html5&logoColor=white" alt="Responsive Web Portal" />
   <img src="https://img.shields.io/badge/SEO-JSON--LD%20%7C%20OpenGraph%20%7C%20Sitemap-10B981?style=for-the-badge&logo=google&logoColor=white" alt="SEO Optimized" />
   <img src="https://img.shields.io/badge/Deletion%20Portal-Google%20Play%20Policy%20Compliant-DC2626?style=for-the-badge&logo=shield&logoColor=white" alt="Account Deletion Portal" />
+  <img src="https://img.shields.io/badge/Email%20Service-Resend%20%7C%20Free%20Tier%20Waitlist%20Dispatch-000000?style=for-the-badge&logo=resend&logoColor=white" alt="Resend Free Tier Waitlist Email Dispatch" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
   <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License MIT" />
 </p>
@@ -2336,7 +2337,13 @@ The official companion web portal (`web/`) provides full web access to exégeoma
      - Minified JS and CSS with Gzip/Brotli compression and HSTS HTTPS enforcement headers.
      - Responsive mobile viewport scaling and overflow suppression on phone previews.
 
-6. **Web Portal Commands**:
+6. **Resend Email Integration (Free Tier)**:
+   - **Subscriber Confirmation Email**: When visitors join the waitlist, a confirmation email is dispatched from `noreply@exégeomai.co.za` (`noreply@xn--exgeomai-c1a.co.za`) confirming receipt and welcoming them to the family.
+   - **Internal Team Notification**: An administrative notification is sent to `joinus@exégeomai.co.za` (`joinus@xn--exgeomai-c1a.co.za`) with subscriber details.
+   - **Free Tier Economics**: Powered by Resend (free tier includes 3,000 emails/month, 100 emails/day), providing an enterprise-grade zero-cost alternative to dedicated email hosting.
+   - **IDN & Punycode Architecture**: Built-in support for Internationalized Domain Names (IDN) via Punycode conversion (`xn--exgeomai-c1a.co.za`) for RFC-compliant mail exchange and DNS deliverability.
+
+7. **Web Portal Commands**:
 ```bash
 # Launch Next.js web portal development server (http://localhost:3000)
 npm run web:portal

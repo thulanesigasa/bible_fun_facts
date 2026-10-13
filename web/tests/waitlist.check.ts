@@ -284,3 +284,24 @@ test('RLS independently hides rows even if a read grant is accidentally restored
     }
   } finally {await db.exec('rollback; set role service_role');}
 });
+
+test('triggers email dispatch callback upon accepted waitlist sign-up', async () => {
+  let emailedAddress: string | null = null;
+  const customCall = (request: Request) =>
+    handleWaitlist(request, {
+      env,
+      fetch: databaseFetch,
+      sendEmail: (email) => {
+        emailedAddress = email;
+      },
+    });
+
+  const response = await customCall(
+    req(
+      { email: "welcome@example.com", consent: true, website: "" },
+      { "x-test-ip": "192.0.2.77" },
+    ),
+  );
+  assert.equal(response.status, 200);
+  assert.equal(emailedAddress, "welcome@example.com");
+});
