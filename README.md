@@ -2343,7 +2343,13 @@ The official companion web portal (`web/`) provides full web access to exégeoma
    - **Free Tier Economics**: Powered by Resend (free tier includes 3,000 emails/month, 100 emails/day), providing an enterprise-grade zero-cost alternative to dedicated email hosting.
    - **Domain Architecture**: Configured on official `exegeomai.co.za` domain with DKIM/SPF verification for reliable inbox deliverability.
 
-7. **Web Portal Commands**:
+7. **Architectural & Biblical Decorative Elements**:
+   - **Sacred Cross Geometry (`.deco-cross`)**: Delicate SVG Latin cross elements positioned as subtle, elegant architectural accents across the hero section, Why section, and waitlist section.
+   - **Watermark Brand Monogram (`.deco-logo-watermark`)**: Low-opacity watermark instances of the iconic `exégeomai` monogram layered behind major sections.
+   - **Concentric Celestial Orbits & Diamonds**: Golden accent orbital curves (`.launch-orbit`), floating geometric rings, and 45-degree diamond markers providing structural depth without UI clutter.
+   - **Subpage Header Motifs**: Consistent vertical grid guidelines, watermark logos, and cross accents applied to all subpages.
+
+8. **Web Portal Commands**:
 ```bash
 # Launch Next.js web portal development server (http://localhost:3000)
 npm run web:portal
