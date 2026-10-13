@@ -49,7 +49,7 @@ export async function getOfflineDictionaryStatus(): Promise<OfflineDictionaryMet
         entriesCount: 14298,
         sizeBytes: 9646000,
         sizeFormatted: '9.2 MB',
-        version: '1.0.4',
+        version: '1.0.5',
       };
     }
 
@@ -79,7 +79,7 @@ export async function downloadOfflineDictionary(
     entriesCount: 14298,
     sizeBytes: 9646000,
     sizeFormatted,
-    version: '1.0.4',
+    version: '1.0.5',
   };
 
   await AsyncStorage.setItem(OFFLINE_DICT_META_KEY, JSON.stringify(meta));

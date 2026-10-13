@@ -14,7 +14,7 @@
   <img src="https://img.shields.io/badge/Native%20APK-Conditional%20Gated%20Compilation-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Conditional Gated Compilation" />
   <img src="https://img.shields.io/badge/EAS%20Channels-Production%20%7C%20Preview-000000?style=for-the-badge&logo=expo&logoColor=white" alt="EAS Channels" />
   <img src="https://img.shields.io/badge/Runtime%20Version-1.0.1%20%7C%20Permanently%20Locked-10B981?style=for-the-badge&logo=expo&logoColor=white" alt="Runtime Version 1.0.1 Permanently Locked" />
-  <img src="https://img.shields.io/badge/Outer%20Release-v1.0.4-2563EB?style=for-the-badge&logo=android&logoColor=white" alt="Outer Release v1.0.4" />
+  <img src="https://img.shields.io/badge/Outer%20Release-v1.0.5-2563EB?style=for-the-badge&logo=android&logoColor=white" alt="Outer Release v1.0.5" />
   <img src="https://img.shields.io/badge/Security-Kotlin%20FLAG__SECURE-DC2626?style=for-the-badge&logo=android&logoColor=white" alt="Kotlin FLAG_SECURE" />
   <img src="https://img.shields.io/badge/Tab%20Architecture-Floating%20Pill%20280px-FDD223?style=for-the-badge" alt="Floating Pill Tab Bar" />
   <img src="https://img.shields.io/badge/Streak%20Milestones-3D%20Hexagonal%20Badges-F59E0B?style=for-the-badge" alt="3D Streak Milestone Badges" />
@@ -193,7 +193,7 @@ EAS Update is configured with two distinct channels:
 - **Dual Deployment**: Pushes to `main` automatically publish OTA updates to both channels so that internal testers on preview APKs and production users receive updates concurrently.
 
 ### 2. Dual Versioning Model (Preserving `v1.0.1`)
-- **Locked OTA & App Version**: `app.json` specifies `"version": "1.0.4"` and `"runtimeVersion": "1.0.1"`. All Over-The-Air updates deployed through EAS target runtime `1.0.1` matching the compiled native APK base.
+- **Locked OTA & App Version**: `app.json` specifies `"version": "1.0.5"` and `"runtimeVersion": "1.0.1"`. All Over-The-Air updates deployed through EAS target runtime `1.0.1` matching the compiled native APK base.
 - **Dynamic Native Compilation Build Numbers**: When native binaries are compiled through GitHub Actions or EAS Build, the CI pipeline automatically injects incremental build identifiers (`android.versionCode` and `ios.buildNumber`) derived from `github.run_number` while strictly preserving `1.0.1` as the base runtimeVersion.
 - **Runtime Compatibility Guarantee**: Any compiled native application bearing runtimeVersion `1.0.1` will continuously and seamlessly receive OTA JavaScript and asset updates without triggering native version mismatches. Never increment `runtimeVersion` in `app.json` unless simultaneously compiling, releasing, and distributing a new native APK, as doing so breaks OTA updates for existing installed devices.
 
@@ -1234,7 +1234,7 @@ Native compilation runs directly on GitHub Actions compute runners (Java 17 + ru
   2. Or when a commit/PR message includes deliberate build flags: `[build-apk]`, `[compile-apk]`, or `[release-apk]`.
 - **Workflow**: `.github/workflows/compile-and-ota.yml` (`compile_native_app` job)
 - **Engine**: `npx expo prebuild --platform android --no-install` + `./gradlew assembleRelease -x lint -x test --no-daemon`
-- **Output**: Generates `exegeomai-v${VERSION}.apk` (e.g. `exegeomai-v1.0.4.apk`) and uploads it directly to the repository's GitHub Releases page under **Assets** with automatic clobbering.
+- **Output**: Generates `exegeomai-v${VERSION}.apk` (e.g. `exegeomai-v1.0.5.apk`) and uploads it directly to the repository's GitHub Releases page under **Assets** with automatic clobbering.
 
 ### GitHub Releases vs. Over-The-Air (OTA) Updates
 - **GitHub Releases (`/releases`)**: Houses official version tags (e.g. `v1.0.3`), changelogs, and direct `.apk` binary downloads compiled directly on GitHub Actions.
@@ -1579,6 +1579,24 @@ bible_fun_facts/
    - **Bottom Navigation Tab Badge**: Dynamically integrates the active unread notification/achievement count directly into the "Feed" tab label and tab icon via an accent pill badge (`#FDD223` on `#0F172A`), alerting believers to newly earned milestones immediately.
    - **Distinct Achievement Card Rendering**: Clarifies achievement notifications by displaying milestone titles (`item.title`), milestone descriptions (`item.body`), category badge tags, and biblical anchor quotes with scripture references, preventing achievements from being confused with plain scripture bookmarks.
    - **Zero-Friction Milestone Modal Deep-Linking**: Registers `AchievementsScreen` inside `DiscoverStack` and implements route parameter passing (`category`, `milestoneId`) so tapping `"View in Achievements ›"` instantly activates the matching category tab (e.g., Bookmarks) and pops up the 3D milestone modal.
+
+---
+
+### Release v1.0.5: Native Embedded Flat Believers Architecture & Text Switcher
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Release-v1.0.5-2563EB?style=for-the-badge&logo=android&logoColor=white" alt="Release v1.0.5" />
+  <img src="https://img.shields.io/badge/Runtime%20Version-1.0.1%20%7C%20Permanently%20Locked-10B981?style=for-the-badge&logo=expo&logoColor=white" alt="Runtime Version 1.0.1 Permanently Locked" />
+  <img src="https://img.shields.io/badge/Binary-exegeomai--v1.0.5.apk-FDD223?style=for-the-badge&logo=android&logoColor=white" alt="v1.0.5 APK" />
+  <img src="https://img.shields.io/badge/Search%20Architecture-Continuous%20Body%20Rows%20%7C%20Zero%20Card%20Divs-10B981?style=for-the-badge" alt="Continuous Body Rows Zero Card Divs" />
+</p>
+
+Version 1.0.5 compiles and delivers the definitive embedded native Android APK with the refined continuous body layout and scope switcher:
+1. **Direct Plain-Text Scope Switcher**: Seamless inline `Believers • Churches` toggle eliminating bulky segmented pill capsules and icon containers.
+2. **Flat Continuous Believers Body Rows**: Full elimination of nested white card containers, card margins, and drop shadows in favor of editorial body rows separated by subtle hairline dividers (`rgba(15, 23, 42, 0.08)`).
+3. **Flat Inline Filter Row**: Direct plain-text category filter (`All • Scholars • Pastors • Exegesis • Linguistics`) replacing rounded pill capsules.
+4. **Zero-Icon Direct Canvas Empty States**: Direct typography empty states on the surface canvas without enclosing circle borders or shadow wrappers.
+5. **Runtime Compatibility Guarantee**: Native bundle permanently maintains `runtimeVersion: 1.0.1` compatibility ensuring existing installed devices seamlessly receive Over-The-Air updates without native runtime mismatch.
 
 ---
 
@@ -2123,20 +2141,21 @@ To permanently eliminate Android application crashes on startup ("exégeomai kee
 ### 8. Native Android Release Compilation & Full Asset Embedding
 
 <p align="left">
-  <img src="https://img.shields.io/badge/Native%20APK-v1.0.4%20Direct%20Compilation-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Native APK Direct Compilation" />
+  <img src="https://img.shields.io/badge/Native%20APK-v1.0.5%20Direct%20Compilation-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Native APK Direct Compilation" />
   <img src="https://img.shields.io/badge/Churches%20%26%20Ministries-Native%20Pre--Loaded-0284C7?style=for-the-badge&logo=church&logoColor=white" alt="Churches Pre-Loaded" />
   <img src="https://img.shields.io/badge/Bible%20Translations-32%20Integrated%20Catalogs-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="32 Integrated Catalogs" />
 </p>
 
 To guarantee that all devices immediately reflect the latest architecture without relying on asynchronous OTA downloads:
 1. **Direct GitHub Actions Runner Compilation**:
-   - Compiles standalone native binary (`exegeomai-v1.0.4.apk`) using Java 17 Temurin and Gradle directly on `ubuntu-latest`.
+   - Compiles standalone native binary (`exegeomai-v1.0.5.apk`) using Java 17 Temurin and Gradle directly on `ubuntu-latest`.
+   - Embeds the refined continuous body layout and plain text `Believers • Churches` scope switcher.
    - Embeds the full pre-populated church and ministry directory (God Embassy, Christ Embassy, Spirit Embassy, ECG The Jesus Nation Church).
    - Embeds all 32 translation registries (isiZulu, isiXhosa, Sepedi, Afrikaans, ChiShona, The Message, NIV, ESV, etc.).
    - Embeds the flat, div-free biometric security screen with 0px border radius logo.
    - Embeds Hermes AST stack-safe data loaders preventing cold boot crashes.
 2. **Distribution**:
-   - Published directly to GitHub Releases under tag `v1.0.4` as an asset ready for direct download and installation.
+   - Published directly to GitHub Releases under tag `v1.0.5` as an asset ready for direct download and installation.
 
 ---
 

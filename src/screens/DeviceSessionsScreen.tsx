@@ -144,7 +144,7 @@ export default function DeviceSessionsScreen() {
                   App Release
                 </Text>
                 <Text variant="caption" color={colors.textSecondary} style={styles.specValue}>
-                  v{deviceInfo?.appVersion || '1.0.4'}
+                  v{deviceInfo?.appVersion || '1.0.5'}
                 </Text>
               </View>
 

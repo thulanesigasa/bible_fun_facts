@@ -23,7 +23,7 @@ export function HeroSection() {
             className="btn btn-accent"
             id="heroDownloadBtn"
           >
-            Download APK — v1.0.4
+            Download APK — v1.0.5
           </a>
           <a
             href="https://github.com/thulanesigasa/bible_fun_facts"

@@ -557,7 +557,7 @@ export default function HomePage() {
                     <path d="m7 11 5 5 5-5" />
                     <path d="M4 20h16" />
                   </svg>
-                  <span>Download APK (v1.0.4)</span>
+                  <span>Download APK (v1.0.5)</span>
                 </a>
                 <a
                   href="https://github.com/thulanesigasa/bible_fun_facts"
