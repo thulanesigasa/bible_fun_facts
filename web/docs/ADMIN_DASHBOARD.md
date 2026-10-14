@@ -12,16 +12,16 @@ Persistent 15-minute IP/email login limits run before password authentication. R
 
 ## Production prerequisites
 
-A read-only check on 14 October 2026 found **no waiting-list table** in project `ibwooiejzxhbzplnldcz`. Therefore a live total is not available until the waiting-list migration is deployed. An unavailable source must never be presented as a genuine zero.
+Both migrations were deployed to production project `ibwooiejzxhbzplnldcz` on 14 October 2026 at the owner's explicit request, in this order:
 
-Apply, in order, after production approval:
+1. `supabase/migrations/20261013061117_launch_waitlist.sql`, recorded remotely as `20261014152305_launch_waitlist`.
+2. `supabase/migrations/20261014135350_waitlist_admin_dashboard.sql`, recorded remotely as `20261014152348_waitlist_admin_dashboard`.
 
-1. `supabase/migrations/20261013061117_launch_waitlist.sql` (existing registration, private subscriber storage, and signup limiter).
-2. `supabase/migrations/20261014135350_waitlist_admin_dashboard.sql` (aggregate statistics, timestamp index, and private admin login limiter).
+The connector assigned the remote timestamps; use the recorded versions when reconciling CLI migration history rather than applying these files again. Live verification returned zero retained subscriptions and 30 zero-filled daily buckets. All three tables have RLS enabled, with no anonymous or ordinary authenticated SELECT access. All three RPCs deny those roles and allow service_role execution. No auth, profile, study or directory records were changed.
 
-The existing waiting-list migration explicitly says: “Review/approval required before applying to production project ibwooiejzxhbzplnldcz.” Neither migration was applied to production as part of this dashboard implementation. The new migration is tested in an isolated PostgreSQL-compatible database. No auth, profile, study or directory records need to be changed for this dashboard.
+The dashboard still requires hosting environment configuration and an explicitly approved admin account before live use. Production advisors report informational RLS-without-policy notices for these three intentionally server-only tables; do not add browser policies to silence them. Guidance: https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy
 
-Both tables use RLS without public browser access. Only the trusted `service_role` can invoke the admin RPCs. The website must first validate admin authorisation before making those privileged calls. The statistics function returns counts and times, never subscriber identities. Do not grant `anon` or `authenticated` read/execute access to make the dashboard work.
+All three tables use RLS without public browser access. Only the trusted `service_role` can invoke the admin RPCs. The website must first validate admin authorisation before making those privileged calls. The statistics function returns counts and times, never subscriber identities. Do not grant `anon` or `authenticated` read/execute access to make the dashboard work.
 
 ## Hosting configuration
 
