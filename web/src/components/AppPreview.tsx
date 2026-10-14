@@ -40,7 +40,13 @@ export function PreviewPhone({ screen = 0 }: { screen?: number }) {
             loading="lazy"
           />
           <b>exégeomai</b>
-          <span>☰</span>
+          <span className="phone-menu-icon" aria-hidden="true" style={{ display: "inline-flex", alignItems: "center", pointerEvents: "none" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F172A" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </span>
         </div>
         <div className="phone-body">
           {screen === 0 ? (
