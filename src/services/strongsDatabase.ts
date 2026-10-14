@@ -18,7 +18,7 @@ import { getAllCanonicalStrongs } from '../data/strongs';
 const DB_NAME = 'strongs_concordance_v1.db';
 const SEED_FLAG_KEY = '@strongs_sqlite_seeded_v1';
 const DB_VERSION_KEY = '@strongs_sqlite_db_version_v1';
-const CURRENT_VERSION = '1.0.4';
+const CURRENT_VERSION = '1.0.5';
 
 let dbInstance: SQLite.SQLiteDatabase | null = null;
 let isSeeding = false;

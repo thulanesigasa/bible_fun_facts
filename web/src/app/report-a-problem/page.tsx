@@ -10,7 +10,7 @@ export default function ReportAProblemPage() {
     name: '',
     email: '',
     category: 'bug',
-    version: '1.0.4',
+    version: '1.0.5',
     device: '',
     details: '',
   });
@@ -53,7 +53,7 @@ export default function ReportAProblemPage() {
                   </p>
                   <button
                     type="button"
-                    onClick={() => { setSubmitted(false); setFormData({ name: '', email: '', category: 'bug', version: '1.0.4', device: '', details: '' }); }}
+                    onClick={() => { setSubmitted(false); setFormData({ name: '', email: '', category: 'bug', version: '1.0.5', device: '', details: '' }); }}
                     className="btn-primary"
                     style={{ marginTop: 16 }}
                   >

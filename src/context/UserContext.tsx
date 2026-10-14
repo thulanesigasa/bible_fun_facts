@@ -627,36 +627,34 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
               ...prev, userProfile: null,
               favoritesFacts: [], favoritesScriptures: [], completedWOTDs: [],
               readFactIds: [], bibleHighlights: {}, followedUserIds: [],
-              factsViewedCount: 0, sharesCount: 0, streak: 1,
+              factsViewedCount: 0, sharesCount: 0,
+              streak: Math.max(prev.streak || 1, 1),
               earnedAchievementIds: [],
-              lastLoginDate: null,
+              lastLoginDate: prev.lastLoginDate || null,
             }));
-            // Rehydrate ONLY this authenticated account's encrypted cache.
-            // Check identity again after asynchronous disk access; rapid A/B
-            // account switches must not restore the previous owner's data.
-            void SecureStoreAdapter.getItem(SECURE_STUDY_KEY(user.id))
-              .then(raw => {
-                if (activeAuthUserIdRef.current !== user.id) return;
-                if (raw) {
-                  const restored = JSON.parse(raw) as Partial<UserState> & { _authUserId?: string };
-                  if (restored._authUserId === user.id) {
-                    setState(prev => ({
-                      ...prev,
-                      favoritesFacts: Array.isArray(restored.favoritesFacts) ? restored.favoritesFacts : [],
-                      favoritesScriptures: Array.isArray(restored.favoritesScriptures) ? restored.favoritesScriptures : [],
-                      completedWOTDs: Array.isArray(restored.completedWOTDs) ? restored.completedWOTDs : [],
-                      readFactIds: Array.isArray(restored.readFactIds) ? restored.readFactIds : [],
-                      earnedAchievementIds: Array.isArray(restored.earnedAchievementIds) ? restored.earnedAchievementIds : [],
-                      bibleHighlights: restored.bibleHighlights && typeof restored.bibleHighlights === 'object'
-                        ? restored.bibleHighlights : {},
-                      streak: typeof restored.streak === 'number' ? restored.streak : 1,
-                      lastLoginDate: restored.lastLoginDate || null,
-                    }));
+              void SecureStoreAdapter.getItem(SECURE_STUDY_KEY(user.id))
+                .then(raw => {
+                  if (activeAuthUserIdRef.current !== user.id) return;
+                  if (raw) {
+                    const restored = JSON.parse(raw) as Partial<UserState> & { _authUserId?: string };
+                    if (restored._authUserId === user.id) {
+                      setState(prev => ({
+                        ...prev,
+                        favoritesFacts: Array.isArray(restored.favoritesFacts) ? restored.favoritesFacts : [],
+                        favoritesScriptures: Array.isArray(restored.favoritesScriptures) ? restored.favoritesScriptures : [],
+                        completedWOTDs: Array.isArray(restored.completedWOTDs) ? restored.completedWOTDs : [],
+                        readFactIds: Array.isArray(restored.readFactIds) ? restored.readFactIds : [],
+                        earnedAchievementIds: Array.isArray(restored.earnedAchievementIds) ? restored.earnedAchievementIds : [],
+                        bibleHighlights: restored.bibleHighlights && typeof restored.bibleHighlights === 'object'
+                          ? restored.bibleHighlights : {},
+                        streak: Math.max(prev.streak || 1, typeof restored.streak === 'number' ? restored.streak : 1),
+                        lastLoginDate: getLatestDateString(prev.lastLoginDate, restored.lastLoginDate) || prev.lastLoginDate || null,
+                      }));
+                    }
                   }
-                }
-                isLoadedFromStorage.current = true;
-              })
-              .catch(() => {
+                  isLoadedFromStorage.current = true;
+                })
+                .catch(() => {
                 // Never overwrite a previous encrypted snapshot after a
                 // secure-store read failure; future writes stay suspended.
                 console.warn('[UserContext] Unable to restore secure account cache.');

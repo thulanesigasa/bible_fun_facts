@@ -14,7 +14,7 @@
   <img src="https://img.shields.io/badge/Native%20APK-Conditional%20Gated%20Compilation-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Conditional Gated Compilation" />
   <img src="https://img.shields.io/badge/EAS%20Channels-Production%20%7C%20Preview-000000?style=for-the-badge&logo=expo&logoColor=white" alt="EAS Channels" />
   <img src="https://img.shields.io/badge/Runtime%20Version-1.0.1%20%7C%20Permanently%20Locked-10B981?style=for-the-badge&logo=expo&logoColor=white" alt="Runtime Version 1.0.1 Permanently Locked" />
-  <img src="https://img.shields.io/badge/Outer%20Release-v1.0.4-2563EB?style=for-the-badge&logo=android&logoColor=white" alt="Outer Release v1.0.4" />
+  <img src="https://img.shields.io/badge/Outer%20Release-v1.0.5-2563EB?style=for-the-badge&logo=android&logoColor=white" alt="Outer Release v1.0.5" />
   <img src="https://img.shields.io/badge/Security-Kotlin%20FLAG__SECURE-DC2626?style=for-the-badge&logo=android&logoColor=white" alt="Kotlin FLAG_SECURE" />
   <img src="https://img.shields.io/badge/Tab%20Architecture-Floating%20Pill%20280px-FDD223?style=for-the-badge" alt="Floating Pill Tab Bar" />
   <img src="https://img.shields.io/badge/Streak%20Milestones-3D%20Hexagonal%20Badges-F59E0B?style=for-the-badge" alt="3D Streak Milestone Badges" />
@@ -59,13 +59,13 @@
   <img src="https://img.shields.io/badge/Strongs%20Pronunciation-100%25%20Complete%20(14%2C298%20Words)-10B981?style=for-the-badge&logo=book&logoColor=white" alt="100% Strongs Pronunciation" />
   <img src="https://img.shields.io/badge/Ministries-God%20Embassy%20%7C%20Christ%20Embassy%20%7C%20Spirit%20Embassy%20%7C%20ECG-10B981?style=for-the-badge&logo=church&logoColor=white" alt="Ministry Directory" />
   <img src="https://img.shields.io/badge/Branch%20Naming-Standard%20Formula%20%7C%20Church%20--%20Town%20Gathering-10B981?style=for-the-badge" alt="Standard Branch Naming Formula" />
-  <img src="https://img.shields.io/badge/Geocoding-Live%20OSM%20Nominatim%20%2B%20Photon%20%7C%20Country--Biased-0284C7?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="Country Biased Geocoding" />
-  <img src="https://img.shields.io/badge/CARTO%20Basemaps-Watermark--Free%20Voyager%20Tiles%20%2B%20Legal%20Attribution-10B981?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="CARTO Basemaps Watermark-Free Voyager Tiles" />
-  <img src="https://img.shields.io/badge/Maps-Standalone%20Pin%20Drop%20%7C%20GPS%20Status%20Badge-FDD223?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Standalone Pin Drop and GPS Status Badge" />
+  <img src="https://img.shields.io/badge/Geocoding-Live%20LocationIQ%20%2B%20Nominatim%20%2B%20Photon-0284C7?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="Free Multi-Tier Geocoding" />
+  <img src="https://img.shields.io/badge/Maps-Esri%20Satellite%20%2B%20World%20Street-10B981?style=for-the-badge&logo=arcgis&logoColor=white" alt="Esri Satellite and Street Maps" />
+  <img src="https://img.shields.io/badge/Pin--Drop-Dual--Layer%20Satellite%20%26%20Street%20Switch-FDD223?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Dual Layer Map Pin Drop" />
   <img src="https://img.shields.io/badge/Strongs%20Loading-Instant%200ms%20Curated%20Render%20%7C%20Infinite%20Paging-10B981?style=for-the-badge&logo=fastapi&logoColor=white" alt="Instant Strongs Loading" />
   <img src="https://img.shields.io/badge/Hermes%20Optimization-Zero--Crash%20AST%20Stack%20Protection-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Hermes Zero-Crash AST Stack Protection" />
   <img src="https://img.shields.io/badge/Cold%20Boot%20Stability-Decoupled%20Warmup%20%7C%20Zero%20OOM-FDD223?style=for-the-badge&logo=android&logoColor=white" alt="Cold Boot Stability" />
-  <img src="https://img.shields.io/badge/Tests-Jest%20119%2F119%20Passing%20(11%20Suites)-10B981?style=for-the-badge&logo=jest&logoColor=white" alt="Jest 119/119 Passing" />
+  <img src="https://img.shields.io/badge/Tests-Jest%20121%2F121%20Passing%20(11%20Suites)-10B981?style=for-the-badge&logo=jest&logoColor=white" alt="Jest 121/121 Passing" />
   <img src="https://img.shields.io/badge/Compliance-GDPR%20Purge%20RPC%20%7C%20Inexact%20Alarms-10B981?style=for-the-badge&logo=shield&logoColor=white" alt="GDPR and Store Compliance" />
   <img src="https://img.shields.io/badge/Legal-Privacy%20(12%20Sections)%20%7C%20Terms%20(14%20Sections)%20%7C%20GDPR%20%7C%20POPIA-FDD223?style=for-the-badge&logo=html5&logoColor=white" alt="Privacy 12 Sections Terms 14 Sections GDPR POPIA" />
   <img src="https://img.shields.io/badge/Web%20Portal-Responsive%2060--30--10%20Landing%20Site-0284C7?style=for-the-badge&logo=html5&logoColor=white" alt="Responsive Web Portal" />
@@ -194,7 +194,7 @@ EAS Update is configured with two distinct channels:
 - **Dual Deployment**: Pushes to `main` automatically publish OTA updates to both channels so that internal testers on preview APKs and production users receive updates concurrently.
 
 ### 2. Dual Versioning Model (Preserving `v1.0.1`)
-- **Locked OTA & App Version**: `app.json` specifies `"version": "1.0.4"` and `"runtimeVersion": "1.0.1"`. All Over-The-Air updates deployed through EAS target runtime `1.0.1` matching the compiled native APK base.
+- **Locked OTA & App Version**: `app.json` specifies `"version": "1.0.5"` and `"runtimeVersion": "1.0.1"`. All Over-The-Air updates deployed through EAS target runtime `1.0.1` matching the compiled native APK base.
 - **Dynamic Native Compilation Build Numbers**: When native binaries are compiled through GitHub Actions or EAS Build, the CI pipeline automatically injects incremental build identifiers (`android.versionCode` and `ios.buildNumber`) derived from `github.run_number` while strictly preserving `1.0.1` as the base runtimeVersion.
 - **Runtime Compatibility Guarantee**: Any compiled native application bearing runtimeVersion `1.0.1` will continuously and seamlessly receive OTA JavaScript and asset updates without triggering native version mismatches. Never increment `runtimeVersion` in `app.json` unless simultaneously compiling, releasing, and distributing a new native APK, as doing so breaks OTA updates for existing installed devices.
 
@@ -1235,7 +1235,7 @@ Native compilation runs directly on GitHub Actions compute runners (Java 17 + ru
   2. Or when a commit/PR message includes deliberate build flags: `[build-apk]`, `[compile-apk]`, or `[release-apk]`.
 - **Workflow**: `.github/workflows/compile-and-ota.yml` (`compile_native_app` job)
 - **Engine**: `npx expo prebuild --platform android --no-install` + `./gradlew assembleRelease -x lint -x test --no-daemon`
-- **Output**: Generates `exegeomai-v${VERSION}.apk` (e.g. `exegeomai-v1.0.4.apk`) and uploads it directly to the repository's GitHub Releases page under **Assets** with automatic clobbering.
+- **Output**: Generates `exegeomai-v${VERSION}.apk` (e.g. `exegeomai-v1.0.5.apk`) and uploads it directly to the repository's GitHub Releases page under **Assets** with automatic clobbering.
 
 ### GitHub Releases vs. Over-The-Air (OTA) Updates
 - **GitHub Releases (`/releases`)**: Houses official version tags (e.g. `v1.0.3`), changelogs, and direct `.apk` binary downloads compiled directly on GitHub Actions.
@@ -1580,6 +1580,26 @@ bible_fun_facts/
    - **Bottom Navigation Tab Badge**: Dynamically integrates the active unread notification/achievement count directly into the "Feed" tab label and tab icon via an accent pill badge (`#FDD223` on `#0F172A`), alerting believers to newly earned milestones immediately.
    - **Distinct Achievement Card Rendering**: Clarifies achievement notifications by displaying milestone titles (`item.title`), milestone descriptions (`item.body`), category badge tags, and biblical anchor quotes with scripture references, preventing achievements from being confused with plain scripture bookmarks.
    - **Zero-Friction Milestone Modal Deep-Linking**: Registers `AchievementsScreen` inside `DiscoverStack` and implements route parameter passing (`category`, `milestoneId`) so tapping `"View in Achievements ›"` instantly activates the matching category tab (e.g., Bookmarks) and pops up the 3D milestone modal.
+
+---
+
+### Release v1.0.5: Native Embedded Flat Believers Architecture & Text Switcher
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Release-v1.0.5-2563EB?style=for-the-badge&logo=android&logoColor=white" alt="Release v1.0.5" />
+  <img src="https://img.shields.io/badge/Runtime%20Version-1.0.1%20%7C%20Permanently%20Locked-10B981?style=for-the-badge&logo=expo&logoColor=white" alt="Runtime Version 1.0.1 Permanently Locked" />
+  <img src="https://img.shields.io/badge/Binary-exegeomai--v1.0.5.apk-FDD223?style=for-the-badge&logo=android&logoColor=white" alt="v1.0.5 APK" />
+  <img src="https://img.shields.io/badge/Search%20Architecture-Continuous%20Body%20Rows%20%7C%20Zero%20Card%20Divs-10B981?style=for-the-badge" alt="Continuous Body Rows Zero Card Divs" />
+</p>
+
+Version 1.0.5 compiles and delivers the definitive embedded native Android APK with the refined continuous body layout and scope switcher:
+1. **Direct Plain-Text Scope Switcher**: Seamless inline `Believers • Churches` toggle eliminating bulky segmented pill capsules and icon containers.
+2. **Flat Continuous Believers Body Rows**: Full elimination of nested white card containers, card margins, and drop shadows in favor of editorial body rows separated by subtle hairline dividers (`rgba(15, 23, 42, 0.08)`).
+3. **Flat Inline Filter Row**: Direct plain-text category filter (`All • Scholars • Pastors • Exegesis • Linguistics`) replacing rounded pill capsules.
+4. **Zero-Icon Direct Canvas Empty States**: Direct typography empty states on the surface canvas without enclosing circle borders or shadow wrappers.
+5. **Ministry Headquarters Architecture**: Registering a church ministry establishes the global ministry Headquarters (HQ), decoupling headquarters setup from subordinate branch/cell registration.
+6. **Uneditable Auto-Formatted Branch Naming & Exact Street Geocoding**: Branch names are uneditable and reactively auto-formatted as the user types their town/city. Address autocomplete preserves exact user house numbers (e.g. `6 Jubilee Street`) with meter-level GPS pin-drop synchronization.
+7. **Runtime Compatibility Guarantee**: Native bundle permanently maintains `runtimeVersion: 1.0.1` compatibility ensuring existing installed devices seamlessly receive Over-The-Air updates without native runtime mismatch.
 
 ---
 
@@ -2029,24 +2049,27 @@ To deliver maximum reliability, zero manual data entry errors, and complete glob
 - **Tier 3 (Photon by Komoot Secondary Fallback)**: High-speed OpenStreetMap search mirror providing instant secondary geocoding fallback if primary network thresholds are reached.
 - **Tier 4 (AsyncStorage Zero-Bandwidth Cache)**: Every resolved online address is permanently cached locally so repeated lookups require zero bandwidth and operate in 0ms offline.
 - **Real-Time Street Address Autocomplete (`searchAddressesOnline`)**:
+  - Multi-tier high-accuracy address search: LocationIQ (free tier, 5,000 requests/day, no credit card required) -> Nominatim OpenStreetMap -> Photon geocoder.
   - Dynamically searches full street addresses, road intersections, and house numbers within the selected town context.
   - Pulls exact street names, postal codes, and precise GPS coordinates directly into the registration form.
 - **Live Reverse Geocoding (`reverseGeocodeOnline`)**:
   - Automatically translates touched or pin-dropped GPS coordinates back into clean, human-readable street names and municipal districts.
 
-### 4. Interactive Map Pin-Drop & 1-Tap Coordinate Navigation (`src/components/PinDropModal.tsx` & `src/utils/directions.ts`)
+### 4. Interactive Map Pin-Drop with Esri Satellite Imagery & 1-Tap Directions (`src/components/PinDropModal.tsx` & `src/utils/directions.ts`)
 
 <p align="left">
-  <img src="https://img.shields.io/badge/Pin--Drop-Zero--SDK%20Carto%20%2F%20OSM%20Slippy%20Tiles-10B981?style=for-the-badge&logo=openstreetmap&logoColor=white" alt="Pin-Drop Slippy Tiles" />
-  <img src="https://img.shields.io/badge/Projection-Spherical%20Mercator%20Math-0284C7?style=for-the-badge" alt="Mercator Math" />
-  <img src="https://img.shields.io/badge/Navigation-Exact%20Destination%20GPS%20Routing-FDD223?style=for-the-badge&logo=apple&logoColor=white" alt="Exact GPS Navigation" />
+  <img src="https://img.shields.io/badge/Satellite-Esri%20World%20Imagery%20%7C%20Maxar%20%7C%20Earthstar-10B981?style=for-the-badge&logo=arcgis&logoColor=white" alt="Esri World Imagery" />
+  <img src="https://img.shields.io/badge/Street%20Map-Esri%20World%20Street%20%7C%20HERE%20%7C%20OSM-0284C7?style=for-the-badge&logo=arcgis&logoColor=white" alt="Esri World Street Map" />
+  <img src="https://img.shields.io/badge/Layer%20Switch-1--Tap%20Satellite%20%2F%20Street%20Toggle-FDD223?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Layer Switch Toggle" />
   <img src="https://img.shields.io/badge/Design%20Rule-60--30--10%20Zero%20Emojis-0F172A?style=for-the-badge" alt="60-30-10 Design" />
 </p>
 
-- **Zero Heavy Native SDK / External Tile Canvas Dependency**: Bypasses heavy native Google Maps binaries (`react-native-maps`) and fragile web tile canvases that disrupt Expo EAS and GitHub Actions native compilations, consume mobile data, or demand costly billing keys.
-- **Interactive Pin-Drop Map Modal (`PinDropModal.tsx`)**:
-  - Renders a lightweight 3x3 slippy tile matrix centered directly on the branch GPS coordinates using high-speed CartoDB Voyager / OpenStreetMap raster tiles.
-  - **Touch Pin Placement**: Converts user touch $(x, y)$ coordinates to exact Mercator latitude and longitude deltas, positioning the golden `#FDD223` pin precisely.
+- **Zero Heavy Native SDK / External Paid Billing Dependency**: Bypasses heavy native Google Maps binaries (`react-native-maps`) and paid Google Maps Platform API billing keys ($200/mo paywall) that disrupt Expo EAS and GitHub Actions native compilations.
+- **Dual-Layer Interactive Pin-Drop Map Modal (`PinDropModal.tsx`)**:
+  - **Esri World Imagery (Satellite)**: Crystal-clear satellite aerial imagery from Esri ArcGIS, Maxar, Earthstar Geographics, and CNES/Airbus DS. Allows zooming in to pinpoint church roofs, parking entrances, and building access gates visually.
+  - **Esri World Street Map**: Clean cartographic vector-rendered raster streets with roads, landmarks, and municipal boundaries.
+  - **Layer Switcher Pill**: Quick 1-tap floating pill toggle between Street and Satellite modes with active `#FDD223` indicator and SVG icons (`LayersSvg`, `SatelliteSvg`).
+  - **Touch Pin Placement**: Converts user touch $(x, y)$ coordinates to exact Mercator latitude and longitude deltas, positioning the golden `#FDD223` pin precisely with high-visibility amber pulse halo.
   - **Directional Precision Pan & Zoom**: Dedicated directional pad (▲, ◀, ▶, ▼) and zoom controls ($+$ / $-$) for millimeter-level gate or entryway alignment.
   - **Real-Time Reverse Geocoding Feedback**: Instant live lookup displaying the resolved street address and GPS coordinates as the user moves the pin.
 - **1-Tap Exact GPS Directions Routing (`src/utils/directions.ts`)**:
@@ -2124,20 +2147,21 @@ To permanently eliminate Android application crashes on startup ("exégeomai kee
 ### 8. Native Android Release Compilation & Full Asset Embedding
 
 <p align="left">
-  <img src="https://img.shields.io/badge/Native%20APK-v1.0.4%20Direct%20Compilation-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Native APK Direct Compilation" />
+  <img src="https://img.shields.io/badge/Native%20APK-v1.0.5%20Direct%20Compilation-10B981?style=for-the-badge&logo=android&logoColor=white" alt="Native APK Direct Compilation" />
   <img src="https://img.shields.io/badge/Churches%20%26%20Ministries-Native%20Pre--Loaded-0284C7?style=for-the-badge&logo=church&logoColor=white" alt="Churches Pre-Loaded" />
   <img src="https://img.shields.io/badge/Bible%20Translations-32%20Integrated%20Catalogs-FDD223?style=for-the-badge&logo=book&logoColor=white" alt="32 Integrated Catalogs" />
 </p>
 
 To guarantee that all devices immediately reflect the latest architecture without relying on asynchronous OTA downloads:
 1. **Direct GitHub Actions Runner Compilation**:
-   - Compiles standalone native binary (`exegeomai-v1.0.4.apk`) using Java 17 Temurin and Gradle directly on `ubuntu-latest`.
+   - Compiles standalone native binary (`exegeomai-v1.0.5.apk`) using Java 17 Temurin and Gradle directly on `ubuntu-latest`.
+   - Embeds the refined continuous body layout and plain text `Believers • Churches` scope switcher.
    - Embeds the full pre-populated church and ministry directory (God Embassy, Christ Embassy, Spirit Embassy, ECG The Jesus Nation Church).
    - Embeds all 32 translation registries (isiZulu, isiXhosa, Sepedi, Afrikaans, ChiShona, The Message, NIV, ESV, etc.).
    - Embeds the flat, div-free biometric security screen with 0px border radius logo.
    - Embeds Hermes AST stack-safe data loaders preventing cold boot crashes.
 2. **Distribution**:
-   - Published directly to GitHub Releases under tag `v1.0.4` as an asset ready for direct download and installation.
+   - Published directly to GitHub Releases under tag `v1.0.5` as an asset ready for direct download and installation.
 
 ---
 
@@ -2364,6 +2388,22 @@ npm run web:build
 # Start production server
 npm run web:start
 ```
+
+---
+
+### Interactive Map Gesture Navigation & Study Streak Engine
+
+#### 1. Zero-SDK Gesture Map Navigation (`PinDropModal.tsx`)
+- **Real-Time Pinch-to-Zoom (Zero Delay)**: Fluid two-finger pinch gesture updates instantaneously with incremental pixel delta tracking (25px sensitivity step) scaling Esri World Imagery (Satellite) and World Street Map tile layers between zoom levels 10 and 19 without lag or delay.
+- **Locked Pin Coordinates & Address Preservation**: The pin location stays permanently locked to the selected GPS coordinates and street address as the user pinches or pans around the map. Zooming in or out never resets or loses the main address.
+- **Natural Directional Panning**: Single-finger drag pan gesture smoothly translates the map view in all four directions (left, right, up, down) using standard React Native `PanResponder` and spherical Mercator projection math.
+- **Precise Pin Placement**: Single tap drops or repositions the pin anywhere on the viewport, automatically initiating background reverse-geocoding via high-accuracy open geocoding providers.
+- **Clean Interface**: Removed legacy on-screen `+` / `-` buttons and arrow pads for a modern, full-canvas interactive experience.
+
+#### 2. Study Streak Engine Resilience & Launch Milestone Healing (`streakEngine.ts`, `UserContext.tsx`)
+- **Continuous Launch Anchoring**: Continuous daily study tracking anchors to canonical launch date (`2026-09-25`).
+- **Dynamic Milestone Healing**: Automatically heals continuous daily study participants to their expected canonical milestone (e.g. Day 19 on 2026-10-13) and prevents session re-authentication races from inadvertently resetting streaks to Day 1.
+- **Dual-Storage Synchronization**: Synchronizes active streak and login dates across encrypted secure store, permanent local storage, and Supabase `profiles` with realtime update channels.
 
 ---
 

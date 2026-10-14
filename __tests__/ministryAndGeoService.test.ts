@@ -599,6 +599,48 @@ describe('Ministry & Church Directory Service (ministryService)', () => {
     }
   });
 
+  it('searchAddressesOnline preserves house number when OSM only returns road way without house_number', async () => {
+    const originalFetch = global.fetch;
+    const mockJubileeResponse = [
+      {
+        display_name: 'Jubilee Street, Rhodesfield, Kempton Park, Gauteng, 1627, South Africa',
+        lat: '-26.10954',
+        lon: '28.23174',
+        address: {
+          road: 'Jubilee Street',
+          suburb: 'Rhodesfield',
+          town: 'Kempton Park',
+          state: 'Gauteng',
+          country: 'South Africa',
+          postcode: '1627',
+        },
+      },
+    ];
+
+    global.fetch = jest.fn().mockImplementation((url: string) => {
+      if (url.includes('nominatim.openstreetmap.org/search')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => mockJubileeResponse,
+        });
+      }
+      return Promise.resolve({ ok: false, json: async () => [] });
+    }) as any;
+
+    try {
+      const results = await searchAddressesOnline('6 jubilee street', 'Kempton Park', 'South Africa');
+      expect(results.length).toBeGreaterThan(0);
+      expect(results[0].streetAddress).toBe('6 Jubilee Street');
+      expect(results[0].town).toBe('Kempton Park');
+      expect(results[0].suburb).toBe('Rhodesfield');
+      expect(results[0].province).toBe('Gauteng');
+      expect(results[0].coordinates.latitude).toBeCloseTo(-26.10954, 4);
+      expect(results[0].coordinates.longitude).toBeCloseTo(28.23174, 4);
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
   it('reverseGeocodeOnline resolves GPS coordinates to exact street address and town', async () => {
     const originalFetch = global.fetch;
     const mockReverseResponse = {
@@ -655,6 +697,50 @@ describe('Ministry & Church Directory Service (ministryService)', () => {
     expect(calledUrl).toContain('29.2417');
 
     openURLSpy.mockRestore();
+  });
+
+  it('searchAddressesOnline queries LocationIQ when API key is provided and prefixes house number in displayName', async () => {
+    const originalFetch = global.fetch;
+    const originalApiKey = process.env.EXPO_PUBLIC_LOCATIONIQ_API_KEY;
+    process.env.EXPO_PUBLIC_LOCATIONIQ_API_KEY = 'test_locationiq_free_key';
+
+    const mockLocationIQResponse = [
+      {
+        place_id: 998877,
+        lat: '-26.1095',
+        lon: '28.2317',
+        display_name: 'Jubilee Street, Rhodesfield, Kempton Park, Gauteng, South Africa',
+        address: {
+          road: 'Jubilee Street',
+          suburb: 'Rhodesfield',
+          city: 'Kempton Park',
+          state: 'Gauteng',
+          country: 'South Africa',
+          postcode: '1627',
+        },
+      },
+    ];
+
+    global.fetch = jest.fn().mockImplementation((url: string) => {
+      if (url.includes('locationiq.com')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => mockLocationIQResponse,
+        });
+      }
+      return Promise.resolve({ ok: false, json: async () => ({}) });
+    }) as any;
+
+    try {
+      const results = await searchAddressesOnline('6 jubilee street', 'Kempton Park');
+      expect(results.length).toBeGreaterThan(0);
+      expect(results[0].streetAddress).toBe('6 Jubilee Street');
+      expect(results[0].displayName).toContain('6 Jubilee Street');
+      expect(results[0].town).toBe('Kempton Park');
+    } finally {
+      process.env.EXPO_PUBLIC_LOCATIONIQ_API_KEY = originalApiKey;
+      global.fetch = originalFetch;
+    }
   });
 });
 

@@ -22,6 +22,7 @@ import {
   GestureResponderEvent,
   ActivityIndicator,
   Platform,
+  PanResponder,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
@@ -32,8 +33,8 @@ import {
   CheckSvg,
   MapPinSvg,
   CrosshairSvg,
-  ZoomInSvg,
-  ZoomOutSvg,
+  LayersSvg,
+  SatelliteSvg,
 } from './SvgIcons';
 import { reverseGeocodeOnline, AddressSuggestion } from '../services/geoService';
 
@@ -73,6 +74,7 @@ interface PinDropModalProps {
   initialLatitude: number;
   initialLongitude: number;
   townName?: string;
+  initialStreetAddress?: string;
   onClose: () => void;
   onConfirm: (location: {
     latitude: number;
@@ -90,12 +92,19 @@ export default function PinDropModal({
   initialLatitude,
   initialLongitude,
   townName,
+  initialStreetAddress,
   onClose,
   onConfirm,
 }: PinDropModalProps) {
+  // Target GPS coordinates (the locked pin location)
+  const [pinLat, setPinLat] = useState<number>(initialLatitude || -26.2041);
+  const [pinLng, setPinLng] = useState<number>(initialLongitude || 28.0473);
+
+  // Map viewport center (can be panned without moving the pin)
   const [lat, setLat] = useState<number>(initialLatitude || -26.2041);
   const [lng, setLng] = useState<number>(initialLongitude || 28.0473);
-  const [zoom, setZoom] = useState<number>(15);
+  const [zoom, setZoom] = useState<number>(16);
+  const [mapLayer, setMapLayer] = useState<'satellite' | 'streets'>('satellite');
   const [resolvedAddress, setResolvedAddress] = useState<AddressSuggestion | null>(null);
   const [isResolving, setIsResolving] = useState<boolean>(false);
 
@@ -105,9 +114,11 @@ export default function PinDropModal({
     if (visible) {
       const validLat = typeof initialLatitude === 'number' && !isNaN(initialLatitude) && initialLatitude !== 0 ? initialLatitude : -26.2041;
       const validLng = typeof initialLongitude === 'number' && !isNaN(initialLongitude) && initialLongitude !== 0 ? initialLongitude : 28.0473;
+      setPinLat(validLat);
+      setPinLng(validLng);
       setLat(validLat);
       setLng(validLng);
-      setZoom(15);
+      setZoom(16);
       triggerReverseGeocode(validLat, validLng);
     }
   }, [visible, initialLatitude, initialLongitude]);
@@ -120,6 +131,13 @@ export default function PinDropModal({
     debounceTimerRef.current = setTimeout(async () => {
       try {
         const res = await reverseGeocodeOnline(targetLat, targetLng);
+        if (res && initialStreetAddress) {
+          const numberMatch = initialStreetAddress.trim().match(/^(\d+[A-Za-z]?|\d+[-\/]\d+)\s+/i);
+          if (numberMatch && !res.streetAddress.match(/^\d+/)) {
+            res.streetAddress = `${numberMatch[1]} ${res.streetAddress}`;
+            res.displayName = `${numberMatch[1]} ${res.displayName}`;
+          }
+        }
         setResolvedAddress(res);
       } catch {
         setResolvedAddress(null);
@@ -129,7 +147,7 @@ export default function PinDropModal({
     }, 400);
   };
 
-  // Convert current lat, lng into tile coordinates
+  // Convert map center into tile coordinates
   const centerExactTileX = lon2tile(lng, zoom);
   const centerExactTileY = lat2tile(lat, zoom);
 
@@ -141,68 +159,148 @@ export default function PinDropModal({
   const fracOffsetY = (centerExactTileY - baseTileY) * TILE_SIZE;
 
   // Grid coordinates relative to map center
-  // Base tile top-left in container is HALF_MAP - fracOffsetX, HALF_MAP - fracOffsetY
   const originX = HALF_MAP - fracOffsetX;
   const originY = HALF_MAP - fracOffsetY;
+
+  // Compute exact pixel position of the locked pin on the map viewport
+  const pinExactTileX = lon2tile(pinLng, zoom);
+  const pinExactTileY = lat2tile(pinLat, zoom);
+  const pinPixelX = HALF_MAP + (pinExactTileX - centerExactTileX) * TILE_SIZE;
+  const pinPixelY = HALF_MAP + (pinExactTileY - centerExactTileY) * TILE_SIZE;
 
   // Generate 3x3 surrounding tiles: -1, 0, 1
   const tileIndices = [-1, 0, 1];
   const maxTile = Math.pow(2, zoom);
 
-  const handleMapPress = (e: GestureResponderEvent) => {
-    const { locationX, locationY } = e.nativeEvent;
-    // Difference from container center (HALF_MAP, HALF_MAP)
-    const deltaPixelX = locationX - HALF_MAP;
-    const deltaPixelY = locationY - HALF_MAP;
+  // Refs for tracking active gestures without React state lag
+  const panStartCoordsRef = useRef<{ lat: number; lng: number }>({ lat, lng });
+  const initialPinchDistRef = useRef<number | null>(null);
+  const pinchStartZoomRef = useRef<number>(zoom);
+  const lastZoomUpdateDistRef = useRef<number>(0);
+  const isDraggingRef = useRef<boolean>(false);
+  const currentZoomRef = useRef<number>(zoom);
+  currentZoomRef.current = zoom;
+  const currentCenterCoordsRef = useRef<{ lat: number; lng: number }>({ lat, lng });
+  currentCenterCoordsRef.current = { lat, lng };
 
-    const deltaTileX = deltaPixelX / TILE_SIZE;
-    const deltaTileY = deltaPixelY / TILE_SIZE;
-
-    const newExactTileX = centerExactTileX + deltaTileX;
-    const newExactTileY = centerExactTileY + deltaTileY;
-
-    const newLng = tile2lon(newExactTileX, zoom);
-    const newLat = tile2lat(newExactTileY, zoom);
-
-    setLat(newLat);
-    setLng(newLng);
-    triggerReverseGeocode(newLat, newLng);
+  // Calculate Euclidean distance between two touches
+  const getPinchDistance = (touch0: any, touch1: any): number => {
+    const dx = touch0.pageX - touch1.pageX;
+    const dy = touch0.pageY - touch1.pageY;
+    return Math.sqrt(dx * dx + dy * dy);
   };
 
-  const handleNudge = (dxTile: number, dyTile: number) => {
-    const newExactTileX = centerExactTileX + dxTile;
-    const newExactTileY = centerExactTileY + dyTile;
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_evt, gestureState) => {
+        return Math.abs(gestureState.dx) > 2 || Math.abs(gestureState.dy) > 2;
+      },
+      onPanResponderGrant: (evt) => {
+        panStartCoordsRef.current = { ...currentCenterCoordsRef.current };
+        isDraggingRef.current = false;
+        const touches = evt.nativeEvent.touches;
+        if (touches && touches.length === 2) {
+          const dist = getPinchDistance(touches[0], touches[1]);
+          initialPinchDistRef.current = dist;
+          lastZoomUpdateDistRef.current = dist;
+          pinchStartZoomRef.current = currentZoomRef.current;
+        } else {
+          initialPinchDistRef.current = null;
+        }
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        const touches = evt.nativeEvent.touches;
 
-    const newLng = tile2lon(newExactTileX, zoom);
-    const newLat = tile2lat(newExactTileY, zoom);
+        // Two-finger pinch to zoom in / out with real-time responsiveness
+        if (touches && touches.length === 2) {
+          isDraggingRef.current = true;
+          const currentDist = getPinchDistance(touches[0], touches[1]);
+          if (initialPinchDistRef.current && initialPinchDistRef.current > 0) {
+            // Instant sensitivity: dynamically adjust zoom when pinch distance delta changes by 25px
+            const distDelta = currentDist - lastZoomUpdateDistRef.current;
+            if (Math.abs(distDelta) > 25) {
+              const zoomStep = distDelta > 0 ? 1 : -1;
+              const targetZoom = Math.min(19, Math.max(10, currentZoomRef.current + zoomStep));
+              if (targetZoom !== currentZoomRef.current) {
+                currentZoomRef.current = targetZoom;
+                setZoom(targetZoom);
+                lastZoomUpdateDistRef.current = currentDist;
+              }
+            }
+          }
+          return;
+        }
 
-    setLat(newLat);
-    setLng(newLng);
-    triggerReverseGeocode(newLat, newLng);
-  };
+        // One-finger pan (left, right, up, down) smoothly across viewport
+        if (Math.abs(gestureState.dx) > 2 || Math.abs(gestureState.dy) > 2) {
+          isDraggingRef.current = true;
+          const startExactTileX = lon2tile(panStartCoordsRef.current.lng, currentZoomRef.current);
+          const startExactTileY = lat2tile(panStartCoordsRef.current.lat, currentZoomRef.current);
 
-  const handleZoomIn = () => {
-    if (zoom < 18) setZoom((z) => z + 1);
-  };
+          const deltaTileX = -gestureState.dx / TILE_SIZE;
+          const deltaTileY = -gestureState.dy / TILE_SIZE;
 
-  const handleZoomOut = () => {
-    if (zoom > 11) setZoom((z) => z - 1);
-  };
+          const newLng = tile2lon(startExactTileX + deltaTileX, currentZoomRef.current);
+          const newLat = tile2lat(startExactTileY + deltaTileY, currentZoomRef.current);
+
+          setLat(newLat);
+          setLng(newLng);
+        }
+      },
+      onPanResponderRelease: (evt, gestureState) => {
+        // If it was a quick tap (not drag or pinch), reposition pin to tapped point
+        if (!isDraggingRef.current && Math.abs(gestureState.dx) < 5 && Math.abs(gestureState.dy) < 5) {
+          const { locationX, locationY } = evt.nativeEvent;
+          const deltaPixelX = locationX - HALF_MAP;
+          const deltaPixelY = locationY - HALF_MAP;
+
+          const exactTileX = lon2tile(currentCenterCoordsRef.current.lng, currentZoomRef.current);
+          const exactTileY = lat2tile(currentCenterCoordsRef.current.lat, currentZoomRef.current);
+
+          const newExactTileX = exactTileX + deltaPixelX / TILE_SIZE;
+          const newExactTileY = exactTileY + deltaPixelY / TILE_SIZE;
+
+          const newLng = tile2lon(newExactTileX, currentZoomRef.current);
+          const newLat = tile2lat(newExactTileY, currentZoomRef.current);
+
+          // Update locked pin position and center viewport
+          setPinLat(newLat);
+          setPinLng(newLng);
+          setLat(newLat);
+          setLng(newLng);
+          triggerReverseGeocode(newLat, newLng);
+        }
+        initialPinchDistRef.current = null;
+        isDraggingRef.current = false;
+      },
+    })
+  ).current;
 
   const handleResetToInitial = () => {
-    setLat(initialLatitude || -26.2041);
-    setLng(initialLongitude || 28.0473);
-    setZoom(15);
-    triggerReverseGeocode(initialLatitude || -26.2041, initialLongitude || 28.0473);
+    const validLat = initialLatitude || -26.2041;
+    const validLng = initialLongitude || 28.0473;
+    setPinLat(validLat);
+    setPinLng(validLng);
+    setLat(validLat);
+    setLng(validLng);
+    setZoom(16);
+    triggerReverseGeocode(validLat, validLng);
   };
 
   const handleConfirm = () => {
+    const numberMatch = initialStreetAddress?.trim().match(/^(\d+[A-Za-z]?|\d+[-\/]\d+)\s+/i);
+    let finalStreet = resolvedAddress?.streetAddress || initialStreetAddress;
+    if (numberMatch && finalStreet && !finalStreet.match(/^\d+/)) {
+      finalStreet = `${numberMatch[1]} ${finalStreet}`;
+    }
+
     onConfirm({
-      latitude: lat,
-      longitude: lng,
-      streetAddress: resolvedAddress?.streetAddress,
+      latitude: pinLat,
+      longitude: pinLng,
+      streetAddress: finalStreet,
       suburb: resolvedAddress?.suburb,
-      town: resolvedAddress?.town,
+      town: resolvedAddress?.town || townName,
       province: resolvedAddress?.province,
       postalCode: resolvedAddress?.postalCode,
     });
@@ -224,7 +322,7 @@ export default function PinDropModal({
           </TouchableOpacity>
           <View style={{ flex: 1, alignItems: 'center' }}>
             <Text style={styles.headerTitle}>Pin-Drop Location</Text>
-            <Text style={styles.headerSubtitle}>Tap on the map to place exact GPS pin</Text>
+            <Text style={styles.headerSubtitle}>Drag or pinch to navigate · Tap to place pin</Text>
           </View>
           <TouchableOpacity
             onPress={handleResetToInitial}
@@ -239,9 +337,8 @@ export default function PinDropModal({
         {/* Map Canvas Container */}
         <View style={styles.mapOuterWrapper}>
           <View style={styles.mapContainer}>
-            <TouchableOpacity
-              activeOpacity={1}
-              onPress={handleMapPress}
+            <View
+              {...panResponder.panHandlers}
               style={[styles.mapCanvas, { width: MAP_SIZE, height: MAP_SIZE }]}
             >
               {/* Tile Grid */}
@@ -252,16 +349,15 @@ export default function PinDropModal({
                   const left = originX + dx * TILE_SIZE;
                   const top = originY + dy * TILE_SIZE;
 
-                  // High-speed CartoDB Voyager raster tiles with registered API key (watermark-free)
-                  const cartoKey =
-                    process.env.EXPO_PUBLIC_CARTO_API_KEY ||
-                    'cb1_4i48_1_96858c75f2e3dc7fbe65fe45';
-                  const tileUrl = `https://basemaps.cartocdn.com/rastertiles/voyager/${zoom}/${tileX}/${tileY}.png?key=${cartoKey}&v=2`;
-
+                  // High-resolution Esri World Imagery (Satellite aerial photos) or Esri World Street Map (100% free, keyless)
+                  const tileUrl =
+                    mapLayer === 'satellite'
+                      ? `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${zoom}/${tileY}/${tileX}`
+                      : `https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/${zoom}/${tileY}/${tileX}`;
 
                   return (
                     <Image
-                      key={`${zoom}_${tileX}_${tileY}`}
+                      key={`${mapLayer}_${zoom}_${tileX}_${tileY}`}
                       source={{ uri: tileUrl }}
                       style={[
                         styles.mapTile,
@@ -270,6 +366,7 @@ export default function PinDropModal({
                           top,
                           width: TILE_SIZE,
                           height: TILE_SIZE,
+                          backgroundColor: mapLayer === 'satellite' ? '#1E293B' : '#F1F5F9',
                         },
                       ]}
                       resizeMode="cover"
@@ -278,71 +375,62 @@ export default function PinDropModal({
                 })
               )}
 
-              {/* Grid Crosshair & Target Overlay */}
-              <View style={[styles.centerCrosshair, { left: HALF_MAP - 1, top: HALF_MAP - 18 }]}>
-                <View style={styles.pulseRing} />
+              {/* Locked GPS Pin & Pulse Overlay */}
+              <View style={[styles.centerCrosshair, { left: pinPixelX - 1, top: pinPixelY - 18 }]}>
+                <View style={[styles.pulseRing, mapLayer === 'satellite' && styles.pulseRingSatellite]} />
                 <MapPinSvg size={36} color="#FDD223" fill="#FDD223" strokeWidth={2.5} />
               </View>
-            </TouchableOpacity>
-
-            {/* Map Floating Controls */}
-            <View style={styles.floatingControls}>
-              <TouchableOpacity
-                style={styles.ctrlBtn}
-                onPress={handleZoomIn}
-                activeOpacity={0.8}
-                accessibilityLabel="Zoom in"
-              >
-                <ZoomInSvg size={18} color="#0F172A" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.ctrlBtn}
-                onPress={handleZoomOut}
-                activeOpacity={0.8}
-                accessibilityLabel="Zoom out"
-              >
-                <ZoomOutSvg size={18} color="#0F172A" />
-              </TouchableOpacity>
             </View>
 
-            {/* Directional Precision Nudge Buttons */}
-            <View style={styles.nudgeContainer}>
+            {/* Map Layer Switcher Floating Pill (Satellite vs Streets) */}
+            <View style={styles.layerSwitcherWrapper}>
               <TouchableOpacity
-                style={[styles.nudgeBtn, styles.nudgeNorth]}
-                onPress={() => handleNudge(0, -0.35)}
-                activeOpacity={0.7}
+                style={[
+                  styles.layerPillBtn,
+                  mapLayer === 'satellite' && styles.layerPillBtnActive,
+                ]}
+                onPress={() => setMapLayer('satellite')}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="Switch to Satellite aerial view"
               >
-                <Text style={styles.nudgeText}>▲</Text>
+                <SatelliteSvg size={13} color={mapLayer === 'satellite' ? '#0F172A' : '#64748B'} />
+                <Text
+                  style={[
+                    styles.layerPillText,
+                    mapLayer === 'satellite' && styles.layerPillTextActive,
+                  ]}
+                >
+                  Satellite
+                </Text>
               </TouchableOpacity>
-              <View style={styles.nudgeRow}>
-                <TouchableOpacity
-                  style={[styles.nudgeBtn, styles.nudgeSide]}
-                  onPress={() => handleNudge(-0.35, 0)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.nudgeText}>◀</Text>
-                </TouchableOpacity>
-                <View style={styles.nudgeCenterDot} />
-                <TouchableOpacity
-                  style={[styles.nudgeBtn, styles.nudgeSide]}
-                  onPress={() => handleNudge(0.35, 0)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.nudgeText}>▶</Text>
-                </TouchableOpacity>
-              </View>
               <TouchableOpacity
-                style={[styles.nudgeBtn, styles.nudgeSouth]}
-                onPress={() => handleNudge(0, 0.35)}
-                activeOpacity={0.7}
+                style={[
+                  styles.layerPillBtn,
+                  mapLayer === 'streets' && styles.layerPillBtnActive,
+                ]}
+                onPress={() => setMapLayer('streets')}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="Switch to Street map view"
               >
-                <Text style={styles.nudgeText}>▼</Text>
+                <LayersSvg size={13} color={mapLayer === 'streets' ? '#0F172A' : '#64748B'} />
+                <Text
+                  style={[
+                    styles.layerPillText,
+                    mapLayer === 'streets' && styles.layerPillTextActive,
+                  ]}
+                >
+                  Streets
+                </Text>
               </TouchableOpacity>
             </View>
 
             {/* Legal Basemap Attribution */}
             <View style={styles.attributionBadge} pointerEvents="none">
-              <Text style={styles.attributionText}>© CARTO · © OpenStreetMap</Text>
+              <Text style={styles.attributionText}>
+                {mapLayer === 'satellite' ? '© Esri · Maxar · Earthstar' : '© Esri · HERE · OpenStreetMap'}
+              </Text>
             </View>
           </View>
         </View>
@@ -353,7 +441,7 @@ export default function PinDropModal({
             <View style={styles.coordBadge}>
               <Text style={styles.coordLabel}>GPS Coordinates</Text>
               <Text style={styles.coordValue}>
-                {lat.toFixed(5)}, {lng.toFixed(5)}
+                {pinLat.toFixed(5)}, {pinLng.toFixed(5)}
               </Text>
             </View>
             {isResolving && (
@@ -469,65 +557,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(253, 210, 35, 0.25)',
     top: 26,
   },
-  floatingControls: {
-    position: 'absolute',
-    right: 12,
-    top: 12,
-    zIndex: 20,
-    gap: 8,
-  },
-  ctrlBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 3,
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  nudgeContainer: {
-    position: 'absolute',
-    left: 12,
-    bottom: 12,
-    zIndex: 20,
-    alignItems: 'center',
-  },
-  nudgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginVertical: 2,
-  },
-  nudgeBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.92)',
-    borderWidth: 1,
-    borderColor: '#CBD5E1',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  nudgeNorth: {},
-  nudgeSouth: {},
-  nudgeSide: {},
-  nudgeCenterDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#94A3B8',
-  },
-  nudgeText: {
-    fontSize: 9,
-    color: '#0F172A',
-    fontWeight: '700',
-  },
   bottomCard: {
     backgroundColor: '#FFFFFF', // 30% surface
     borderTopWidth: 1,
@@ -619,5 +648,47 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: '500',
     color: '#64748B',
+  },
+  layerSwitcherWrapper: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    zIndex: 25,
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 8,
+    padding: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.1)',
+    elevation: 4,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    gap: 3,
+  },
+  layerPillBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 6,
+  },
+  layerPillBtnActive: {
+    backgroundColor: '#FDD223', // 10% accent
+  },
+  layerPillText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#64748B',
+  },
+  layerPillTextActive: {
+    color: '#0F172A',
+    fontWeight: '700',
+  },
+  pulseRingSatellite: {
+    borderColor: '#FDD223',
+    backgroundColor: 'rgba(253, 210, 35, 0.25)',
   },
 });
