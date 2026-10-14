@@ -38,6 +38,7 @@ web/
 │       ├── SecuritySection.tsx    # Cryptographic pillars + data practices
 │       ├── FaqSection.tsx         # 7-entry animated accordion
 │       ├── DeletionForm.tsx       # Client form — validation, POST, success state
+│       ├── AppPreview.tsx         # Interactive mobile phone mockup trio & preview stage
 │       └── SvgIcons.tsx           # All SVG icon components (svgrepo.com)
 ├── public/
 │   ├── manifest.json
