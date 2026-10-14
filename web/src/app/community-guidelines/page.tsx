@@ -1,12 +1,6 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Footer } from '@/components/Footer';
 
-export const metadata: Metadata = {
-  title: 'Community Guidelines — exégeomai',
-  description:
-    'Guidelines for wholesome communication, Christ-centered discourse, and respectful fellowship within the exégeomai community.',
-};
 
 export default function CommunityGuidelinesPage() {
   return (

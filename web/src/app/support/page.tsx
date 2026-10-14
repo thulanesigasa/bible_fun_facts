@@ -1,12 +1,6 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Footer } from '@/components/Footer';
 
-export const metadata: Metadata = {
-  title: 'Support & Help Hub — exégeomai',
-  description:
-    'Find answers, troubleshoot offline canon issues, submit bug reports, or contact the exégeomai open source support team.',
-};
 
 export default function SupportPage() {
   const supportChannels = [
@@ -68,7 +62,7 @@ export default function SupportPage() {
             <div className="cards-grid" style={{ marginBottom: 64 }}>
               {supportChannels.map((c, i) => (
                 <div key={i} className="feature-card">
-                  <h3>{c.title}</h3>
+                  <h2>{c.title}</h2>
                   <p>{c.desc}</p>
                   <div style={{ marginTop: 20 }}>
                     {c.external ? (

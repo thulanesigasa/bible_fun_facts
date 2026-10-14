@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
       {
         success: true,
         referenceId,
-        message: `Deletion request received for ${email}. You will receive a confirmation email within 24 hours. Data will be purged within 30 days.`,
+        message: `Deletion request received for ${email}. This request response does not confirm account deletion or email delivery. Contact privacy@exegeomai.co.za from your registered address for handling and verification.`,
       },
       {
         status: 200,

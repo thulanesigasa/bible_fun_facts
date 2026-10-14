@@ -1,3 +1,6 @@
-import DeletionPage from '../deletion/page';
-export { metadata } from '../deletion/page';
-export default DeletionPage;
+import Link from 'next/link';
+import { Footer } from '@/components/Footer';
+import { DeletionForm } from '@/components/DeletionForm';
+export default function DeletionPage() {
+  return <><main id="main"><header className="subpage-hero"><div className="wrap"><span className="section-kicker">Your account and information</span><h1>Account and Data Deletion</h1><p>Use authenticated in-app deletion when available, or contact the privacy team if you cannot access your account.</p></div></header><section className="subpage-content"><div className="wrap"><div className="prose-card"><h2>Delete through the app</h2><p>The in-app account deletion flow needs an online signed-in session and server confirmation before it clears selected local account records and resets the interface. If it reports failure, do not assume the cloud account has been deleted.</p><h2>If you cannot sign in</h2><p>Email <a href="mailto:privacy@exegeomai.co.za?subject=Account%20deletion%20request">privacy@exegeomai.co.za</a> from the registered address. Identify the account and requested removal; do not send passwords, PINs, tokens, or a full personal journal. The team may need proportionate verification.</p><h2>Understand the boundaries</h2><p>Independent exports, screenshots, email attachments, recipient copies, and device backups need separate management. Provider logs and backups may follow a limited applicable retention schedule. Request details about a specific category if needed.</p><nav className="legal-related" aria-label="Deletion information"><Link href="/privacy#section-39">In-app deletion details</Link><Link href="/privacy#section-40">Retention</Link><Link href="/data-safety">Data Safety</Link></nav></div><div className="prose-card"><DeletionForm /></div></div></section></main><Footer /></>;
+}

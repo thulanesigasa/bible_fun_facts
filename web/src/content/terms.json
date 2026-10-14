@@ -1,0 +1,202 @@
+[
+  {
+    "id": "section-1",
+    "title": "1. Agreement and scope",
+    "paragraphs": [
+      "These terms govern use of the exégeomai application, supporting website, account services, and features provided by the exégeomai team. They apply to personal study, account synchronisation, directory contributions, and other supported interactions. Additional rules can apply to a particular content source or external service. Read the Privacy Policy for personal-information handling and the Data Safety Declaration for feature-level data flows.",
+      "By using a service feature, you agree to the terms applicable to that feature to the extent an agreement can validly be formed under the relevant law. Mandatory statutory rights remain in place. If you disagree, stop using the affected service and contact the team about any account or data removal you need. You do not surrender privacy rights merely by reading a public legal page."
+    ]
+  },
+  {
+    "id": "section-2",
+    "title": "2. The operator and service communications",
+    "paragraphs": [
+      "The exégeomai team operates the application and supporting services. Directory-listed churches, ministry leaders, content publishers, and infrastructure providers are not automatically operators, partners, or agents of the team. A public listing or outbound link does not prove endorsement, ownership, or authority to act for exégeomai.",
+      "For questions about these terms, contact legal@exegeomai.co.za or use the website's published contact route. For personal-information requests, contact privacy@exegeomai.co.za. Keep your account email accessible if you rely on account functions. The team may send necessary service or security communications, while launch waiting-list messages follow the separate consent and unsubscribe arrangements described in the waitlist notice."
+    ]
+  },
+  {
+    "id": "section-3",
+    "title": "3. Eligibility, children, and authority",
+    "paragraphs": [
+      "Use the service only where you can lawfully do so and can give any permissions required for the feature. If you act for a church, branch, school, or other organisation, you must have authority for the submission or decision you make. Possession of an organisation's name or contact details does not establish that authority.",
+      "Parents, guardians, and other competent persons should consider appropriate supervision and privacy protections for children. These terms do not invent a technical age-verification process or imply that a child may independently consent to every public account or data use. Do not publish children's personal details, photographs, or private meeting locations without the necessary authority and safeguards. Applicable children's-information requirements take precedence over a general acceptance clause."
+    ]
+  },
+  {
+    "id": "section-4",
+    "title": "4. Account creation and accurate information",
+    "paragraphs": [
+      "An account enables supported identity, synchronisation, and continuity features. Provide accurate registration details and update information that affects account access or a public listing. Choose a username and avatar that do not impersonate another person or organisation. Do not create an account using someone else's email without authority.",
+      "Some fields are optional or configurable, and you should not provide unnecessary sensitive information. An account identifier can connect saved activity to cloud records. Refer to the Privacy Policy before deciding which profile details to supply or which privacy controls to enable. If registration or verification fails, follow the supported process rather than creating deceptive details or attempting to bypass access controls."
+    ]
+  },
+  {
+    "id": "section-5",
+    "title": "5. Credentials and account security",
+    "paragraphs": [
+      "Protect your password, registered email, authentication credentials, device passcode, and local app-lock information. Do not share tokens or encryption keys with another user or include them in a public support issue. A biometric or PIN app lock supplements other protections; it is not a substitute for securing the account and device.",
+      "Notify the team through an appropriate private route if you suspect account misuse. The team may require reasonable verification before changing an account or releasing its information. Do not assume that support needs your password to assist you. Where a device is shared, sign out using the supported controls and review which exported files or notifications remain visible outside the application."
+    ]
+  },
+  {
+    "id": "section-6",
+    "title": "6. What the study tools provide",
+    "paragraphs": [
+      "The application provides Scripture resources, language-study information, devotional material, historical context, progress features, and other educational tools available in the release you use. Availability can differ by platform, language, translation, connectivity, or content source. A website description is not a promise that every capability exists in every build.",
+      "Study information can contain errors, omissions, disputed interpretations, or translation differences. Compare important claims with reliable sources and appropriate scholarly or pastoral guidance. A streak, badge, or completion record is a product indicator, not a judgment about your faith or character. The application does not guarantee a particular spiritual, educational, academic, or professional result."
+    ]
+  },
+  {
+    "id": "section-7",
+    "title": "7. Personal study and responsible reliance",
+    "paragraphs": [
+      "Use the content thoughtfully and in context. A short quotation, vocabulary definition, or historical summary may not provide all the information required to interpret a passage. Consult complete texts and relevant sources when teaching, publishing, or making an important decision. Report clear errors with the reference, translation, and correction proposed.",
+      "The service is not a substitute for professional medical, psychological, legal, financial, or emergency assistance. Comforting Scripture and pastoral-resource prompts do not establish that a qualified person is monitoring your activity or providing a professional diagnosis. Do not rely on an automated keyword response as proof that a message has been reviewed by a counsellor or that emergency help has been contacted."
+    ]
+  },
+  {
+    "id": "section-8",
+    "title": "8. Offline content and online features",
+    "paragraphs": [
+      "Supported downloaded material can be used offline, while authentication, synchronisation, downloads, maps, updates, and other online features require communication with providers. Offline-first describes a product approach; it does not mean the entire application never makes network requests. Your device and connectivity determine which operations can complete at a given time.",
+      "You are responsible for ordinary connectivity and device-storage costs imposed by your own providers. A download or update can consume data and space. Read the displayed state before assuming content is installed or a cloud change is complete. Where a translation or feature is unavailable, the team may provide a fallback without guaranteeing identical content or functionality."
+    ]
+  },
+  {
+    "id": "section-9",
+    "title": "9. Synchronisation and pending actions",
+    "paragraphs": [
+      "Some study actions can be queued locally and submitted when an authenticated account reconnects. A displayed local change may precede its confirmed cloud state. Do not assume that an offline edit, deletion, or visibility switch has already taken effect on every device or server. The application should distinguish failure or pending status where supported.",
+      "Use the available privacy preferences before creating sensitive content. Private Study Mode and private-notes settings have specific effects explained in the Privacy Policy; they are not universal anonymity or deletion controls. If a queued operation fails or conflicts, ask for assistance with a minimal example. Do not attempt to resolve a synchronisation issue by accessing another user's records or bypassing server checks."
+    ]
+  },
+  {
+    "id": "section-10",
+    "title": "10. Your notes and other contributed material",
+    "paragraphs": [
+      "You retain any rights you hold in your original notes, reflections, photographs, descriptions, and other material you contribute. You are responsible for having the rights and permissions necessary to use and submit that material. Public Scripture text, another person's photograph, and your original reflection can have different ownership and licensing rules.",
+      "You permit the team and relevant service providers to process, store, transmit, and display your contributions as necessary for the feature you choose and the purposes described in the Privacy Policy. A private note is not licensed for unrelated public promotion merely because it is synchronised. A public directory description is intended for directory display. This permission is limited by applicable privacy rights and any more specific agreement governing the contribution."
+    ]
+  },
+  {
+    "id": "section-11",
+    "title": "11. Public directory submissions",
+    "paragraphs": [
+      "Submit ministry and branch information only with appropriate authority and a reasonable basis for believing it is accurate. Use public organisational contacts where possible. Obtain permission before listing a private residence, another person's personal phone number, or a recognisable photograph. Do not claim a ministry has endorsed the app merely because you registered its listing.",
+      "The team may correct, limit, or remove inaccurate, duplicate, unauthorised, misleading, or unsafe records. Directory inclusion is informational and does not certify an organisation's legal status, safeguarding practices, leadership authority, doctrine, or service quality. Verify contact details and meeting arrangements independently before visiting. A map pin does not grant permission to enter private property."
+    ]
+  },
+  {
+    "id": "section-12",
+    "title": "12. Community conduct and respectful interaction",
+    "paragraphs": [
+      "Use community-related features respectfully and follow the published Community Guidelines. Do not harass, threaten, impersonate, exploit, or discriminate against other people. Do not publish private personal information, intimate images, malicious links, or deceptive requests for money. Religious disagreement does not authorise abuse or invasive profiling.",
+      "The application can include automated language checks or other moderation tools. Those tools can make mistakes and do not replace a fair review where appropriate. A permitted phrase is not automatically safe, accurate, or lawful. A rejected phrase is not necessarily evidence of malicious intent. Report a moderation problem with the relevant context while avoiding repeated publication of the private or harmful material at issue."
+    ]
+  },
+  {
+    "id": "section-13",
+    "title": "13. Prohibited technical misuse",
+    "paragraphs": [
+      "Do not use the service to distribute malware, steal credentials, bypass authentication, evade access limits, interfere with other users, or unlawfully collect personal information. Do not exploit a configuration error to retrieve another person's private study records. Finding a flaw is a reason to report the boundary problem, not permission to build a dataset of affected users.",
+      "Responsible security reporting should identify the feature, expected behaviour, and minimal evidence through a suitable private channel. Avoid posting tokens, personal notes, or production data publicly. Legitimate inspection of publicly available source code does not remove the obligations that apply when interacting with a live service or handling information about other people."
+    ]
+  },
+  {
+    "id": "section-14",
+    "title": "14. Scripture, translations, and third-party rights",
+    "paragraphs": [
+      "Translations, lexicons, maps, photographs, fonts, and other resources can be owned or licensed by different rights holders. Do not assume every resource is public domain or subject to the same licence. Follow the attribution, quotation, redistribution, and usage conditions associated with the particular material. A resource available for reading is not automatically available for unrestricted commercial republishing.",
+      "The application may deliver material through external APIs or download hosts. Availability and permitted use can change under the relevant provider's terms. If you believe material is used incorrectly, identify the resource and rights issue so the team can review it. These terms do not grant rights the team does not hold or remove a publisher's independent conditions."
+    ]
+  },
+  {
+    "id": "section-15",
+    "title": "15. Source code, public repositories, and licensing",
+    "paragraphs": [
+      "Where source code is made publicly available, use it according to the licence actually supplied with the relevant repository, component, or release. A public GitHub repository is not by itself a universal grant of MIT, public-domain, trademark, content, or hosting rights. Dependency licences can differ from the licence governing the application's original code.",
+      "Do not represent an altered build as an official release without appropriate authority. Preserve notices required by applicable licences and distinguish your changes from the original service. These user terms do not override a separate valid open-source licence, and an open-source licence does not automatically authorise use of production credentials, user records, or the exégeomai brand in a misleading way."
+    ]
+  },
+  {
+    "id": "section-16",
+    "title": "16. Branding and representations",
+    "paragraphs": [
+      "The exégeomai name, visual identity, and official service presentation identify the application and its operator. Do not use them to suggest that an unrelated service, altered build, ministry, fundraiser, or product has been approved when it has not. Honest reference to the app for discussion, review, or lawful use remains subject to applicable law.",
+      "A directory listing is not a brand licence. If you want to use the name or imagery in promotional material, contact the team with the proposed use. Avoid creating confusing account handles, websites, or messages that appear to be official support. Never ask someone for an account password while presenting yourself as a representative of exégeomai."
+    ]
+  },
+  {
+    "id": "section-17",
+    "title": "17. External services and links",
+    "paragraphs": [
+      "External maps, content providers, update infrastructure, email services, and linked organisational sites can have their own terms and notices. Their availability, accuracy, pricing, and privacy practices are not wholly controlled by the exégeomai team. Follow the rules relevant to the destination and review its notice before supplying personal information.",
+      "The team can correct a link it controls but cannot guarantee every external page remains available or unchanged. Do not enter an exégeomai password into an unrelated destination. If a directory link becomes misleading or unsafe, report the listing and URL. Opening an external service does not mean you consented to every other organisation mentioned in the application contacting you."
+    ]
+  },
+  {
+    "id": "section-18",
+    "title": "18. Pricing, payments, and future paid features",
+    "paragraphs": [
+      "These terms do not create a payment obligation for a feature displayed as free. The reviewed application does not establish a general card-payment collection workflow. App-store charges, mobile data, and independent provider costs can be separate from the application's own price and should be assessed with the relevant provider.",
+      "If paid features, subscriptions, donations, or transactions are introduced, the price, billing arrangements, cancellation process, and applicable refund rights should be disclosed before a purchase. A future possibility is not authorisation to charge you now. Mandatory consumer rights remain applicable, and a payment provider's terms do not excuse misleading descriptions of the app's own offer."
+    ]
+  },
+  {
+    "id": "section-19",
+    "title": "19. Service changes, updates, and availability",
+    "paragraphs": [
+      "The team may maintain, update, correct, or retire features for operational, security, content, or legal reasons. Compatible releases and downloaded resources can be necessary for continued functionality. The service does not guarantee uninterrupted access, a fixed update schedule, or indefinite availability of every translation and provider.",
+      "Where a change materially affects account access or stored user content, the team should provide appropriate information and reasonable options where feasible. Keep independent backups of material you cannot afford to lose, using a secure format and destination. An over-the-air update may not replace every native platform capability, and an older installation may require a new app-store or installation package."
+    ]
+  },
+  {
+    "id": "section-20",
+    "title": "20. Suspension and restrictions",
+    "paragraphs": [
+      "The team may restrict use where necessary to address unlawful activity, security threats, serious misuse, or violation of these terms. Restrictions should be proportionate to the circumstances and should not be used to suppress a lawful privacy request or respectful disagreement. Where appropriate, the team should explain the reason and provide a review route.",
+      "Protecting users or a live system can sometimes require immediate action before a full conversation. A restriction does not automatically eliminate your applicable rights to information, correction, or deletion. If you believe a decision is mistaken, identify the account, affected feature, and relevant facts without creating replacement accounts to evade the restriction or publishing other users' records."
+    ]
+  },
+  {
+    "id": "section-21",
+    "title": "21. Ending use and deleting information",
+    "paragraphs": [
+      "You can stop using the application and use the supported account-deletion flow or privacy contact for relevant removal. Uninstalling the app, signing out, hiding a profile, unsubscribing from launch emails, and deleting the account are different actions. The Privacy Policy explains their boundaries and the treatment of cloud records, local state, and independent copies.",
+      "An in-app deletion requires server confirmation. A website request reference does not by itself prove that the authenticated account was deleted. Preserve anything you want to keep before deletion, and consider whether an encrypted backup will remain accessible. The team cannot automatically remove exports, screenshots, messages, or copies held by independent recipients simply because the account is removed."
+    ]
+  },
+  {
+    "id": "section-22",
+    "title": "22. Educational accuracy and service limitations",
+    "paragraphs": [
+      "The service is provided with the limitations described here and in the relevant feature notices. The team aims to provide useful study tools but does not guarantee that all material, geographic results, synchronised states, or automated suggestions are complete and error-free. Verify important information and report specific inaccuracies.",
+      "Nothing in these terms excludes a guarantee, duty, remedy, or liability that cannot lawfully be excluded. Broad software disclaimers should be read subject to mandatory consumer and other protections. The limitations of a tool do not excuse deliberate deception, unlawful personal-information handling, or a failure to honour rights required by applicable law."
+    ]
+  },
+  {
+    "id": "section-23",
+    "title": "23. Liability and loss",
+    "paragraphs": [
+      "To the extent permitted by applicable law, the service's liability is limited in light of the nature of the feature, the circumstances of the loss, and any binding statutory obligations. These terms do not impose an invented universal monetary cap or state that the team can never be responsible for a privacy or security failure. Any limitation must operate within the law that applies to the particular dispute.",
+      "You should take reasonable care with credentials, devices, exports, and public submissions. That responsibility does not transfer every infrastructure or privacy obligation to you. If a loss occurs, preserve relevant non-sensitive evidence and explain the issue promptly. Do not disclose someone else's private information as leverage in a dispute or attempt to resolve a financial disagreement by attacking the service."
+    ]
+  },
+  {
+    "id": "section-24",
+    "title": "24. Disputes, complaints, and applicable protections",
+    "paragraphs": [
+      "Contact the team first where a practical discussion may resolve a service problem. Provide the relevant facts and desired outcome. Privacy complaints can also have an independent regulator route described in the Privacy Policy. The terms do not require you to waive access to a competent authority or any remedy that applicable law preserves.",
+      "These terms do not impose compulsory private arbitration or an exclusive foreign court on every user. Applicable law and competent jurisdiction are determined by the relevant legal rules and any valid more specific agreement. If a term is unenforceable, the remaining terms continue to the extent they can operate lawfully. A fair resolution should distinguish a product error, a content dispute, a privacy request, and an issue involving an independent provider."
+    ]
+  },
+  {
+    "id": "section-25",
+    "title": "25. Changes to these terms and contact",
+    "paragraphs": [
+      "The team may revise these terms when the service or applicable requirements change. The revision date should reflect the published version, and material changes should be communicated appropriately. A new clause does not retrospectively authorise an undisclosed use of private information or extinguish a right that cannot lawfully be removed.",
+      "Read the terms together with the Privacy Policy, Data Safety Declaration, Community Guidelines, and notices relevant to your chosen features. Where a separate licence or specific agreement validly governs a particular resource, that instrument remains relevant. If you cannot find an answer, contact legal@exegeomai.co.za with the feature and question. You do not need to send account secrets, identity documents, or private study content to ask what a term means."
+    ]
+  }
+]

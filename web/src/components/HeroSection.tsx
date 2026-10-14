@@ -58,7 +58,7 @@ export function HeroSection() {
           <strong>Technical FAQ</strong>
           <span>Offline guarantees, privacy model, data deletion, and architecture</span>
         </Link>
-        <Link href="/deletion" className="hero-nav-item">
+        <Link href="/account-deletion" className="hero-nav-item">
           <strong>Account Deletion</strong>
           <span>GDPR Article 17 compliant permanent personal data purge portal</span>
         </Link>

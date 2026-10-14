@@ -47,7 +47,7 @@ function BrandMark() {
   return (
     <figure className="brandmark-focal-wrap" aria-label="exégeomai Sacred Brand Emblem">
       <Image
-        src="/assets/logo-transparent.png"
+        src="/logo.webp"
         alt="exégeomai Sacred Brand Emblem"
         width={380}
         height={380}

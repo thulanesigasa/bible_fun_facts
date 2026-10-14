@@ -4,38 +4,14 @@ import React, { useState } from 'react';
 import { Footer } from '@/components/Footer';
 
 const FAQS = [
-  {
-    q: 'What does "exégeomai" mean?',
-    a: 'exégeomai (ἐξηγέομαι, Strong\'s G1834) is the classical Greek verb meaning "to lead out, draw forth in narrative, declare, or unfold divine mysteries". It is the biblical root from which we derive "exegesis" — letting Scripture speak for itself in its original historical, grammatical, and theological context.',
-  },
-  {
-    q: 'Does exégeomai work completely offline without internet?',
-    a: 'Yes! All 14,298 Strong\'s Greek and Hebrew definitions, 365 daily devotionals, and 32 full canonical Bible translations are stored in an optimized local SQLite database on your device. Once installed, zero internet access is required.',
-  },
-  {
-    q: 'Is the app really 100% free with no ads or paywalls?',
-    a: 'Absolutely. exégeomai is released under the permissive MIT Open Source license. There are no subscriptions, no locked features, no in-app purchases, and no third-party advertisements. As Matthew 10:8 teaches: "Freely you have received; freely give."',
-  },
-  {
-    q: 'How does the app protect my privacy and study notes?',
-    a: 'The application contains zero telemetry, zero analytics tracking, and zero advertising SDKs. All reading progress, private notes, and bookmarks are encrypted using Android Keystore AES-256 hardware encryption. Furthermore, FLAG_SECURE protects against background screen scrapers.',
-  },
-  {
-    q: 'How do I install the Android APK directly on my phone?',
-    a: 'Download the compiled APK directly from our GitHub Releases link below. Open the APK file on your Android device and tap "Install" (allowing installation from unknown sources if prompted). The app runs standalone on Android 8.0 through Android 15.',
-  },
-  {
-    q: 'Can developers and scholars contribute to exégeomai?',
-    a: 'Yes! exégeomai is completely open-source on GitHub. Community members are welcome to contribute bug fixes, new public domain translations, performance improvements, and linguistic commentary via pull requests.',
-  },
-  {
-    q: 'Which Bible translations are included offline?',
-    a: 'The bundled SQLite engine includes KJV, ASV, Young\'s Literal Translation, Darby, Bible in Basic English, Douay-Rheims, Latin Vulgate, Greek New Testament (Textus Receptus), and South African vernaculars (isiZulu, Afrikaans, Sepedi, Xhosa).',
-  },
-  {
-    q: 'How do I permanently delete my account and data?',
-    a: 'Since the app is 100% offline, there is no remote account to track you. You can wipe all local encrypted notes and settings instantly from Settings → Security → Nuclear Data Wipe, or submit a deletion confirmation request on our Data Deletion portal.',
-  },
+  { q: 'What does exégeomai mean?', a: 'The Greek verb ἐξηγέομαι means to explain, recount, or make known. The app encourages thoughtful study of Scripture in its linguistic and historical context.' },
+  { q: 'Can I study offline?', a: 'Supported bundled or downloaded resources work offline. Accounts, synchronisation, maps, content downloads, updates, and configured diagnostics can still involve online services.' },
+  { q: 'Is the app available to download now?', a: 'This website announces the upcoming launch. Join the waiting list for official availability news; do not rely on an unofficial download link.' },
+  { q: 'Does the app collect personal information?', a: 'Account registration, cloud study records, selected avatars, directory submissions, and configured online services involve information processing. See the detailed Privacy Policy and Data Safety Declaration for the relevant features and choices.' },
+  { q: 'What does Private Study Mode do?', a: 'It limits relevant study synchronisation paths. It does not erase older cloud records or disable every authentication, map, update, content, or diagnostic request.' },
+  { q: 'Are profile pictures private?', a: 'The reviewed avatar implementation creates a public image URL. Choose an image suitable for that audience, and request removal of an old avatar if replacing the current display is insufficient.' },
+  { q: 'How do I delete my account?', a: 'Use the authenticated in-app deletion flow when available. It needs online server confirmation. If you cannot access the account, contact privacy@exegeomai.co.za. Exported backups and recipient copies need separate management.' },
+  { q: 'How do I leave the launch waiting list?', a: 'Email joinus@exegeomai.co.za from the subscribed address with an unsubscribe request. Waiting-list removal does not delete your app account.' },
 ];
 
 export default function FaqPage() {
@@ -54,12 +30,13 @@ export default function FaqPage() {
             <h1>Frequently Asked Questions</h1>
             <p>
               Everything you need to know about exégeomai: offline storage, cryptographic standards,
-              canonical translations, and open-source contributions.
+              available resources, accounts, and privacy choices.
             </p>
           </div>
         </header>
 
         <section className="subpage-content">
+          <div className="wrap legal-related"><a href="/privacy">Privacy Policy</a><a href="/data-safety">Data Safety</a><a href="/account-deletion">Account Deletion</a></div>
           <div className="wrap">
             <div className="faq-wrap">
               {FAQS.map((faq, idx) => (

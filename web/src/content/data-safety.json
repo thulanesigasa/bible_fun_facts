@@ -1,0 +1,202 @@
+[
+  {
+    "id": "section-1",
+    "title": "1. What this declaration covers",
+    "paragraphs": [
+      "This page describes data flows in the exégeomai mobile application and supporting website. It supplements the Privacy Policy with a feature-oriented explanation of collection, local processing, public disclosure, recipients, and user controls. It is a developer disclosure, not a certification by Google, Apple, a regulator, or an independent security auditor. The app-store declaration for a released build must reflect that build's actual behaviour and configured providers.",
+      "The service is offline-first but includes accounts and online capabilities. Personal information can leave a device when a user signs in, synchronises study records, uploads an avatar, submits a directory entry, uses geographic lookup, requests online content, or invokes a configured diagnostic integration. The website can process waitlist emails and connection information. A blanket “no data collected or shared” statement would not accurately describe these combined features."
+    ]
+  },
+  {
+    "id": "section-2",
+    "title": "2. How to read the data matrix",
+    "paragraphs": [
+      "The matrix below distinguishes data that can be transmitted from information processed only locally for a particular operation. “Conditional” means the feature, setting, or release configuration determines whether the transmission occurs. It does not mean the data is never processed. “Public” identifies a feature intended to disclose information beyond private account storage. Optionality is judged by the interaction: account sign-in needs account credentials, while offline reading of downloaded material need not send those credentials for every chapter.",
+      "A service provider receiving information is still an external recipient in ordinary language. Google Play's specific definition of “sharing” can include exceptions for qualifying service-provider processing or user-directed actions. The app-store form must assess those definitions against actual contracts and behaviour. A website table cannot declare every provider exempt merely by calling it infrastructure. Consult the linked official guidance and test the released build before submitting store answers."
+    ]
+  },
+  {
+    "id": "section-3",
+    "title": "3. Names, email, usernames, and phone details",
+    "paragraphs": [
+      "Account registration supports first name, surname, username, email, country code, and phone number along with other preferences. The authentication and account infrastructure receives the submitted fields. Names and usernames can support profile presentation, while email supports account access. Supplied phone details become account information even if they are not the primary sign-in method.",
+      "Public visibility is not identical for every profile field. A public avatar or community name does not authorise public exposure of email or phone details. Users should review the registration form and optional profile fields, maintain accurate account contact information, and use the privacy contact for corrections unavailable in the interface. Do not send a password as part of an access or correction request. The exact required fields and display audience should be verified in the release being distributed."
+    ]
+  },
+  {
+    "id": "section-4",
+    "title": "4. Authentication credentials and identifiers",
+    "paragraphs": [
+      "The authentication flow processes a password and issues session credentials associated with an account identifier. The mobile client persists relevant session information through native secure storage. The server-side authentication service handles account verification and session operations. These are functional security data, not a reason to expose tokens to other users or include them in public logs.",
+      "Signing out ends the active account session through the supported flow; it does not necessarily erase previously stored cloud study data. A local biometric lock is a separate protection and does not replace cloud authentication. Account changes and deletion can need an online request. Infrastructure can also retain authentication or security metadata under its configured arrangements. Store disclosure should include applicable identifiers and account information rather than assume an identifier is anonymous because it is not a person's real name."
+    ]
+  },
+  {
+    "id": "section-5",
+    "title": "5. Study preferences and religious context",
+    "paragraphs": [
+      "Translation preference, study focus, daily goal, and knowledge level can be supplied during registration and used to configure the study experience. The app also remembers other supported reading and interface preferences. Some state remains on the device, while account metadata or profile updates can include related values. The exact field set should be assessed in the release and feature being used.",
+      "An identifiable preference for religious study can reveal sensitive context. The service should not treat all educational preferences as non-personal or automatically suitable for public display. Users can limit optional detail and review cloud or public choices. These records are intended to support the study experience, rather than unrelated advertising or assessments by employers, insurers, or other external organisations. Sensitive-category handling and applicable legal conditions are explained in the Privacy Policy."
+    ]
+  },
+  {
+    "id": "section-6",
+    "title": "6. Favourites, read records, completions, and achievements",
+    "paragraphs": [
+      "Supported synchronisation paths can send content identifiers, saved states, completion dates, viewed-fact records, achievement identifiers, and account links to Supabase. A favourite is not only a public Scripture item: it is also an association between that item and the account that saved it. The purpose is continuity of study and progress across supported account interactions.",
+      "Offline actions can remain in a durable queue and be submitted later. Connectivity loss postpones transmission rather than necessarily cancelling it. Private Study Mode affects relevant submission and flush paths. Public display preferences govern visibility separately from private account retention. Users should check whether a change has synchronised and should specify whether a request concerns public hiding, record correction, record deletion, or the entire account. These actions have different technical results."
+    ]
+  },
+  {
+    "id": "section-7",
+    "title": "7. Notes and highlights",
+    "paragraphs": [
+      "Cloud note paths can send a note identifier, account identifier, Scripture reference, note text, and update information. Highlight paths can send a verse key, colour, and related account or update state. The app also uses local storage for study state. Privacy settings and the particular feature determine which records are queued or transmitted.",
+      "Notes can contain religious reflections and information about health, family, or another person. Avoid unnecessary identifying details and use private controls where supported. The existence of an encrypted archive service does not prove that every cloud note is end-to-end encrypted. If you need a note to remain strictly local, confirm the relevant feature behaviour. When reporting a save or sync defect, use a harmless test note or redacted example instead of uploading an entire personal journal."
+    ]
+  },
+  {
+    "id": "section-8",
+    "title": "8. Photos and avatar uploads",
+    "paragraphs": [
+      "A user-selected avatar can be processed on the device and uploaded to Supabase storage. The reviewed implementation obtains a public image URL. An avatar should therefore be treated as potentially accessible to anyone who obtains that URL. It is incorrect to describe this flow categorically as uploading only to a private image bucket.",
+      "The app's photo-selection purpose is the selected image, not deliberate upload of the whole library. The chosen image can nevertheless identify a face, residence, child, or another person. Device re-encoding should not be assumed to remove every possible metadata item or privacy concern. Users can decline image selection, choose a neutral illustration, replace an avatar, or request removal of an old object. Revoking device photo permission does not retract an image already uploaded."
+    ]
+  },
+  {
+    "id": "section-9",
+    "title": "9. Directory contributions and public organisational data",
+    "paragraphs": [
+      "Ministry records can include names, founders, headquarters, countries, descriptions, websites, categories, contact emails, and phone numbers. Branch and homecell features can include leaders, meeting locations, and service schedules. These fields can be stored in the account infrastructure and presented publicly through directory features. A public organisational field may also identify a natural person.",
+      "Contributors should have authority and use appropriately public contacts. Exact homecell addresses can expose a residence, so obtain permission and consider a less precise description when suitable. Directory inclusion is not proof of verification or endorsement. People affected by an inaccurate or unauthorised listing can request review through the team. Correcting a directory record is separate from deleting the contributor's app account or correcting an independent external map listing."
+    ]
+  },
+  {
+    "id": "section-10",
+    "title": "10. Address searches and precise coordinates",
+    "paragraphs": [
+      "The geographic services include online queries to Nominatim/OpenStreetMap, Photon, and LocationIQ where configured. A query can contain a town, street address, place name, search text, or latitude and longitude. Providers also receive ordinary request and connection metadata. Reverse geocoding can transmit coordinates to obtain an address description.",
+      "A coordinate may be manually selected or supplied by another supported source; the presence of coordinate processing is not by itself evidence of continuous background GPS tracking. A town query and a live device-location permission are also different interactions. The declaration should reflect what the feature actually sends. Users can avoid an unnecessary exact address, choose a broader area, and decline permissions where a feature requests them. Public listing removal does not automatically delete a separate provider's request logs."
+    ]
+  },
+  {
+    "id": "section-11",
+    "title": "11. Map imagery and viewed regions",
+    "paragraphs": [
+      "Map and satellite views can request tiles from external infrastructure, including Esri services used by the pin-selection feature. Requested tile areas and zoom levels can reveal which geographic region is being displayed. The provider also receives the connection needed to deliver the image. Panning and zooming can result in additional imagery requests.",
+      "A tile request need not include an app account name to have privacy implications. It also should not be inaccurately described as a complete live movement history. Users can rely on textual directory information where sufficient and avoid online maps when they want to reduce external geographic requests. Provider notices explain their own processing. Map results can be wrong or outdated and do not provide permission to visit private property or a guarantee of safe travel."
+    ]
+  },
+  {
+    "id": "section-12",
+    "title": "12. Content APIs and translation downloads",
+    "paragraphs": [
+      "Online Scripture retrieval includes supported calls to bible-api.com and Bolls.life. Resource downloads can use content delivery and repository hosts, including jsDelivr and GitHub raw-content infrastructure. The provider can receive the passage or file requested, translation information where present, connection metadata, and request time. Mirror fallback can change the host receiving a particular download attempt.",
+      "Downloaded material can support later local reading without repeating the same request. That local activity does not undo earlier delivery logs. A passage request can reveal a study interest even without including the app's account identifier. Users can use available offline resources to reduce routine online retrieval and should consider mobile-data costs. The terms and licence conditions of each content source remain separate from the privacy treatment of the request."
+    ]
+  },
+  {
+    "id": "section-13",
+    "title": "13. Diagnostic reporting when configured",
+    "paragraphs": [
+      "The app contains Sentry integration for crashes, messages, session stability, and sampled performance reporting. Remote reporting is conditional on release configuration. The reviewed standard error-event sanitisation removes user, extra, and certain request fields and discards caller-supplied breadcrumb data. These are payload-reduction measures, not proof that every diagnostic event type contains no personal information.",
+      "Technical events can include crash details, device or application characteristics, timings, and service-generated identifiers. Performance and native events can differ from ordinary exception payloads. The release should be inspected for active destinations, event contents, and retention. No user-facing diagnostic opt-out should be promised unless it exists in the installed interface. Private Study Mode is not a universal switch disabling independent diagnostics, maps, downloads, or authentication requests."
+    ]
+  },
+  {
+    "id": "section-14",
+    "title": "14. App updates and delivery information",
+    "paragraphs": [
+      "Expo update infrastructure can receive requests to check for and deliver compatible over-the-air updates. Update selection can involve platform, runtime, channel, and other delivery information, together with ordinary network metadata. The app configuration can check on launch and fall back to cached content when an update is unavailable.",
+      "The purpose is application delivery and maintenance, not uploading the user's journal. Nevertheless, this is an off-device interaction and should be considered in the release's disclosure assessment. Preview and production channels can differ, and a modified unofficial build may behave differently again. Users should obtain releases through official routes, keep compatible updates installed, and contact the team if a new permission or processing activity is not explained clearly."
+    ]
+  },
+  {
+    "id": "section-15",
+    "title": "15. Local reminders and operating-system notifications",
+    "paragraphs": [
+      "The reviewed reminder service schedules local study notifications after requesting operating-system permission. It can use titles, reminder text, times, and local delivery state. The reviewed path does not establish a general collection of Expo push tokens for remote delivery, so this declaration does not claim that a token is collected whenever local reminders are enabled.",
+      "The operating system can show notification content on the lock screen or connected accessories. Users can decline notification permission, disable reminders, or change preview settings. Cancelling future schedules does not remove already delivered notifications from every device. If remote push delivery is added, its token, provider, and payload handling need to be disclosed for the release where it is active. Local notification scheduling and launch-notification emails are separate systems."
+    ]
+  },
+  {
+    "id": "section-16",
+    "title": "16. Biometrics, PINs, and secure storage",
+    "paragraphs": [
+      "The device operating system performs biometric matching and returns an authentication outcome to the app. The reviewed app-lock feature does not require upload of raw fingerprint templates or face scans. PIN and lock preferences support local access control. Selected credentials and account-scoped records use native secure storage, while other preferences and caches can use ordinary application storage.",
+      "The presence of secure storage does not mean every database, temporary file, cloud record, or backup has identical hardware-backed protection. Encrypted journal archives are a separate feature with their own key boundary. Screenshot restrictions also have platform limits and cannot prevent a photograph taken with another device. Users should secure the whole device and avoid sharing secrets. Store answers should distinguish local-only biometric processing from off-device account or diagnostic information."
+    ]
+  },
+  {
+    "id": "section-17",
+    "title": "17. Exported files and user-directed sharing",
+    "paragraphs": [
+      "A study export can create a file containing selected personal and study records. A user-directed share passes the selected content to the chosen destination through device facilities. That destination can be an email app, another person, a cloud drive, or a different service. Its privacy and retention rules apply to the copy it receives.",
+      "Check whether the export is encrypted, what it contains, and where it is stored. An encrypted archive and an ordinary JSON file are not equivalent. Removing an app account cannot recall every recipient's screenshot, message, or independent backup. A store form may classify a qualifying user-directed transfer differently from routine service collection, but the product still needs to explain the transfer clearly. Do not use an exemption label to hide the fact that a selected recipient can receive private content."
+    ]
+  },
+  {
+    "id": "section-18",
+    "title": "18. Website and waitlist data",
+    "paragraphs": [
+      "The website host processes requests needed to deliver pages and can retain standard access or security logs. Browser storage remembers the privacy-banner choice. The launch waiting list collects an email, consent, and registration metadata. Its server derives a keyed IP hash for short-lived rate-limit buckets while the host can still process raw connection information.",
+      "Resend can deliver subscriber confirmations and team notifications when configured. The submitted address can therefore reach the email provider and authorised administrative recipients. Waiting-list membership is separate from an app account. Users can request removal through joinus@exegeomai.co.za. The waiting-list programme's 90-day post-final-notification commitment is specific to that programme and does not establish a universal retention period for all app accounts, provider logs, or support correspondence."
+    ]
+  },
+  {
+    "id": "section-19",
+    "title": "19. Support and deletion-request information",
+    "paragraphs": [
+      "A support email can include the sender's address, message, device details, app version, and chosen attachments. A directory or content correction should include the record needed to investigate, not unrelated private information. The website deletion-request implementation records submitted email, optional reason, time, reference, and forwarded connection information in server logs.",
+      "That website response is a request acknowledgment, not confirmation that an authenticated account was erased or that a confirmation email was sent. Use in-app account deletion where available, or contact privacy@exegeomai.co.za if access is unavailable. The team should verify ownership proportionately. Do not send passwords, tokens, or a full journal with a deletion request. A request-management workflow and its operational retention should be assessed separately from the client-side account-reset behaviour."
+    ]
+  },
+  {
+    "id": "section-20",
+    "title": "20. What is not established by the reviewed implementation",
+    "paragraphs": [
+      "The reviewed code does not establish an advertising network, a data-broker sale workflow, general collection of payment card details, harvesting of the device address book, or a microphone-recording feature for ordinary study. It does not establish continuous background GPS tracking merely by containing maps. These statements describe the reviewed features rather than certify every possible future or unofficial build.",
+      "Absence of an advertising identifier does not mean the app has no identifiers at all: account and service-generated diagnostic identifiers can still exist. Absence of microphone recording does not mean selected photographs are never uploaded. An installed SDK may remain inactive without configuration, so the actual release needs to be tested. Each category should be assessed independently, with changes reflected in the notice and store form when new processing is introduced."
+    ]
+  },
+  {
+    "id": "section-21",
+    "title": "21. Security and encryption boundaries",
+    "paragraphs": [
+      "Account requests and reviewed online provider endpoints use HTTPS. The application includes authentication checks, account-scoped queues, secure local storage, privacy preferences, and backend access-control rules intended to protect records. These protections depend on the live deployment and platform. They should not be described as a blanket independent certification or a guarantee that every server log and export uses the same encryption.",
+      "A code migration does not prove that the production database applied it. A sanitisation function does not prove that every diagnostic event was inspected. A public storage URL is not confidential simply because the upload was authenticated. The team should validate the actual release and configuration, limit privileged access, and investigate reports. Users should protect credentials and device access while retaining their applicable rights against the service operator."
+    ]
+  },
+  {
+    "id": "section-22",
+    "title": "22. Retention and removal",
+    "paragraphs": [
+      "Active account records support ongoing account use until changed or deleted, subject to relevant retention obligations. Local records follow the applicable device and app controls. Public contributions, support records, diagnostic events, provider logs, and backups can have different schedules. This declaration does not invent a universal fixed deletion period for all systems.",
+      "The in-app deletion process calls the authenticated server function and requires success before clearing selected local account state. It cannot remove independent exports or recipient copies. A website reference is not a completed purge. Users can request information about retained categories and applicable limitations. Waiting-list removal does not delete the app account, and hiding a public progress display does not automatically erase the private progress record. The Privacy Policy explains these boundaries with practical examples."
+    ]
+  },
+  {
+    "id": "section-23",
+    "title": "23. User controls and optionality",
+    "paragraphs": [
+      "Controls can include editing profile fields, choosing private study or notes, changing discoverability and public streak display, declining photo or notification permissions, avoiding online maps, using downloaded resources, managing exports, unsubscribing from launch emails, and requesting deletion. The installed release determines which controls are available. A failed or pending server-backed change should not be treated as completed.",
+      "Not every processing activity has a separate switch. For example, requesting account sign-in necessarily sends the credentials needed for that operation, and the current interface should not promise a diagnostic opt-out it does not implement. Users can decline an optional interaction without necessarily losing local reading. The team should explain the actual consequence of each choice and avoid combining all optional provider processing into a single vague permission."
+    ]
+  },
+  {
+    "id": "section-24",
+    "title": "24. How this relates to app-store disclosures",
+    "paragraphs": [
+      "Google Play requires developers to describe the relevant released app's data practices, including applicable SDK activity. Its definitions of collection, ephemeral processing, required or optional use, and sharing must be applied to actual data flows. A qualifying service-provider or user-directed-transfer exception is a classification rule, not a statement that the information never leaves the device.",
+      "This public page provides context for users and an inventory for release review. It does not itself submit or certify a Play Console form. The team should inspect active configuration and payloads for the exact distributed versions, confirm provider relationships, and keep the store answers consistent with the Privacy Policy. A source-only review cannot prove every live retention setting, deployed database rule, or diagnostic payload. Differences should be resolved before making categorical store claims."
+    ]
+  },
+  {
+    "id": "section-25",
+    "title": "25. Questions, corrections, and updates",
+    "paragraphs": [
+      "If a feature appears to send or display information differently from this declaration, contact privacy@exegeomai.co.za with the feature, app version, approximate time, and a minimal description. Avoid sending secrets or someone else's records. For waiting-list removal, use joinus@exegeomai.co.za. For a public directory problem, identify the affected listing and field.",
+      "The team should investigate inconsistencies, explain deployment-specific boundaries, and update the notice when processing changes. Users can request access, correction, deletion, or other applicable rights through the Privacy Policy's process. A long declaration is useful only if it stays accurate and navigable; its summary, matrix, and contents are intended to make the relevant information findable without requiring a user to read every paragraph before making an ordinary privacy choice."
+    ]
+  }
+]

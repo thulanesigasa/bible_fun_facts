@@ -487,7 +487,7 @@
   letter-spacing: 1px;
   color: #64748b;
 }
-.phone-body h3 {
+.phone-body .phone-heading {
   font-size: 25px;
   line-height: 1.3;
   font-weight: 600;
@@ -529,7 +529,7 @@
   border-radius: 4px;
   letter-spacing: 0.5px;
 }
-.phone-fact h4 {
+.phone-fact .phone-subheading {
   font-size: 23px;
   line-height: 1.18;
   font-weight: 500;
@@ -622,7 +622,7 @@
   border-radius: 12px;
   margin: 16px 0;
 }
-.phone-lexicon h4 {
+.phone-lexicon .phone-subheading {
   font:
     29px/1.5 Georgia,
     serif;
@@ -1402,3 +1402,5 @@
     scroll-behavior: auto !important;
   }
 }
+
+.launch-note { color: #64748b; }

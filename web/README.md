@@ -132,7 +132,7 @@ For the deletion API to store requests persistently, configure a Supabase projec
 
 ### Mobile navigation checks
 
-The shared `Header` is rendered once in `src/app/layout.tsx`. Pages must not render a second header. Navigation layers and transitions live in `globals.css`; page styles must not override their stacking order. The panel stays mounted to animate both opening and closing, and is inert while closed. It scrolls independently, closes on Escape or navigation, and releases the body scroll lock when switching to desktop.
+The shared `Header` is rendered once in `src/app/layout.tsx`. Pages must not render a second header. Navigation layers and transitions live in `globals.css`; page styles must not override their stacking order. The compact panel stays mounted to animate opening and closing, and is inert while closed. Its plain text links have single-line separators. It leaves the page visible and scrollable, scrolls independently on short screens, and closes on outside tap, Escape, navigation, or desktop resizing.
 
 The development CSP permits `unsafe-eval` for Next.js development bundles. The production CSP does not permit it.
 
@@ -145,3 +145,23 @@ NAV_TEST_MODE=development npm run test:navigation
 ```
 
 Run development and production checks sequentially because both use the default `.next` directory. Browser checks cover mobile taps, animation state, menu scrolling, section links, Escape, desktop resizing, duplicate headers on subpages, hydration errors, and the environment-specific CSP.
+
+### SEO and site validation
+
+Canonical public routes and per-page metadata are defined in `src/lib/seo.ts`. Route layouts provide metadata even for client-rendered pages. The sitemap includes canonical page URLs, not fragments or duplicate aliases. Old `/deletion`, `/safety-and-trust`, and selected `.html` URLs redirect to their canonical equivalents. HTTPS and the non-www host are enforced for the public domain, while localhost and preview domains remain testable.
+
+`/llms.txt` provides the public content index; `/llm.txt` is an identical compatibility alias. The legal pages render their full server-side content from `src/content/*.json`, with summaries, related links, contents, and a feature data matrix.
+
+```bash
+npm run build
+npm run test:site
+npm run test:navigation
+npm run test:waitlist
+npm run check:links
+```
+
+`test:site` covers every sitemap page, canonical/title/description uniqueness, indexing directives, heading levels, image alt attributes, JSON-LD, redirects, HTTPS, generated endpoints, internal links and anchors, and 320px/390px layouts. Real-user Core Web Vitals and hosting-specific indexing headers must also be monitored on the deployed domain; local lab scores do not establish field performance.
+
+### Admin waiting-list monitoring
+
+The private dashboard is at `/admin`, with sign-in at `/admin/login`. It shows aggregate totals, SAST daily activity, and a 30-day chart with automatic/manual refresh. It requires verified Supabase accounts in a server-side UUID allowlist and the private database migrations. No subscriber email list is sent to the browser. See `docs/ADMIN_DASHBOARD.md` for deployment prerequisites, environment variables, and tests. Public SEO indexing applies to public content; private admin routes intentionally remain noindex and authenticated.

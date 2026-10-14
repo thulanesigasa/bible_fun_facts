@@ -35,6 +35,15 @@ const nextConfig: NextConfig = {
         source: '/(.*)',
         headers: securityHeaders,
       },
+      { source: '/admin/:path*', headers: [{ key: 'Cache-Control', value: 'private, no-store' }, { key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
+      { source: '/api/admin/:path*', headers: [{ key: 'Cache-Control', value: 'private, no-store' }, { key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
+    ];
+  },
+  async redirects() {
+    return [
+      { source: '/privacy.html', destination: '/privacy', permanent: true },
+      { source: '/terms.html', destination: '/terms', permanent: true },
+      { source: '/data_safety', destination: '/data-safety', permanent: true },
     ];
   },
   images: {
