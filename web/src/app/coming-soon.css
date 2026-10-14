@@ -311,6 +311,7 @@
   top: 535px;
   left: 50%;
   transform: translateX(-50%);
+  pointer-events: none;
 }
 .launch-orbit:before,
 .launch-orbit:after {
@@ -319,6 +320,7 @@
   inset: 70px;
   border: 1.5px solid rgba(253, 210, 35, 0.2);
   border-radius: 50%;
+  pointer-events: none;
 }
 .launch-orbit:after {
   inset: -90px;

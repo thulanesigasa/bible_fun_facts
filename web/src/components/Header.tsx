@@ -148,7 +148,9 @@ export function Header() {
           <div
             className="mobile-menu is-open"
             id="mobile-menu"
-            aria-hidden={false}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mobile navigation menu"
           >
             <div className="mobile-menu-links">
               {links.map(({ label, href }) => (
