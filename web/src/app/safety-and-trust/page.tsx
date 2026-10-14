@@ -1,3 +1,2 @@
-import SafetyPage from '../safety/page';
-export { metadata } from '../safety/page';
-export default SafetyPage;
+import { permanentRedirect } from 'next/navigation';
+export default function SafetyAlias() { permanentRedirect('/safety'); }

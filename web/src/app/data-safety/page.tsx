@@ -1,93 +1,26 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
-import { Footer } from '@/components/Footer';
-
-export const metadata: Metadata = {
-  title: 'Data Safety Declarations — Google Play Compliant',
-  description:
-    'Official Data Safety disclosures for exégeomai. Zero personal data collected, zero third-party tracking, 100% offline security.',
-};
-
+import { LegalDocument } from '@/components/LegalDocument';
+import sections from '@/content/data-safety.json';
 export default function DataSafetyPage() {
-  return (
-    <>
-      <main id="main">
-        <header className="subpage-hero">
-          <div className="wrap">
-            <span className="section-kicker">Compliance &amp; Transparency</span>
-            <h1>Data Safety Declarations</h1>
-            <p>
-              Official disclosures compliant with Google Play Store Data Safety policies,
-              GDPR Article 13, and South African Protection of Personal Information Act (POPIA).
-            </p>
-          </div>
-        </header>
-
-        <section className="subpage-content">
-          <div className="wrap">
-            <div className="prose-card">
-              <h2>1. Data Collection Summary</h2>
-              <div style={{ background: 'var(--surface-alt)', padding: '20px 24px', borderRadius: 'var(--r-md)', border: '1px solid var(--border)', marginBottom: 28 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#16A34A' }}></span>
-                  <strong style={{ fontSize: 16, color: 'var(--ink)' }}>No Personal Data Collected</strong>
-                </div>
-                <p style={{ margin: 0, fontSize: 14.5, color: 'var(--body-text)' }}>
-                  exégeomai does not collect, record, harvest, or transmit any personal identifiable information,
-                  device identifiers, contact books, or browsing history to remote servers.
-                </p>
-              </div>
-
-              <h2>2. Data Safety Checklist</h2>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 14, margin: '20px 0 32px' }}>
-                <thead>
-                  <tr style={{ borderBottom: '2px solid var(--border)', background: 'var(--surface-alt)' }}>
-                    <th style={{ padding: '12px 16px', fontWeight: 700 }}>Data Category</th>
-                    <th style={{ padding: '12px 16px', fontWeight: 700 }}>Collected?</th>
-                    <th style={{ padding: '12px 16px', fontWeight: 700 }}>Shared with 3rd Parties?</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    <td style={{ padding: '12px 16px', fontWeight: 600 }}>Location (Precise / Coarse)</td>
-                    <td style={{ padding: '12px 16px', color: '#16A34A', fontWeight: 600 }}>No (Calculated on-device)</td>
-                    <td style={{ padding: '12px 16px', color: '#16A34A', fontWeight: 600 }}>No</td>
-                  </tr>
-                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    <td style={{ padding: '12px 16px', fontWeight: 600 }}>Personal Info (Name, Email)</td>
-                    <td style={{ padding: '12px 16px', color: '#16A34A', fontWeight: 600 }}>No</td>
-                    <td style={{ padding: '12px 16px', color: '#16A34A', fontWeight: 600 }}>No</td>
-                  </tr>
-                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    <td style={{ padding: '12px 16px', fontWeight: 600 }}>Financial / Payment Info</td>
-                    <td style={{ padding: '12px 16px', color: '#16A34A', fontWeight: 600 }}>No</td>
-                    <td style={{ padding: '12px 16px', color: '#16A34A', fontWeight: 600 }}>No</td>
-                  </tr>
-                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    <td style={{ padding: '12px 16px', fontWeight: 600 }}>App Activity &amp; Search Queries</td>
-                    <td style={{ padding: '12px 16px', color: '#16A34A', fontWeight: 600 }}>No</td>
-                    <td style={{ padding: '12px 16px', color: '#16A34A', fontWeight: 600 }}>No</td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '12px 16px', fontWeight: 600 }}>Device Identifiers / Advertising ID</td>
-                    <td style={{ padding: '12px 16px', color: '#16A34A', fontWeight: 600 }}>No</td>
-                    <td style={{ padding: '12px 16px', color: '#16A34A', fontWeight: 600 }}>No</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <h2>3. Security Practices</h2>
-              <ul>
-                <li><strong>Hardware Cryptographic Storage:</strong> User notes and reading bookmarks are stored encrypted at rest using AES-256 GCM backed by the Android Keystore.</li>
-                <li><strong>FLAG_SECURE Window Protection:</strong> App switcher window screenshots are disabled at the OS level to protect sensitive personal reflections.</li>
-                <li><strong>User Deletion Mechanism:</strong> Users can permanently purge all stored data via the in-app Nuclear Data Wipe or via our <Link href="/deletion" style={{ color: 'var(--ink)', fontWeight: 700, textDecoration: 'underline' }}>Account Deletion Portal</Link>.</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <Footer />
-    </>
-  );
+  return <LegalDocument title="Data Safety Declaration" introduction="A feature-by-feature explanation of what stays local, what can be transmitted, which providers receive it, and what choices you have. This is a developer disclosure, not a Google Play certification or a blanket claim of zero collection." sections={sections} rows={[
+    ['Account identity and contact details', 'Yes, when submitted', 'Supabase account infrastructure', 'Account access; edit supported fields'],
+    ['Passwords, session and account identifiers', 'Yes, for authentication', 'Authentication service; secure local session storage', 'Sign-in and security; sign out or delete account'],
+    ['Study preferences and progress', 'Conditional synchronisation', 'Account metadata and study tables', 'Study continuity; private-study controls'],
+    ['Notes, favourites and highlights', 'Conditional synchronisation', 'Account-scoped cloud records', 'Local/private settings; record deletion'],
+    ['Selected profile photo', 'Yes, when uploaded', 'Supabase storage; public image URL', 'Optional avatar; replace or request removal'],
+    ['Directory names, contacts and locations', 'Yes, when submitted', 'Cloud directory; public readers', 'Public contribution; authority and correction'],
+    ['Address queries and coordinates', 'Yes, for online lookup', 'Nominatim, Photon, LocationIQ where configured', 'Geographic result; avoid unnecessary precision'],
+    ['Map areas and zoom levels', 'Yes, for online imagery', 'Map providers including Esri', 'Map display; optional interaction'],
+    ['Passage and translation requests', 'Yes, for online content', 'Bible APIs, download hosts and mirrors', 'Content delivery; use downloaded resources'],
+    ['Crash and performance diagnostics', 'When Sentry is configured', 'Sentry; restricted diagnostic operations', 'Reliability; release-dependent configuration'],
+    ['Runtime and update delivery metadata', 'When update checks run', 'Expo update infrastructure', 'Compatible application delivery'],
+    ['Biometric templates', 'No upload by reviewed app-lock path', 'Device operating system performs matching', 'Optional local lock; disable in settings'],
+    ['Local reminder schedules', 'Local in reviewed reminder path', 'Device notification system', 'Optional reminders; device permission'],
+    ['Exports and shared content', 'When you choose a destination', 'Selected app, recipient or storage provider', 'User-directed transfer; manage external copies'],
+    ['Waitlist email, consent and rate-limit hash', 'Yes, on website submission', 'Supabase; Resend and team email when configured', 'Launch notifications; unsubscribe'],
+    ['Support and website deletion-request details', 'Yes, when submitted', 'Team correspondence or hosting logs', 'Request handling; minimise attachments'],
+  ]} sources={[
+    { label: 'Google Play: Data safety definitions and form guidance', href: 'https://support.google.com/googleplay/android-developer/answer/10787469' },
+    { label: 'Google Play: User Data policy', href: 'https://support.google.com/googleplay/android-developer/answer/10144311' },
+    { label: 'Information Regulator: POPIA guidance', href: 'https://inforegulator.org.za/guidance-notes/' },
+  ]} />;
 }

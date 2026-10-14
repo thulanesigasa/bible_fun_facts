@@ -37,6 +37,13 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      { source: '/privacy.html', destination: '/privacy', permanent: true },
+      { source: '/terms.html', destination: '/terms', permanent: true },
+      { source: '/data_safety', destination: '/data-safety', permanent: true },
+    ];
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],

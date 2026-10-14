@@ -11,7 +11,7 @@ export function Footer() {
             <Link href="/" className="brand" aria-label="exégeomai home">
               <span className="brand-mark" aria-hidden="true">
                 <Image
-                  src="/logo-transparent.png"
+                  src="/logo.webp"
                   alt="exégeomai Holy Scripture and Exegesis logo"
                   width={28}
                   height={28}
@@ -50,7 +50,7 @@ export function Footer() {
             <div className="footer-col-title">SAFETY</div>
             <div className="footer-links">
               <Link href="/safety">Safety &amp; Trust</Link>
-              <Link href="/safety-and-trust">Security Architecture</Link>
+              <Link href="/safety">Security Architecture</Link>
               <Link href="/community-guidelines">Community Guidelines</Link>
               <Link href="/report-a-problem">Report a Problem</Link>
             </div>
@@ -61,7 +61,7 @@ export function Footer() {
             <div className="footer-links">
               <Link href="/help">Help Centre</Link>
               <Link href="/contact">Contact Support</Link>
-              <Link href="/deletion">Account Deletion</Link>
+              <Link href="/account-deletion">Account Deletion</Link>
             </div>
           </div>
 

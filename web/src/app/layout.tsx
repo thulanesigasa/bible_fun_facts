@@ -63,7 +63,7 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   icons: {
-    icon: [{ url: "/favicon.png", type: "image/png" }],
+    icon: [{ url: "/favicon.ico", type: "image/x-icon" }],
     apple: [{ url: "/icon.png" }],
   },
 };
@@ -94,23 +94,9 @@ const jsonLd = {
         width: 512,
         height: 512,
       },
-      sameAs: [
-        "https://exegeomai.app",
-      ],
+
     },
-    {
-      "@type": "SoftwareApplication",
-      name: "exégeomai",
-      applicationCategory: "EducationalApplication",
-      operatingSystem: "Android, iOS",
-      description:
-        "365 calendar-synchronized exegetical devotionals, 14,298 Strong's concordance definitions, and 32 offline Bible translations.",
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "USD",
-      },
-    },
+
   ],
 };
 
@@ -125,14 +111,15 @@ export default function RootLayout({
       className={`${outfit.variable} ${spaceMono.variable} ${poppins.variable}`}
     >
       <head>
-        <meta name="google-site-verification" content="exegeomai-gsc-verification-token" />
-        <link rel="canonical" href={BASE_URL} />
+
+
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
       <body>
+        <a className="skip-link" href="#main">Skip to content</a>
         <Header />
         {children}
         <CookieConsent />

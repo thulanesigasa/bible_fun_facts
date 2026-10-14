@@ -33,7 +33,7 @@ export function PreviewPhone({ screen = 0 }: { screen?: number }) {
         </div>
         <div className="phone-brand">
           <Image
-            src="/logo-transparent.png"
+            src="/logo.webp"
             alt="exégeomai Holy Bible app logo"
             width={25}
             height={25}
@@ -52,7 +52,7 @@ export function PreviewPhone({ screen = 0 }: { screen?: number }) {
           {screen === 0 ? (
             <>
               <small>DISCOVER SOMETHING DEEPER</small>
-              <h3>Did You Know?</h3>
+              <p className="phone-heading">Did You Know?</p>
               <p className="phone-muted">Hidden treasures in Scripture</p>
               <div className="phone-streak">
                 <span>YOUR STUDY JOURNEY</span>
@@ -60,10 +60,10 @@ export function PreviewPhone({ screen = 0 }: { screen?: number }) {
               </div>
               <div className="phone-fact">
                 <span className="phone-tag">WORDS OF SCRIPTURE</span>
-                <h4>
+                <p className="phone-subheading">
                   A name with
                   <br />a deeper meaning.
-                </h4>
+                </p>
                 <p>
                   exégeomai comes from a Greek word meaning to explain or make
                   known.
@@ -79,9 +79,9 @@ export function PreviewPhone({ screen = 0 }: { screen?: number }) {
           ) : screen === 1 ? (
             <>
               <small>THE BIBLE / KING JAMES VERSION</small>
-              <h3>
+              <p className="phone-heading">
                 John <span className="chapter-pill">1</span>
-              </h3>
+              </p>
               <p className="phone-muted">The Word became flesh</p>
               <div className="phone-verse">
                 <sup>1</sup> In the beginning was the Word, and the Word was
@@ -104,11 +104,11 @@ export function PreviewPhone({ screen = 0 }: { screen?: number }) {
           ) : (
             <>
               <small>STRONG&apos;S CONCORDANCE</small>
-              <h3>Original words</h3>
+              <p className="phone-heading">Original words</p>
               <p className="phone-muted">A closer look at the Greek</p>
               <div className="phone-lexicon">
                 <span className="phone-tag">G1834 · VERB</span>
-                <h4 lang="el">ἐξηγέομαι</h4>
+                <p className="phone-subheading" lang="el">ἐξηγέομαι</p>
                 <p>exēgeomai</p>
                 <hr />
                 <b>To explain. To make known.</b>

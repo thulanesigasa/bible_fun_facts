@@ -50,7 +50,7 @@ export function CookieConsent() {
             <strong>Privacy &amp; Cookie Preferences</strong>
           </p>
           <p className="cookie-text">
-            We only use essential local storage to safeguard your session, waitlist confirmation, and reading preferences. We do not use third-party tracking or advertising cookies. Learn more in our{" "}
+            This site stores your privacy-banner choice in your browser. Hosting logs and submitted forms involve separate processing; no advertising network is integrated into these pages. Learn more in our{" "}
             <Link href="/privacy" className="cookie-link">
               Privacy Policy
             </Link>{" "}

@@ -1,16 +1,13 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
+import { PageSchema } from "@/components/PageSchema";
 import Image from "next/image";
 import { Footer } from "@/components/Footer";
 import { AppPreview, PhoneTrio } from "@/components/AppPreview";
 import { WaitlistForm } from "@/components/WaitlistForm";
 import "./coming-soon.css";
 
-export const metadata: Metadata = {
-  title: { absolute: "exégeomai | Scripture has depths." },
-  description:
-    "Meet exégeomai, the Bible study experience. Explore Scripture, biblical languages and fascinating biblical facts. Join the waiting list for launch news.",
-  alternates: { canonical: "https://exegeomai.app" },
-};
+export const metadata: Metadata = pageMetadata('/');
 const features = [
   [
     "01",
@@ -66,6 +63,7 @@ const faqs = [
 export default function HomePage() {
   return (
     <>
+      <PageSchema path="/" />
       <main id="main" className="launch-page">
         <section className="launch-hero" id="home" aria-labelledby="hero-title">
           {/* Decorative architectural background lines & geometric floating rings */}
@@ -102,11 +100,13 @@ export default function HomePage() {
           {/* Watermark brand logo motif in hero */}
           <div className="deco-logo-watermark hero-logo-watermark" aria-hidden="true">
             <Image
-              src="/logo-transparent.png"
+              src="/logo.webp"
               alt=""
+                sizes="260px"
               width={260}
               height={260}
-              loading="lazy"
+              priority
+              fetchPriority="high"
             />
           </div>
 
@@ -178,8 +178,9 @@ export default function HomePage() {
           </div>
           <div className="deco-logo-watermark why-logo-watermark" aria-hidden="true">
             <Image
-              src="/logo-transparent.png"
+              src="/logo.webp"
               alt=""
+                sizes="(max-width: 640px) 260px, 600px"
               width={280}
               height={280}
               loading="lazy"
@@ -357,8 +358,9 @@ export default function HomePage() {
           </div>
           <div className="deco-logo-watermark waitlist-logo-watermark" aria-hidden="true">
             <Image
-              src="/logo-transparent.png"
+              src="/logo.webp"
               alt=""
+                sizes="(max-width: 640px) 260px, 600px"
               width={320}
               height={320}
               loading="lazy"

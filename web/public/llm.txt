@@ -1,0 +1,28 @@
+# exégeomai
+
+> exégeomai is a Bible study app with a Coming Soon website. It helps readers explore Scripture, Greek and Hebrew words, daily discoveries, personal study, and ministry information.
+
+The public website announces the upcoming launch and provides a launch-notification waiting list. Do not infer a public download, app-store listing, regulatory certification, or zero-data-collection guarantee. Availability depends on the released version. Downloaded study can work offline; accounts, synchronisation, maps, content downloads, updates, and configured diagnostics can involve external providers.
+
+## Product
+
+- [Home](https://exegeomai.app/): Coming Soon overview and launch waiting list.
+- [About](https://exegeomai.app/about): Vision and study approach.
+- [Features](https://exegeomai.app/features): Study tools and feature information.
+- [How it works](https://exegeomai.app/how-it-works): Study workflows and choices.
+- [Strong’s lexicon](https://exegeomai.app/strongs): Greek and Hebrew study preview.
+- [FAQ](https://exegeomai.app/faq): Frequently asked questions.
+
+## Privacy and support
+
+- [Privacy Policy](https://exegeomai.app/privacy): Detailed account, synchronisation, public avatar, map, diagnostic, retention, and rights information.
+- [Data Safety](https://exegeomai.app/data-safety): Feature data-flow matrix and release-dependent disclosures.
+- [Terms](https://exegeomai.app/terms): Account use, contributions, content rights, limitations, and protections.
+- [Waitlist Privacy](https://exegeomai.app/waitlist-privacy): Launch email consent, delivery, unsubscribe, and retention.
+- [Account deletion](https://exegeomai.app/account-deletion): Deletion routes and confirmation boundaries.
+- [Support](https://exegeomai.app/support): Support resources.
+- [Contact](https://exegeomai.app/contact): Team contact routes.
+
+## Site map
+
+- [Sitemap](https://exegeomai.app/sitemap.xml): Canonical public page URLs.

@@ -10,11 +10,12 @@ export function DeletionForm() {
   const [confirm, setConfirm] = useState(false);
   const [status, setStatus] = useState<Status>('idle');
   const [errMsg, setErrMsg] = useState('');
+  const [reference, setReference] = useState('');
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!confirm) {
-      setErrMsg('Please confirm you understand this action is irreversible.');
+      setErrMsg('Please confirm you understand this form submits a request, not a completed account deletion.');
       return;
     }
     setStatus('loading');
@@ -27,6 +28,8 @@ export function DeletionForm() {
         body: JSON.stringify({ email: email.trim(), reason }),
       });
       if (res.ok) {
+        const result = await res.json();
+        setReference(result.referenceId ?? '');
         setStatus('success');
       } else {
         const d = await res.json().catch(() => ({}));
@@ -50,11 +53,10 @@ export function DeletionForm() {
         <h3 style={{ fontSize: 22, marginBottom: 8, color: 'var(--ink)' }}>Request Received</h3>
         <p style={{ color: 'var(--body-text)', fontSize: 15, maxWidth: 540, margin: '0 auto 16px' }}>
           Your deletion request has been submitted for <strong>{email}</strong>.
-          You will receive a confirmation email within 24 hours. Your data will
-          be fully purged within 30 days per GDPR Article 17.
+          This form records the request in the website service logs; it does not complete account deletion or send a confirmation email. Please also email privacy@exegeomai.co.za from your registered address for handling and verification.
         </p>
         <span style={{ fontSize: 13, color: 'var(--muted)', background: 'var(--surface-alt)', padding: '6px 12px', borderRadius: 4 }}>
-          Reference ID: DEL-{Date.now().toString(36).toUpperCase()}
+          Reference ID: {reference}
         </span>
       </div>
     );
@@ -64,7 +66,7 @@ export function DeletionForm() {
     <div>
       <h2 style={{ marginBottom: 8, fontSize: 22 }}>Submit Deletion Request</h2>
       <p style={{ marginBottom: 24, fontSize: 14.5, color: 'var(--body-text)' }}>
-        All fields marked * are required. Requests are verified and processed within 30 days.
+        Fields marked * are required. This form records a request; use authenticated in-app deletion or contact privacy@exegeomai.co.za for account handling.
       </p>
 
       <form onSubmit={handleSubmit} id="deletionRequestForm">
@@ -110,8 +112,7 @@ export function DeletionForm() {
             }}
           />
           <label htmlFor="deletionConfirm" style={{ fontSize: 13.5, color: 'var(--ink)', lineHeight: 1.5 }}>
-            I understand this action is <strong>permanent and irreversible</strong>.
-            All personal data, reading records, and notes will be permanently erased.
+            I understand this form submits a <strong>request for review</strong> and does not itself confirm account deletion. Account deletion, once confirmed, may be irreversible.
           </label>
         </div>
 

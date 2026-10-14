@@ -1,0 +1,596 @@
+[
+  {
+    "id": "section-1",
+    "title": "1. Scope and a practical summary",
+    "paragraphs": [
+      "exégeomai is a Bible study application with a supporting website, account services, study tools, a ministry directory, and optional online features. This policy explains how information is handled when you read Scripture, explore Greek or Hebrew words, save a study record, create an account, submit a directory listing, use an online map, contact the team, or join the launch waiting list. It applies to processing controlled by the exégeomai service. Independent websites, map providers, email providers, app stores, and organisations you contact have their own responsibilities and privacy notices.",
+      "The most useful distinction is between information that remains on your device and information sent outside it. Downloaded Scripture and language resources can support offline study. An account, synchronisation, an online address search, a translation download, an update check, or a support request can involve a network connection. An offline reading experience therefore does not mean the entire application never communicates with servers. This policy identifies those different situations rather than describing every feature as local.",
+      "Account registration can involve your name, email, username, phone details, and study preferences. Account-linked study actions can be synchronised. A selected avatar can be available through a public image URL. Online geographic searches can send addresses or coordinates to providers. Crash diagnostics can be sent when the released application is configured for diagnostic reporting. Website launch notifications involve an email address and consent record. You can choose how much optional information to provide and should use the privacy settings available in your installed version."
+    ]
+  },
+  {
+    "id": "section-2",
+    "title": "2. Who operates the service and how to contact us",
+    "paragraphs": [
+      "In this policy, “exégeomai,” “we,” and “our” refer to the team operating the exégeomai application and its supporting services. “You” includes an application user, website visitor, account holder, directory contributor, or person communicating with the team. The policy does not assume that a church listed in the directory operates the application or that every directory contributor is an employee or representative of exégeomai.",
+      "For privacy questions, access requests, corrections, deletion assistance, or concerns about a disclosure, contact privacy@exegeomai.co.za. For questions specifically about the launch waiting list, including removal from that list, contact joinus@exegeomai.co.za. The website contact and support pages provide additional routes for raising a problem. Explain which service you used, which account or email address is involved, and what you want the team to do. Do not send an account password, app PIN, authentication token, encryption key, or a complete personal journal to prove ownership.",
+      "The team may need limited additional information to identify the correct account and protect someone else's records. A reply from the registered email address or an authenticated in-app action will often be more appropriate than identity documents. If a more formal verification step is necessary, the team should explain its purpose and request the minimum information suitable for that step. Questions about an independent provider's own records should also be addressed to that provider, especially where the information was submitted directly through its website or service."
+    ]
+  },
+  {
+    "id": "section-3",
+    "title": "3. Which version of this notice applies",
+    "paragraphs": [
+      "This notice is updated on 14 October 2026. It describes the application features and website processing reviewed for the current service, while recognising that platform capabilities, release configuration, and service availability can differ. A feature described here is not necessarily available on every device or in every release. A provider identified as conditional is used only when the relevant integration is configured or the relevant online feature is invoked.",
+      "A privacy notice is an explanation of processing and the team's commitments. It is not a guarantee that every installation has an identical technical configuration, that an old build includes every current privacy improvement, or that a proposed feature has already been released. Where a setting is unavailable or a request fails, do not assume that an intended change has taken effect. Check the visible result and contact the team if the application does not confirm it.",
+      "Material changes to the categories of information collected, the purposes for using it, or the audience who can see it should be reflected in an updated notice. Where consent is required for a new use, publishing revised wording does not replace the need to obtain that consent. Your existing private study notes do not become public merely because a notice changes. Keep a copy of the version you relied on if you want to compare future changes. The app's terms, data safety page, waitlist notice, and feature-specific prompts should be read together with this policy; more specific notices explain a particular interaction in greater detail."
+    ]
+  },
+  {
+    "id": "section-4",
+    "title": "4. Meaning of personal information and sensitive context",
+    "paragraphs": [
+      "Personal information is information relating to an identified or identifiable person. Obvious examples include a name, email address, phone number, or recognisable photograph. An account identifier, a combination of study events, or a technical log can also relate to a person even when it does not display a real name. Replacing a name with an identifier can reduce direct identification without making the record anonymous.",
+      "Bible study records can reveal more than a simple application preference. A saved passage, a ministry affiliation, a devotional pattern, or a personal reflection may suggest religious or philosophical beliefs. A note about illness, bereavement, family circumstances, or a request for pastoral help can contain additional sensitive information. We therefore treat the context of a record as relevant to privacy, rather than assuming that educational or faith-related information is always harmless.",
+      "Please consider the people mentioned in your own content. You might know that a relative is ill, that a child attends a particular homecell, or that a friend is facing financial difficulty. Your knowledge does not automatically authorise publication or cloud storage of those details. Use initials or remove identifying details where they are unnecessary. The safest directory listing is a public organisational contact and public service location, not a private family address or a pastor's personal details supplied without permission. Sensitive context also affects support requests: describe a technical problem without attaching unrelated private study material."
+    ]
+  },
+  {
+    "id": "section-5",
+    "title": "5. Sources of information",
+    "paragraphs": [
+      "Information can come directly from you, from actions you choose within the application, from the device features you allow, from an account service, or from public directory and content sources. Direct submissions include registration details, an avatar selection, a note, a directory entry, an email, or a waitlist form. Activity records include a saved verse, a completion event, a streak date, or a changed preference that the application needs to remember.",
+      "Some information is generated automatically during a requested operation. A server receiving a connection ordinarily receives network metadata. An authentication service creates an account identifier and session credentials. A local notification schedule includes a delivery time. A map request identifies the map area needed to draw the view. Automatic generation does not mean the information is unrelated to your use of the service, so these categories are explained separately below.",
+      "Public organisational information can be included in the ministry directory or supplied by a contributor. A public listing may describe a church founder, branch leader, meeting schedule, organisational website, or service address. The fact that information is public does not eliminate the need to keep it accurate and handle correction requests appropriately. We do not treat a directory entry as proof that a named person endorsed the application, authorised every detail, or currently occupies the role described. If a listing wrongly identifies you or publishes a private contact, tell the team which record is involved so that it can be reviewed."
+    ]
+  },
+  {
+    "id": "section-6",
+    "title": "6. Account registration details",
+    "paragraphs": [
+      "Creating an account sends registration information to the authentication and account infrastructure. The registration implementation supports first name, surname, username, email, password, country code, phone number, preferred translation, study focus, daily goal, and knowledge level. Which fields are required is determined by the registration form you are using. Do not interpret a policy list as a request to provide information that the form does not need.",
+      "The account identifier connects your account to profile records and synchronised study data. Your email supports sign-in and account communications. Names and a chosen username support profile presentation and identification within the application. Study preferences help configure your experience. Phone details supplied during registration become account information; the policy does not claim that they are always absent simply because email is used to sign in.",
+      "A password is submitted to the authentication service through the account flow. You should never send that password to the team by email or place it in a support attachment. The application also stores session credentials using native secure storage to maintain the signed-in state. These credentials are different from your display name and should be treated as secrets. Choose a password you do not reuse elsewhere, keep your registered email accessible, and review account details before submitting them. If you do not want to supply optional profile information, leave optional fields blank where the application permits that choice."
+    ]
+  },
+  {
+    "id": "section-7",
+    "title": "7. Sign-in, sessions, and authentication metadata",
+    "paragraphs": [
+      "When you sign in, the authentication service processes the credentials and request information needed to verify the account and issue a session. A session commonly includes access and refresh credentials, an account identifier, and expiry information. The app uses a native secure-storage adapter for persisted authentication. The presence of session storage is a functional part of account access, not an advertising identifier or a reason to expose credentials in diagnostic reports.",
+      "Network requests for authentication can produce operational metadata such as time, success or failure, and information associated with the connection. This supports reliable sign-in and protection against abuse. An application lock and an authenticated cloud session are separate controls: unlocking the local interface does not create a new server account, and signing out is not the same as deleting existing cloud records.",
+      "If the app cannot securely persist a session on your device, it may refuse or interrupt the operation rather than use an insecure storage fallback. Offline availability relies on an existing supported local state; an offline session cache is not permission to bypass server authentication. Changes to an account, including deletion or credential changes, can require an online connection. If a device is lost or shared with another person, protect the email account and use the available sign-out or session controls. Ask support about the appropriate account-security steps without disclosing tokens or recovery secrets."
+    ]
+  },
+  {
+    "id": "section-8",
+    "title": "8. Profile names, usernames, and account preferences",
+    "paragraphs": [
+      "A profile can contain identity and preference fields supplied at registration or edited later. A display name helps you recognise your own profile, while a username may support community presentation where that functionality is enabled. Translation choice, reading goal, study focus, and level settings affect the content or defaults presented to you. These fields can be held locally and may also be included in account metadata or profile updates.",
+      "Not every field stored in a profile is intended for public display. An email or phone number should not be assumed public merely because a display name appears in a community feature. Conversely, using a nickname does not make a profile anonymous if it includes a recognisable photograph or identifying biographical details. Consider the combined information someone can see, including any activity that you elect to display.",
+      "You can edit supported fields through the application. A successful local edit may be pending synchronisation if the connection is unavailable, so distinguish a changed display on your device from a confirmed server update. Historical copies can also remain in exported files, messages, or independently captured screenshots. A profile correction does not automatically alter an unrelated ministry listing naming the same person; identify both records in a request if necessary. Do not impersonate another individual, church, or organisation by combining their name, image, and contact details in your account."
+    ]
+  },
+  {
+    "id": "section-9",
+    "title": "9. Study records and cloud synchronisation",
+    "paragraphs": [
+      "The application supports saved biblical facts, favourite Scriptures, completed Word of the Day studies, read-fact records, verse highlights, achievements, and study notes. When account synchronisation is used, these records can be sent to cloud tables associated with your account. Some account metadata and profile updates also support continuity of study preferences and streak information. The app is therefore not accurately described as storing every personal study record exclusively on a device.",
+      "Synchronisation provides continuity when reconnecting or using supported account features. It also creates privacy responsibilities because a record that was entered offline can later be transmitted. The data involved can include an account identifier, content identifier, chosen highlight colour, note reference and text, completion state, and event or update time. A public Scripture text may be non-personal, while the fact that you saved it at a particular time can be personal account activity.",
+      "Use private-study and private-notes controls where supported if you want to limit cloud study processing. Their precise effect is described below; they do not retroactively erase every record previously synchronised. A note about another person's circumstances should be written with particular care. If a synchronised record is inaccurate, edit or delete it using the available controls and allow the account to reconnect. If you need confirmation about a cloud record that cannot be managed through the app, request assistance from the privacy contact."
+    ]
+  },
+  {
+    "id": "section-10",
+    "title": "10. Offline queues and delayed transmission",
+    "paragraphs": [
+      "The app includes a durable queue for account-linked study actions created when immediate network delivery is unavailable. Queue entries can identify the account, action, relevant content item, desired state, optional value, creation time, and retry count. Supported actions include saving or removing favourites, recording completion or reading, changing highlights, updating or deleting notes, and recording earned achievements. The queue is scoped to an account and uses secure storage.",
+      "A queued operation is still information on your device until it is transmitted. Reconnecting can cause the operation to be submitted to the account service. This matters if you briefly disable connectivity while studying: airplane mode can postpone synchronisation without necessarily cancelling it. Account changes are checked before delivery to reduce the risk of sending one user's queue under another user's account.",
+      "The queue has operational limits and can fail because of a full queue, invalid record, expired session, or unavailable service. A pending deletion is not a confirmed cloud deletion until the server accepts it. Private-study controls can prevent or pause particular queued actions, but the effect of previously queued content should be considered separately. Before sharing a device, signing into another account, or making a sensitive privacy change, let outstanding actions resolve where possible and confirm the relevant state. Do not assume that force-closing the app erases pending records; durable queues are designed to survive ordinary restarts."
+    ]
+  },
+  {
+    "id": "section-11",
+    "title": "11. Personal study notes and reflections",
+    "paragraphs": [
+      "Notes and reflections are content you deliberately create. They may include a Scripture reference, note text, an identifier, and creation or update information. Depending on the feature and your settings, notes can remain local, be held in secure account storage, be queued for synchronisation, or be included in a study export. Personal reflections deserve careful handling because their sensitivity depends on what you write, not only on the label “study note.”",
+      "Avoid recording passwords, payment credentials, identity document numbers, or detailed information about people who have not agreed to that use. A prayer or reflection may include health, relationship, employment, or religious information about someone else. You can often preserve the spiritual purpose of a note while omitting a full name or other identifying detail. Keep the account and device appropriately protected when you store a sensitive journal.",
+      "Do not assume that every note is end-to-end encrypted or inaccessible to infrastructure administrators. The application includes secure local storage and encrypted archive capabilities, but those are specific protections with specific boundaries. They do not establish that every cloud note is encrypted with a key available only to you. If you need a strictly local journal, review the private-notes setting and confirm that the feature you are using respects that choice. When asking for technical assistance with notes, provide a minimal example or a redacted screenshot rather than the entire journal."
+    ]
+  },
+  {
+    "id": "section-12",
+    "title": "12. Favourites, bookmarks, and highlights",
+    "paragraphs": [
+      "Favourites and bookmarks associate your account or device with content you want to revisit. The stored item may be a biblical fact identifier, verse identifier, or saved Scripture object. Highlights can include a verse key and a selected colour. These records make the study interface useful without requiring you to remember every passage or manually recreate a reading list.",
+      "A list of saved verses can reveal interests, current concerns, or religious perspectives. It is not made non-personal by the fact that Scripture itself is publicly readable. Where cloud saving is enabled, the application can store the association with your account. Where a privacy setting keeps the item local, the local copy still needs device protection and may appear in a manual export or share action.",
+      "Removing a favourite from a connected account can submit a corresponding removal operation. If you remove it offline, the server may retain its previous state until the change synchronises. Copies you deliberately sent to another person or stored in a separate backup will not necessarily be removed by that action. Review a share preview so that a bookmark title or note does not disclose more than you intended. If you see a saved item belonging to another account on a shared device, stop using that account state and report the problem with minimal identifying information."
+    ]
+  },
+  {
+    "id": "section-13",
+    "title": "13. Reading progress, devotional completion, and streaks",
+    "paragraphs": [
+      "Reading activity used by the application can include viewed-fact identifiers, completed study items, dates of activity, current streaks, historical streak information, and milestone state. The app uses these records to resume study, track progress, display reminders, and present achievements. Account-linked progress can be synchronised, while some continuity information is maintained locally across ordinary restarts.",
+      "A streak is an application indicator rather than an assessment of your faith, character, health, or religious commitment. It can be affected by time zones, device clocks, connectivity, restoration, or changes in the implementation. We do not use the existence of a streak to authorise a church leader to access your private notes. Public display of progress is a separate visibility choice from retaining progress for your own account.",
+      "Activity dates and patterns can reveal routines, so consider whether public achievement or streak display is appropriate for you. Switching public display off does not necessarily erase the underlying progress record used privately by your account. Correcting a streak also differs from deleting all study events. If an account restoration unexpectedly shows another person's activity, do not export or circulate it; identify the device and account situation to support. You can reduce unnecessary disclosure by using privacy controls and avoiding screenshots that display both account identity and a detailed history of activity."
+    ]
+  },
+  {
+    "id": "section-14",
+    "title": "14. Achievements and community visibility",
+    "paragraphs": [
+      "Achievements can be earned from supported study actions and recorded against your account. A record can include an achievement identifier and earned time. The feature helps you recognise milestones within the application. Visibility settings may control whether streaks or achievements are shown to others in supported community experiences, while private storage supports your own progress view.",
+      "The public audience for an enabled community feature may be broader than your personal church group. A username, photograph, and milestone shown together can make the account recognisable. Choose a display identity thoughtfully and review public settings before enabling them. A setting that controls search discoverability is not automatically identical to a setting that controls the visibility of an achievement or a shared image.",
+      "Once another person has seen or captured a public display, a later visibility change cannot reliably remove their independent copy. The application can change what it serves through its own features, but it cannot promise to erase screenshots, forwarded images, or search caches outside its control. The team should respond to reports of wrongly exposed personal information and investigate the affected feature. If your request concerns a milestone display, explain whether you want to hide public visibility, correct the milestone, remove the record, or delete the account; these are different actions and need not have the same technical result."
+    ]
+  },
+  {
+    "id": "section-15",
+    "title": "15. Private Study Mode",
+    "paragraphs": [
+      "Private Study Mode is intended to limit particular study synchronisation paths and is stored as an account-scoped preference on the device. In the reviewed implementation, it affects account metadata synchronisation and the submission or flushing of certain study actions. It is a meaningful control for study processing, but it should not be interpreted as a network-wide anonymity switch or as automatic deletion of old server records.",
+      "Authentication, content downloads, update checks, online maps, and an email you send can still involve network processing. A selected avatar can still have a public URL. The device and operating system can retain their own state. A private study preference does not erase data previously sent to Supabase, Sentry, a map provider, a content host, or a recipient of a manual share.",
+      "Turn the control on before using the affected features if the goal is to limit new synchronisation, and confirm the setting after an account change or restoration. If you want existing cloud records removed, use a supported record-deletion action or submit a privacy request. If a feature does not clearly indicate whether its data stays local, avoid including sensitive information until you obtain clarification. Private Study Mode also does not replace a strong device lock, secure account credentials, or care when using the operating system's sharing and backup facilities."
+    ]
+  },
+  {
+    "id": "section-16",
+    "title": "16. Private notes and bookmark preferences",
+    "paragraphs": [
+      "The private-notes preference is a separate setting that can influence how study notes and bookmarks are handled. Public visibility preferences are stored through server-backed account settings where supported. Some code paths also check private preferences before queuing a favourite or bookmark. A setting name is helpful shorthand, but the actual behaviour depends on which feature creates the record and whether that feature honours the preference.",
+      "A successful update to a server-backed preference requires confirmation from the account service. If the service is unavailable, the app should not tell you that a public visibility change succeeded merely because a switch moved locally. Existing local preferences can support privacy decisions, but an offline change and a confirmed cloud change are not always equivalent. Check any error or pending-state message before relying on the result.",
+      "Choosing private notes is not a promise that every existing account record, export, or backup is now local-only. Records already synchronised may need separate removal. A manual share explicitly transfers content to the recipient you choose even if a storage preference is private. If you want to preserve a personal reflection only on your device, avoid sharing it, inspect the relevant setting, and consider whether any export includes it. Ask the team about the specific feature rather than assuming a single toggle governs all possible transfers."
+    ]
+  },
+  {
+    "id": "section-17",
+    "title": "17. Search discoverability and public profile controls",
+    "paragraphs": [
+      "Discoverability settings are intended to govern whether account information is available through supported community search. A discoverable profile and a publicly visible directory listing are different types of record. A person may have a private account while also being named as a public organisational contact, or have a public avatar URL while profile search is disabled.",
+      "The reviewed application requests confirmation from the server when changing public privacy preferences. In some missing-server-record or error conditions, privacy-sensitive values are treated conservatively. However, feature availability, older releases, and exceptional conditions can differ. This policy does not claim that an unverified public-search implementation is fully deployed or that every historical account has been migrated successfully. Report unexpected visibility rather than assuming it is intentional.",
+      "When you change discoverability, review the related streak and private-notes controls as well. They address different concerns. Removing your account from search does not remove content you posted publicly under another feature, revoke access to a public image link already copied, or delete directory entries you submitted. If you want a broad removal, list the relevant records in a privacy request. You should not use community search to collect other people's contact information, identify minors, infer health or religious circumstances, or compile profiles outside the purpose of the application."
+    ]
+  },
+  {
+    "id": "section-18",
+    "title": "18. Profile pictures and public image URLs",
+    "paragraphs": [
+      "The avatar feature lets you select a photo for your profile. Selection and image processing occur through device image tools, and the chosen image can be uploaded to the Supabase avatars storage bucket. The reviewed code generates a public URL for a successfully uploaded image. An avatar should therefore be treated as potentially accessible to someone who obtains its URL, rather than described as a confidential image in a private bucket.",
+      "Photo selection does not mean the application deliberately uploads your entire photo library. Nevertheless, the chosen photo can show your face, another person, a child, a home, a uniform, a vehicle plate, or other identifying details. Choose an image you are comfortable using in that context, and obtain permission from other people pictured where appropriate. A symbol or illustration can be an alternative if you do not want a recognisable personal photo.",
+      "The app may resize or re-encode an image before upload. Do not rely on that processing as a guarantee that every item of metadata is removed or that every possible privacy risk is eliminated. Replacing an avatar changes the current profile reference, but previously copied links, cached images, or old storage objects may require separate handling. If you want an old avatar removed, identify the account and approximate upload or replacement time. Do not submit an intimate, medical, identifying-document, or otherwise highly sensitive image as a public profile picture."
+    ]
+  },
+  {
+    "id": "section-19",
+    "title": "19. Photo-library permissions",
+    "paragraphs": [
+      "The operating system can ask for permission when you use an image-selection feature. Depending on platform and version, you may select a limited set of photos or use a system picker without granting broader access. The permission prompt describes the platform's scope; this privacy policy describes the purpose for which the exégeomai feature uses your selection.",
+      "You can decline photo access and continue using features that do not require an avatar upload. If you later want a profile image, you can revisit the device settings or selection flow. The app does not need unrestricted access to your personal photo collection to read Scripture, search a downloaded lexicon, or display ordinary text. A permission denial may prevent the particular image feature from completing, but it is not a reason to submit photos by an insecure support route.",
+      "Revoking a permission controls future access through the device. It does not recall an image that has already been uploaded, sent in a message, or exported. If you remove permission after choosing an avatar, manage the uploaded avatar separately. Carefully check the selected image and crop before confirming the upload, especially on a shared device. If a picker exposes a photo that belongs to another user of the device, do not assume that device access means you have permission to publish it."
+    ]
+  },
+  {
+    "id": "section-20",
+    "title": "20. Ministry and church-directory records",
+    "paragraphs": [
+      "The directory can store ministry names, founders or senior leaders, headquarters details, countries, descriptions, categories, websites, contact emails, and contact phone numbers. Branch and homecell records can add leaders, locations, service schedules, and other information relevant to finding a meeting. These records are intended to be useful to people browsing the directory, so they should be treated as public-facing organisational information.",
+      "A contributor should have authority to submit or correct a listing and should use an organisation's public contact channels where possible. Do not publish a private home address, personal mobile number, information about children, or sensitive pastoral material simply because a form accepts text. A homecell address can identify a family residence, so the location owner should understand the publication and agree to the appropriate level of detail.",
+      "A listed church is not automatically verified, endorsed, or affiliated with the app operator. Directory inclusion does not establish ownership of a ministry name, authority over a branch, or approval from every person named. If a listing is inaccurate, outdated, duplicated, unauthorised, or unsafe, use the contact or report route and identify the record. The team may need evidence of an authorised correction without demanding excessive personal documents. Corrections to public listings can take time to reach external map caches or copies already made by independent readers."
+    ]
+  },
+  {
+    "id": "section-21",
+    "title": "21. Addresses, town searches, and geocoding",
+    "paragraphs": [
+      "The application includes online geographic lookup functions. Depending on the feature and available configuration, it can submit a town, street address, search phrase, or coordinates to services including Nominatim/OpenStreetMap, Photon, or LocationIQ. These providers can receive the request, associated network information, and the query needed to return a geographic result. Choosing a country or town can be less precise than submitting an exact residential address.",
+      "Reverse geocoding can send latitude and longitude to obtain a place or street description. A coordinate can identify a private location even when the request does not contain a person's name. A map provider's receipt of a query is separate from saving a public directory location in the app's own account infrastructure. Both can occur during the same workflow and should not be confused with a calculation performed entirely on the device.",
+      "Use a public meeting address rather than your current personal location when that is sufficient. Avoid entering a sensitive address unless you understand why the feature needs it. Search results may be cached locally to avoid repeated lookups, but a local cache does not undo the initial provider request. Provider availability and request limits can affect results. If a result is wrong, verify the address independently before publishing it or travelling. Online address lookup is an optional interaction; ordinary offline reading does not require a geographic query."
+    ]
+  },
+  {
+    "id": "section-22",
+    "title": "22. Maps, satellite imagery, and map-view metadata",
+    "paragraphs": [
+      "Displaying an online map or satellite view requires imagery for the area being shown. The map integration can request tiles or related imagery from external mapping infrastructure, including Esri imagery services where used by the feature. Those requests can indicate a map region, zoom level, and the network connection used to obtain the image. Panning and zooming can generate further requests for adjacent areas or more detailed imagery.",
+      "This is different from saying that the provider receives a live movement history. A displayed area may be a church location, a location you searched manually, or the map's current view. The relevant privacy question is what the feature actually sends and why. Because requested areas can still reveal an interest in a location, avoid treating map use as anonymous solely because no account name appears in a tile URL.",
+      "A pinned directory location can be public, while the user's viewing behaviour is a separate technical interaction. The app does not promise that every tile provider has the same logging or retention arrangements. Consult the provider's notice when you use its service through the integration. If you need to avoid those network requests, do not open online map views while connected and use already available textual directory information where suitable. Map content and geocoding are informational aids; they are not a guarantee of safety, route accuracy, or permission to visit private property."
+    ]
+  },
+  {
+    "id": "section-23",
+    "title": "23. Device location and manually supplied coordinates",
+    "paragraphs": [
+      "A location-related feature may work with a manually searched address, a point selected on a map, or coordinates provided to a geographic function. The reviewed code includes coordinate processing and external reverse-geocoding requests. This policy therefore does not claim that all location handling is local or that no coordinates ever leave the device. It also does not claim continuous background GPS collection merely because the app contains map code.",
+      "The way a particular release obtains coordinates matters. Where a platform permission is required to obtain device location, the operating system's prompt and the feature's explanation should identify that use. If the feature instead uses a town you typed or a directory pin, it may not require device-location access. Read the prompt rather than assuming that an address search and a live-location permission are the same thing.",
+      "Precise coordinates can reveal a home, workplace, place of worship, or another sensitive destination. You can often use a broader town search if precision is unnecessary. Revoking device-location access does not remove a manually entered address, delete a saved directory location, or retract coordinates already submitted to a provider. If you have concerns about a public location identifying you, request correction or removal of that listing and explain the privacy issue. Do not use the directory or map features to track another person's movements."
+    ]
+  },
+  {
+    "id": "section-24",
+    "title": "24. Downloaded Scripture and language resources",
+    "paragraphs": [
+      "Downloaded Bible translations and language resources allow supported study features to work without repeated online retrieval. A download can involve a content host, mirror, or content delivery network. The application includes download URLs for resources hosted through services such as jsDelivr and GitHub raw-content infrastructure. The selected resource, request time, network information, and ordinary delivery metadata can be visible to the provider delivering that file.",
+      "The contents of a downloaded Bible are not ordinarily personal information. Your request for a particular translation, however, is an interaction made from your connection and may suggest language or study interests. Some downloads use alternative mirrors when a primary source is unavailable. The provider receiving the request can therefore differ between attempts. A download does not need to include your private journal to deliver a text resource.",
+      "After a successful download, supported reading operations can use the local copy. Storage consumption, availability, and content version can vary. Removing a downloaded resource frees the app's local copy where supported but does not remove provider access logs generated when it was requested. Check mobile-data and storage implications before downloading large resources. A download failure is not evidence that the provider has deleted its request metadata. The licensing and attribution conditions for each translation remain separate from this privacy explanation."
+    ]
+  },
+  {
+    "id": "section-25",
+    "title": "25. Online Scripture requests and external content APIs",
+    "paragraphs": [
+      "When content is not served from a local resource, the app can request a passage through an external Bible API. The reviewed implementation includes requests to bible-api.com and Bolls.life for supported translation paths. A request may identify a book, chapter, passage, or translation and will be received by the provider handling the connection. This differs from account synchronisation: the content provider need not receive your app account identifier for the request to have privacy implications.",
+      "A passage request can reveal the topic you are reading at that moment. It is generally less revealing than sending a full personal reflection, but religious context still matters. A provider may log operational request information under its own notice and settings. The app should not promise that those independent logs are always anonymous, instantly deleted, or controlled by the exégeomai team.",
+      "Use downloaded resources when you prefer to reduce routine content requests and the required translation is available offline. The app may fall back between local and online paths depending on content availability, so read feature indicators and consider connectivity status. Do not put personal names or confidential notes into an external search field unless it clearly needs them. If a passage displays incorrectly, report the reference, translation, and observed issue rather than supplying a complete account export. The terms governing a provider's content and service also apply to your use of those resources."
+    ]
+  },
+  {
+    "id": "section-26",
+    "title": "26. Greek and Hebrew study, local search, and pronunciation",
+    "paragraphs": [
+      "Language-study tools include lexicon resources, concordance information, and pronunciation support. Many operations can use bundled or downloaded material on the device. Looking up a term locally is different from requesting a new resource from a remote host. The app may retain a preference, bookmark, or study progress associated with the term, and that record can have its own synchronisation path.",
+      "A linguistic lookup does not necessarily reveal a person's identity, but a collection of lookups linked to an account can show study interests. The app does not use this policy to claim that every language feature is entirely offline in every release. If a feature opens an external website, downloads content, or relies on a platform service, that interaction has a different boundary from an embedded dictionary search.",
+      "Pronunciation assistance should not be assumed to involve microphone recording. The existence of audio playback or generated pronunciation is not evidence that the application captures your voice. No general microphone-based collection feature is established by the reviewed study implementation. If a future recording feature is introduced, it would need its own explanation and applicable permission. You can keep a language-study record private by limiting synchronised saves and avoiding exports containing personal reflections. A vocabulary result is educational material, not a medical, psychological, or religious profile of the user who requested it."
+    ]
+  },
+  {
+    "id": "section-27",
+    "title": "27. Notifications and local reminder schedules",
+    "paragraphs": [
+      "The reviewed reminder service requests notification permission and schedules local notifications for study-related events. A local reminder can include a title, text, scheduled delivery time, and related local state. The operating system handles display and can show a reminder on a lock screen, notification centre, or connected accessory depending on your device settings.",
+      "The reminder implementation reviewed here does not establish a general collection of Expo push tokens for remote notification delivery. We therefore do not describe every study reminder as a remotely transmitted push message or claim that a push token is collected whenever you enable local notifications. If a release adds remote push delivery, the notice should identify the token, delivery provider, and purpose before that integration is treated as part of the service.",
+      "You can decline notification permission or disable notifications through the supported app and device controls. Disabling future reminders does not erase notifications already delivered to the system tray or a connected device. Review preview settings if your account identity or study topic is sensitive in your circumstances. On shared devices, choose reminder wording and delivery times with care. A notification schedule is a convenience, not a guarantee that a reminder will arrive at an exact time; battery optimisation, platform limits, time changes, and user settings can affect delivery."
+    ]
+  },
+  {
+    "id": "section-28",
+    "title": "28. Local app lock and biometric authentication",
+    "paragraphs": [
+      "The app supports optional access protection through a local app lock and the device's biometric authentication capabilities. The operating system performs biometric matching and returns a success, failure, or cancellation result to the application. The app does not need your raw fingerprint template or face scan to use that result. Device biometric enrolment is managed by the operating system, not by a photo upload to the app's account service.",
+      "A local lock helps protect access to the interface when the app is backgrounded or reopened according to the selected timeout. It is separate from account authentication, database access rules, secure storage, and encrypted exports. Enabling a biometric lock does not mean every cloud record is end-to-end encrypted. It also does not protect content you intentionally share, export, display on another device, or leave visible in a system notification.",
+      "Use a device passcode and keep the operating system updated. Some devices may lack supported biometric hardware or enrolled credentials, and fallback behaviour can differ. Do not enrol another person's biometric credentials on a device if you want to keep that person from unlocking it. Changes to device security can affect access to stored secrets. If you lose access, use the supported account or device recovery process; the team should not ask you to transmit biometric data. Avoid describing the feature as a guarantee against every physical or technical attack."
+    ]
+  },
+  {
+    "id": "section-29",
+    "title": "29. PIN protection and local security state",
+    "paragraphs": [
+      "A PIN-based protection feature uses local security state to verify an entered PIN and manage access. A PIN is distinct from the password used for a cloud account. Do not use the same value for every account, share it with support, or place it inside a study note. A short PIN can be convenient but has limitations compared with a strong device passcode and other security controls.",
+      "The application includes security services intended to protect local secrets and manage lock state. The exact algorithm, lockout behaviour, and recovery options depend on the installed implementation. This policy does not promise an independent security certification or that every device provides identical hardware protection. It explains the purpose of the control and the information involved without treating a security label as proof of universal confidentiality.",
+      "If you forget a PIN, follow the available recovery route and understand whether resetting local protection affects access to encrypted content. A cloud account reset does not necessarily recreate a lost local encryption key. Do not give another person your device and PIN while expecting the app to conceal an already unlocked journal from them. When reporting a PIN problem, state the device model, app version, and error behaviour, but omit the PIN itself. If you suspect unauthorised access, secure the device and account first, then ask the team about the affected feature."
+    ]
+  },
+  {
+    "id": "section-30",
+    "title": "30. Secure storage, ordinary caches, and their limits",
+    "paragraphs": [
+      "The application uses different storage mechanisms for different purposes. Native secure storage is used for authentication credentials and selected account-scoped study or privacy state. Ordinary application storage can hold preferences, cached content, streak continuity values, and other non-secret operational records. Downloaded Scripture can also be stored in local databases or files. These categories should not be combined into an unsupported statement that every local byte is protected by the same encryption method.",
+      "The secure-storage adapter is designed to fail when secure storage is unavailable rather than fall back to plaintext secret persistence. It also supports chunked records and replacement behaviour so larger values can be managed. Those protections do not turn every unrelated cache, temporary file, or operating-system backup into secure storage. A device sandbox and an encrypted archive are useful protections with different boundaries.",
+      "You should protect the device as a whole. A compromised operating system, shared unlocked device, malicious backup tool, or user-selected export destination can undermine the confidentiality of information outside the secure-storage boundary. Clearing an ordinary cache may not remove secure credentials, while deleting a credential does not necessarily erase downloaded content. If you need comprehensive removal, use the app's supported deletion controls and review external copies. Do not infer that a storage failure means the data was successfully deleted; check the result before relying on it."
+    ]
+  },
+  {
+    "id": "section-31",
+    "title": "31. Encrypted exports and personal backups",
+    "paragraphs": [
+      "The application includes a study-journal export capability and an encryption service for supported archive formats. An export can include selected account or study records and can be written to a file before being shared through device facilities. Supported encrypted archives use authenticated encryption with a key managed through secure storage. Legacy formats may be readable for migration without being the format used for new archives.",
+      "An encrypted export is not the same as an ordinary JSON export, and neither is a guarantee that every cloud copy is encrypted using the same key. Check the format and options presented by the export flow. If you send an unencrypted export to an email address or cloud drive, that recipient or provider can obtain the content. If you lose the key required for an encrypted archive, recovery may be impossible even if you retain the archive file.",
+      "Store backups in a location you trust and consider the sensitivity of notes, account details, and religious context within them. Do not attach a full export to a routine support message. An account deletion cannot reach into your chosen backup destination and remove all independent copies. You are responsible for managing exported files you retain or distribute, subject to your own rights and obligations regarding other people's information. If an export contains an unexpected record, stop sharing it and contact the team with a minimal, redacted description of the issue."
+    ]
+  },
+  {
+    "id": "section-32",
+    "title": "32. Sharing, screenshots, and recipient choices",
+    "paragraphs": [
+      "The app can use device sharing facilities to send selected content to another app, person, or storage destination. The operating system may display a list of recipients or applications, and the destination handles the content under its own terms. A manual share is a deliberate disclosure even if the source content was stored privately inside exégeomai.",
+      "Review the full preview before confirming. A verse image might also show a name, watermark, note, profile photo, or account context. A journal export can contain much more than the single item visible on the current screen. Once the recipient receives a copy, a later deletion inside the app does not automatically remove that copy. The recipient can save, forward, screenshot, or publish it, and those actions may be outside the app operator's control.",
+      "Screenshot-protection features can reduce some system capture paths on supported devices, but they cannot prevent someone from photographing a screen with another device or manually copying visible text. Such controls should not be treated as a confidentiality guarantee. If you are studying in a group, separate public discussion material from a personal journal. Do not share a screenshot containing another user's private record to demonstrate a defect; redact the information and report the minimum needed to investigate. Consider the destination's retention and access settings before sharing a backup or sensitive reflection."
+    ]
+  },
+  {
+    "id": "section-33",
+    "title": "33. Crash diagnostics and Sentry configuration",
+    "paragraphs": [
+      "The application contains a Sentry integration for crash reporting, diagnostic messages, session stability information, and sampled performance reporting. It becomes active when the release is configured with a Sentry destination. When no destination is configured, the service does not have that remote reporting route. The existence of the dependency means the app should not make an unconditional “zero telemetry” claim across all possible release configurations.",
+      "The reviewed configuration turns default personal-information sending off and removes user, extra, and certain request fields from standard error events. Caller-supplied breadcrumb data is discarded. These steps are intended to reduce sensitive payloads, but they are not a guarantee that all possible event types, performance spans, native crash details, or future diagnostic messages are incapable of containing personal information. Operational diagnostics can include device or app characteristics, crash details, timing, and service-generated identifiers.",
+      "Diagnostic reporting is intended to identify failures and improve reliability, rather than supply advertising profiles. It should not be described as a user-controlled opt-out unless the installed application actually provides that control. Do not insert private note text, credentials, or full addresses into a technical report simply because a sanitiser exists. If you want to understand whether diagnostics are active in your installed release, ask the team about that release and configuration. Provider retention and processing settings need to be assessed separately from the app's local storage choices."
+    ]
+  },
+  {
+    "id": "section-34",
+    "title": "34. Updates and application delivery",
+    "paragraphs": [
+      "The application uses Expo update infrastructure for supported over-the-air updates. The configuration can check for updates when the app starts and use a cached application bundle while an update is unavailable. Update requests can convey information needed to identify the correct platform, runtime, channel, and update. The connection also exposes ordinary network metadata to the delivery infrastructure.",
+      "An update request is not the same as uploading a personal journal. Nevertheless, it is a network interaction and must be included when explaining how an offline-first application communicates. Downloaded code and assets can change the application behaviour within the constraints of the installed runtime. Security improvements, content fixes, and privacy controls can depend on having a compatible current release.",
+      "Use official distribution routes and avoid unknown modified builds that may contain different data practices. A public source repository does not ensure that every binary offered elsewhere was built from the same code. Preview channels can have different features from production channels. If you test an early version, avoid unnecessary sensitive data and understand that a later installation may not automatically remove earlier local files. App-store and device update services also have their own records and notices. Contact the team if an update introduces a permission or data use that is not clearly explained by the current notice."
+    ]
+  },
+  {
+    "id": "section-35",
+    "title": "35. Website visits and browser storage",
+    "paragraphs": [
+      "When you visit the exégeomai website, the hosting service receives the requests required to deliver pages, images, scripts, and other assets. Standard connection and security information can include IP address, request time, requested path, browser characteristics, and response information. This is separate from app account study synchronisation and should not be described as no processing simply because you did not fill in a form.",
+      "The website uses browser local storage for the privacy-preference choice presented by its banner. That stored preference allows the banner to remember your selection. Local storage is information held in the browser; it is not inherently a tracking cookie, but it is still a storage mechanism users should understand. Clearing site data or using another browser can cause the banner to reappear.",
+      "The reviewed website does not integrate an advertising network into these pages. This does not mean that every hosting log is disabled or that browser extensions, your internet provider, or an external link destination have no activity records. You can inspect and clear site storage through your browser, use privacy settings appropriate to your device, and avoid entering information into forms you do not need. A browser privacy choice does not change the separate app account privacy settings. Visiting the policy page does not itself require you to create an account or subscribe to launch notifications."
+    ]
+  },
+  {
+    "id": "section-36",
+    "title": "36. Launch waiting-list information",
+    "paragraphs": [
+      "The waiting list is a separate launch-notification service. It collects the email address you submit, your consent, and related registration information such as the consent wording version, signup source, and time. The address is normalised to reduce duplicate records. A launch subscription does not automatically create an app account or import your study notes into the waiting-list database.",
+      "The server checks the request origin, validates the form, uses an anti-bot field, and applies rate limiting. It processes the source IP address to derive a keyed hash used in rate-limit buckets. The database's keyed hash is different from the raw address, but it is not described as universally anonymous. Hosting infrastructure can still process the original connection and hold standard logs according to its settings.",
+      "Where email delivery is configured, Resend can send a confirmation to the subscriber and a notification to the team's configured administration address. That means the submitted address can be processed by the email-delivery service and authorised team recipients. A database acceptance and successful email delivery are separate outcomes. You can request removal by emailing joinus@exegeomai.co.za from the registered address with a clear unsubscribe request. Removal from the waiting list does not delete an app account. The specific waitlist notice provides the programme's retention commitment and should remain consistent with the actual delivery configuration."
+    ]
+  },
+  {
+    "id": "section-37",
+    "title": "37. Support correspondence and technical reports",
+    "paragraphs": [
+      "If you email the team, use an available contact channel, or submit a report that is connected to a working delivery route, the team processes the information you provide to understand and resolve the issue. This can include your contact address, message, account reference, device model, application version, error description, and attachments you choose to send. The receiving email or support infrastructure can also hold delivery metadata.",
+      "Send the smallest useful report. A passage-display problem usually needs a reference and translation, not a personal journal. A login problem does not require a password or authentication token. A directory correction needs the affected listing and an explanation, not unrelated details about congregation members. If an attachment contains other people's information, obtain appropriate permission or redact it before sending.",
+      "Some visible website forms may not yet be connected to a complete server workflow. The absence of an error on a form is not always confirmation that an email was delivered or a privacy request was actioned. Use a published contact address if you do not receive an appropriate acknowledgment. The team should distinguish the content needed to resolve a request from unnecessary sensitive details, and should avoid circulating personal attachments beyond those who need them. Support correspondence is retained only as appropriate to the request, accountability needs, security, and applicable obligations, rather than being treated as a permanent public contribution."
+    ]
+  },
+  {
+    "id": "section-38",
+    "title": "38. Website deletion requests and their limitations",
+    "paragraphs": [
+      "The website includes a deletion-request route that accepts an email address and optional reason. In the reviewed implementation, it generates a reference and writes request details, time, and forwarded connection information to server logs. That implementation does not by itself complete an authenticated account deletion, send a confirmation email, or prove that all records were purged. A request reference is evidence of the submission response, not evidence of completed erasure.",
+      "The website wording should therefore distinguish a request from the confirmed in-app deletion process. If you cannot sign into the app, contact the privacy team from the registered address and retain any reference returned by the website. The team may need to verify account ownership before removing data. Do not provide an optional deletion reason containing sensitive health, family, or religious details unless it is necessary; the reason should not be mandatory for an ordinary erasure request.",
+      "Server logs can contain information you submit to this route, so it is not accurate to say the form never processes personal data. A production request-management workflow should provide appropriate access controls, handling, and retention. This notice does not invent a confirmation deadline or purge schedule that the endpoint has not implemented. Applicable legal response periods remain relevant, and the team should communicate the actual status, any necessary verification, and any lawful limitation rather than treating a success response as a guarantee of completion."
+    ]
+  },
+  {
+    "id": "section-39",
+    "title": "39. In-app account deletion",
+    "paragraphs": [
+      "The in-app account-deletion flow requires an online signed-in session and calls a server function intended to delete the authenticated account and its owned records. The client checks for a successful server confirmation before clearing the relevant local account state. If the server returns an error or does not confirm deletion, the app should report failure instead of pretending that a local profile removal deleted the cloud account.",
+      "After confirmation, the application attempts to sign out, remove selected secure account records and queued study state, clear ordinary application storage, disable local lock state where appropriate, cancel scheduled notifications, and reset the interface. These client actions help remove the active account's local traces, but they cannot erase independent exports, screenshots, emails, recipient copies, provider logs, or every operating-system backup.",
+      "Server-side deletion depends on the deployed account function, database relations, storage handling, and operational retention arrangements. The app's success check is an important safeguard, not an independent certificate that every provider has physically erased every backup copy immediately. Some records may be retained where required for legal obligations, security, or a limited documented purpose. If you need information about a specific retained record or a public avatar, ask the team. Before deleting the account, export anything you want to retain and understand that deletion can make account-linked information unavailable for recovery."
+    ]
+  },
+  {
+    "id": "section-40",
+    "title": "40. Retention principles and practical boundaries",
+    "paragraphs": [
+      "We retain personal information for the purposes explained in this notice and for applicable operational, legal, security, and accountability needs. The appropriate period depends on the record. An active account and its synchronised study state can remain while you use the account, unless you delete a record or request a relevant change. Local preferences remain until changed, cleared, or removed through the applicable device or application control.",
+      "The waiting-list programme has a separate commitment: records should be removed within 90 days after the final launch notification or if the programme is cancelled, unless a subscriber requests earlier removal. Short-lived rate-limit buckets are cleared through the implemented submission maintenance behaviour. That bucket cleanup is not the same as the hosting provider's log-retention policy or the retention of a sent confirmation email.",
+      "For other provider logs, backups, diagnostics, and support records, this policy does not invent fixed periods that have not been verified for the live configuration. The team should be able to explain relevant schedules when asked and limit retention to a justified purpose. A record marked deleted can take additional time to disappear from backups that are not used as active records. Any restoration should respect deletion decisions where required. If you need a precise retention answer, identify the category and service rather than asking whether “all data” follows a single universal period."
+    ]
+  },
+  {
+    "id": "section-41",
+    "title": "41. Service providers and recipient categories",
+    "paragraphs": [
+      "The service uses infrastructure providers for authentication, database storage, object storage, website hosting, content delivery, updates, configured diagnostics, geographic functions, and configured email delivery. Named integrations reviewed include Supabase, Expo update infrastructure, Sentry when configured, Resend when configured, content APIs and download hosts, and map or geocoding services. Their roles differ: a provider delivering a passage is not performing the same task as a provider storing your account profile.",
+      "Information is sent only as relevant to the requested function and implementation. Supabase receives account and synchronised records. A geographic provider receives the query needed for its result. An email provider receives the address and message needed for delivery. A diagnostic provider can receive an event and technical context. Public directory users receive published directory fields, while recipients of manual shares receive the content you selected.",
+      "A contractual service provider acting on the team's instructions can have a different legal role from an independent external website or organisation you contact. The correct classification depends on the actual relationship, purpose, and agreement. This policy does not label every named company a processor or certify every vendor's compliance without verification. Provider notices and contractual safeguards should be considered alongside this explanation. You can request information about a particular processing relationship through the privacy contact. The fact that a provider is widely used does not remove the team's responsibility to minimise the information sent to it."
+    ]
+  },
+  {
+    "id": "section-42",
+    "title": "42. Public disclosures, other users, and organisations",
+    "paragraphs": [
+      "Some information is deliberately public or visible to other people because of the feature you use. Examples include a ministry listing, an organisational contact, a public profile element where enabled, an avatar URL, or a manually shared image. Public information can be copied or indexed, and the audience may extend beyond people who have an app account.",
+      "Think about the intended audience before submitting. A church directory is an appropriate place for a public office email and meeting schedule, but may be an inappropriate place for a person's private mobile number or a family's exact home location. A community milestone can be a useful encouragement, but it can also associate a person with a religious study activity. Visibility controls should be reviewed individually rather than assumed to be the same across features.",
+      "The team can correct or remove records it controls, subject to applicable obligations and the facts of the request. It cannot reliably remove every screenshot, independent archive, message, or external provider cache created after publication. If the disclosure creates a safety concern, explain that concern when requesting review and provide the minimum necessary record identifier. You do not need to post additional sensitive information publicly to demonstrate that a listing is sensitive. Public availability also does not authorise harassment, bulk profiling, unlawful scraping, or use of someone's details for unrelated unsolicited contact."
+    ]
+  },
+  {
+    "id": "section-43",
+    "title": "43. Advertising, sale, and profiling",
+    "paragraphs": [
+      "The reviewed application and website do not contain an advertising-network integration or a data-broker sale workflow. We do not use this service to sell your personal study notes or account details for advertising. This commitment should not be confused with saying that the service uses no identifiers, collects no personal information, or engages no external providers. Functional account storage, configured crash diagnostics, and online content delivery still involve processing.",
+      "The application can personalise aspects of the study experience using the preferences and progress you provide. Showing a selected translation, a recent reading, or an earned milestone is different from building an advertising profile for unrelated marketing. Nevertheless, personalisation should remain within the purposes explained to you. A person's religious interests should not be used to infer unrelated sensitive characteristics or determine their access to employment, insurance, or other external opportunities.",
+      "A launch waiting-list subscription is permission for the stated programme, not permission to enrol you in unrelated commercial mailing lists. If a future business model introduces sponsored content, purchases, subscriptions, or new analytics, the relevant notices and choices should be updated before those activities are treated as authorised. We do not rely on a general statement that “we may do anything to improve the service.” You can raise a concern if a message or interaction appears inconsistent with the stated purpose, especially if it involves sensitive religious or personal circumstances."
+    ]
+  },
+  {
+    "id": "section-44",
+    "title": "44. Legal purposes and lawful bases",
+    "paragraphs": [
+      "We use account information to provide requested account functions, study records to support the relevant study and synchronisation features, public directory submissions to operate the directory, and technical information to deliver and secure the service. We use waiting-list information for the launch programme you choose. A lawful basis depends on the applicable jurisdiction and the particular processing operation; it cannot be supplied by describing all data use as consent regardless of the facts.",
+      "Where consent is the appropriate basis, the choice should be specific, informed, and capable of withdrawal. Some processing can be necessary to provide a feature you request, while other processing can be justified by a proportionate operational or security interest where the law permits it. Legal obligations can require limited record retention or disclosure. Sensitive personal information, including religious context, can require an additional condition beyond an ordinary lawful basis.",
+      "The team should assess the relevant basis and explain it when a privacy request concerns a specific operation. This notice does not state that acceptance of the terms automatically authorises every use of religious, health, or children's information. Declining an optional feature can prevent that feature from working without necessarily preventing offline reading. If you believe a use goes beyond what is needed or what you agreed to, identify the feature and ask for clarification or cessation. Applicable law takes precedence over a broader contractual statement."
+    ]
+  },
+  {
+    "id": "section-45",
+    "title": "45. Religious beliefs and other special personal information",
+    "paragraphs": [
+      "Because exégeomai is a Bible study service, certain records can reveal religious or philosophical beliefs. Examples include an identifiable account's study preferences, a public church affiliation, a saved reflection, or a directory leadership role. A note can also reveal health, family, or other sensitive circumstances. We do not assume that these records lose their sensitivity because they were volunteered or relate to a public Scripture passage.",
+      "South African POPIA and, where applicable, the GDPR include particular protections for special or sensitive categories. The applicable condition depends on the record, purpose, and circumstances. Consent, a deliberate public disclosure, or another statutory condition cannot be presumed simply from the presence of the app on a device. The team should assess these matters and use appropriate safeguards for the actual processing.",
+      "You can reduce exposure by limiting identifiable personal detail, choosing private study controls, avoiding unnecessary cloud synchronisation, and using organisational rather than private directory contacts. These user choices complement the team's responsibilities; they do not transfer all responsibility to you. If a third party submits religious information about you without authority, contact the team with the relevant record and concern. You do not need to disclose more about your beliefs to request a review. We should not use a privacy complaint to create a broader profile of your religious identity."
+    ]
+  },
+  {
+    "id": "section-46",
+    "title": "46. Children's information and family use",
+    "paragraphs": [
+      "Reading Scripture can be a family activity, but that does not mean every account or public-directory feature is designed for independent use by children. The service should apply the relevant rules concerning a child's personal information, parental or other competent-person involvement, and age-appropriate design. This policy does not invent an age-verification process that the current app does not implement or assume that every child can legally consent to every processing activity.",
+      "A parent, guardian, teacher, or church organiser should avoid publishing a child's name, photograph, precise meeting location, contact details, or private reflections in a public directory or community feature without the appropriate authority and safeguards. A group organiser's access to a device does not automatically give permission to create a public profile for each child. Consider local device use and carefully selected shared study material when a public account is unnecessary.",
+      "If you believe the service holds a child's personal information inappropriately, contact the privacy team. Identify the record and your relationship to the child using the minimum information needed for a safe review. The team may need to verify a competent person's authority without requesting excessive documents or exposing the child further. Applicable children's-information requirements remain relevant even if the original submission came from an adult. A notice about family use is not a claim that the app has been independently certified as a children's service or approved for every school or church deployment."
+    ]
+  },
+  {
+    "id": "section-47",
+    "title": "47. International processing and hosting locations",
+    "paragraphs": [
+      "The service can be used from different countries, while providers may operate infrastructure, support, and subprocessors in more than one location. Your information may therefore be processed outside the country where you live. The database project region, diagnostic configuration, email routing, website host, and content provider all affect the actual processing locations. A provider's headquarters is not necessarily the location of every server or support operation.",
+      "This notice deliberately does not promise that all personal information stays in South Africa, Ireland, Frankfurt, or any other single jurisdiction without verifying the live arrangements. The earlier notices contained inconsistent geographic claims; the current explanation focuses on the actual service relationships and the need to confirm deployment-specific details. You can ask the team about the current region and relevant transfer arrangements for the category of information involved.",
+      "Where applicable law requires safeguards for an international transfer, the team should use an appropriate legal mechanism and assess the receiving arrangement. The existence of a cloud-provider contract alone is not a substitute for understanding those requirements. Public publication and user-directed sharing can also create international access that is different from a private processor transfer. If location of processing is central to your decision, ask before supplying sensitive information or using a cloud feature. Offline local study can reduce some transfers, but it does not make later downloads, updates, or manual shares local to your country."
+    ]
+  },
+  {
+    "id": "section-48",
+    "title": "48. Access controls and operational security",
+    "paragraphs": [
+      "The application and backend include authentication checks, account-scoped records, secure local storage, and database access-control migrations intended to restrict personal information. Database row-level access rules help prevent one ordinary account from reading another account's private records. Authorised operational access may still exist for maintaining the service, investigating a failure, or responding to a verified request.",
+      "The security of a live service depends on deployed rules, configuration, credentials, provider controls, and operational practice. Committed migration files are not proof that a particular production database has applied every rule. This policy does not claim an independent audit, guaranteed penetration-test result, or universal encryption certification. It also does not describe administrative access as impossible when the architecture includes service operations capable of handling account data.",
+      "The team should restrict access to what is needed, protect privileged credentials, avoid unnecessary copying of production data, and investigate reported exposure. You can help by using a strong account password, protecting your registered email, enabling suitable device controls, and keeping the app updated. Do not publish tokens or personal records when reporting an access-control issue. A report can identify the feature, expected boundary, and observed problem with redacted examples. If an unexpected record appears, avoid exploring or downloading additional records belonging to others while the issue is investigated."
+    ]
+  },
+  {
+    "id": "section-49",
+    "title": "49. Incidents and suspected unauthorised access",
+    "paragraphs": [
+      "A security incident can involve unauthorised access, accidental disclosure, loss, alteration, or destruction of personal information. Not every application error is a personal-data breach, but a failure involving someone else's records should be reported promptly. Useful details include the affected feature, app version, approximate time, and a minimal description of what was visible or inaccessible.",
+      "The team should investigate the facts, contain the issue where possible, assess the affected information and people, and provide notifications required by applicable law. Notification obligations depend on the jurisdiction, risk, and circumstances. This notice does not invent a universal reporting deadline or imply that every incident will receive identical treatment. A notification should explain what is known, what is being done, and what practical steps may help affected users.",
+      "Do not send a large collection of exposed records to demonstrate a problem, and do not publish private information before giving the team a suitable report. Preserve only the evidence reasonably needed to explain the issue, subject to lawful and responsible handling. If your device or email account is compromised, secure those systems as well; an app fix cannot by itself remove an attacker from an unrelated mailbox or device. Ask for clarification if the team requests sensitive evidence, and use an appropriate private route rather than posting it in a public repository issue."
+    ]
+  },
+  {
+    "id": "section-50",
+    "title": "50. Access, correction, and information requests",
+    "paragraphs": [
+      "You can ask what personal information the service holds about you, how it is used, which categories of recipient receive it, and what relevant retention or transfer arrangements apply. You can also ask to correct inaccurate account or directory information. Some information can be viewed or edited directly in the app; other requests may require the team to identify records in the account or support infrastructure.",
+      "A request should distinguish your own account information from a public organisation's listing and from information held independently by another provider. Provide the registered address or relevant record reference, the category you want to access, and the correction needed. Do not provide secrets or excessive identity information at the outset. The team may need proportionate verification before giving access, especially if the requested record includes sensitive study content or other people's information.",
+      "Applicable rights can have conditions and exceptions. An access response may need to protect third-party privacy, security secrets, legally restricted information, or records outside the team's control. If a request cannot be fulfilled as asked, the team should explain the reason and any available alternative or complaint route. A request for access does not authorise the team to publish the response on a public forum. Consider the security of the delivery destination, particularly if you request a file containing journal content or detailed religious study activity."
+    ]
+  },
+  {
+    "id": "section-51",
+    "title": "51. Erasure, withdrawal, restriction, and objection",
+    "paragraphs": [
+      "Depending on applicable law and the circumstances, you can request deletion, withdraw a consent, ask for processing to be restricted, or object to a use. These actions have different effects. Withdrawing waiting-list consent ends the stated launch-notification use; it does not automatically delete the app account. Turning off public streak display changes visibility; it does not necessarily remove the underlying private progress record.",
+      "Erasure can be available through the in-app account process or a verified request. Some retained information may be necessary for a legal obligation, security investigation, or another limited lawful purpose. The team should explain any applicable exception rather than treating a general retention statement as permission to keep everything indefinitely. Withdrawal does not necessarily make an earlier lawful use unlawful, but it affects future processing based on that consent.",
+      "A restriction request should identify the information and disputed use. For example, you might want a directory contact temporarily hidden while authority to publish it is checked. An objection should explain the relevant processing and concern without requiring you to reveal more sensitive details than necessary. Rights requests must not be used to delete another person's account or suppress accurate information simply because you disagree with their beliefs. The team should verify the request and balance applicable obligations fairly, while giving you a clear explanation of the outcome and any available escalation route."
+    ]
+  },
+  {
+    "id": "section-52",
+    "title": "52. Portability and usable exports",
+    "paragraphs": [
+      "Where applicable law provides a right to data portability, you can request eligible information in an appropriate structured format and, where applicable, ask for transmission to another provider. The scope depends on the legal basis, manner of processing, and information involved. The app's study-journal export is a useful product feature, but it should not be described as automatically satisfying every possible statutory portability request.",
+      "An export may contain local records, account-linked data, or selected study content according to the feature. It may not include all authentication-provider metadata, diagnostic logs, administrative records, or information held by an independent map service. A readable archive also does not necessarily preserve every application relationship, content licence, or future compatibility requirement. Ask the team if you need a specific category beyond what the product export contains.",
+      "Check the destination and encryption format before accepting an export. A file useful for portability can also expose private content if stored in a public folder or forwarded to the wrong recipient. Portability concerns your eligible information; it does not provide a right to obtain another person's private notes, unrestricted directory databases, or secret operational credentials. If a file unexpectedly includes another user's record, stop using it and report the issue. Keep exported copies secure and manage them separately after an account deletion, because the service cannot automatically recall independent backups you chose to create."
+    ]
+  },
+  {
+    "id": "section-53",
+    "title": "53. Complaints and supervisory authorities",
+    "paragraphs": [
+      "If you think personal information has been handled incorrectly, first identify the relevant feature, record, or request and contact the privacy team. Explain the concern and desired outcome. The team should assess the facts and respond through an appropriate private channel. You do not need to publish your journal or religious circumstances publicly to raise a complaint.",
+      "In South Africa, you may have the right to raise a POPIA-related complaint with the Information Regulator. Where the GDPR applies, a competent data-protection supervisory authority may also provide a complaint route. Other jurisdictions can have their own regulators and rights. Use the authority's current official website for forms, contact details, and procedures rather than relying on an outdated address copied into a long policy.",
+      "A complaint route is available independently of whether the team agrees with your interpretation. The team should not discourage a lawful complaint or require you to waive applicable rights as a condition of ordinary support. Some disputes may involve an independent church, map provider, email provider, or app store rather than processing controlled by exégeomai. In those cases, the team can explain the boundary and direct you to the relevant organisation where appropriate. Keep records of your request and response, while avoiding unnecessary replication of sensitive attachments. The policy's length does not itself establish regulatory approval or legal compliance."
+    ]
+  },
+  {
+    "id": "section-54",
+    "title": "54. Changes, new features, and future integrations",
+    "paragraphs": [
+      "A large application can evolve, but potential future capabilities are not automatically part of today's processing. If a new feature introduces purchases, remote messaging, additional analytics, recording, or a new public audience, its data handling should be explained before users rely on it. We do not use hypothetical features to justify collecting information for unspecified future purposes.",
+      "Changes can include a new provider, altered synchronisation behaviour, a different privacy default, or a new use of existing information. The team should update the notice and relevant feature prompts, and obtain an appropriate choice where required. A revised effective date should identify a genuine change rather than silently reusing a policy that no longer matches the released application. Old builds may continue to behave differently until users update, so release configuration matters.",
+      "If you notice a permission prompt or data flow not covered clearly here, pause the optional interaction and contact the team with the app version and feature name. You can continue using unaffected features where available. A notice update does not authorise the app to make private journal content public without the relevant basis and controls. Similarly, a new terms clause cannot override mandatory privacy rights. We aim for a policy that remains understandable through a summary, table of contents, detailed feature explanations, and practical examples rather than making users find a new disclosure hidden in unrelated legal text."
+    ]
+  },
+  {
+    "id": "section-55",
+    "title": "55. Example: studying offline and reconnecting later",
+    "paragraphs": [
+      "Suppose you sign in while connected, download a translation, and then study without a connection during a journey. Opening the downloaded chapter can use local content. Saving a favourite or completing a study item can create a local account-linked action. If the action is eligible for synchronisation, the durable queue can preserve it and submit it when the account reconnects. These are three distinct steps: content retrieval, offline activity, and later account transmission.",
+      "If you want the relevant study activity to remain local, review the private-study choices before recording it. Merely switching off Wi-Fi postpones communication; it does not express a permanent instruction never to synchronise. A mobile-data connection can also reconnect an apparently offline device. Check the actual connectivity and privacy state rather than relying only on whether one network icon is visible.",
+      "The downloaded translation provider can have a delivery log even though your subsequent chapter reading was local. The account service can have the synchronised favourite after reconnection even though it was first created offline. A manually exported journal can have a separate copy again. If you later request deletion, identify the account records you want removed and manage your own exported copy. This example explains why the policy distinguishes local reading, queue persistence, content delivery, and cloud storage instead of using a single “offline” label to describe all four. The same distinction applies to notes and highlights where those features use a synchronisation path."
+    ]
+  },
+  {
+    "id": "section-56",
+    "title": "56. Example: hiding a milestone without deleting your progress",
+    "paragraphs": [
+      "Suppose you earned a study milestone and want to keep the progress privately without showing it to others. The relevant public-streak or achievement visibility control can change the presentation in supported community features. Your private account can still need the underlying achievement identifier and progress state to display the milestone to you. Hiding the public display and deleting the private record are different choices.",
+      "Check for a successful server confirmation when you change public visibility. If the connection fails, the previous public setting may still govern the server. A local switch movement is not sufficient evidence that another user can no longer see the old display. If the app reports an error, retry through the supported flow or ask the team for assistance. Do not publish a screenshot of the entire account to prove the problem; a redacted explanation and the relevant setting are usually enough.",
+      "Someone who saw the milestone earlier may retain an independent screenshot. The team can change service-controlled visibility but cannot promise to erase every copy made by another person. If the earlier display contains inaccurate or sensitive information, explain that in the request. You can ask to correct the milestone, hide it, remove the record, or delete the account, and should specify which outcome you want. Choosing one should not silently be treated as authorisation for all the others. Consider whether your avatar and username still identify you even after a progress indicator is hidden."
+    ]
+  },
+  {
+    "id": "section-57",
+    "title": "57. Example: replacing an identifiable avatar",
+    "paragraphs": [
+      "Suppose you uploaded a photograph and later decide to use an illustration. Editing the profile can replace the current image reference with the new selection. The old photograph may have had a public storage URL and may have been downloaded or cached by another person. Replacing the current avatar therefore changes an important display, but it does not necessarily prove that the old object and every independent copy are gone.",
+      "Ask for removal of the old avatar if that is your goal. Identify the account and approximate replacement time without sending a high-resolution copy of the photograph unnecessarily. If you still have the old URL, provide it through the private request channel rather than posting it publicly. The team can investigate the object it controls and explain any relevant cache or retention boundary. If another person appears in the image, mention that permission or privacy concern without disclosing unrelated details about them.",
+      "Revoking photo-library permission after the upload prevents future selection through that permission, but does not retract the server upload. Deleting the source image from the phone's gallery is also a separate action. These distinctions help you choose an effective privacy response. For a future avatar, select a neutral image if recognising your face or location would be uncomfortable. Check the background as well as the main subject, since signs, uniforms, vehicles, or a distinctive residence can identify someone even when the face is partly obscured."
+    ]
+  },
+  {
+    "id": "section-58",
+    "title": "58. Example: registering a homecell at a private residence",
+    "paragraphs": [
+      "Suppose an organiser wants to list a homecell that meets in someone's home. The directory form can accept a location, leader, schedule, and contact details. Publishing the exact location can help invited visitors, but it can also expose a family residence to people outside the intended group. The ability to enter the address is not evidence that the homeowner approved public publication.",
+      "Before submitting, obtain appropriate authority and decide what detail is suitable for the public directory. An organisational contact and broader town description may be sufficient if an exact address should be given only to confirmed visitors. Do not include children's names, private household phone numbers, or sensitive pastoral notes in the public description. Verify that the map pin does not accidentally identify a neighbouring residence. A geocoding result can be inaccurate even when it looks precise.",
+      "The address search may send the query to an external provider before the listing is saved. Cancelling the directory submission can prevent publication in the app while leaving that separate provider interaction unaffected. If a residence has already been published without permission, contact the team with the listing identifier and request an appropriate correction or removal. Explain any immediate safety concern without adding it to the public listing. The team should distinguish the public directory record, the contributor's account, and external mapping records when explaining what can be changed."
+    ]
+  },
+  {
+    "id": "section-59",
+    "title": "59. Example: correcting a directory contact",
+    "paragraphs": [
+      "Suppose a ministry listing displays your personal phone number even though you are no longer responsible for that branch. The relevant request is a directory correction or removal of the contact, not necessarily deletion of your personal app account. Your app account and the organisational listing may be stored separately and can have different submitters or administrators.",
+      "Identify the ministry, branch, field, and desired correction. If you have a public organisational contact that should replace the number, provide it only if you are authorised to do so. The team may need to verify the correction with an appropriate representative or assess your privacy concern directly. You should not need to surrender your account password or upload an entire identity document simply to flag an obviously private contact appearing in a public record.",
+      "If an external website or map directory also displays the number, that independent record may need a separate request to its operator. The exégeomai team can change records it controls and explain any remaining boundary. Keep the request factual: distinguish an outdated contact, an unauthorised publication, and a dispute about ministry ownership. A correction process should not be used to redirect an organisation's visitors to an unrelated private business or impersonator. After the change, review the visible listing when possible and tell the team if the old detail still appears through another service-controlled view or cached result."
+    ]
+  },
+  {
+    "id": "section-60",
+    "title": "60. Example: asking for help with a private note",
+    "paragraphs": [
+      "Suppose a personal study note will not save. A useful report can identify the screen, app version, approximate note size, whether you were connected, and the error shown. The team usually does not need to read the entire reflection to reproduce a save failure. You can create a harmless test note with the same approximate length or explain which input pattern caused the issue.",
+      "If a screenshot is necessary, redact names, health information, family circumstances, and other private text. Check whether the screenshot also shows your email, profile image, or another person's record. A small attachment sent privately is generally more suitable than a public repository issue containing your journal. Do not include session tokens or encryption keys in a diagnostic report, even if someone asks for a detailed log.",
+      "A support conversation can itself become a personal-information record. The email service and authorised support recipients receive what you attach. Deleting the failed note inside the app does not remove the support attachment. If you want that attachment deleted after the investigation, include that request and ask about any necessary recordkeeping limitation. The team should use a redacted reproduction where possible rather than copying sensitive production notes into a development environment. This example applies equally to an export failure, a bookmark that will not synchronise, or a privacy setting that does not confirm its update."
+    ]
+  },
+  {
+    "id": "section-61",
+    "title": "61. Example: leaving the waiting list and keeping your app account",
+    "paragraphs": [
+      "Suppose you joined the launch waiting list and later created an app account using the same email address. Those records serve different purposes. An unsubscribe request for launch notifications should stop the waiting-list programme for that address without being interpreted automatically as an instruction to erase the app account and its study records.",
+      "Email joinus@exegeomai.co.za from the registered address and state that you want to unsubscribe from the launch waiting list. If you also want account deletion, say so separately and use the authenticated in-app process where available. A request involving a new email address may need limited verification so that another person cannot remove or access your records. Do not send the password for either your app account or mailbox.",
+      "Confirmation emails and earlier launch messages can remain in your inbox or in operational delivery records even after the active subscription is removed. Your own mailbox copies are under your control. The team should stop the relevant future use and explain any limited retained record needed to honour the unsubscribe or meet applicable obligations. If you receive a message after requesting removal, forward the minimal message information needed to investigate, including the destination address and time, without attaching unrelated personal correspondence. A change to your app's notification settings does not necessarily unsubscribe an email waiting-list entry, because local reminders and launch emails use different systems."
+    ]
+  },
+  {
+    "id": "section-62",
+    "title": "62. Example: deleting an account after exporting a journal",
+    "paragraphs": [
+      "Suppose you export your journal to a personal cloud drive and then delete your app account. The authenticated deletion process concerns the service-controlled account and related records, together with the client cleanup performed after confirmation. Your drive copy was deliberately placed with a separate provider and remains a separate record unless you remove it there.",
+      "Before deleting, confirm that the export is usable and stored securely if you intend to keep it. If the archive is encrypted, retain the appropriate access material safely; an account deletion or device reset may affect access to a local key. Do not assume support can reconstruct a lost encryption secret. If you no longer want the backup, remove it from the drive and review that provider's recycle bin, version history, shared links, and retention options.",
+      "A recipient who previously received a journal copy may also retain it. You can ask them to remove it, but the application's deletion button cannot automatically erase their independent device. The same applies to printed notes, screenshots, email attachments, and public posts. The team should explain any remaining service-controlled retention when responding to a deletion request, rather than claiming every copy everywhere vanished instantly. If the app reports deletion failure, do not rely on the reset appearance of a local screen alone. Obtain a successful confirmation or contact the team about the account state before assuming the cloud account is gone."
+    ]
+  },
+  {
+    "id": "section-63",
+    "title": "63. Example: a shared device and more than one account",
+    "paragraphs": [
+      "Suppose two family members use the same phone at different times. Each person's account can have different privacy preferences, progress, notes, and synchronisation queues. The application uses account-scoped storage and account checks in relevant paths to reduce mixing, but the device's notification centre, photo library, exported files, and ordinary system access can still be shared.",
+      "Sign out through the supported flow before another person signs in, and let important pending actions resolve where possible. Review the new account's privacy and lock settings instead of assuming that the first person's choices apply to everyone. A cached translation can appropriately be common non-personal content, while a private note or account token should not be treated the same way. If another person's note appears unexpectedly, do not save or share it; report the issue with a redacted account-switching description.",
+      "The operating system's device lock protects the device, while an app lock protects a particular access path. Neither prevents a person with broad device access from opening an exported file you saved in a shared folder. A biometric enrolment used by several people can also reduce the practical exclusivity of a local lock. Consider separate devices or platform user profiles where available if confidentiality is especially important. After an account deletion or reset, review remaining downloads and independently saved files; not every shared-device record is tied to the account that was just removed."
+    ]
+  },
+  {
+    "id": "section-64",
+    "title": "64. Example: diagnostic reporting without a full journal upload",
+    "paragraphs": [
+      "Suppose the app crashes while displaying a study screen and the release has Sentry configured. The diagnostic integration can submit a crash event and technical context so the team can investigate. The reviewed sanitisation removes several personal and request fields from standard events. That reduction matters, but it does not mean the event contains no information or that every diagnostic event is identical.",
+      "A stack trace can identify the failing component, app version, device characteristics, or timing. Sampled performance reporting can have a different event structure from a standard exception. The policy therefore explains diagnostics conditionally and avoids claiming that all network telemetry is absent. It also avoids promising a user-accessible diagnostic opt-out where the installed interface has not implemented one.",
+      "If you report the crash manually, do not attach your journal to supplement the automatic event unless a minimal redacted example is necessary and you choose to provide it. Ask about the relevant release configuration if you want to understand whether remote diagnostics were active. A private-study preference controls study paths; it should not be assumed to disable an independent diagnostic integration. Similarly, turning off notifications does not turn off crash reporting. These are separate purposes and controls. The team should review event contents and provider retention rather than relying solely on a comment in the source code or the name of a privacy setting."
+    ]
+  },
+  {
+    "id": "section-65",
+    "title": "65. Example: following an external link from the app",
+    "paragraphs": [
+      "Suppose you open a ministry's website, an external Bible resource, a map link, or an email contact from the app. The destination can receive a request from your browser or selected application and may process technical information, account state already held there, and anything you submit directly. The exégeomai privacy notice does not replace that destination's notice.",
+      "A link's presence does not certify the destination's security or authorise it to access your app journal. Check the address before entering credentials or personal information, especially if a page asks you to sign in with an unrelated account. Do not reuse your exégeomai password on a church website or send it to a contact reached through a directory listing. A malicious or outdated destination can have practices different from the legitimate organisation's current site.",
+      "If the app's link is wrong, report the listing or screen and destination URL. The team can correct a link it controls, while the external operator remains responsible for its own content and records. A request to remove your details from an external contact form generally needs to go to that operator as well. You can often use a public phone or office email without submitting extra personal details. The choice to contact a ministry is yours; opening a directory record does not mean you consented to unrelated marketing, private counselling records, or indefinite storage by every organisation named in the directory."
+    ]
+  },
+  {
+    "id": "section-66",
+    "title": "66. A final privacy checklist for your own choices",
+    "paragraphs": [
+      "Before using a feature, consider what information it needs, whether the information stays local, whether a cloud or external provider receives it, and whether any part becomes public. This is especially useful for study exports, avatars, precise addresses, public milestones, and directory contacts. The goal is to make a deliberate choice rather than prevent ordinary study. Many educational interactions need little personal detail.",
+      "After changing a setting, look for confirmation and understand its scope. A discoverability change is different from account deletion. A private-notes preference is different from disabling all network requests. A revoked photo permission is different from removing an uploaded avatar. A deleted local export is different from deleting the same file from a cloud drive. These distinctions are practical tools for requesting the result you actually want.",
+      "Keep your app, device, and account credentials protected, and choose an appropriate private channel for support. If you ask for access or deletion, identify the category and desired outcome without sending passwords or unnecessary sensitive documents. If you discover someone else's information, stop exploring it and report the boundary problem responsibly. If this notice does not answer a concrete question, contact privacy@exegeomai.co.za and name the feature or record involved. The team should provide a clear explanation, investigate inconsistencies, and update the notice when the service changes. Your privacy choices and applicable legal rights do not depend on reading every paragraph of this long-form explanation; the summary, contents, and feature-specific sections are intended to help you find what matters to you."
+    ]
+  }
+]

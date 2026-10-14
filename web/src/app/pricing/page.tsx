@@ -1,12 +1,6 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Footer } from '@/components/Footer';
 
-export const metadata: Metadata = {
-  title: 'Pricing — 100% Free & Open Source',
-  description:
-    'exégeomai is 100% Free and Open Source under the MIT License. Zero paywalls, zero subscriptions, zero ads.',
-};
 
 export default function PricingPage() {
   return (
@@ -15,7 +9,7 @@ export default function PricingPage() {
         <header className="subpage-hero">
           <div className="wrap">
             <span className="section-kicker">Software Freedom</span>
-            <h1>100% Free &amp; Open Source</h1>
+            <h1>Pricing and Availability</h1>
             <p>
               The Word of God is sacred and must never be trapped behind commercial subscriptions,
               paywalled study notes, or targeted advertising trackers.
@@ -28,14 +22,14 @@ export default function PricingPage() {
             <div className="pricing-grid" style={{ marginBottom: 64 }}>
               {/* Standalone Community Tier */}
               <div className="pricing-card featured">
-                <span className="pricing-badge">Free Forever · MIT License</span>
+                <span className="pricing-badge">Coming Soon</span>
                 <div className="pricing-header">
-                  <h3>exégeomai Standalone</h3>
+                  <h2>exégeomai Standalone</h2>
                   <p>Unrestricted access for individual believers, scholars, and pastors.</p>
                 </div>
                 <div className="pricing-price">
                   <span className="pricing-amount">$0</span>
-                  <span className="pricing-period">/ forever</span>
+                  <span className="pricing-period">/ current planned access</span>
                 </div>
                 <ul className="pricing-features">
                   <li>
@@ -48,30 +42,30 @@ export default function PricingPage() {
                   </li>
                   <li>
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#0F172A" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
-                    <span>32 Complete Offline Bible Translations</span>
+                    <span>Translation resources vary by release</span>
                   </li>
                   <li>
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#0F172A" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
-                    <span>Hardware Keystore AES-256 Encryption</span>
+                    <span>Local security and privacy choices</span>
                   </li>
                   <li>
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#0F172A" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
-                    <span>Zero Ads, Zero Trackers, Zero Data Harvesting</span>
+                    <span>No integrated advertising network</span>
                   </li>
                   <li>
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#0F172A" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
-                    <span>Full Offline SQLite Database Included</span>
+                    <span>Supported offline resources</span>
                   </li>
                 </ul>
-                <a href="/#download" className="btn-primary" style={{ justifyContent: 'center' }}>
-                  <span>Download APK (Free)</span>
+                <a href="/#waitlist" className="btn-primary" style={{ justifyContent: 'center' }}>
+                  <span>Join Waiting List</span>
                 </a>
               </div>
 
               {/* Open Source Contributor */}
               <div className="pricing-card">
                 <div className="pricing-header">
-                  <h3>Open Source Contributor</h3>
+                  <h2>Open Source Contributor</h2>
                   <p>For biblical linguists, developers, and theological editors.</p>
                 </div>
                 <div className="pricing-price">
@@ -111,20 +105,9 @@ export default function PricingPage() {
             </div>
 
             <div className="prose-card">
-              <h2>Why We Will Never Charge for exégeomai</h2>
-              <p>
-                Commercial Bible applications often start free and slowly introduce paywalls: charging for
-                commentaries, Strong&apos;s concordances, or advanced search tools. Worse, many commercial apps
-                embed third-party marketing SDKs that harvest your reading time, bookmarked verses, and location data.
-              </p>
-              <p>
-                We reject this model entirely. <strong>Matthew 10:8</strong> records the Lord&apos;s command:
-                <em> &quot;Freely you have received; freely give.&quot;</em>
-              </p>
-              <p>
-                Every feature, from the complete 14,298 Strong&apos;s lexicon entries to all 32 offline canons,
-                is and will always remain completely free and open-source under the MIT license.
-              </p>
+              <h2>Our approach to access</h2>
+              <p>Our aim is to make thoughtful Scripture study accessible. This site announces the upcoming launch; the official release will describe available features and access arrangements.</p>
+              <p>Account processing, cloud study features, maps, and configured diagnostics are described in our <Link href="/privacy">Privacy Policy</Link>. Content and source-code rights depend on the licence actually published for each resource.</p>
             </div>
           </div>
         </section>

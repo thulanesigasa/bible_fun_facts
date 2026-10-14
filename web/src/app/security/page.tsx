@@ -1,20 +1,5 @@
-import type { Metadata } from 'next';
+import Link from 'next/link';
 import { Footer } from '@/components/Footer';
-import { SecuritySection } from '@/components/SecuritySection';
-
-export const metadata: Metadata = {
-  title: 'Security & Privacy',
-  description:
-    'Learn how exégeomai protects your data with AES-256-CBC hardware encryption, PBKDF2 PIN hashing, and a zero-cloud-collection architecture.',
-};
-
 export default function SecurityPage() {
-  return (
-    <>
-      <main>
-        <SecuritySection />
-      </main>
-      <Footer />
-    </>
-  );
+  return <><main id="main"><header className="subpage-hero"><div className="wrap"><span className="section-kicker">Account and study security</span><h1>Protect Your Account and Study</h1><p>Choose appropriate local controls and understand what each one protects.</p></div></header><section className="subpage-content"><div className="wrap prose-card"><h2>Protect access</h2><p>Use a strong account password, secure your registered email, enable suitable device protection, and use local app-lock features where supported. Never send passwords, PINs, session tokens, or encryption keys to support.</p><h2>Understand storage boundaries</h2><p>Native secure storage and encrypted journal archives protect particular records. They do not mean that every cloud note, cache, public avatar, or exported file uses the same encryption or is accessible only to you.</p><h2>Confirm privacy and deletion changes</h2><p>Server-backed privacy changes need confirmation. Account deletion requires an online authenticated server result before local cleanup. Independent backups, screenshots, and recipient copies need separate management.</p><h2>Learn more or report a concern</h2><nav className="legal-related" aria-label="Security resources"><Link href="/safety">Safety controls</Link><Link href="/privacy">Privacy Policy</Link><Link href="/data-safety">Data Safety</Link><Link href="/report-a-problem">Report a Problem</Link></nav></div></section></main><Footer /></>;
 }

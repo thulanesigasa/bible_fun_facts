@@ -1,12 +1,6 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Footer } from '@/components/Footer';
 
-export const metadata: Metadata = {
-  title: 'Features — Deep Biblical Scholarship',
-  description:
-    'Explore the complete feature suite of exégeomai: 365 daily devotionals, 14,298 Strong\'s Greek and Hebrew entries, 32 offline canons, and hardware security.',
-};
 
 export default function FeaturesPage() {
   const featureList = [
@@ -16,9 +10,9 @@ export default function FeaturesPage() {
       desc: 'Instant access to all 8,674 Hebrew and 5,624 Greek lemmas. Tap any word to view phonetic transliteration, lexical definition, morphology, and every biblical verse where the root occurs.',
     },
     {
-      title: '32 Full Offline Canons',
+      title: 'Translation Resources',
       category: 'CANONICAL TEXTS',
-      desc: 'Zero streaming required. Bundled KJV, ASV, Young’s Literal, Darby, Greek New Testament, Latin Vulgate, and South African vernaculars (isiZulu, Sepedi, Afrikaans) stored in embedded SQLite.',
+      desc: 'Explore supported bundled, downloadable, and online Scripture resources. Availability and offline behaviour depend on the selected translation and release.',
     },
     {
       title: '365 Daily Exegetical Devotionals',
@@ -31,14 +25,14 @@ export default function FeaturesPage() {
       desc: 'Contextual timelines for every biblical writer, covering ancient Near-Eastern geography, royal reigns, governing covenants, and prophetic historical milestones.',
     },
     {
-      title: 'Sound Church Ministry Directory',
+      title: 'Ministry Directory',
       category: 'LOCAL FELLOWSHIP',
       desc: 'Discover verified orthodox, Christ-centered church assemblies with exact geo-coordinates, meeting times, and pastoral leadership information.',
     },
     {
-      title: 'Hardware Keystore AES-256 Encryption',
+      title: 'Security and Privacy Controls',
       category: 'PRIVACY & SECURITY',
-      desc: 'Your reading history, journal notes, and bookmarks are encrypted via hardware-backed AES-256 GCM. FLAG_SECURE protects against unauthorized screen recording.',
+      desc: 'Use local app locks, secure account storage, supported encrypted exports, and account privacy controls. Cloud and public content have distinct boundaries.',
     },
   ];
 
@@ -62,59 +56,19 @@ export default function FeaturesPage() {
               {featureList.map((f, i) => (
                 <div key={i} className="feature-card">
                   <span className="pm-badge" style={{ alignSelf: 'flex-start' }}>{f.category}</span>
-                  <h3>{f.title}</h3>
+                  <h2>{f.title}</h2>
                   <p>{f.desc}</p>
                 </div>
               ))}
             </div>
 
-            {/* Architecture Comparison Table */}
             <div className="prose-card" style={{ maxWidth: 1000 }}>
-              <h2>Engineered Differently</h2>
-              <p>Compare exégeomai&apos;s offline, privacy-first architecture against conventional commercial apps.</p>
-
-              <div style={{ overflowX: 'auto', marginTop: 24 }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 14 }}>
-                  <thead>
-                    <tr style={{ borderBottom: '2px solid var(--border)', background: 'var(--surface-alt)' }}>
-                      <th style={{ padding: '14px 18px', fontWeight: 700 }}>Dimension</th>
-                      <th style={{ padding: '14px 18px', fontWeight: 700, color: 'var(--ink)' }}>exégeomai</th>
-                      <th style={{ padding: '14px 18px', fontWeight: 700, color: 'var(--muted)' }}>Commercial Apps</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                      <td style={{ padding: '14px 18px', fontWeight: 600 }}>Offline Storage</td>
-                      <td style={{ padding: '14px 18px', color: 'var(--ink)', fontWeight: 600 }}>100% Embedded FTS5 SQLite (Zero data plan)</td>
-                      <td style={{ padding: '14px 18px', color: 'var(--muted)' }}>Cloud streaming (Fails without internet)</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                      <td style={{ padding: '14px 18px', fontWeight: 600 }}>Original Language Depth</td>
-                      <td style={{ padding: '14px 18px', color: 'var(--ink)', fontWeight: 600 }}>14,298 Strong’s Greek &amp; Hebrew Concordance linked</td>
-                      <td style={{ padding: '14px 18px', color: 'var(--muted)' }}>English only or paid study expansion packs</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                      <td style={{ padding: '14px 18px', fontWeight: 600 }}>Privacy &amp; Telemetry</td>
-                      <td style={{ padding: '14px 18px', color: 'var(--ink)', fontWeight: 600 }}>Zero trackers, zero ads, zero data harvesting</td>
-                      <td style={{ padding: '14px 18px', color: 'var(--muted)' }}>Ad SDKs &amp; behavioral analytics profiling</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                      <td style={{ padding: '14px 18px', fontWeight: 600 }}>Cryptographic Security</td>
-                      <td style={{ padding: '14px 18px', color: 'var(--ink)', fontWeight: 600 }}>Hardware Keystore AES-256 + FLAG_SECURE</td>
-                      <td style={{ padding: '14px 18px', color: 'var(--muted)' }}>Unencrypted plaintext preferences</td>
-                    </tr>
-                    <tr>
-                      <td style={{ padding: '14px 18px', fontWeight: 600 }}>Software Freedom</td>
-                      <td style={{ padding: '14px 18px', color: 'var(--ink)', fontWeight: 600 }}>100% Free &amp; Open Source (MIT License)</td>
-                      <td style={{ padding: '14px 18px', color: 'var(--muted)' }}>Closed-source subscription paywalls</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
+              <h2>Your choices, explained</h2>
+              <p>Downloaded resources can support offline study. Accounts, cloud synchronisation, online maps, resource downloads, updates, and configured diagnostics can involve external providers.</p>
+              <nav className="legal-related" aria-label="Feature disclosures"><Link href="/privacy">Privacy Policy</Link><Link href="/data-safety">Data Safety</Link><Link href="/safety">Privacy controls</Link></nav>
               <div style={{ marginTop: 40, textAlign: 'center' }}>
-                <a href="/#download" className="btn-primary">
-                  <span>Download APK Now</span>
+                <a href="/#waitlist" className="btn-primary">
+                  <span>Join Waiting List</span>
                 </a>
               </div>
             </div>

@@ -1,9 +1,4 @@
-import type { Metadata } from "next";
 import { Footer } from "@/components/Footer";
-export const metadata: Metadata = {
-  title: "Waitlist Privacy",
-  alternates: { canonical: "https://exegeomai.app/waitlist-privacy" },
-};
 export default function WaitlistPrivacy() {
   return (
     <>
@@ -32,7 +27,7 @@ export default function WaitlistPrivacy() {
           <p>
             With your consent, we use your address to notify you about the
             exégeomai launch. Records are stored in our existing Supabase
-            project in the EU (Ireland) region, with access restricted to
+            project, with the live hosting region and transfer arrangements available from the team and access restricted to
             authorised server operations and administrators. Your address is not
             publicly readable and is not sold or used to sign you up for
             unrelated marketing.
@@ -66,9 +61,7 @@ export default function WaitlistPrivacy() {
             We keep your record while the launch-notification list is active,
             unless you ask us to remove it sooner. The team will delete the list
             within 90 days after the final launch notification, or if the
-            launch-notification programme is cancelled. No confirmation email is
-            sent when you join. Future notification emails will include a way to
-            unsubscribe.
+            launch-notification programme is cancelled. When email delivery is configured, Resend can send a confirmation to you and a signup notification to the authorised team. Email delivery can fail independently of registration. Notification messages provide an unsubscribe route.
           </p>
           <p style={{ marginTop: 32 }}>
             Notice and consent version: launch-v1 · 13 October 2026

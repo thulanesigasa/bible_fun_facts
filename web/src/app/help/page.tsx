@@ -1,12 +1,6 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Footer } from '@/components/Footer';
 
-export const metadata: Metadata = {
-  title: 'Help Centre — exégeomai Documentation',
-  description:
-    'Comprehensive user manuals, APK sideloading tutorials, and Strong\'s concordance user guides for exégeomai.',
-};
 
 export default function HelpPage() {
   const guides = [
@@ -68,7 +62,7 @@ export default function HelpPage() {
               {guides.map((g, idx) => (
                 <div key={idx} className="feature-card">
                   <span className="pm-badge" style={{ alignSelf: 'flex-start' }}>{g.category}</span>
-                  <h3 style={{ fontSize: 18, marginTop: 4 }}>{g.title}</h3>
+                  <h2 style={{ fontSize: 18, marginTop: 4 }}>{g.title}</h2>
                   <p style={{ fontSize: 14 }}>{g.content}</p>
                 </div>
               ))}

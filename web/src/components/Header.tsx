@@ -18,6 +18,7 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     setOpen(false);
@@ -32,17 +33,22 @@ export function Header() {
 
   useEffect(() => {
     if (!open) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setOpen(false);
         toggleRef.current?.focus();
       }
     };
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (!toggleRef.current?.contains(target) && !menuRef.current?.contains(target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", onPointerDown);
     document.addEventListener("keydown", onKeyDown);
     return () => {
-      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("pointerdown", onPointerDown);
       document.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);
@@ -127,7 +133,7 @@ export function Header() {
           >
             <span className="brand-mark" aria-hidden="true">
               <Image
-                src="/logo-transparent.png"
+                src="/logo.webp"
                 alt="exégeomai Logo"
                 width={30}
                 height={30}
@@ -190,84 +196,22 @@ export function Header() {
         </div>
       </nav>
 
-      {/* Full-screen Mobile Menu Overlay */}
+      {/* Compact dropdown; the page remains visible and scrollable below it. */}
       <nav
+        ref={menuRef}
         id="mobile-nav-menu"
         className={`mobile-menu${open ? " is-open" : ""}`}
         aria-hidden={!open}
         inert={!open}
-        aria-label="Navigation menu"
+        aria-label="Mobile navigation"
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 10,
-            maxWidth: 480,
-            margin: "0 auto",
-            width: "100%",
-          }}
-        >
+        <div className="mobile-menu-links">
           {NAV_LINKS.map(({ label, href }) => (
-            <a
-              key={label}
-              href={href}
-              onClick={(e) => handleLink(e, href)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "16px 20px",
-                fontSize: 17,
-                fontWeight: 600,
-                color: "#0F172A",
-                textDecoration: "none",
-                borderRadius: 12,
-                background: "#F8FAFC",
-                border: "1px solid rgba(15, 23, 42, 0.06)",
-                touchAction: "manipulation",
-                transition: "background 0.15s ease",
-              }}
-            >
-              <span>{label}</span>
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#64748B"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                style={{ pointerEvents: "none" }}
-              >
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
-              </svg>
+            <a key={label} href={href} onClick={(e) => handleLink(e, href)}>
+              {label}
             </a>
           ))}
-
-          <a
-            href="/#waitlist"
-            onClick={(e) => handleLink(e, "/#waitlist")}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              padding: "16px 20px",
-              marginTop: 8,
-              fontSize: 16,
-              fontWeight: 700,
-              color: "#0F172A",
-              textDecoration: "none",
-              borderRadius: 12,
-              background: "#FDD223",
-              touchAction: "manipulation",
-              boxShadow: "0 4px 14px rgba(253, 210, 35, 0.4)",
-            }}
-          >
+          <a className="mobile-menu-waitlist" href="/#waitlist" onClick={(e) => handleLink(e, "/#waitlist")}>
             Join Waiting List <span aria-hidden="true">↗</span>
           </a>
         </div>

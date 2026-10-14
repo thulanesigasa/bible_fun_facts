@@ -42,7 +42,7 @@ try {
     await page.waitForFunction(() => document.querySelector('.hamburger').getAttribute('aria-expanded') === 'true');
     await page.waitForFunction(() => getComputedStyle(document.querySelector('#mobile-nav-menu')).opacity === '1');
     assert.equal(await menu.evaluate(el => el.inert), false);
-    assert.equal(await page.evaluate(() => document.body.style.overflow), 'hidden');
+    assert.notEqual(await page.evaluate(() => document.body.style.overflow), 'hidden');
     assert.equal(await toggle.evaluate(el => {
       const r = el.getBoundingClientRect();
       return el.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2));
@@ -56,6 +56,11 @@ try {
     assert.notEqual(await page.evaluate(() => document.body.style.overflow), 'hidden');
   }
   assert.equal(await toggle.count(), 1);
+  await openMenu();
+  assert.ok(await menu.evaluate(el => el.getBoundingClientRect().bottom) < 844, 'dropdown must leave the page visible');
+  assert.equal(await menu.getByRole('link').first().evaluate(el => getComputedStyle(el).borderRadius), '0px');
+  await page.mouse.click(20, 700);
+  await closedMenu();
   await openMenu();
   await toggle.tap();
   await closedMenu();

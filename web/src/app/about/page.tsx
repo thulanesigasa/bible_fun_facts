@@ -1,12 +1,6 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Footer } from '@/components/Footer';
 
-export const metadata: Metadata = {
-  title: 'About exégeomai — The Vision & Theological Foundation',
-  description:
-    'Learn about exégeomai, our mission of unfolding the original biblical languages, historical author timelines, and open source theological integrity.',
-};
 
 export default function AboutPage() {
   return (
@@ -59,7 +53,7 @@ export default function AboutPage() {
                 <div style={{ background: 'var(--surface-alt)', padding: 20, borderRadius: 'var(--r-md)', border: '1px solid var(--border)' }}>
                   <h3 style={{ marginTop: 0, fontSize: 17, color: 'var(--ink)' }}>3. Complete Software Freedom</h3>
                   <p style={{ fontSize: 14, margin: 0, color: 'var(--body-text)' }}>
-                    100% Free and Open Source under the MIT license. No paywalls, no proprietary lock-in, and zero advertising trackers.
+                    A study experience built around Scripture. Review the published release and resource licences, and read the privacy disclosures for account and online features.
                   </p>
                 </div>
               </div>
@@ -76,8 +70,8 @@ export default function AboutPage() {
               </p>
 
               <div style={{ marginTop: 40, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                <a href="/#download" className="btn-primary">
-                  <span>Download the Application</span>
+                <a href="/#waitlist" className="btn-primary">
+                  <span>Join Waiting Listlication</span>
                 </a>
                 <Link href="/community-guidelines" className="btn-outline" style={{ borderColor: 'var(--border-strong)', color: 'var(--ink)' }}>
                   <span>Community Guidelines</span>
