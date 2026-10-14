@@ -2074,3 +2074,46 @@ main [id] { scroll-margin-top: 96px; }
 .pricing-header h2 { font-size: 22px; }
 
 .site-footer .footer-bottom { color: #94a3b8; }
+
+/* Private waitlist dashboard */
+.admin-page { padding: 130px 24px 70px; min-height: 100vh; background: #f6f7fa; color: #0f172a; }
+.admin-wrap { max-width: 1180px; margin: 0 auto; }
+.admin-heading { display: flex; justify-content: space-between; gap: 24px; align-items: center; }
+.admin-heading h1, .admin-login-card h1 { font-size: clamp(32px, 5vw, 48px); letter-spacing: -1.5px; margin-bottom: 10px; }
+.admin-heading p, .admin-login-card p, .admin-account, .admin-stat > p:last-child { color: #475569; line-height: 1.6; }
+.admin-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.admin-actions button { background: white; border: 1px solid #cbd5e1; border-radius: 8px; padding: 11px 18px; color: #0f172a; cursor: pointer; }
+.admin-page button:disabled { opacity: .6; cursor: wait; }
+.admin-page button:focus-visible, .admin-page input:focus-visible { outline: 3px solid #a17e00; outline-offset: 3px; }
+.admin-account { margin: 22px 0 32px; font-size: 13px; overflow-wrap: anywhere; }
+.admin-metrics { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 18px; }
+.admin-stat { background: white; border: 1px solid #e2e8f0; border-radius: 14px; padding: 24px; }
+.admin-stat:first-child { background: #fdd223; border-color: #fdd223; }
+.admin-stat h2 { font-size: 14px; font-weight: 600; }
+.admin-number { font-size: 44px; font-weight: 700; line-height: 1.2; margin: 16px 0 10px; }
+.admin-stat > p:last-child { font-size: 12px; }
+.admin-chart-card { background: white; border: 1px solid #e2e8f0; border-radius: 14px; padding: 28px; margin-top: 24px; }
+.admin-chart-heading { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; }
+.admin-chart-heading h2 { font-size: 22px; }
+.admin-chart-heading p, .admin-live, .admin-empty { font-size: 13px; color: #475569; line-height: 1.6; }
+.admin-live { background: #f1f5f9; padding: 7px 10px; border-radius: 6px; white-space: nowrap; }
+.admin-chart { display: grid; grid-template-columns: repeat(30,minmax(0,1fr)); gap: 6px; height: 225px; margin: 30px 0; border-bottom: 1px solid #cbd5e1; padding-bottom: 20px; }
+.admin-bar-slot { position: relative; display: flex; align-items: flex-end; justify-content: center; }
+.admin-bar-slot > span { display: block; background: #0f172a; width: 100%; min-height: 0; border-radius: 4px 4px 0 0; }
+.admin-bar-slot small { position: absolute; bottom: -19px; font-size: 10px; color: #475569; }
+.admin-empty { margin-top: 24px; }
+.admin-data-table summary { cursor: pointer; color: #0f172a; font-size: 14px; }
+.admin-data-table table { width: 100%; margin-top: 18px; border-collapse: collapse; font-size: 13px; }
+.admin-data-table caption { text-align: left; color: #475569; margin-bottom: 12px; }
+.admin-data-table th, .admin-data-table td { text-align: left; border-bottom: 1px solid #e2e8f0; padding: 10px; }
+.admin-footer { display: flex; justify-content: space-between; gap: 16px; margin-top: 20px; font-size: 12px; color: #475569; flex-wrap: wrap; }
+.admin-error { padding: 16px; margin: 20px 0; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 10px; color: #9f1239 !important; line-height: 1.6; }
+.admin-error p { color: #9f1239; }
+.admin-login-card { max-width: 480px; margin: 10px auto; padding: 32px; background: white; border: 1px solid #e2e8f0; border-radius: 16px; }
+.admin-login-card form { display: grid; gap: 12px; margin: 24px 0; }
+.admin-login-card label { font-size: 14px; font-weight: 600; }
+.admin-login-card input { width: 100%; min-width: 0; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font: inherit; }
+.admin-primary { background: #fdd223; color: #0f172a; border: 0; border-radius: 8px; padding: 14px; font-weight: 700; cursor: pointer; }
+.admin-help { font-size: 12px; margin-bottom: 20px; }
+@media (max-width: 900px) { .admin-metrics { grid-template-columns: repeat(2,minmax(0,1fr)); } .admin-chart-heading { display: block; } .admin-live { display: inline-block; margin-top: 12px; } }
+@media (max-width: 600px) { .admin-page { padding: 110px 16px 40px; } .admin-heading { display: block; } .admin-actions { margin-top: 20px; } .admin-stat { padding: 18px; } .admin-number { font-size: 34px; } .admin-chart-card { padding: 20px 14px; } .admin-chart { gap: 3px; } .admin-bar-slot small { font-size: 8px; } .admin-bar-slot:nth-child(even) small { visibility: hidden; } .admin-login-card { padding: 24px; } }

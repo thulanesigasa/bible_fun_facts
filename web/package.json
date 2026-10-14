@@ -11,7 +11,9 @@
     "test:waitlist": "node --import tsx --test tests/waitlist.check.ts",
     "check:links": "node scripts/check-links.mjs",
     "test:navigation": "node tests/navigation.check.mjs",
-    "test:site": "node tests/site.check.mjs"
+    "test:site": "node tests/site.check.mjs",
+    "test:admin": "node --import tsx --test tests/admin.check.ts",
+    "test:admin:browser": "node tests/admin-browser.check.mjs"
   },
   "dependencies": {
     "next": "^15.1.0",

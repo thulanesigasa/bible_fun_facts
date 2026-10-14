@@ -161,3 +161,7 @@ npm run check:links
 ```
 
 `test:site` covers every sitemap page, canonical/title/description uniqueness, indexing directives, heading levels, image alt attributes, JSON-LD, redirects, HTTPS, generated endpoints, internal links and anchors, and 320px/390px layouts. Real-user Core Web Vitals and hosting-specific indexing headers must also be monitored on the deployed domain; local lab scores do not establish field performance.
+
+### Admin waiting-list monitoring
+
+The private dashboard is at `/admin`, with sign-in at `/admin/login`. It shows aggregate totals, SAST daily activity, and a 30-day chart with automatic/manual refresh. It requires verified Supabase accounts in a server-side UUID allowlist and the private database migrations. No subscriber email list is sent to the browser. See `docs/ADMIN_DASHBOARD.md` for deployment prerequisites, environment variables, and tests. Public SEO indexing applies to public content; private admin routes intentionally remain noindex and authenticated.
