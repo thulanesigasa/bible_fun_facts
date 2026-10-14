@@ -71,6 +71,7 @@
   <img src="https://img.shields.io/badge/Web%20Portal-Responsive%2060--30--10%20Landing%20Site-0284C7?style=for-the-badge&logo=html5&logoColor=white" alt="Responsive Web Portal" />
   <img src="https://img.shields.io/badge/SEO-JSON--LD%20%7C%20OpenGraph%20%7C%20Sitemap-10B981?style=for-the-badge&logo=google&logoColor=white" alt="SEO Optimized" />
   <img src="https://img.shields.io/badge/Deletion%20Portal-Google%20Play%20Policy%20Compliant-DC2626?style=for-the-badge&logo=shield&logoColor=white" alt="Account Deletion Portal" />
+  <img src="https://img.shields.io/badge/Email%20Service-Resend%20%7C%20Free%20Tier%20Waitlist%20Dispatch-000000?style=for-the-badge&logo=resend&logoColor=white" alt="Resend Free Tier Waitlist Email Dispatch" />
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
   <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License MIT" />
 </p>
@@ -2327,16 +2328,56 @@ The official companion web portal (`web/`) provides full web access to exégeoma
    - `/terms`: 6-section terms of service covering MIT open source licensing, public domain texts, and acceptable use.
    - `/data-safety`: Official Google Play Store Data Safety declaration matrix confirming 0 bytes of collected or shared personal data.
 
-3. **Plugu-Style Multi-Column Footer (`Footer.tsx`)**:
-   - Structured 5-column navigation grid:
-     - **Brand Column**: Logo, theological vision, and MIT open-source license badge.
-     - **Product Column**: Features, How It Works, Pricing (Free), Download App, FAQ.
-     - **Company Column**: About exégeomai, Contact, Support & FAQ, GitHub Project.
+3. **Multi-Column Footer (`Footer.tsx`)**:
+   - Structured navigation grid:
+     - **Brand Column**: Logo, theological vision, and coming-soon status notice.
+     - **Product Column**: Features, How It Works, Waitlist Privacy, Join Waiting List, FAQ.
+     - **Company Column**: About exégeomai, Contact, Support & FAQ.
      - **Safety Column**: Safety & Trust, Security Architecture, Community Guidelines, Report a Problem.
-     - **Support Column**: Help Centre, Contact Support, Account Deletion, Issue Tracker.
-     - **Legal Column**: Privacy Policy, Terms of Service, Data Safety, MIT License.
+     - **Support Column**: Help Centre, Contact Support, Account Deletion.
+     - **Legal Column**: Privacy Policy, Terms of Service, Data Safety.
 
-4. **Web Portal Commands**:
+4. **Web Portal Design Standards & Continuous Body Architecture**:
+   - Clean white background body architecture matching editorial layouts (`#FFFFFF` base) across all pages and subpages.
+   - Removed pill badges and capsules across the portal in favor of clean, simple Poppins font typography (`--font-poppins`).
+   - Clean white navigation bar with borderless transparent logo mark (no white container border-radius or background box).
+   - All boxed div cards, panels, feature columns, and forms (`WaitlistForm`, `DeletionForm`, `prose-card`, `feature-card`, `step-card`, `sec-card`, `pricing-card`, `faq-item`) are seamlessly integrated into the page body matching the editorial "How it works" column style with hairline dividers, eliminating floating card containers and shadow islands.
+   - Decorative architectural elements: Background vertical grid guide lines, concentric planetary orbits (`.launch-orbit`), floating geometric rings (`.hero-deco-ring`), accent circles (`.hero-deco-circle`), and rotated geometric squares (`.hero-deco-square`).
+   - Removed external GitHub project sections and links across footer and pages.
+
+5. **SEO, Performance & Core Web Vitals Optimization**:
+   - **Dynamic Sitemap (`sitemap.ts`)**: Automatic XML sitemap generation covering all routes, priorities, and change frequencies at `/sitemap.xml`.
+   - **Dynamic Robots (`robots.ts`)**: Crawling directives, canonical host declaration, and sitemap pointer at `/robots.txt`.
+   - **AI/LLM Crawling Standards (`llms.txt`)**: Curated machine-readable overview of exégeomai lexical features, translations, and security at `/llms.txt`.
+   - **OpenGraph & Dynamic Social Sharing**: Pre-rendered `/opengraph-image` with branded typography and metadata cards.
+   - **Schema Markup**: Comprehensive JSON-LD `@graph` defining `WebSite`, `Organization`, and `SoftwareApplication` entities.
+   - **Search Console Verification**: Verified search console metadata token and canonical tags (`rel="canonical"`).
+   - **Indexation**: Removed all restrictive `noindex` and `nofollow` tags to ensure full public search discoverability.
+   - **Cookie Consent (`CookieConsent.tsx`)**: GDPR/POPIA compliant non-tracking privacy preferences banner with granular choices.
+   - **Core Web Vitals & Loading Performance**:
+     - Image lazy loading with explicit width/height dimensions to eliminate layout shifts (CLS).
+     - Next.js image optimization supporting AVIF/WebP next-gen compression.
+     - Skeleton loading utilities (`.skeleton`) for non-blocking UI rendering.
+     - Minified JS and CSS with Gzip/Brotli compression and HSTS HTTPS enforcement headers.
+     - Responsive mobile viewport scaling and overflow suppression on phone previews.
+
+6. **Resend Email Integration (Free Tier)**:
+   - **Subscriber Confirmation Email**: When visitors join the waitlist, a confirmation email is dispatched from `noreply@exegeomai.co.za` confirming receipt and welcoming them to the family.
+   - **Internal Team Notification**: An administrative notification is sent to `joinus@exegeomai.co.za` with subscriber details.
+   - **Free Tier Economics**: Powered by Resend (free tier includes 3,000 emails/month, 100 emails/day), providing an enterprise-grade zero-cost alternative to dedicated email hosting.
+   - **Domain Architecture**: Configured on official `exegeomai.co.za` domain with DKIM/SPF verification for reliable inbox deliverability.
+
+7. **Architectural & Biblical Decorative Elements**:
+   - **Sacred Cross Geometry (`.deco-cross`)**: Delicate SVG Latin cross elements positioned as subtle, elegant architectural accents across the hero section, Why section, and waitlist section.
+   - **Watermark Brand Monogram (`.deco-logo-watermark`)**: Low-opacity watermark instances of the iconic `exégeomai` monogram layered behind major sections.
+   - **Concentric Celestial Orbits & Diamonds**: Golden accent orbital curves (`.launch-orbit`), floating geometric rings, and 45-degree diamond markers providing structural depth without UI clutter.
+   - **Subpage Header Motifs**: Consistent vertical grid guidelines, watermark logos, and cross accents applied to all subpages.
+
+8. **Mobile Navigation & Animated Uiverse Hamburger Menu**:
+   - **Uiverse SVG Morphing Animation**: Smooth SVG stroke transition (`stroke-dasharray` and `stroke-dashoffset` 600ms cubic-bezier) transforming three lines into an 'X' close icon on check.
+   - **Fixed High-Z-Index Dropdown**: Mobile drawer dropdown positioned with `z-index: 1000`, full viewport bounds, tap-to-close handlers, and clear navigation links.
+
+9. **Web Portal Commands**:
 ```bash
 # Launch Next.js web portal development server (http://localhost:3000)
 npm run web:portal

@@ -65,8 +65,8 @@ export default function ReportAProblemPage() {
                   <h2>Submit Problem Report</h2>
                   <p style={{ marginBottom: 28 }}>
                     For security vulnerabilities, you may also email{' '}
-                    <a href="mailto:security@exegeomai.app" style={{ color: 'var(--ink)', fontWeight: 700 }}>
-                      security@exegeomai.app
+                    <a href="mailto:security@exegeomai.co.za" style={{ color: 'var(--ink)', fontWeight: 700 }}>
+                      security@exegeomai.co.za
                     </a> directly.
                   </p>
 

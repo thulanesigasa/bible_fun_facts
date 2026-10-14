@@ -64,8 +64,8 @@ export default function TermsPage() {
               <h2>6. Contact Information</h2>
               <p>
                 For questions regarding these Terms, contact us at{' '}
-                <a href="mailto:legal@exegeomai.app" style={{ color: 'var(--ink)', fontWeight: 700 }}>
-                  legal@exegeomai.app
+                <a href="mailto:legal@exegeomai.co.za" style={{ color: 'var(--ink)', fontWeight: 700 }}>
+                  legal@exegeomai.co.za
                 </a>.
               </p>
             </div>

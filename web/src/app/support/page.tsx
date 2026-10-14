@@ -42,11 +42,11 @@ export default function SupportPage() {
       cta: 'Data Deletion Portal',
     },
     {
-      title: 'GitHub Issue Tracker',
-      desc: 'Developer and community issues, feature requests, and pull request tracking on our public repository.',
-      link: 'https://github.com/thulanesigasa/bible_fun_facts/issues',
-      cta: 'Open GitHub Issues',
-      external: true,
+      title: 'Security & Trust Architecture',
+      desc: 'Understand our zero-cloud telemetry, hardware AES-256 encryption, and local SQLite data isolation.',
+      link: '/safety-and-trust',
+      cta: 'Explore Security Specs',
+      external: false,
     },
   ];
 
@@ -104,8 +104,8 @@ export default function SupportPage() {
               <h2>Direct Email Support</h2>
               <p>
                 Need personal assistance? Email our core open source maintainers directly at{' '}
-                <a href="mailto:support@exegeomai.app" style={{ color: 'var(--ink)', fontWeight: 700, textDecoration: 'underline' }}>
-                  support@exegeomai.app
+                <a href="mailto:support@exegeomai.co.za" style={{ color: 'var(--ink)', fontWeight: 700, textDecoration: 'underline' }}>
+                  support@exegeomai.co.za
                 </a>
               </p>
               <p style={{ fontSize: 13, color: 'var(--muted)', margin: 0 }}>
