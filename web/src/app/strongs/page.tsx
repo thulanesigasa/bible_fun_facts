@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { StrongsSection } from '@/components/StrongsSection';
 
@@ -12,7 +11,6 @@ export const metadata: Metadata = {
 export default function StrongsPage() {
   return (
     <>
-      <Header />
       <main>
         <StrongsSection />
       </main>

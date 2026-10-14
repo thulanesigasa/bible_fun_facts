@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 
 export default function ReportAProblemPage() {
@@ -22,8 +21,6 @@ export default function ReportAProblemPage() {
 
   return (
     <>
-      <Header />
-
       <main id="main">
         <header className="subpage-hero">
           <div className="wrap">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -17,6 +17,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+  const toggleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setOpen(false);
@@ -30,15 +31,30 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    if (typeof document !== "undefined") {
-      document.body.style.overflow = open ? "hidden" : "";
-    }
-    return () => {
-      if (typeof document !== "undefined") {
-        document.body.style.overflow = "";
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        toggleRef.current?.focus();
       }
     };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+    };
   }, [open]);
+
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const closeOnDesktop = () => {
+      if (desktop.matches) setOpen(false);
+    };
+    desktop.addEventListener("change", closeOnDesktop);
+    return () => desktop.removeEventListener("change", closeOnDesktop);
+  }, []);
 
   const handleLink = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (pathname === "/" && href.startsWith("/#")) {
@@ -149,31 +165,13 @@ export function Header() {
 
           {/* Animated Hamburger Button (Visible on Mobile) */}
           <button
+            ref={toggleRef}
             type="button"
             className={`hamburger ${open ? "is-active" : ""}`}
             aria-label={open ? "Close navigation menu" : "Open navigation menu"}
             aria-expanded={open}
             aria-controls="mobile-nav-menu"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setOpen((prev) => !prev);
-            }}
-            style={{
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 44,
-              height: 44,
-              padding: 0,
-              border: "none",
-              background: "transparent",
-              touchAction: "manipulation",
-              WebkitTapHighlightColor: "transparent",
-              zIndex: 1000001,
-              position: "relative",
-            }}
+            onClick={() => setOpen((prev) => !prev)}
           >
             <svg
               viewBox="0 0 32 32"
@@ -193,103 +191,87 @@ export function Header() {
       </nav>
 
       {/* Full-screen Mobile Menu Overlay */}
-      {open && (
+      <nav
+        id="mobile-nav-menu"
+        className={`mobile-menu${open ? " is-open" : ""}`}
+        aria-hidden={!open}
+        inert={!open}
+        aria-label="Navigation menu"
+      >
         <div
-          id="mobile-nav-menu"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Navigation menu"
           style={{
-            position: "fixed",
-            top: 76,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "#FFFFFF",
-            zIndex: 999999,
-            overflowY: "auto",
             display: "flex",
             flexDirection: "column",
-            padding: "20px 20px 48px",
-            borderTop: "1px solid rgba(15, 23, 42, 0.08)",
-            boxShadow: "0 20px 40px rgba(15, 23, 42, 0.12)",
+            gap: 10,
+            maxWidth: 480,
+            margin: "0 auto",
+            width: "100%",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
-              maxWidth: 480,
-              margin: "0 auto",
-              width: "100%",
-            }}
-          >
-            {NAV_LINKS.map(({ label, href }) => (
-              <a
-                key={label}
-                href={href}
-                onClick={(e) => handleLink(e, href)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "16px 20px",
-                  fontSize: 17,
-                  fontWeight: 600,
-                  color: "#0F172A",
-                  textDecoration: "none",
-                  borderRadius: 12,
-                  background: "#F8FAFC",
-                  border: "1px solid rgba(15, 23, 42, 0.06)",
-                  touchAction: "manipulation",
-                  transition: "background 0.15s ease",
-                }}
-              >
-                <span>{label}</span>
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#64748B"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                  style={{ pointerEvents: "none" }}
-                >
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </a>
-            ))}
-
+          {NAV_LINKS.map(({ label, href }) => (
             <a
-              href="/#waitlist"
-              onClick={(e) => handleLink(e, "/#waitlist")}
+              key={label}
+              href={href}
+              onClick={(e) => handleLink(e, href)}
               style={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
+                justifyContent: "space-between",
                 padding: "16px 20px",
-                marginTop: 8,
-                fontSize: 16,
-                fontWeight: 700,
+                fontSize: 17,
+                fontWeight: 600,
                 color: "#0F172A",
                 textDecoration: "none",
                 borderRadius: 12,
-                background: "#FDD223",
+                background: "#F8FAFC",
+                border: "1px solid rgba(15, 23, 42, 0.06)",
                 touchAction: "manipulation",
-                boxShadow: "0 4px 14px rgba(253, 210, 35, 0.4)",
+                transition: "background 0.15s ease",
               }}
             >
-              Join Waiting List <span aria-hidden="true">↗</span>
+              <span>{label}</span>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#64748B"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                style={{ pointerEvents: "none" }}
+              >
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
             </a>
-          </div>
+          ))}
+
+          <a
+            href="/#waitlist"
+            onClick={(e) => handleLink(e, "/#waitlist")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              padding: "16px 20px",
+              marginTop: 8,
+              fontSize: 16,
+              fontWeight: 700,
+              color: "#0F172A",
+              textDecoration: "none",
+              borderRadius: 12,
+              background: "#FDD223",
+              touchAction: "manipulation",
+              boxShadow: "0 4px 14px rgba(253, 210, 35, 0.4)",
+            }}
+          >
+            Join Waiting List <span aria-hidden="true">↗</span>
+          </a>
         </div>
-      )}
+      </nav>
     </>
   );
 }
