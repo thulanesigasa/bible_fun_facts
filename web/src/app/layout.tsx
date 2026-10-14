@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Outfit, Space_Mono, Poppins } from "next/font/google";
 import "./globals.css";
 import { CookieConsent } from "@/components/CookieConsent";
+import { Header } from "@/components/Header";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -132,6 +133,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <Header />
         {children}
         <CookieConsent />
       </body>

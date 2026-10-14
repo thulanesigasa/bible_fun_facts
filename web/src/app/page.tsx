@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AppPreview, PhoneTrio } from "@/components/AppPreview";
 import { WaitlistForm } from "@/components/WaitlistForm";
@@ -67,7 +66,6 @@ const faqs = [
 export default function HomePage() {
   return (
     <>
-      <Header />
       <main id="main" className="launch-page">
         <section className="launch-hero" id="home" aria-labelledby="hero-title">
           {/* Decorative architectural background lines & geometric floating rings */}
