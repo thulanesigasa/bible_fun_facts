@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { DeletionForm } from '@/components/DeletionForm';
 
@@ -21,8 +20,6 @@ const deletedItems = [
 export default function DeletionPage() {
   return (
     <>
-      <Header />
-
       <main id="main">
         <header className="subpage-hero">
           <div className="wrap">

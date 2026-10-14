@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { SecuritySection } from '@/components/SecuritySection';
 
@@ -12,7 +11,6 @@ export const metadata: Metadata = {
 export default function SecurityPage() {
   return (
     <>
-      <Header />
       <main>
         <SecuritySection />
       </main>

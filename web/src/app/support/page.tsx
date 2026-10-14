@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
@@ -52,8 +51,6 @@ export default function SupportPage() {
 
   return (
     <>
-      <Header />
-
       <main id="main">
         <header className="subpage-hero">
           <div className="wrap">

@@ -129,3 +129,19 @@ npm run build      # Production build check
 Deploy to [Vercel](https://vercel.com) (recommended) or any Node.js host. Set the domain in `layout.tsx` under `BASE_URL`.
 
 For the deletion API to store requests persistently, configure a Supabase project and add the `SUPABASE_URL` + `SUPABASE_ANON_KEY` environment variables. See `api/deletion-request/route.ts` for the integration hook.
+
+### Mobile navigation checks
+
+The shared `Header` is rendered once in `src/app/layout.tsx`. Pages must not render a second header. Navigation layers and transitions live in `globals.css`; page styles must not override their stacking order. The panel stays mounted to animate both opening and closing, and is inert while closed. It scrolls independently, closes on Escape or navigation, and releases the body scroll lock when switching to desktop.
+
+The development CSP permits `unsafe-eval` for Next.js development bundles. The production CSP does not permit it.
+
+```bash
+npm ci
+npx playwright install chromium
+npm run build
+npm run test:navigation
+NAV_TEST_MODE=development npm run test:navigation
+```
+
+Run development and production checks sequentially because both use the default `.next` directory. Browser checks cover mobile taps, animation state, menu scrolling, section links, Escape, desktop resizing, duplicate headers on subpages, hydration errors, and the environment-specific CSP.

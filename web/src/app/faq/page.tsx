@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 
 const FAQS = [
@@ -48,8 +47,6 @@ export default function FaqPage() {
 
   return (
     <>
-      <Header />
-
       <main id="main">
         <header className="subpage-hero">
           <div className="wrap">
