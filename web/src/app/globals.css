@@ -449,7 +449,10 @@ button {
     display: flex;
   }
   .hamburger {
-    display: none;
+    display: none !important;
+  }
+  .mobile-menu {
+    display: none !important;
   }
 }
 
