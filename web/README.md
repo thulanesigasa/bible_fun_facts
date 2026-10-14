@@ -30,7 +30,7 @@ web/
 │   │       └── deletion-request/
 │   │           └── route.ts       # Edge API — POST deletion requests
 │   └── components/
-│       ├── Header.tsx             # Sticky nav with conditional-render mobile overlay (.hdr-*)
+│       ├── Header.tsx             # Sticky nav with animated SVG hamburger & full-screen mobile menu
 │       ├── Footer.tsx             # 4-column footer grid
 │       ├── HeroSection.tsx        # Hero + stats bar
 │       ├── FeaturesSection.tsx    # 6-card features grid
