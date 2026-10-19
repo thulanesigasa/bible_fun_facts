@@ -126,35 +126,23 @@ export function reconcileOfflineOnlineStreak(params: {
   shouldSync: boolean;
 } {
   const todayStr = params.todayStr || getLocalDateString();
+  const localDate = normalizeDateStringToLocalYMD(params.localLastLogin);
+  const remoteDate = normalizeDateStringToLocalYMD(params.remoteLastLogin);
+  // A count belongs to its date. Never resurrect a broken 19-day streak by
+  // combining its old count with the date of a newer one-day streak.
   const localStreak = Math.max(1, params.localStreak || 1);
-  const remoteStreak = typeof params.remoteStreak === 'number' && params.remoteStreak > 0 ? params.remoteStreak : 0;
-  const baseStreak = Math.max(localStreak, remoteStreak, 1);
-
-  const latestLastLogin = getLatestDateString(params.localLastLogin, params.remoteLastLogin);
-  const normalizedLocalLogin = normalizeDateStringToLocalYMD(params.localLastLogin);
-
-  if (params.hasEvaluatedToday || normalizedLocalLogin === todayStr) {
-    // If already evaluated today, heal if lagging (e.g. stuck at 9 on Oct 4)
-    const healed = healHistoricalDay7Clamp(baseStreak, todayStr);
-    const finalStreak = healed.healedStreak;
-    return {
-      finalStreak,
-      finalLastLogin: todayStr,
-      evaluatedToday: true,
-      shouldSync: remoteStreak !== finalStreak || normalizeDateStringToLocalYMD(params.remoteLastLogin) !== todayStr,
-    };
-  }
-
-  const evaluation = evaluateDailyStreak(latestLastLogin, baseStreak, todayStr);
-  // Post-evaluation healing: if evaluated streak still lags due to historical clamp/delay
-  const healed = healHistoricalDay7Clamp(evaluation.newStreak, todayStr);
-  const finalStreak = Math.max(evaluation.newStreak, healed.healedStreak);
-
+  const remoteStreak = Math.max(1, params.remoteStreak || 1);
+  const latest = getLatestDateString(localDate, remoteDate);
+  const count = localDate && remoteDate
+    ? (localDate > remoteDate ? localStreak : remoteDate > localDate ? remoteStreak : Math.max(localStreak, remoteStreak))
+    : remoteDate ? remoteStreak : localStreak;
+  const result = evaluateDailyStreak(latest, count, todayStr);
+  const finalStreak = healHistoricalDay7Clamp(result.newStreak, todayStr).healedStreak;
+  const finalLastLogin = latest && latest > todayStr ? latest : todayStr;
   return {
-    finalStreak,
-    finalLastLogin: evaluation.todayStr,
-    evaluatedToday: true,
-    shouldSync: true,
+    finalStreak, finalLastLogin,
+    evaluatedToday: finalLastLogin === todayStr,
+    shouldSync: params.remoteStreak !== finalStreak || remoteDate !== finalLastLogin,
   };
 }
 
@@ -198,7 +186,7 @@ export function healHistoricalDay7Clamp(
   // lagging behind expectedStreak due to the historical clamp, same-day date-stamp stall,
   // or clamp drift:
   if (
-    todayStr >= '2026-10-02' &&
+    todayStr >= '2026-10-02' && todayStr <= '2026-10-05' &&
     safeCandidate >= 4 &&
     safeCandidate < expectedStreak
   ) {

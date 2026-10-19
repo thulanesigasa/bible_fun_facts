@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { SecureStoreAdapter } from './secureStorage';
+import { readLocalSessionUser } from './localSession';
 
 export const PRIVATE_STUDY_KEY = '@exegeomai_private_study_mode_v1';
 const PRIVATE_STUDY_ACCOUNT_KEY = (userId: string) =>
@@ -15,7 +16,23 @@ export interface ScholarPrivacyPreferences {
   privateStudyNotes: boolean;
 }
 
+const cachedPreferenceKey = (id: string) => `@exegeomai_privacy_snapshot_v1:${id}`;
 export const PrivacyService = {
+  // Offline mutations consult encrypted local preferences; no token refresh.
+  getLocalPreferences: async (): Promise<ScholarPrivacyPreferences> => {
+    const user = await readLocalSessionUser();
+    if (!user) return { isPrivateStudyMode: true, privateStudyNotes: true, isDiscoverableInSearch: false, showStreaksPublicly: false };
+    const mode = await SecureStoreAdapter.getItem(PRIVATE_STUDY_ACCOUNT_KEY(user.id));
+    const legacy = mode === null ? await SecureStoreAdapter.getItem(PRIVATE_STUDY_KEY) : null;
+    const raw = await SecureStoreAdapter.getItem(cachedPreferenceKey(user.id));
+    const cached = raw ? JSON.parse(raw) : null;
+    return {
+      isPrivateStudyMode: (mode ?? legacy) === 'true',
+      privateStudyNotes: cached?.privateStudyNotes !== false,
+      isDiscoverableInSearch: cached?.isDiscoverableInSearch === true,
+      showStreaksPublicly: cached?.showStreaksPublicly === true,
+    };
+  },
   /**
    * A public privacy toggle only takes effect after the server confirms it.
    * Offline writes are not silently represented as successful public changes.
@@ -28,7 +45,12 @@ export const PrivacyService = {
         p_field: field,
         p_enabled: enabled,
       });
-      return !error;
+      if (error) return false;
+      const raw = await SecureStoreAdapter.getItem(cachedPreferenceKey(session.user.id));
+      const cached = raw ? JSON.parse(raw) : {};
+      const localField = { is_discoverable: 'isDiscoverableInSearch', show_streaks_publicly: 'showStreaksPublicly', private_study_notes: 'privateStudyNotes' }[field];
+      await SecureStoreAdapter.setItem(cachedPreferenceKey(session.user.id), JSON.stringify({ ...cached, [localField]: enabled }));
+      return true;
     } catch {
       return false;
     }
@@ -72,19 +94,21 @@ export const PrivacyService = {
           privateStudyNotes: true,
         };
       }
-      return {
+      const preferences = {
         isPrivateStudyMode: privateStudy === 'true',
         isDiscoverableInSearch: data.is_discoverable === true,
         showStreaksPublicly: data.show_streaks_publicly === true,
         privateStudyNotes: data.private_study_notes !== false,
       };
+      await SecureStoreAdapter.setItem(cachedPreferenceKey(session.user.id), JSON.stringify(preferences));
+      return preferences;
     } catch (e) {
-      console.warn('[PrivacyService] getPreferences error:', e);
+      console.warn('[PrivacyService] getPreferences unavailable.');
       return {
-        isPrivateStudyMode: false,
-        isDiscoverableInSearch: true,
-        showStreaksPublicly: true,
-        privateStudyNotes: false,
+        isPrivateStudyMode: true,
+        isDiscoverableInSearch: false,
+        showStreaksPublicly: false,
+        privateStudyNotes: true,
       };
     }
   },

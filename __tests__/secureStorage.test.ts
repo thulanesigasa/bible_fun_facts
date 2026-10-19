@@ -1,4 +1,4 @@
-import { SecureStoreAdapter } from '../src/services/secureStorage';
+import { SecureStoreAdapter, nativeStorageKey } from '../src/services/secureStorage';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -22,7 +22,10 @@ beforeEach(() => {
   jest.clearAllMocks();
   native.clear();
   (secureMock.isAvailableAsync as jest.Mock).mockResolvedValue(true);
-  (secureMock.getItemAsync as jest.Mock).mockImplementation(async (key: string) => native.get(key) ?? null);
+  (secureMock.getItemAsync as jest.Mock).mockImplementation(async (key: string) => {
+    if (!/^[A-Za-z0-9._-]+$/.test(key)) throw Error('Invalid native key');
+    return native.get(key) ?? null;
+  });
   (secureMock.setItemAsync as jest.Mock).mockImplementation(async (key: string, value: string) => { native.set(key, value); });
   (secureMock.deleteItemAsync as jest.Mock).mockImplementation(async (key: string) => { native.delete(key); });
   (plainMock.removeItem as jest.Mock).mockResolvedValue(undefined);
@@ -95,3 +98,16 @@ describe('SecureStoreAdapter fail-closed behavior', () => {
     await expect(SecureStoreAdapter.getItem('auth-token')).rejects.toThrow(/Incomplete/);
   });
 });
+
+  it('persists account-scoped keys under Expo native key constraints across updates/removal', async () => {
+    const logical = '@exegeomai_user_data_secure_v2:account-a';
+    await SecureStoreAdapter.setItem(logical, 'first');
+    expect(await SecureStoreAdapter.getItem(logical)).toBe('first');
+    await SecureStoreAdapter.setItem(logical, 'second');
+    expect(await SecureStoreAdapter.getItem(logical)).toBe('second');
+    await SecureStoreAdapter.removeItem(logical);
+    expect(await SecureStoreAdapter.getItem(logical)).toBeNull();
+    expect([...native.keys()].every(k => /^[A-Za-z0-9._-]+$/.test(k))).toBe(true);
+    expect(nativeStorageKey(logical)).not.toBe(nativeStorageKey(nativeStorageKey(logical)));
+    expect(nativeStorageKey('sb-project-auth-token')).toBe('sb-project-auth-token');
+  });
