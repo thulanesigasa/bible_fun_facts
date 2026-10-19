@@ -1,3 +1,4 @@
+import { readLocalSessionUser } from '../src/services/localSession';
 import { PrivacyService } from '../src/services/privacyService';
 import { supabase } from '../src/services/supabase';
 import { SecureStoreAdapter } from '../src/services/secureStorage';
@@ -8,6 +9,8 @@ jest.mock('../src/services/supabase', () => ({
 jest.mock('../src/services/secureStorage', () => ({
   SecureStoreAdapter: { getItem: jest.fn(), setItem: jest.fn(), removeItem: jest.fn() },
 }));
+
+jest.mock('../src/services/localSession', () => ({ readLocalSessionUser: jest.fn() }));
 
 const session = { user: { id: 'user-alpha' } };
 const getSession = supabase.auth.getSession as jest.Mock;
@@ -105,4 +108,13 @@ describe('Server-enforced privacy settings', () => {
     const prefs = await PrivacyService.getPreferences();
     expect(prefs.isPrivateStudyMode).toBe(true);
   });
+});
+
+it('reads offline privacy without invoking token refresh or database queries', async () => {
+  (readLocalSessionUser as jest.Mock).mockResolvedValue({ id: 'user-alpha' });
+  getSecure.mockImplementation(async (key: string) => key.includes('privacy_snapshot')
+    ? JSON.stringify({ privateStudyNotes: false }) : key.includes('private_study_mode_v2') ? 'true' : null);
+  const prefs = await PrivacyService.getLocalPreferences();
+  expect(prefs.isPrivateStudyMode).toBe(true); expect(prefs.privateStudyNotes).toBe(false);
+  expect(getSession).not.toHaveBeenCalled(); expect(supabase.from).not.toHaveBeenCalled();
 });

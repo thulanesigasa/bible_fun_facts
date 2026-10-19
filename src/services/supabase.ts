@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { SecureStoreAdapter } from './secureStorage';
+import { AUTH_STORAGE_KEY } from './localSession';
 
 // Project Ref: ibwooiejzxhbzplnldcz
 export const SUPABASE_URL =
@@ -14,6 +15,7 @@ const createSafeClient = () => {
     return createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
         storage: SecureStoreAdapter,
+        storageKey: AUTH_STORAGE_KEY,
         autoRefreshToken: true,
         persistSession: true,
         detectSessionInUrl: false,
@@ -24,6 +26,7 @@ const createSafeClient = () => {
     return createClient(SUPABASE_URL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.placeholder', {
       auth: {
         storage: SecureStoreAdapter,
+        storageKey: AUTH_STORAGE_KEY,
         autoRefreshToken: false,
         persistSession: false,
         detectSessionInUrl: false,

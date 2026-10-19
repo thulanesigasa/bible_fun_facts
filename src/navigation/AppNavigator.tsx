@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   View,
+  ActivityIndicator,
   Text,
   Platform,
   useWindowDimensions,
@@ -883,6 +884,7 @@ const navTheme = {
 export default function AppNavigator() {
   const {
     userProfile,
+    isLoadingApp, startupError, retryStartup,
     hideTabBar,
     accent,
     unreadNotificationsCount,
@@ -894,6 +896,17 @@ export default function AppNavigator() {
   } = useApp();
   const { width } = useWindowDimensions();
   const horizontalPadding = (width - 280) / 2;
+
+  if (isLoadingApp || startupError) return (
+    <View style={{ flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      {startupError ? <>
+        <Text style={{ color: colors.textPrimary, textAlign: 'center', marginBottom: 16 }}>Your saved study data could not be opened. Please try again. Your data has not been reset.</Text>
+        <TouchableOpacity accessibilityRole="button" onPress={retryStartup} style={{ padding: 16 }}>
+          <Text style={{ color: colors.accent }}>Try again</Text>
+        </TouchableOpacity>
+      </> : <ActivityIndicator accessibilityLabel="Opening your study library" color={colors.accent} size="large" />}
+    </View>
+  );
 
   return (
     <NavigationContainer theme={navTheme}>

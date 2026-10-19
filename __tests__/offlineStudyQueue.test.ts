@@ -1,17 +1,20 @@
 import { OfflineStudyQueue } from '../src/services/offlineStudyQueue';
 import { SecureStoreAdapter } from '../src/services/secureStorage';
 import { supabase } from '../src/services/supabase';
+import { readLocalSessionUser } from '../src/services/localSession';
 import { PrivacyService } from '../src/services/privacyService';
 
 jest.mock('../src/services/secureStorage', () => ({
   SecureStoreAdapter: { getItem: jest.fn(), setItem: jest.fn(), removeItem: jest.fn() },
 }));
 jest.mock('../src/services/privacyService', () => ({
-  PrivacyService: { getPreferences: jest.fn() },
+  PrivacyService: { getPreferences: jest.fn(), getLocalPreferences: jest.fn() },
 }));
 jest.mock('../src/services/supabase', () => ({
   supabase: { auth: { getSession: jest.fn() }, from: jest.fn() },
 }));
+
+jest.mock('../src/services/localSession', () => ({ readLocalSessionUser: jest.fn() }));
 
 const secure = SecureStoreAdapter as jest.Mocked<typeof SecureStoreAdapter>;
 const client = supabase as jest.Mocked<typeof supabase>;
@@ -26,6 +29,8 @@ beforeEach(() => {
   remote.clear();
   activeUser = 'account-a';
   databaseOnline = false;
+  (readLocalSessionUser as jest.Mock).mockImplementation(async () => activeUser ? { id: activeUser } : null);
+  (PrivacyService.getLocalPreferences as jest.Mock).mockImplementation(() => PrivacyService.getPreferences());
   (PrivacyService.getPreferences as jest.Mock).mockResolvedValue({
     isPrivateStudyMode: false, privateStudyNotes: false,
     isDiscoverableInSearch: false, showStreaksPublicly: false,
@@ -195,4 +200,18 @@ describe('OfflineStudyQueue', () => {
     expect(await OfflineStudyQueue.pendingCount()).toBe(0);
     expect(remote.size).toBe(0);
   });
+});
+
+it('saves new offline actions while a cloud token refresh is stalled', async () => {
+  await OfflineStudyQueue.enqueue('read_fact', 'first', true);
+  let resume!: (value: any) => void;
+  (client.auth.getSession as jest.Mock).mockImplementationOnce(() => new Promise(resolve => { resume = resolve; }));
+  const flushing = OfflineStudyQueue.flush();
+  // Allow flush to reach the cloud boundary before appending locally.
+  for (let i = 0; i < 30; i++) await Promise.resolve();
+  await OfflineStudyQueue.enqueue('read_fact', 'second', true);
+  expect(await OfflineStudyQueue.pendingCount()).toBe(2);
+  resume({ data: { session: null }, error: null });
+  await flushing;
+  expect(await OfflineStudyQueue.pendingCount()).toBe(2);
 });

@@ -1,6 +1,14 @@
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// Expo permits only letters, numbers, dots, dashes and underscores in keys.
+// Encode logical account-scoped keys injectively; retain existing valid auth keys.
+export function nativeStorageKey(key: string): string {
+  return /^[A-Za-z0-9._-]+$/.test(key) && !key.startsWith('ss3_')
+    ? key
+    : 'ss3_' + Array.from(key).map(c => c.codePointAt(0)!.toString(16).padStart(6, '0')).join('');
+}
+
 const CHUNK_SIZE = 1800;
 const MAX_CHUNKS = 1024;
 type Manifest = { version: 2; bank: 0 | 1; count: number };
@@ -58,7 +66,8 @@ function locked<T>(key: string, fn: () => Promise<T>): Promise<T> {
 
 /** Native encrypted storage only; never use AsyncStorage for secret retrieval. */
 export const SecureStoreAdapter = {
-  getItem: async (key: string): Promise<string | null> => {
+  getItem: async (logicalKey: string): Promise<string | null> => {
+    const key = nativeStorageKey(logicalKey);
     await requireSecureStore();
     return locked(key, async () => {
       const active = await getManifest(key);
@@ -88,7 +97,8 @@ export const SecureStoreAdapter = {
     });
   },
 
-  setItem: async (key: string, value: string): Promise<void> => {
+  setItem: async (logicalKey: string, value: string): Promise<void> => {
+    const key = nativeStorageKey(logicalKey);
     await requireSecureStore();
     return locked(key, async () => {
       const old = await getManifest(key);
@@ -119,11 +129,12 @@ export const SecureStoreAdapter = {
         await SecureStore.deleteItemAsync(`${key}_chunk_count`).catch(() => {});
       }
       await SecureStore.deleteItemAsync(key).catch(() => {});
-      await AsyncStorage.removeItem(key);
+      await AsyncStorage.removeItem(logicalKey);
     });
   },
 
-  removeItem: async (key: string): Promise<void> => {
+  removeItem: async (logicalKey: string): Promise<void> => {
+    const key = nativeStorageKey(logicalKey);
     await requireSecureStore();
     return locked(key, async () => {
       const old = await getManifest(key);
@@ -141,7 +152,7 @@ export const SecureStoreAdapter = {
         await SecureStore.deleteItemAsync(`${key}_chunk_count`);
       }
       await SecureStore.deleteItemAsync(key);
-      await AsyncStorage.removeItem(key);
+      await AsyncStorage.removeItem(logicalKey);
     });
   },
 };

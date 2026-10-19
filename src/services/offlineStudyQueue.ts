@@ -1,6 +1,7 @@
 import { supabase } from './supabase';
 import { SecureStoreAdapter } from './secureStorage';
 import { PrivacyService } from './privacyService';
+import { readLocalSessionUser } from './localSession';
 
 /**
  * Durable, per-account offline sync for idempotent study actions.
@@ -38,6 +39,7 @@ function serialize<T>(job: () => Promise<T>): Promise<T> {
   return next;
 }
 
+let runningFlush: Promise<{ synced: number; pending: number }> | null = null;
 let localSequence = 0;
 function newOperationId(): string {
   // IDs only label queue entries locally; database idempotence comes from
@@ -47,11 +49,9 @@ function newOperationId(): string {
 }
 
 async function currentUserId(): Promise<string> {
-  const { data: { session }, error } = await supabase.auth.getSession();
-  if (error || !session?.user?.id) {
-    throw new Error('Sign in online first to use authenticated offline study.');
-  }
-  return session.user.id;
+  const user = await readLocalSessionUser();
+  if (!user) throw new Error('Sign in online first to use authenticated offline study.');
+  return user.id;
 }
 
 async function readQueue(userId: string): Promise<OfflineStudyOperation[]> {
@@ -149,7 +149,7 @@ export const OfflineStudyQueue = {
       const userId = await currentUserId();
       if (!entityId.trim()) throw new Error('Cannot queue an empty study entity ID.');
       if (action === 'favorite_fact' || action === 'favorite_scripture') {
-        const privacy = await PrivacyService.getPreferences();
+        const privacy = await PrivacyService.getLocalPreferences();
         if (privacy.isPrivateStudyMode || privacy.privateStudyNotes) {
           throw new Error('Private bookmarks must remain local to this device.');
         }
@@ -193,7 +193,7 @@ export const OfflineStudyQueue = {
     if (!reference.trim() || reference.length > 512 || (text !== null && text.length > 32000)) {
       return Promise.reject(new Error('Invalid offline study note.'));
     }
-    return PrivacyService.getPreferences().then((preferences) => {
+    return PrivacyService.getLocalPreferences().then((preferences) => {
       if (preferences.isPrivateStudyMode || preferences.privateStudyNotes) {
         throw new Error('Study notes are private; cloud synchronization is disabled.');
       }
@@ -207,36 +207,40 @@ export const OfflineStudyQueue = {
   },
 
   flush(): Promise<{ synced: number; pending: number }> {
-    return serialize(async () => {
+    if (runningFlush) return runningFlush;
+    const run = async () => {
       const userId = await currentUserId();
-      const queue = await readQueue(userId);
-      // Defensive service boundary: never rely on a UI caller remembering
-      // to check incognito or private-notes settings before replay.
+      // Network delivery never holds the local storage queue lock. A hanging
+      // refresh must not prevent the next offline bookmark from being saved.
       const privacy = await PrivacyService.getPreferences();
-      if (privacy.isPrivateStudyMode) return { synced: 0, pending: queue.length };
       let synced = 0;
-      while (queue.length > 0) {
-        const op = queue[0];
+      if (!privacy.isPrivateStudyMode) for (;;) {
+        if (await currentUserId() !== userId) break;
+        const op = await serialize(async () => (await readQueue(userId))[0]);
+        if (!op) break;
         try {
           if (['upsert_note', 'delete_note', 'favorite_fact', 'favorite_scripture'].includes(op.action) &&
-              (await PrivacyService.getPreferences()).privateStudyNotes) {
-            // Leave all later operations ordered and pending while the
-            // user prefers local-only notes. Never silently discard them.
-            break;
-          }
+              (await PrivacyService.getPreferences()).privateStudyNotes) break;
           await executeOperation(op);
         } catch {
-          op.retryCount += 1;
-          await writeQueue(userId, queue);
+          await serialize(async () => {
+            const queue = await readQueue(userId);
+            const pending = queue.find(item => item.operationId === op.operationId);
+            if (pending) pending.retryCount += 1;
+            await writeQueue(userId, queue);
+          });
           break;
         }
-        // Server upsert/delete is idempotent; retry after crash cannot duplicate.
-        queue.shift();
+        await serialize(async () => {
+          const queue = await readQueue(userId);
+          await writeQueue(userId, queue.filter(item => item.operationId !== op.operationId));
+        });
         synced += 1;
-        await writeQueue(userId, queue);
       }
-      return { synced, pending: queue.length };
-    });
+      return { synced, pending: await serialize(async () => (await readQueue(userId)).length) };
+    };
+    runningFlush = run().finally(() => { runningFlush = null; });
+    return runningFlush;
   },
 
   pendingCount(): Promise<number> {

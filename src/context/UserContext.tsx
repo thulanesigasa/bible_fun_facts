@@ -5,6 +5,8 @@ import * as Notifications from 'expo-notifications';
 import { Fact, Scripture, WOTDEntry } from '../data/mockDatabase';
 import { colors } from '../theme/colors';
 import { supabase, SUPABASE_ANON_KEY } from '../services/supabase';
+import type { User } from '@supabase/supabase-js';
+import { readLocalSessionUser, AUTH_STORAGE_KEY } from '../services/localSession';
 import { useThemedAlert } from './AlertContext';
 import {
   registerAllAutomatedNotifications,
@@ -52,6 +54,7 @@ interface UserState {
   sharesCount: number;
   earnedAchievementIds: string[];
   lastLoginDate: string | null;
+  streakPendingRemote?: boolean;
   followedUserIds: string[];
   lastReadBible: LastReadBiblePosition;
   bibleHighlights: Record<string, string>;
@@ -59,6 +62,9 @@ interface UserState {
 }
 
 interface AppContextType extends UserState {
+  isLoadingApp: boolean;
+  startupError: boolean;
+  retryStartup: () => void;
   hideTabBar: boolean;
   setHideTabBar: (hide: boolean) => void;
   accent: string;
@@ -148,20 +154,21 @@ export {
   getExpectedCanonicalStreak,
 } from '../services/streakEngine';
 import {
+  reconcileOfflineOnlineStreak,
   getLocalDateString,
   normalizeDateStringToLocalYMD,
-  getLatestDateString,
   evaluateDailyStreak,
-  healHistoricalDay7Clamp,
-  STREAK_CANONICAL_LAUNCH_DATE,
-  getExpectedCanonicalStreak,
 } from '../services/streakEngine';
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { showAlert } = useThemedAlert();
   const isLoadedFromStorage = useRef<boolean>(false);
-  const hasEvaluatedStreakTodayRef = useRef<boolean>(false);
   const activeAuthUserIdRef = useRef<string | null>(null);
+  const [isLoadingApp, setIsLoadingApp] = useState(true);
+  const [startupError, setStartupError] = useState(false);
+  const [startupAttempt, setStartupAttempt] = useState(0);
+  const retryStartup = () => setStartupAttempt(n => n + 1);
+  const hydrationEpoch = useRef(0);
   const [hideTabBar, setHideTabBar] = useState<boolean>(false);
   const [accent, setAccent] = useState<string>(colors.accent);
   const [state, setState] = useState<UserState>({
@@ -262,26 +269,26 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     lastReadBible?: LastReadBiblePosition;
     [key: string]: any;
   }) => {
-    if (!SUPABASE_ANON_KEY || isPrivateStudyModeRef.current) return;
+    const expectedUser = activeAuthUserIdRef.current;
+    const expectedEpoch = hydrationEpoch.current;
+    if (!SUPABASE_ANON_KEY || isPrivateStudyModeRef.current || !expectedUser) return;
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
+      if (session?.user?.id === expectedUser && activeAuthUserIdRef.current === expectedUser && hydrationEpoch.current === expectedEpoch) {
         // 1. Sync to Supabase auth user_metadata (guaranteed permanent persistence across logins/devices)
         await supabase.auth.updateUser({
           data: updates,
         });
 
+        if (activeAuthUserIdRef.current !== expectedUser || hydrationEpoch.current !== expectedEpoch) return;
         // 2. Sync to public.profiles table
         const profileUpdate: any = {};
         if (typeof updates.streak === 'number') {
           profileUpdate.streak = updates.streak;
-          await AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(updates.streak)).catch(() => {});
-          await AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(updates.streak)).catch(() => {});
         }
         if (typeof updates.factsViewedCount === 'number') profileUpdate.facts_viewed_count = updates.factsViewedCount;
         if (updates.lastLoginDate) {
           profileUpdate.last_login_date = updates.lastLoginDate;
-          await AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, updates.lastLoginDate).catch(() => {});
         }
 
         if (Object.keys(profileUpdate).length > 0) {
@@ -295,39 +302,28 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Helper to restore streak, unfolded count, and library from Supabase on login or session restore
   const restoreRemoteUserData = async (userId: string, meta: any) => {
+    const epoch = hydrationEpoch.current;
     try {
       let remoteStreak = typeof meta?.streak === 'number' ? meta.streak : undefined;
-      let remoteUnfolded = typeof meta?.factsViewedCount === 'number' ? meta.factsViewedCount : undefined;
       let remoteLastLogin = meta?.lastLoginDate;
 
+      let profileLoaded = false;
       // Query profiles table for latest realtime values
       try {
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('streak, facts_viewed_count, last_login_date')
           .eq('id', userId)
           .single();
 
+        profileLoaded = !profileError;
         if (profile) {
           if (typeof profile.streak === 'number') remoteStreak = profile.streak;
-          if (typeof profile.facts_viewed_count === 'number') remoteUnfolded = profile.facts_viewed_count;
           if (profile.last_login_date) remoteLastLogin = profile.last_login_date;
         }
       } catch (profileErr) {
         // Silently fallback to metadata
       }
-
-      // If storage hasn't loaded yet, read permanent keys directly to prevent race conditions
-      let localPermStreak = 0;
-      let localPermLastLogin: string | null = null;
-      try {
-        const [permStreakRaw, permLastLoginRaw] = await Promise.all([
-          AsyncStorage.getItem(PERMANENT_STREAK_KEY),
-          AsyncStorage.getItem(PERMANENT_LAST_LOGIN_KEY),
-        ]);
-        if (permStreakRaw) localPermStreak = parseInt(permStreakRaw, 10) || 0;
-        if (permLastLoginRaw) localPermLastLogin = permLastLoginRaw;
-      } catch {}
 
       // Restore immutable historical unlocks from the owner's protected
       // server table. Missing migration/offline errors leave local badges intact.
@@ -343,33 +339,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       } catch {}
 
-      if (activeAuthUserIdRef.current !== userId) return;
+      if (activeAuthUserIdRef.current !== userId || hydrationEpoch.current !== epoch) return;
       setState(prev => {
-        if (activeAuthUserIdRef.current !== userId) return prev;
+        if (activeAuthUserIdRef.current !== userId || hydrationEpoch.current !== epoch) return prev;
         const todayStr = getLocalDateString();
-        const localStreak = Math.max(prev.streak || 1, localPermStreak || 1);
-        const localLastLogin = getLatestDateString(prev.lastLoginDate, localPermLastLogin);
-
-        // Robust date reconciliation: Choose the chronologically latest login date between local and remote
-        const latestLastLogin = getLatestDateString(localLastLogin, remoteLastLogin);
-        let baseStreak = Math.max(localStreak, remoteStreak || 1);
-        let finalStreak = baseStreak;
-        let finalLastLogin = todayStr;
-
-        if (hasEvaluatedStreakTodayRef.current || normalizeDateStringToLocalYMD(localLastLogin) === todayStr) {
-          // Already evaluated today: heal baseStreak if lagging (e.g. Day 9 on Oct 4)
-          const healed = healHistoricalDay7Clamp(baseStreak, todayStr);
-          finalStreak = healed.healedStreak;
-          finalLastLogin = todayStr;
-          hasEvaluatedStreakTodayRef.current = true;
-        } else {
-          // First time evaluating
-          const evaluation = evaluateDailyStreak(latestLastLogin, baseStreak, todayStr);
-          const healed = healHistoricalDay7Clamp(evaluation.newStreak, todayStr);
-          finalStreak = Math.max(evaluation.newStreak, healed.healedStreak);
-          finalLastLogin = evaluation.todayStr;
-          hasEvaluatedStreakTodayRef.current = true;
-        }
+        const { finalStreak, finalLastLogin } = reconcileOfflineOnlineStreak({
+          localStreak: prev.streak, localLastLogin: prev.streakPendingRemote ? null : prev.lastLoginDate,
+          remoteStreak, remoteLastLogin, todayStr,
+        });
 
         // Merge readFactIds: facts explicitly marked Done by the user
         const remoteReadFactIds: string[] = Array.isArray(meta?.readFactIds) ? meta.readFactIds : [];
@@ -394,23 +371,16 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const remoteHighlights = meta?.bibleHighlights && typeof meta.bibleHighlights === 'object' ? meta.bibleHighlights : {};
         const mergedHighlights = { ...(prev.bibleHighlights || {}), ...remoteHighlights };
 
-        syncUserDataToRemote({
-          streak: finalStreak,
-          lastLoginDate: finalLastLogin,
-          factsViewedCount: finalUnfolded,
-          readFactIds: mergedReadFactIds,
-          favoritesFacts: mergedFavFacts,
-          favoritesScriptures: mergedFavScriptures,
-          bibleHighlights: mergedHighlights,
-        });
-
-        AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(finalStreak)).catch(() => {});
-        AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(finalStreak)).catch(() => {});
-        AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, finalLastLogin).catch(() => {});
+        if (profileLoaded) setTimeout(() => {
+          if (activeAuthUserIdRef.current === userId && hydrationEpoch.current === epoch) void syncUserDataToRemote({
+            streak: finalStreak, lastLoginDate: finalLastLogin,
+          });
+        }, 0);
 
         return {
           ...prev,
           streak: finalStreak,
+          streakPendingRemote: prev.streakPendingRemote && !profileLoaded,
           factsViewedCount: finalUnfolded,
           lastLoginDate: finalLastLogin,
           favoritesFacts: mergedFavFacts,
@@ -469,239 +439,107 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.remove();
   }, []);
 
-  // Load data on mount
+  // Restore local identity and study data before choosing a navigation stack.
+  // Never wait for token refresh / internet to unlock an already signed-in user's
+  // encrypted local library. SIGNED_OUT remains an explicit local-access boundary.
   useEffect(() => {
-    const loadData = async () => {
+    let active = true;
+    let sawAuthEvent = false;
+    const resetState = () => setState(prev => ({
+      ...prev, userProfile: null, favoritesFacts: [], favoritesScriptures: [],
+      completedWOTDs: [], readFactIds: [], bibleHighlights: {},
+      followedUserIds: [], factsViewedCount: 0, sharesCount: 0,
+      earnedAchievementIds: [], streak: 1, lastLoginDate: null, streakPendingRemote: false,
+      lastReadBible: { book: 'John', chapter: 3, translation: 'web' }, readerTheme: 'light',
+    }));
+    const restore = async (user: User | null) => {
+      if (!active) return;
+      const epoch = ++hydrationEpoch.current;
+      const current = () => active && hydrationEpoch.current === epoch;
+      isLoadedFromStorage.current = false;
+      activeAuthUserIdRef.current = user?.id || null;
+      setIsLoadingApp(true);
+      setStartupError(false);
+      // Hide the previous account while its replacement loads.
+      resetState();
       try {
-        // A cached profile is not authentication. Load private local data only
-        // when a securely persisted Supabase session belongs to the same user.
-        const { data: { session: cachedSession } } = await supabase.auth.getSession();
-        const lastOwnerId = await AsyncStorage.getItem(LOCAL_OWNER_KEY);
-        if (!cachedSession?.user || lastOwnerId !== cachedSession.user.id) {
-          await AsyncStorage.multiRemove([
-            STORAGE_KEY, PERMANENT_STREAK_KEY, PERMANENT_BACKUP_KEY,
-            PERMANENT_LAST_LOGIN_KEY,
-          ]);
-          if (cachedSession?.user) {
-            await AsyncStorage.setItem(LOCAL_OWNER_KEY, cachedSession.user.id);
-          } else {
-            await AsyncStorage.removeItem(LOCAL_OWNER_KEY);
-          }
+        if (!user) { if (current()) setIsLoadingApp(false); return; }
+        let raw = await SecureStoreAdapter.getItem(SECURE_STUDY_KEY(user.id));
+        const owner = await AsyncStorage.getItem(LOCAL_OWNER_KEY);
+        if (!raw && owner === user.id) {
+          const legacy = await AsyncStorage.getItem(STORAGE_KEY);
+          if (legacy && JSON.parse(legacy)._authUserId === user.id) raw = legacy;
         }
-        // New private state must come from native encrypted, account-scoped storage.
-        // Import a legacy plaintext cache only if its immutable owner ID matches.
-        let saved: string | null = null;
-        if (cachedSession?.user) {
-          saved = await SecureStoreAdapter.getItem(SECURE_STUDY_KEY(cachedSession.user.id));
-          if (!saved) {
-            const oldRaw = await AsyncStorage.getItem(STORAGE_KEY);
-            const oldEnvelope = oldRaw ? JSON.parse(oldRaw) : null;
-            if (oldEnvelope?._authUserId === cachedSession.user.id) {
-              await SecureStoreAdapter.setItem(SECURE_STUDY_KEY(cachedSession.user.id), oldRaw!);
-              await AsyncStorage.removeItem(STORAGE_KEY);
-              saved = oldRaw;
-            }
-          }
-        }
-        const permStreakRaw = await AsyncStorage.getItem(PERMANENT_STREAK_KEY);
-        const backupStreakRaw = await AsyncStorage.getItem(PERMANENT_BACKUP_KEY);
-        const permLastLogin = await AsyncStorage.getItem(PERMANENT_LAST_LOGIN_KEY);
-        const storedPermStreak = permStreakRaw ? parseInt(permStreakRaw, 10) : 0;
-        const storedBackupStreak = backupStreakRaw ? parseInt(backupStreakRaw, 10) : 0;
-
-        let cleanFollowed: string[] = [];
-        let cleanProfile: UserProfile | null = null;
-        let parsedData: any = {};
-        let parsedStreak = 1;
-        let parsedLastLogin: string | null = null;
-
-        if (saved) {
-          parsedData = JSON.parse(saved);
-          delete parsedData._authUserId;
-          cleanFollowed = (parsedData.followedUserIds || []).filter(
-            (id: string) => !id.startsWith('user_')
-          );
-          cleanProfile = parsedData.userProfile
-            ? {
-                ...parsedData.userProfile,
-                redLetterEnabled: parsedData.userProfile.redLetterEnabled ?? true,
-                followersCount:
-                  parsedData.userProfile.followersCount === 248 ? 0 : (parsedData.userProfile.followersCount || 0),
-                followingCount:
-                  parsedData.userProfile.followingCount === 182
-                    ? cleanFollowed.length
-                    : (parsedData.userProfile.followingCount || cleanFollowed.length),
-              }
-            : null;
-
-          parsedStreak = typeof parsedData.streak === 'number' ? parsedData.streak : 1;
-          parsedLastLogin = parsedData.lastLoginDate;
-        }
-
-        let candidateStreak = Math.max(parsedStreak, storedPermStreak, storedBackupStreak, 1);
-        let candidateLastLogin = getLatestDateString(parsedLastLogin, permLastLogin);
-        const todayStr = getLocalDateString();
-
-        const evalResult = evaluateDailyStreak(candidateLastLogin, candidateStreak, todayStr);
-        let finalStreak = evalResult.newStreak;
-
-        // Apply dynamic launch-calibrated healing post-evaluation (recovers Day 10 stall and historical clamps)
-        const healed = healHistoricalDay7Clamp(finalStreak, todayStr);
-        finalStreak = Math.max(finalStreak, healed.healedStreak);
-        const finalLastLogin = evalResult.todayStr || todayStr;
-        hasEvaluatedStreakTodayRef.current = true;
-
-        if (evalResult.shouldUpdate || candidateStreak !== evalResult.newStreak) {
-          syncUserDataToRemote({ streak: finalStreak, lastLoginDate: finalLastLogin });
-        }
-
-        // Immediately reinforce storage with clean normalized streak and YYYY-MM-DD date
-        await AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(finalStreak)).catch(() => {});
-        await AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(finalStreak)).catch(() => {});
-        await AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, finalLastLogin).catch(() => {});
-
-        setState(prev => ({
-          ...prev,
-          ...parsedData,
-          streak: finalStreak,
-          lastLoginDate: finalLastLogin,
-          sharesCount: typeof parsedData.sharesCount === 'number' ? parsedData.sharesCount : 0,
-          followedUserIds: cleanFollowed,
-          userProfile: cleanProfile,
+        const saved = raw ? JSON.parse(raw) : {};
+        if (raw && saved._authUserId !== user.id) throw Error('Study cache owner mismatch');
+        delete saved._authUserId;
+        // Old plaintext backup counters are only eligible for their recorded owner.
+        const backupStreak = !raw && owner === user.id
+          ? Number(await AsyncStorage.getItem(PERMANENT_STREAK_KEY)) || 1 : 1;
+        const backupDate = !raw && owner === user.id
+          ? await AsyncStorage.getItem(PERMANENT_LAST_LOGIN_KEY) : null;
+        const local = reconcileOfflineOnlineStreak({
+          localStreak: saved.streak || 1, localLastLogin: saved.lastLoginDate,
+          remoteStreak: backupStreak, remoteLastLogin: backupDate,
+        });
+        // If no dated local snapshot exists, use the persisted session's metadata.
+        const meta = user.user_metadata || {};
+        const progress = reconcileOfflineOnlineStreak({
+          localStreak: saved.lastLoginDate || backupDate ? local.finalStreak : 1,
+          localLastLogin: saved.lastLoginDate || backupDate ? local.finalLastLogin : null,
+          remoteStreak: meta.streak, remoteLastLogin: meta.lastLoginDate,
+        });
+        if (!current()) return;
+        const profile: UserProfile = {
+          ...(saved.userProfile || {}), ...meta,
+          name: meta.name || saved.userProfile?.name || user.email?.split('@')[0] || 'Believer',
+          username: meta.username || saved.userProfile?.username || user.email?.split('@')[0] || 'believer',
+          email: user.email || '', joinedDate: user.created_at,
+          notificationsEnabled: saved.userProfile?.notificationsEnabled ?? true,
+          redLetterEnabled: meta.redLetterEnabled ?? saved.userProfile?.redLetterEnabled ?? true,
+        };
+        isLoadedFromStorage.current = true;
+        setState(prev => ({ ...prev, ...saved, userProfile: profile,
+          earnedAchievementIds: saved.earnedAchievementIds || [],
+          streak: progress.finalStreak, lastLoginDate: progress.finalLastLogin,
+          streakPendingRemote: saved.streakPendingRemote ?? !(saved.lastLoginDate || backupDate || meta.lastLoginDate),
         }));
-
-        isLoadedFromStorage.current = true;
-
-        const isNotifEnabled = cleanProfile ? cleanProfile.notificationsEnabled : true;
-        if (isNotifEnabled) {
-          registerAllAutomatedNotifications().catch(() => {});
-        }
-      } catch (e) {
-        console.error('Failed to load user data');
-        isLoadedFromStorage.current = true;
+        setIsLoadingApp(false);
+        // Remote restoration is a background step, after local hydration, outside
+        // Supabase's synchronous auth callback and its internal auth lock.
+        void restoreRemoteUserData(user.id, meta);
+        if (profile.notificationsEnabled) void registerAllAutomatedNotifications().catch(() => {});
+      } catch {
+        // A storage failure is not sign-out. Do not erase or overwrite a cache.
+        if (current()) { setStartupError(true); setIsLoadingApp(false); }
       }
     };
-    loadData();
-
-    // Supabase Session Restoration
-    if (SUPABASE_ANON_KEY) {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session?.user) {
-          const user = session.user;
-          activeAuthUserIdRef.current = user.id;
-          const meta = user.user_metadata as any || {};
-          const metaName = meta.name || user.email?.split('@')[0] || 'Believer';
-          const metaUsername = meta.username || user.email?.split('@')[0] || 'believer';
-          restoreRemoteUserData(user.id, meta);
-
-          setState(prev => ({
-            ...prev,
-            userProfile: {
-              name: metaName,
-              firstName: meta.firstName,
-              lastName: meta.lastName,
-              username: metaUsername,
-              email: user.email || '',
-              joinedDate: new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-              preferredTranslation: meta.preferredTranslation || prev.userProfile?.preferredTranslation || 'ESV',
-              notificationsEnabled: prev.userProfile?.notificationsEnabled ?? true,
-              studyFocus: meta.studyFocus || prev.userProfile?.studyFocus,
-              dailyGoal: meta.dailyGoal || prev.userProfile?.dailyGoal,
-              knowledgeLevel: meta.knowledgeLevel || prev.userProfile?.knowledgeLevel,
-              redLetterEnabled: meta.redLetterEnabled ?? prev.userProfile?.redLetterEnabled ?? true,
-            },
-          }));
-        }
-      }).catch(err => {
-        console.warn('Supabase getSession notice:', err);
-      });
-
-      const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-        if (session?.user) {
-          const user = session.user;
-          if (activeAuthUserIdRef.current !== user.id) {
-            activeAuthUserIdRef.current = user.id;
-            isLoadedFromStorage.current = false;
-            hasEvaluatedStreakTodayRef.current = false;
-            setState(prev => ({
-              ...prev, userProfile: null,
-              favoritesFacts: [], favoritesScriptures: [], completedWOTDs: [],
-              readFactIds: [], bibleHighlights: {}, followedUserIds: [],
-              factsViewedCount: 0, sharesCount: 0,
-              streak: Math.max(prev.streak || 1, 1),
-              earnedAchievementIds: [],
-              lastLoginDate: prev.lastLoginDate || null,
-            }));
-              void SecureStoreAdapter.getItem(SECURE_STUDY_KEY(user.id))
-                .then(raw => {
-                  if (activeAuthUserIdRef.current !== user.id) return;
-                  if (raw) {
-                    const restored = JSON.parse(raw) as Partial<UserState> & { _authUserId?: string };
-                    if (restored._authUserId === user.id) {
-                      setState(prev => ({
-                        ...prev,
-                        favoritesFacts: Array.isArray(restored.favoritesFacts) ? restored.favoritesFacts : [],
-                        favoritesScriptures: Array.isArray(restored.favoritesScriptures) ? restored.favoritesScriptures : [],
-                        completedWOTDs: Array.isArray(restored.completedWOTDs) ? restored.completedWOTDs : [],
-                        readFactIds: Array.isArray(restored.readFactIds) ? restored.readFactIds : [],
-                        earnedAchievementIds: Array.isArray(restored.earnedAchievementIds) ? restored.earnedAchievementIds : [],
-                        bibleHighlights: restored.bibleHighlights && typeof restored.bibleHighlights === 'object'
-                          ? restored.bibleHighlights : {},
-                        streak: Math.max(prev.streak || 1, typeof restored.streak === 'number' ? restored.streak : 1),
-                        lastLoginDate: getLatestDateString(prev.lastLoginDate, restored.lastLoginDate) || prev.lastLoginDate || null,
-                      }));
-                    }
-                  }
-                  isLoadedFromStorage.current = true;
-                })
-                .catch(() => {
-                // Never overwrite a previous encrypted snapshot after a
-                // secure-store read failure; future writes stay suspended.
-                console.warn('[UserContext] Unable to restore secure account cache.');
-              });
-          }
-          const meta = user.user_metadata as any || {};
-          const metaName = meta.name || user.email?.split('@')[0] || 'Believer';
-          const metaUsername = meta.username || user.email?.split('@')[0] || 'believer';
-          restoreRemoteUserData(user.id, meta);
-
-          setState(prev => ({
-            ...prev,
-            userProfile: {
-              name: metaName,
-              firstName: meta.firstName,
-              lastName: meta.lastName,
-              username: metaUsername,
-              email: user.email || '',
-              joinedDate: new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-              preferredTranslation: meta.preferredTranslation || prev.userProfile?.preferredTranslation || 'ESV',
-              notificationsEnabled: prev.userProfile?.notificationsEnabled ?? true,
-              studyFocus: meta.studyFocus || prev.userProfile?.studyFocus,
-              dailyGoal: meta.dailyGoal || prev.userProfile?.dailyGoal,
-              knowledgeLevel: meta.knowledgeLevel || prev.userProfile?.knowledgeLevel,
-              fontSize: meta.fontSize || prev.userProfile?.fontSize || 16,
-              fontType: meta.fontType || prev.userProfile?.fontType || 'serif',
-              redLetterEnabled: meta.redLetterEnabled ?? prev.userProfile?.redLetterEnabled ?? true,
-              followersCount: 0,
-              followingCount: prev.followedUserIds?.length || 0,
-            },
-          }));
-        } else if (_event === 'SIGNED_OUT') {
-          activeAuthUserIdRef.current = null;
-          setState(prev => ({
-            ...prev, userProfile: null, favoritesFacts: [], favoritesScriptures: [],
-            completedWOTDs: [], readFactIds: [], bibleHighlights: {},
-            followedUserIds: [], factsViewedCount: 0, sharesCount: 0,
-            earnedAchievementIds: [], streak: 1, lastLoginDate: null,
-          }));
-        }
-      });
-
-      return () => {
-        authListener?.subscription.unsubscribe();
-      };
-    }
-  }, []);
+    setIsLoadingApp(true);
+    void readLocalSessionUser().then(user => {
+      if (!sawAuthEvent) return restore(user);
+    }).catch(() => {
+      if (active && !sawAuthEvent) { setStartupError(true); setIsLoadingApp(false); }
+    });
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      // Initial/token events with no session can be transient during offline
+      // refresh. Only explicit SIGNED_OUT closes local access.
+      if (event === 'SIGNED_OUT') {
+        sawAuthEvent = true;
+        ++hydrationEpoch.current;
+        activeAuthUserIdRef.current = null;
+        isLoadedFromStorage.current = false;
+        resetState(); setStartupError(false); setIsLoadingApp(false);
+      } else if (session?.user && session.user.id !== activeAuthUserIdRef.current) {
+        sawAuthEvent = true;
+        const user = session.user;
+        const scheduledEpoch = ++hydrationEpoch.current;
+        setTimeout(() => { if (active && hydrationEpoch.current === scheduledEpoch) void restore(user); }, 0);
+      }
+      // USER_UPDATED/TOKEN_REFRESHED for the same user must not rehydrate,
+      // rewrite today's date, or start another updateUser feedback loop.
+    });
+    return () => { active = false; ++hydrationEpoch.current; listener.subscription.unsubscribe(); };
+  }, [startupAttempt]);
 
   // Realtime Supabase Channel for instantaneous streak & unfolded sync
   useEffect(() => {
@@ -725,17 +563,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 const newStreak = payload.new.streak;
                 const newUnfolded = payload.new.facts_viewed_count;
                 const newLastLogin = payload.new.last_login_date;
-                // Pure state synchronization from remote database - NEVER re-evaluate or re-increment!
+                // Reconcile dated snapshots; repeated same-day events never increment twice.
                 setState(prev => {
-                  let resolvedStreak = prev.streak;
-                  if (typeof newStreak === 'number' && newStreak > 0) {
-                    resolvedStreak = Math.max(prev.streak, newStreak);
-                  }
-                  const todayStr = getLocalDateString();
-                  const healed = healHistoricalDay7Clamp(resolvedStreak, todayStr);
-                  resolvedStreak = healed.healedStreak;
-
-                  const resolvedLastLogin = getLatestDateString(prev.lastLoginDate, newLastLogin) || prev.lastLoginDate;
+                  if (activeAuthUserIdRef.current !== session.user.id || !isLoadedFromStorage.current) return prev;
+                  const { finalStreak: resolvedStreak, finalLastLogin: resolvedLastLogin } = reconcileOfflineOnlineStreak({
+                    localStreak: prev.streak, localLastLogin: prev.lastLoginDate,
+                    remoteStreak: newStreak, remoteLastLogin: newLastLogin,
+                  });
                   return {
                     ...prev,
                     streak: resolvedStreak,
@@ -765,19 +599,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setState(prev => {
           const lastLoginYmd = normalizeDateStringToLocalYMD(prev.lastLoginDate);
 
-          // Check if streak needs dynamic healing (e.g. Day 9 -> Day 10 on Oct 4)
-          const healed = healHistoricalDay7Clamp(prev.streak, todayStr);
-          if (healed.wasHealed && healed.healedStreak > prev.streak) {
-            syncUserDataToRemote({ streak: healed.healedStreak, lastLoginDate: todayStr });
-            AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(healed.healedStreak)).catch(() => {});
-            AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(healed.healedStreak)).catch(() => {});
-            AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, todayStr).catch(() => {});
-            return {
-              ...prev,
-              streak: healed.healedStreak,
-              lastLoginDate: todayStr,
-            };
-          }
+          if (!isLoadedFromStorage.current || !activeAuthUserIdRef.current) return prev;
 
           // If already checked today and not lagging, do nothing!
           if (lastLoginYmd === todayStr) return prev;
@@ -786,7 +608,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const evalResult = evaluateDailyStreak(prev.lastLoginDate, prev.streak);
           if (!evalResult.shouldUpdate) return prev;
 
-          const updatedStreak = Math.max(evalResult.newStreak, healHistoricalDay7Clamp(evalResult.newStreak, todayStr).healedStreak);
+          const updatedStreak = evalResult.newStreak;
           syncUserDataToRemote({ streak: updatedStreak, lastLoginDate: todayStr });
           AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(updatedStreak)).catch(() => {});
           AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(updatedStreak)).catch(() => {});
@@ -813,18 +635,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!expectedUser) return;
     const saveData = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        // Never persist transient logged-out data or the previous account's
-        // state under a newly authenticated account's secure-storage key.
-        if (!session?.user || session.user.id !== expectedUser ||
-            activeAuthUserIdRef.current !== expectedUser ||
-            state.userProfile?.email?.toLowerCase() !== session.user.email?.toLowerCase()) return;
-        await AsyncStorage.setItem(LOCAL_OWNER_KEY, session.user.id);
-        await SecureStoreAdapter.setItem(SECURE_STUDY_KEY(session.user.id), JSON.stringify({
-          ...state,
-          _authUserId: session.user.id,
-          userProfile: state.userProfile ? { ...state.userProfile, email: session.user.email || '' } : null,
+        // Persist locally without waiting for a network-dependent token refresh.
+        if (activeAuthUserIdRef.current !== expectedUser) return;
+        await SecureStoreAdapter.setItem(SECURE_STUDY_KEY(expectedUser), JSON.stringify({
+          ...state, _authUserId: expectedUser,
         }));
+        if (activeAuthUserIdRef.current !== expectedUser) return;
+        await AsyncStorage.setItem(LOCAL_OWNER_KEY, expectedUser);
         await AsyncStorage.removeItem(STORAGE_KEY);
         if (typeof state.streak === 'number' && state.streak > 0) {
           await AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(state.streak));
@@ -840,27 +657,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     saveData();
   }, [state]);
 
-  const checkStreak = (lastLogin: string | null, currentStreak: number) => {
-    const todayStr = getLocalDateString();
-    const healed = healHistoricalDay7Clamp(currentStreak, todayStr);
-    const resolvedStreak = healed.healedStreak;
-    const lastLoginYmd = normalizeDateStringToLocalYMD(lastLogin);
-    if (lastLoginYmd === todayStr && !healed.wasHealed) return;
-
-    const evaluation = evaluateDailyStreak(lastLogin, resolvedStreak);
-    const finalStreak = Math.max(resolvedStreak, evaluation.newStreak);
-
-    setState(prev => ({ ...prev, streak: finalStreak, lastLoginDate: todayStr }));
-    syncUserDataToRemote({ streak: finalStreak, lastLoginDate: todayStr });
-    AsyncStorage.setItem(PERMANENT_STREAK_KEY, String(finalStreak)).catch(() => {});
-    AsyncStorage.setItem(PERMANENT_BACKUP_KEY, String(finalStreak)).catch(() => {});
-    AsyncStorage.setItem(PERMANENT_LAST_LOGIN_KEY, todayStr).catch(() => {});
-  };
-
   const login = async (emailOrName: string, password?: string, name?: string) => {
     const rawInput = emailOrName.trim();
-    const displayName = name || (rawInput.includes('@') ? rawInput.split('@')[0] : rawInput);
-    const formattedName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
 
     if (SUPABASE_ANON_KEY && password) {
       try {
@@ -893,38 +691,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return;
         }
 
-        if (data.user) {
-          const meta = (data.user.user_metadata as any) || {};
-          const metaName = meta.name || formattedName;
-          const metaUsername = meta.username || targetEmail.split('@')[0].toLowerCase().replace(/\s+/g, '_');
+        if (data.user && data.session) return;
 
-          // Await full remote user data restoration before rendering state
-          await restoreRemoteUserData(data.user.id, meta);
-
-          setState(prev => ({
-            ...prev,
-            userProfile: {
-              name: metaName,
-              firstName: meta.firstName || formattedName.split(' ')[0],
-              lastName: meta.lastName || formattedName.split(' ').slice(1).join(' '),
-              username: metaUsername,
-              avatarUrl: meta.avatarUrl || prev.userProfile?.avatarUrl,
-              email: data.user!.email || targetEmail,
-              joinedDate: new Date(data.user!.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-              preferredTranslation: meta.preferredTranslation || prev.userProfile?.preferredTranslation || 'ESV',
-              notificationsEnabled: prev.userProfile?.notificationsEnabled ?? true,
-              studyFocus: meta.studyFocus || prev.userProfile?.studyFocus,
-              dailyGoal: meta.dailyGoal || prev.userProfile?.dailyGoal,
-              knowledgeLevel: meta.knowledgeLevel || prev.userProfile?.knowledgeLevel,
-              fontSize: meta.fontSize || prev.userProfile?.fontSize || 16,
-              fontType: meta.fontType || prev.userProfile?.fontType || 'serif',
-              redLetterEnabled: meta.redLetterEnabled ?? prev.userProfile?.redLetterEnabled ?? true,
-              followersCount: 0,
-              followingCount: prev.followedUserIds?.length || 0,
-            },
-          }));
-          return;
-        }
       } catch (err: any) {
         console.warn('Supabase auth network notice:', err);
         showAlert({
@@ -1091,25 +859,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
               icon: 'success',
             });
           }
-          if (data.session) setState(prev => ({
-            ...prev,
-            userProfile: {
-              name: fullName,
-              firstName: firstName.trim(),
-              lastName: lastName.trim(),
-              username: cleanUsername,
-              email,
-              countryCode,
-              phoneNumber,
-              joinedDate: new Date(data.user!.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-              preferredTranslation,
-              notificationsEnabled: true,
-              redLetterEnabled: true,
-              studyFocus,
-              dailyGoal,
-              knowledgeLevel,
-            },
-          }));
           return { success: true };
         }
       } catch (err: any) {
@@ -1173,14 +922,16 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = async () => {
+    ++hydrationEpoch.current;
     activeAuthUserIdRef.current = null;
     if (SUPABASE_ANON_KEY) {
       try {
-        await supabase.auth.signOut();
+        await supabase.auth.signOut({ scope: 'local' });
       } catch (err) {
         console.warn('Supabase sign out notice:', err);
       }
     }
+    await SecureStoreAdapter.removeItem(AUTH_STORAGE_KEY);
     // Never leave the next account inside the previous account's cached state.
     isLoadedFromStorage.current = false;
     // Keep the encrypted owner-scoped cache (and pending offline queue) for
@@ -1194,9 +945,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ...prev, userProfile: null, favoritesFacts: [], favoritesScriptures: [],
       completedWOTDs: [], readFactIds: [], bibleHighlights: {},
       followedUserIds: [], sharesCount: 0, factsViewedCount: 0,
-      earnedAchievementIds: [],
+      earnedAchievementIds: [], streak: 1, lastLoginDate: null,
     }));
-    isLoadedFromStorage.current = true;
+    isLoadedFromStorage.current = false;
   };
 
   const toggleFavoriteFact = (fact: Fact) => {
@@ -1737,6 +1488,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <UserContext.Provider value={{
       ...state,
+      isLoadingApp, startupError, retryStartup,
       hideTabBar,
       setHideTabBar,
       accent,

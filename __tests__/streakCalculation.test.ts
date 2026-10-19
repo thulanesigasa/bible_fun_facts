@@ -258,3 +258,22 @@ describe('Study Streak Engine & Offline-Online Reconciliation', () => {
     });
   });
 });
+
+describe('Restarted streak persistence', () => {
+  it('resets Day 19 after a missed day and advances 1 -> 2 -> 3 across cold launches', () => {
+    let count = 19; let date = '2026-10-14';
+    for (const [today, expected] of [['2026-10-16', 1], ['2026-10-16', 1], ['2026-10-17', 2], ['2026-10-18', 3]] as const) {
+      const result = reconcileOfflineOnlineStreak({ localStreak: count, localLastLogin: date,
+        remoteStreak: 19, remoteLastLogin: '2026-10-14', todayStr: today });
+      expect(result.finalStreak).toBe(expected);
+      count = result.finalStreak; date = result.finalLastLogin;
+    }
+  });
+  it('uses a newer cloud restart instead of an older high local count', () => {
+    expect(reconcileOfflineOnlineStreak({ localStreak: 19, localLastLogin: '2026-10-14',
+      remoteStreak: 1, remoteLastLogin: '2026-10-16', todayStr: '2026-10-17' }).finalStreak).toBe(2);
+  });
+  it('never jumps a new four-day streak to the application launch age', () => {
+    expect(healHistoricalDay7Clamp(4, '2026-10-19')).toEqual({ healedStreak: 4, wasHealed: false });
+  });
+});
